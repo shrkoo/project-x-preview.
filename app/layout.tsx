@@ -2,15 +2,15 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Project X — تجربه‌های گروهی",
-  description: "یک تجربه متفاوت برای بازی و ساختن لحظه‌های مشترک با دوستان.",
+  title: "Project X — فضای بازی و دورهمی",
+  description: "یک پلتفرم برای بازی، دوستان و ساختن لحظه‌های مشترک.",
   applicationName: "Project X",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f7f7f4",
+  themeColor: "#0c0d12",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
