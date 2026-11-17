@@ -130,7 +130,7 @@ export default {
     const id=env.ROOM_HUB.idFromName(wsMatch[1]);
     return env.ROOM_HUB.get(id).fetch(new Request(request,{headers:new Headers({...Object.fromEntries(request.headers), "X-PX-USER":record.user_id,"X-PX-NAME":profile.display_name,"X-PX-ROOM":wsMatch[1]})}));
    }
-   const user = await authenticate(request,db);   const user = await authenticate(request,db);
+   const user = await authenticate(request,db);
    if (path.startsWith("/auth/") && path !== "/auth/register" && path !== "/auth/login") {
     if (!user) return fail("برای ادامه وارد حساب شو.",401);
     if (path === "/auth/me" && request.method === "GET") return json({user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played}});
