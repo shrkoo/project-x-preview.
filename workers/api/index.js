@@ -195,7 +195,7 @@ export default {
     }
    }
    if (path === "/rooms" && request.method === "GET") {
-    const rows=await db.prepare("SELECT r.id,r.code,r.name,r.game_title AS gameTitle,r.status,r.max_players AS maxPlayers,r.created_at AS createdAt,u.display_name AS ownerName,(SELECT COUNT(*) FROM room_members m WHERE m.room_id=r.id) AS playerCount FROM rooms r JOIN users u ON u.id=r.owner_id WHERE r.status='waiting' ORDER BY r.created_at DESC LIMIT 40").all();
+    const rows=await db.prepare("SELECT r.id,r.code,r.name,r.game_title AS gameTitle,r.status,r.max_players AS maxPlayers,r.created_at AS createdAt,u.display_name AS ownerName,(SELECT COUNT(*) FROM room_members m WHERE m.room_id=r.id) AS playerCount FROM rooms r JOIN users u ON u.id=r.owner_id WHERE r.status IN ('waiting','playing') ORDER BY r.created_at DESC LIMIT 40").all();
     return json({rooms:rows.results||[]});
    }
    if (path === "/rooms" && request.method === "POST") {
@@ -206,7 +206,7 @@ export default {
       db.prepare("INSERT INTO rooms (id,code,name,game_title,owner_id) VALUES (?,?,?,?,?)").bind(id,code,name,game,user.id),
       db.prepare("INSERT INTO room_members (room_id,user_id,role) VALUES (?,?,?)").bind(id,user.id,"owner")
     ]);
-    return json({room:{id,code,name,gameTitle:game,status:"waiting",playerCount:1,ownerName:user.display_name}},201);
+    return json({room:{id,code,name,gameTitle:game,status:"waiting",playerCount:1,ownerName:user.display_name,ownerId:user.id}},201);
    }
    const joinMatch=path.match(/^\/rooms\/([A-Z0-9]+)\/join$/);
    if(joinMatch && request.method==="POST") {
@@ -216,7 +216,7 @@ export default {
     const already=await db.prepare("SELECT 1 AS yes FROM room_members WHERE room_id=? AND user_id=?").bind(room.id,user.id).first();
     if(!already && count.n>=room.max_players) return fail("ظرفیت اتاق تکمیل است.",409);
     await db.prepare("INSERT OR IGNORE INTO room_members (room_id,user_id) VALUES (?,?)").bind(room.id,user.id).run();
-    return json({ok:true,room:{id:room.id,code:room.code,name:room.name,gameTitle:room.game_title}});
+    return json({ok:true,room:{id:room.id,code:room.code,name:room.name,gameTitle:room.game_title,ownerId:room.owner_id}});
    }
    const messageMatch=path.match(/^\/rooms\/([A-Z0-9]+)\/messages$/);
    if(messageMatch) {
@@ -336,6 +336,12 @@ export class RoomHub extends DurableObject {
     this.env = env;
   }
   async fetch(request) {
+    if(request.method==="POST" && new URL(request.url).pathname==="/broadcast") {
+      const event=await request.json();
+      const payload=JSON.stringify(event);
+      for(const socket of this.ctx.getWebSockets()){try{socket.send(payload);}catch{}}
+      return Response.json({ok:true});
+    }
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") return new Response("WebSocket upgrade required",{status:426});
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
