@@ -44,7 +44,7 @@ async function authenticate(request, db) {
   const token = request.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
   if (!token || token.length < 30) return null;
   const tokenHash = await digest(token);
-  return await db.prepare("SELECT u.id,u.email,u.display_name,u.xp,u.games_played FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
+  return await db.prepare("SELECT u.id,u.email,u.display_name,u.xp,u.games_played,u.role FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
 }
 function cleanName(value) { return String(value || "").trim().replace(/[<>]/g, "").slice(0, 32); }
 function cleanEmail(value) { return String(value || "").trim().toLowerCase().slice(0, 254); }
@@ -66,10 +66,17 @@ export default {
     if (password.length < 10) return fail("رمز عبور باید حداقل ۱۰ کاراکتر باشد.");
     if (password.length > 128) return fail("رمز عبور بیش از حد طولانی است.");
     const id = crypto.randomUUID(), salt = randomToken(16), hash = await passwordHash(password,salt);
-    try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt) VALUES (?,?,?,?,?)").bind(id,email,displayName,hash,salt).run(); }
+    try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role) VALUES (?,?,?,?,?,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user").run(); }
     catch { return fail("این ایمیل قبلاً ثبت شده یا امکان ساخت حساب وجود ندارد.",409); }
+    let verificationSent=false;
+    if(env.RESEND_API_KEY && env.EMAIL_FROM) {
+      const token=await issueEmailToken(db,id,"verify",24*60*60*1000);
+      const link=`${env.APP_URL || "https://shrkoo.github.io/project-x-preview."}/?verify=${encodeURIComponent(token)}`;
+      await sendMail(env,email,"تأیید ایمیل Project X",`<div dir="rtl" style="font-family:Arial"><h2>به Project X خوش آمدی</h2><p>برای فعال‌سازی حساب روی لینک زیر بزن:</p><a href="${link}">تأیید ایمیل</a><p>این لینک تا ۲۴ ساعت معتبر است.</p></div>`);
+      verificationSent=true;
+    }
     const session = await createSession(db,id);
-    return json({ token:session.token, expiresAt:session.expiresAt, user:{id,email,displayName,xp:0,gamesPlayed:0}, emailVerificationRequired:true, message:"حساب ساخته شد؛ تأیید ایمیل هنوز به سرویس ارسال ایمیل متصل نشده است." },201);
+    return json({ token:session.token, expiresAt:session.expiresAt, user:{id,email,displayName,xp:0,gamesPlayed:0,role:email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user"}, emailVerificationRequired:env.REQUIRE_EMAIL_VERIFICATION==="true", verificationSent, message:verificationSent?"لینک تأیید ارسال شد.":"حساب ساخته شد؛ تنظیمات ارسال ایمیل هنوز لازم است." },201);
    }
 
    if (path === "/auth/verify-email" && request.method === "POST") {
@@ -112,10 +119,11 @@ export default {
     const body = await readBody(request), email = cleanEmail(body?.email), password = String(body?.password || "");
     const user = await db.prepare("SELECT * FROM users WHERE email=?").bind(email).first();
     if (!user) return fail("ایمیل یا رمز عبور اشتباه است.",401);
+    if(env.REQUIRE_EMAIL_VERIFICATION==="true" && !user.verified_at) return fail("ابتدا ایمیل خود را تأیید کن.",403);
     const candidate = await passwordHash(password,user.password_salt);
     if (candidate !== user.password_hash) return fail("ایمیل یا رمز عبور اشتباه است.",401);
     const session = await createSession(db,user.id);
-    return json({ token:session.token, expiresAt:session.expiresAt, user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played} });
+    return json({ token:session.token, expiresAt:session.expiresAt, user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role} });
    }
 
    const wsMatch=path.match(/^\/rooms\/([A-Z0-9]+)\/live$/);
@@ -133,7 +141,7 @@ export default {
    const user = await authenticate(request,db);
    if (path.startsWith("/auth/") && path !== "/auth/register" && path !== "/auth/login") {
     if (!user) return fail("برای ادامه وارد حساب شو.",401);
-    if (path === "/auth/me" && request.method === "GET") return json({user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played}});
+    if (path === "/auth/me" && request.method === "GET") return json({user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role}});
     if (path === "/auth/profile" && request.method === "PATCH") {
       const body=await readBody(request), name=cleanName(body?.name);
       if(name.length<2) return fail("نام نمایشی معتبر نیست.");
