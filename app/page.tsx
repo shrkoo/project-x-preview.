@@ -96,7 +96,7 @@ export default function Home() {
     if(!account){setAuth("login");notify("برای ساخت اتاق ابتدا وارد حساب شو.");return;}
     try{
       const data=await apiRequest<{room:any}>("/rooms",{method:"POST",body:JSON.stringify({name:cleanName,gameTitle:selected?.title||""})});
-      const room:Room={id:data.room.id,code:data.room.code,name:data.room.name,game:data.room.gameTitle||"",ownerId:data.room.ownerId,createdAt:new Date().toISOString(),ownerId:data.room.ownerId};
+      const room:Room={id:data.room.id,code:data.room.code,name:data.room.name,game:data.room.gameTitle||"",createdAt:new Date().toISOString(),ownerId:data.room.ownerId};
       setRooms(current=>[room,...current].slice(0,20));setActiveRoom(room);setRoomName("");setSelected(null);
       notify("اتاق روی سرور ساخته شد؛ کد دعوت آماده است.");
     }catch(error){notify(error instanceof Error?error.message:"ساخت اتاق ناموفق بود.");}
