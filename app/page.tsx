@@ -113,7 +113,7 @@ export default function Home() {
     if(auth==="signup"&&!name.trim()){notify("نام نمایشی را وارد کن.");return;}
     try{
       const endpoint=auth==="signup"?"/auth/register":"/auth/login";
-      const data=await apiRequest<{token:string;user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number;role?:string};emailVerificationRequired?:boolean}>(endpoint,{method:"POST",body:JSON.stringify({email:cleanEmail,password,...(auth==="signup"?{name:name.trim()}:{})})});
+      const data=await apiRequest<{token:string;user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number;role?:string};emailVerificationRequired?:boolean;verificationSent?:boolean}>(endpoint,{method:"POST",body:JSON.stringify({email:cleanEmail,password,...(auth==="signup"?{name:name.trim()}:{})})});
       setSession(data.token);
       const next={id:data.user.id,name:data.user.displayName,email:data.user.email,xp:data.user.xp,gamesPlayed:data.user.gamesPlayed,role:data.user.role};
       setAccount(next);setName(next.name);setEmail(next.email);setXp(next.xp||0);setGamesPlayed(next.gamesPlayed||0);setAuth(null);setPassword("");
