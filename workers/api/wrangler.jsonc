@@ -7,10 +7,39 @@
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,
-    "logs": { "enabled": true, "invocation_logs": true, "persist": true },
-    "traces": { "enabled": true, "persist": true, "head_sampling_rate": 0.1 }
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true,
+      "persist": true
+    },
+    "traces": {
+      "enabled": true,
+      "persist": true,
+      "head_sampling_rate": 0.1
+    }
   },
   "d1_databases": [
-    { "binding": "DB", "database_name": "project-x-main", "database_id": "5a8c8d60-10ab-4bb3-888e-f5cd228d3e1a", "migrations_dir": "migrations" }
+    {
+      "binding": "DB",
+      "database_name": "project-x-main",
+      "database_id": "5a8c8d60-10ab-4bb3-888e-f5cd228d3e1a",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "ROOM_HUB",
+        "class_name": "RoomHub"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "RoomHub"
+      ]
+    }
   ]
 }
