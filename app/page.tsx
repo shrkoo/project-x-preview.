@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { apiRequest, clearSession, setSession } from "./lib/api";
 
 type Tab = "home" | "games" | "friends" | "profile" | "leaderboard" | "rewards" | "premium" | "settings" | "admin";
@@ -49,6 +49,7 @@ export default function Home() {
   const [notifications,setNotifications]=useState<Array<{id:string;title:string;body:string;readAt:string|null;createdAt:string}>>([]);
   const [roomMessages, setRoomMessages] = useState<Array<{id:string;body:string;sender:string;createdAt:string}>>([]);
   const [messageDraft, setMessageDraft] = useState("");
+  const roomSocket=useRef<WebSocket|null>(null);
   const [joinCode, setJoinCode] = useState("");
 
   useEffect(() => {
@@ -80,12 +81,12 @@ export default function Home() {
     const load=()=>apiRequest<{messages:Array<{id:string;body:string;sender:string;createdAt:string}>}>(`/rooms/${activeRoom.code}/messages`).then(d=>{if(alive)setRoomMessages(d.messages);}).catch(()=>{});
     apiRequest<{ticket:string}>("/auth/ws-ticket",{method:"POST"}).then(({ticket})=>{
       if(!alive)return;
-      socket=new WebSocket(`wss://project-x-api.shahramalidazeh6203.workers.dev/rooms/${activeRoom.code}/live?ticket=${encodeURIComponent(ticket)}`);
+      socket=new WebSocket(`wss://project-x-api.shahramalidazeh6203.workers.dev/rooms/${activeRoom.code}/live?ticket=${encodeURIComponent(ticket)}`);roomSocket.current=socket;
       socket.onmessage=event=>{try{const data=JSON.parse(event.data);if(data.type==="message")setRoomMessages(current=>current.some(m=>m.id===data.message.id)?current:[...current,data.message]);}catch{}};
       socket.onerror=()=>{if(alive&&!poll){load();poll=window.setInterval(load,5000);}};
       socket.onclose=()=>{if(alive&&!poll){load();poll=window.setInterval(load,5000);}};
     }).catch(()=>{load();poll=window.setInterval(load,5000);});
-    return ()=>{alive=false;if(poll)window.clearInterval(poll);socket?.close();};
+    return ()=>{alive=false;if(poll)window.clearInterval(poll);roomSocket.current=null;socket?.close();};
   }, [activeRoom?.code,account]);
 
   function notify(message: string) { setNotice(message); }
@@ -112,7 +113,7 @@ export default function Home() {
     if(auth==="signup"&&!name.trim()){notify("نام نمایشی را وارد کن.");return;}
     try{
       const endpoint=auth==="signup"?"/auth/register":"/auth/login";
-      const data=await apiRequest<{token:string;user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number};emailVerificationRequired?:boolean}>(endpoint,{method:"POST",body:JSON.stringify({email:cleanEmail,password,...(auth==="signup"?{name:name.trim()}:{})})});
+      const data=await apiRequest<{token:string;user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number;role?:string};emailVerificationRequired?:boolean}>(endpoint,{method:"POST",body:JSON.stringify({email:cleanEmail,password,...(auth==="signup"?{name:name.trim()}:{})})});
       setSession(data.token);
       const next={id:data.user.id,name:data.user.displayName,email:data.user.email,xp:data.user.xp,gamesPlayed:data.user.gamesPlayed,role:data.user.role};
       setAccount(next);setName(next.name);setEmail(next.email);setXp(next.xp||0);setGamesPlayed(next.gamesPlayed||0);setAuth(null);setPassword("");
@@ -143,6 +144,7 @@ export default function Home() {
   }
   async function sendRoomMessage() {
     const body=messageDraft.trim(); if(!body||!activeRoom?.code)return;
+    if(roomSocket.current?.readyState===WebSocket.OPEN){roomSocket.current.send(JSON.stringify({body}));setMessageDraft("");return;}
     try{const data=await apiRequest<{message:{id:string;body:string;sender:string;createdAt:string}}>(`/rooms/${activeRoom.code}/messages`,{method:"POST",body:JSON.stringify({body})});setRoomMessages(current=>[...current,data.message]);setMessageDraft("");}
     catch(error){notify(error instanceof Error?error.message:"ارسال پیام ناموفق بود.");}
   }
