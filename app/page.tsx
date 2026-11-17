@@ -118,7 +118,7 @@ export default function Home() {
       const next={id:data.user.id,name:data.user.displayName,email:data.user.email,xp:data.user.xp,gamesPlayed:data.user.gamesPlayed,role:data.user.role};
       setAccount(next);setName(next.name);setEmail(next.email);setXp(next.xp||0);setGamesPlayed(next.gamesPlayed||0);setAuth(null);setPassword("");
       const roomsData=await apiRequest<{rooms:Array<any>}>("/rooms");setRooms(roomsData.rooms.map(r=>({id:r.id,code:r.code,name:r.name,game:r.gameTitle||"",createdAt:r.createdAt})));
-      notify(data.emailVerificationRequired?"حساب آنلاین ساخته شد؛ تأیید ایمیل هنوز فعال نشده است.":auth==="signup"?"حساب آنلاین ساخته شد.":"با موفقیت وارد شدی.");
+      notify(auth==="signup"?(data.verificationSent?"حساب ساخته شد؛ لینک تأیید ایمیل را بررسی کن.":"حساب ساخته شد؛ ارسال ایمیل هنوز به سرویس ایمیل نیاز دارد."):"با موفقیت وارد شدی.");
     }catch(error){notify(error instanceof Error?error.message:"ورود یا ثبت‌نام ناموفق بود.");}
   }
   async function logout() {
