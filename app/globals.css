@@ -622,3 +622,28 @@ button:focus-visible,input:focus-visible{outline:2px solid #8fc1ff;outline-offse
 @media(prefers-reduced-motion:reduce){
  *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
+
+
+/* Project X accessible light theme */
+.app-shell.theme-light{background:#f3f6fa;color:#172235;color-scheme:light}
+.theme-light .side-rail{background:#fff;border-color:#dce4ee;box-shadow:8px 0 28px #1722350b}
+.theme-light .brand,.theme-light .welcome-row h1,.theme-light .page-heading h1,.theme-light .section-title h2{color:#172235}
+.theme-light .rail-link{color:#58677b}
+.theme-light .rail-link.active,.theme-light .rail-link:hover{background:#eaf2fc;color:#16375c;box-shadow:inset -2px 0 #4c88ce}
+.theme-light .topbar{background:#ffffffed;border-color:#dce4ee}
+.theme-light .breadcrumb,.theme-light .welcome-row p,.theme-light .page-heading p{color:#65758a}
+.theme-light .feature-pill,.theme-light .game-card,.theme-light .panel-card,.theme-light .profile-card,.theme-light .reward-card,.theme-light .premium-card,.theme-light .settings-card{background:#fff;border-color:#dce4ee;box-shadow:0 8px 24px #1722350b}
+.theme-light .feature-pill strong,.theme-light .game-info strong,.theme-light .invite-panel h3,.theme-light .setting-row strong,.theme-light .reward-card strong,.theme-light .premium-card h2{color:#172235}
+.theme-light .feature-pill small,.theme-light .game-info small,.theme-light .game-meta,.theme-light .setting-row small,.theme-light .reward-card small,.theme-light .premium-card p,.theme-light .premium-card li{color:#68788d}
+.theme-light .game-meta,.theme-light .setting-row,.theme-light .leader-row{border-color:#e4eaf1}
+.theme-light .leader-row{color:#172235}
+.theme-light .empty-state{background:#fff;border-color:#cbd7e5}
+.theme-light .empty-state h2{color:#172235}
+.theme-light .empty-state p{color:#68788d}
+.theme-light .toggle-switch,.theme-light .theme-choice{background:#f0f4f8;color:#53647a;border-color:#d5dfeb}
+.theme-light .toggle-switch.on,.theme-light .theme-choice.active{background:#e1efff;color:#1d568e;border-color:#8bb8e8}
+.theme-light .mobile-nav{background:#fffffffa;border-color:#dce4ee}
+.theme-light .mobile-nav button{color:#738198}
+.theme-light .mobile-nav button.chosen{color:#2d72b9}
+.theme-light .rail-bottom{border-color:#dce4ee}
+.theme-light .rail-bottom small{color:#68788d}
