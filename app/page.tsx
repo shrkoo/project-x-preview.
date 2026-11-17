@@ -1,179 +1,75 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
-type Mode = "quick" | "friends" | "trivia";
-type Stage = "home" | "room" | "play" | "result";
-type Player = { id: number; name: string; score: number };
+type Tab = "home" | "games" | "friends" | "profile";
+type Game = { title: string; category: string; players: string; time: string; tone: string; symbol: string };
 
-const modes: { id: Mode; number: string; title: string; description: string; duration: string }[] = [
-  { id: "quick", number: "01", title: "چالش‌های سریع", description: "انتخاب‌های غیرمنتظره و لحظه‌های بامزه", duration: "۳ دقیقه" },
-  { id: "friends", number: "02", title: "چقدر همدیگر را می‌شناسید؟", description: "حدس بزنید دوستانتان چه جوابی می‌دهند", duration: "۵ دقیقه" },
-  { id: "trivia", number: "03", title: "دانستنی‌ها", description: "دانشتان را در یک رقابت دوستانه بسنجید", duration: "۴ دقیقه" },
+const games: Game[] = [
+  { title: "حقیقت یا چالش", category: "جمع‌های دوستانه", players: "۲ تا ۱۲ نفر", time: "۱۰ دقیقه", tone: "violet", symbol: "✳" },
+  { title: "چقدر منو می‌شناسی؟", category: "شناخت دوستان", players: "۲ تا ۸ نفر", time: "۵ دقیقه", tone: "orange", symbol: "♡" },
+  { title: "نبرد اطلاعات", category: "دانستنی‌ها", players: "۲ تا ۱۰ نفر", time: "۸ دقیقه", tone: "blue", symbol: "✦" },
+  { title: "انتخاب غیرممکن", category: "چالش سریع", players: "۲ تا ۱۲ نفر", time: "۳ دقیقه", tone: "green", symbol: "⇄" },
 ];
 
-const rounds: Record<Mode, { question: string; answers: string[]; correct: number }[]> = {
-  quick: [
-    { question: "اگر همین حالا می‌توانستی هر جایی باشی، کجا را انتخاب می‌کردی؟", answers: ["یک کافه دنج در شهر", "کنار دریا، دور از شلوغی", "وسط یک ماجراجویی تازه", "خانه، با آدم‌های موردعلاقه‌ام"], correct: 2 },
-    { question: "برای یک روز کاملاً آزاد، کدام را انتخاب می‌کنی؟", answers: ["کشف یک جای جدید", "فیلم و استراحت", "بازی با دوستان", "یاد گرفتن چیزی تازه"], correct: 2 },
-    { question: "کدام توانایی را انتخاب می‌کنی؟", answers: ["توقف زمان", "پرواز", "تله‌پورت", "صحبت با حیوانات"], correct: 2 },
-  ],
-  friends: [
-    { question: "بهترین ویژگی یک دوست از نظر تو چیست؟", answers: ["صداقت", "شوخ‌طبعی", "وفاداری", "ماجراجویی"], correct: 2 },
-    { question: "در سفر گروهی معمولاً چه نقشی داری؟", answers: ["برنامه‌ریز", "عکاس گروه", "ماجراجو", "مسئول خوراکی‌ها"], correct: 0 },
-    { question: "کدام هدیه بیشتر خوشحالت می‌کند؟", answers: ["یک کتاب خوب", "وسیله‌ای کاربردی", "تجربه‌ای تازه", "یک سورپرایز شخصی"], correct: 2 },
-  ],
-  trivia: [
-    { question: "کدام سیاره به سیاره سرخ معروف است؟", answers: ["زهره", "مریخ", "مشتری", "عطارد"], correct: 1 },
-    { question: "بزرگ‌ترین اقیانوس جهان کدام است؟", answers: ["اطلس", "هند", "آرام", "منجمد شمالی"], correct: 2 },
-    { question: "عدد پی تقریباً برابر با چیست؟", answers: ["۲٫۱۴", "۳٫۱۴", "۴٫۱۳", "۳٫۴۱"], correct: 1 },
-  ],
-};
-
 export default function Home() {
-  const [stage, setStage] = useState<Stage>("home");
-  const [mode, setMode] = useState<Mode>("quick");
-  const [host, setHost] = useState("");
-  const [roomName, setRoomName] = useState("دورهمی دوستان");
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [guest, setGuest] = useState("");
-  const [index, setIndex] = useState(0);
-  const [choice, setChoice] = useState<number | null>(null);
-  const [feedback, setFeedback] = useState("");
-  const [code, setCode] = useState("");
-  const [copied, setCopied] = useState(false);
-  const questionSet = rounds[mode];
-  const current = questionSet[index];
-  const ranking = useMemo(() => [...players].sort((a, b) => b.score - a.score), [players]);
+  const [tab, setTab] = useState<Tab>("home");
+  const [auth, setAuth] = useState<"login" | "signup" | null>(null);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [room, setRoom] = useState("");
+  const [notice, setNotice] = useState("");
+  const [selected, setSelected] = useState<Game | null>(null);
+
+  function submitAuth() {
+    setNotice("این فرم فعلاً نمایشی است؛ برای ساخت حساب واقعی باید سرویس احراز هویت متصل شود.");
+  }
 
   function createRoom() {
-    if (!host.trim()) { setFeedback("برای ساخت اتاق، یک نام نمایشی وارد کن."); return; }
-    setPlayers([{ id: 1, name: host.trim(), score: 0 }]);
-    setCode(Math.random().toString(36).slice(2, 7).toUpperCase());
-    setFeedback("");
-    setStage("room");
-  }
-
-  function addPlayer() {
-    const name = guest.trim();
-    if (!name) { setFeedback("نام بازیکن را وارد کن."); return; }
-    if (players.some((player) => player.name.toLowerCase() === name.toLowerCase())) { setFeedback("این نام قبلاً اضافه شده است."); return; }
-    setPlayers((old) => [...old, { id: Date.now(), name, score: 0 }]);
-    setGuest("");
-    setFeedback("بازیکن آزمایشی اضافه شد.");
-  }
-
-  function answer() {
-    if (choice === null) return;
-    const correct = mode !== "trivia" || choice === current.correct;
-    setPlayers((old) => old.map((player, i) => i === 0 ? { ...player, score: player.score + (correct ? 10 : 0) } : player));
-    setFeedback(mode === "trivia" ? (correct ? "پاسخ درست بود. ۱۰ امتیاز گرفتی." : "این بار نه؛ سؤال بعدی در راه است.") : "انتخابت ثبت شد. ۱۰ امتیاز مشارکت گرفتی.");
-  }
-
-  function next() {
-    if (index + 1 === questionSet.length) { setStage("result"); setFeedback(""); return; }
-    setIndex((n) => n + 1); setChoice(null); setFeedback("");
-  }
-
-  async function copyCode() {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setFeedback("کد اتاق کپی شد. دعوت چنددستگاهی هنوز در نسخه آزمایشی فعال نیست.");
-    } catch {
-      setFeedback("کد اتاق: " + code);
-    }
-  }
-
-  function reset() {
-    setStage("home"); setPlayers([]); setFeedback(""); setChoice(null); setIndex(0); setCopied(false);
+    if (!room.trim()) { setNotice("اول یک نام برای دورهمی انتخاب کن."); return; }
+    setNotice("اتاق نمایشی ساخته شد. اتصال دوستان از دستگاه‌های دیگر در نسخه بعدی فعال می‌شود.");
   }
 
   return (
-    <main className="site">
-      <header className="nav wrap">
-        <a className="wordmark" href="#" onClick={(e) => { e.preventDefault(); reset(); }}>
-          <span className="mark">x</span><span>project<span className="wordmark-light">x</span></span>
-        </a>
-        <div className="nav-center"><span className="nav-dot" /> تجربه‌های گروهی، در یک جا</div>
-        <span className="nav-status"><i /> پیش‌نمایش محصول</span>
-      </header>
+    <main className="app-shell" dir="rtl">
+      <aside className="side-rail">
+        <a className="brand" href="#" onClick={(e) => { e.preventDefault(); setTab("home"); }}><span className="brand-mark">x</span><span>project<span className="brand-x">x</span></span></a>
+        <div className="rail-label">فضای شما</div>
+        <button className={tab === "home" ? "rail-link active" : "rail-link"} onClick={() => setTab("home")}><span>⌂</span> خانه</button>
+        <button className={tab === "games" ? "rail-link active" : "rail-link"} onClick={() => setTab("games")}><span>▦</span> بازی‌ها</button>
+        <button className={tab === "friends" ? "rail-link active" : "rail-link"} onClick={() => setTab("friends")}><span>♧</span> دوستان</button>
+        <button className={tab === "profile" ? "rail-link active" : "rail-link"} onClick={() => setTab("profile")}><span>◉</span> پروفایل</button>
+        <div className="rail-bottom"><div className="rail-avatar">{name ? name.slice(0,1) : "م"}</div><div><strong>{name || "مهمان"}</strong><small>حساب کاربری</small></div><button onClick={() => setAuth("login")} aria-label="ورود">↗</button></div>
+      </aside>
 
-      {stage === "home" && (
-        <>
-          <section className="hero wrap">
-            <div className="hero-copy">
-              <div className="kicker"><span className="kicker-line" /> برای جمع‌هایی که معمولی نیستند</div>
-              <h1>لحظه‌های خوب،<br /><em>اتفاقی نیستند.</em></h1>
-              <p className="hero-text">یک اتاق بسازید، دوستانتان را دعوت کنید و با چالش‌هایی که هر جمع را به خاطره تبدیل می‌کنند، کنار هم بازی کنید.</p>
-              <div className="hero-actions">
-                <a className="button button-dark" href="#create">شروع یک دورهمی <span>←</span></a>
-                <span className="action-note">بدون نصب · شروع در چند ثانیه</span>
-              </div>
-              <div className="hero-proof"><div className="proof-avatars"><b>م</b><b>آ</b><b>ر</b><b>+</b></div><span>برای بازی با آدم‌های خودتان ساخته شده</span></div>
-            </div>
+      <section className="main-panel">
+        <header className="topbar">
+          <div className="mobile-brand"><span className="brand-mark">x</span><b>project<span className="brand-x">x</span></b></div>
+          <div className="breadcrumb">فضای شخصی <span>/</span> {tab === "home" ? "خانه" : tab === "games" ? "بازی‌ها" : tab === "friends" ? "دوستان" : "پروفایل"}</div>
+          <div className="top-actions"><button className="icon-button" onClick={() => setNotice("هنوز اعلان تازه‌ای نداری.")}>♧</button><button className="login-button" onClick={() => setAuth("login")}>ورود</button><button className="signup-button" onClick={() => setAuth("signup")}>ساخت حساب <span>←</span></button></div>
+        </header>
 
-            <div className="visual-wrap" aria-label="پیش‌نمایش یک اتاق بازی">
-              <div className="visual-orbit orbit-one" /><div className="visual-orbit orbit-two" />
-              <div className="floating-note note-top"><span className="note-icon">✳</span><span><strong>یک جمع، یک بازی</strong><small>همه در جریان‌اند</small></span></div>
-              <div className="game-preview">
-                <div className="preview-top"><span className="preview-label">اتاق خصوصی</span><span className="live"><i /> در حال آماده‌سازی</span></div>
-                <div className="preview-title">دورهمی جمعه‌شب</div>
-                <div className="preview-sub">یک چالش کوتاه برای شروع</div>
-                <div className="preview-question">کدام مقصد را برای سفر گروهی انتخاب می‌کنید؟</div>
-                <div className="preview-options"><div><span>01</span> یک کلبه وسط جنگل <b>↗</b></div><div className="preview-selected"><span>02</span> خانه‌ای کنار دریا <b>✓</b></div><div><span>03</span> گشت‌وگذار در شهر <b>↗</b></div></div>
-                <div className="preview-bottom"><div className="mini-people"><b>س</b><b>م</b><b>آ</b><b>+</b></div><span>۴ نفر در این اتاق</span><span className="preview-step">۱ / ۳</span></div>
-              </div>
-              <div className="floating-note note-bottom"><span className="spark">✦</span><span><strong>هر بار متفاوت</strong><small>خاطره‌ای برای تکرار</small></span></div>
-            </div>
-          </section>
+        {tab === "home" && <div className="content">
+          <section className="welcome-row"><div><div className="overline"><i /> فضای بازی شما</div><h1>سلام، {name || "رفیق"} <span className="wave">✳</span></h1><p>آماده‌ای یک خاطره تازه با دوستات بسازی؟</p></div><button className="outline-button" onClick={() => setTab("profile")}>تکمیل پروفایل <span>↗</span></button></section>
+          <section className="hero-banner"><div className="banner-copy"><span className="banner-tag">با هم بهتره</span><h2>دورهمی بعدی،<br/>شروع یک خاطره‌ست.</h2><p>اتاقت رو بساز، دوستات رو دعوت کن و بازی رو شروع کن.</p><button className="light-button" onClick={() => document.getElementById("create-room")?.scrollIntoView({behavior:"smooth"})}>ساخت دورهمی جدید <span>←</span></button></div><div className="banner-art"><div className="art-ring ring-a"/><div className="art-ring ring-b"/><div className="art-center">X</div><span className="art-chip chip-one">PLAY</span><span className="art-chip chip-two">TOGETHER</span><span className="art-star">✳</span></div></section>
+          <div className="section-title"><div><span className="overline">منتخب برای تو</span><h2>بازی‌های محبوب</h2></div><button className="text-button" onClick={() => setTab("games")}>همه بازی‌ها <span>←</span></button></div>
+          <div className="game-grid">{games.slice(0,3).map((g) => <button className="game-card" key={g.title} onClick={() => {setSelected(g); setNotice("بازی انتخاب شد؛ برای شروع، یک اتاق بساز.")}}><div className={"game-art "+g.tone}><span>{g.symbol}</span><small>PROJECT X / GAME</small></div><div className="game-info"><div><strong>{g.title}</strong><small>{g.category}</small></div><span className="card-arrow">↗</span></div><div className="game-meta"><span>♧ {g.players}</span><span>◷ {g.time}</span></div></button>)}</div>
+          <section className="lower-grid" id="create-room"><div className="panel-card create-panel"><div className="section-title compact"><div><span className="overline">شروع کن</span><h2>اتاق جدید بساز</h2></div><span className="panel-icon">＋</span></div><p>یک اسم برای جمع‌تان انتخاب کن. بقیه‌اش با هم ساخته می‌شود.</p><div className="room-input-row"><input value={room} onChange={e=>setRoom(e.target.value)} placeholder="مثلاً دورهمی جمعه‌شب" maxLength={36}/><button onClick={createRoom}>ساخت اتاق <span>←</span></button></div></div><div className="panel-card invite-panel"><span className="invite-icon">♧</span><div><span className="overline">تنها بازی نکن</span><h3>آدم‌های خودت رو بیار</h3><p>دوستانت را دعوت کن تا جمع کامل شود.</p><button className="text-button" onClick={()=>setTab("friends")}>رفتن به دوستان ←</button></div></div></section>
+        </div>}
 
-          <section className="create-section wrap" id="create">
-            <div className="section-heading"><div><div className="eyebrow">شروع ساده است</div><h2>جمع شما، قوانین شما.</h2></div><p>نوع بازی را انتخاب کنید.<br />بقیه‌اش را با هم می‌سازید.</p></div>
-            <div className="create-card">
-              <div className="mode-list">
-                {modes.map((item) => (
-                  <button key={item.id} className={mode === item.id ? "mode-row active" : "mode-row"} onClick={() => setMode(item.id)}>
-                    <span className="mode-number">{item.number}</span><span className="mode-copy"><strong>{item.title}</strong><small>{item.description}</small></span><span className="mode-time">{item.duration}</span><span className="mode-arrow">↗</span>
-                  </button>
-                ))}
-              </div>
-              <div className="create-form">
-                <div className="form-top"><span className="form-index">01 / ساخت اتاق</span><span className="form-lock">◈ فضای خصوصی</span></div>
-                <label htmlFor="roomName">اسم دورهمی</label><input id="roomName" value={roomName} onChange={(e) => setRoomName(e.target.value)} maxLength={32} />
-                <label htmlFor="hostName">اسم شما</label><input id="hostName" value={host} onChange={(e) => setHost(e.target.value)} placeholder="چطور صدایتان کنیم؟" maxLength={18} />
-                <button className="button button-dark button-full" onClick={createRoom}>ساخت اتاق <span>←</span></button>
-                {feedback && <p className="feedback" role="status">{feedback}</p>}
-                <p className="form-foot">رایگان برای شروع · بدون نیاز به نصب</p>
-              </div>
-            </div>
-          </section>
+        {tab === "games" && <div className="content"><div className="page-heading"><span className="overline">کتابخانه سرگرمی</span><h1>بازی‌ای برای هر جمع</h1><p>از یک چالش کوتاه تا رقابت‌های دوستانه؛ انتخاب با شماست.</p></div><div className="game-grid all-games">{games.map(g=><button className="game-card" key={g.title} onClick={()=>{setSelected(g);setNotice("این بازی انتخاب شد. برای تجربه گروهی، ابتدا اتاق بساز.")}}><div className={"game-art "+g.tone}><span>{g.symbol}</span><small>PROJECT X / GAME</small></div><div className="game-info"><div><strong>{g.title}</strong><small>{g.category}</small></div><span className="card-arrow">↗</span></div><div className="game-meta"><span>♧ {g.players}</span><span>◷ {g.time}</span></div></button>)}</div></div>}
 
-          <section className="values wrap">
-            <div><span>01</span><strong>شروع بی‌دردسر</strong><p>بدون پیچیدگی و بدون معطلی، مستقیم وارد بازی شوید.</p></div>
-            <div><span>02</span><strong>برای همه‌ی جمع</strong><p>تجربه‌ای که با حضور دوستان معنا پیدا می‌کند.</p></div>
-            <div><span>03</span><strong>هر بار یک خاطره</strong><p>چالش‌های کوتاه، انتخاب‌های تازه و نتیجه‌ای مشترک.</p></div>
-          </section>
-        </>
-      )}
+        {tab === "friends" && <div className="content"><div className="page-heading"><span className="overline">دایره آدم‌های تو</span><h1>بازی با دوستات بهتره.</h1><p>فضای دوستانت اینجاست؛ دعوت و بازی گروهی به‌زودی با اتصال حساب‌ها فعال می‌شود.</p></div><div className="empty-state"><div className="empty-symbol">♧</div><h2>هنوز کسی اینجا نیست</h2><p>وقتی قابلیت حساب کاربری و دعوت آنلاین متصل شود، دوستانت را اینجا می‌بینی.</p><button className="signup-button" onClick={()=>setAuth("signup")}>ساخت حساب کاربری <span>←</span></button></div></div>}
 
-      {stage === "room" && <section className="stage-card wrap">
-        <div className="stage-kicker">اتاق شما آماده است</div><div className="stage-head"><div><h1 className="stage-title">{roomName || "دورهمی دوستان"}</h1><p>دوستانتان را اضافه کنید و بازی را شروع کنید.</p></div><div className="room-code"><small>کد اتاق</small><strong>{code}</strong></div></div>
-        <div className="member-list">{players.map((p, i) => <div className="member" key={p.id}><span className="member-avatar">{p.name.slice(0,1)}</span><strong>{p.name}</strong><small>{i === 0 ? "میزبان" : "بازیکن آزمایشی"}</small></div>)}</div>
-        <div className="add-member"><label htmlFor="guest">افزودن بازیکن آزمایشی</label><div><input id="guest" value={guest} onChange={(e) => setGuest(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addPlayer()} placeholder="نام بازیکن" maxLength={18}/><button className="button button-outline" onClick={addPlayer}>افزودن</button></div></div>
-        <div className="stage-actions"><button className="button button-dark" onClick={() => { setIndex(0); setChoice(null); setFeedback(""); setStage("play"); }}>شروع بازی <span>←</span></button><button className="button button-outline" onClick={copyCode}>{copied ? "کپی شد" : "کپی کد اتاق"}</button></div>
-        {feedback && <p className="feedback">{feedback}</p>}<p className="fine-print">این پیش‌نمایش با داده آزمایشی و روی همین دستگاه اجرا می‌شود؛ دعوت چنددستگاهی هنوز فعال نیست.</p>
-      </section>}
+        {tab === "profile" && <div className="content"><div className="page-heading"><span className="overline">هویت تو در Project X</span><h1>پروفایل کاربری</h1><p>اطلاعاتت را برای تجربه شخصی‌تر آماده کن.</p></div><div className="profile-card"><div className="profile-avatar">{name ? name.slice(0,1) : "م"}</div><div className="profile-fields"><label>نام نمایشی</label><input value={name} onChange={e=>setName(e.target.value)} placeholder="نامی که دوستانت می‌بینند"/><label>ایمیل</label><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@example.com" type="email"/><button className="signup-button" onClick={()=>setNotice("پروفایل در این پیش‌نمایش فقط روی همین صفحه نگهداری می‌شود.")}>ذخیره تغییرات <span>←</span></button></div></div></div>}
 
-      {stage === "play" && <section className="stage-card game-card wrap">
-        <div className="game-meta"><span>{modes.find((m) => m.id === mode)?.title}</span><span>سؤال {index + 1} از {questionSet.length}</span></div><div className="progress"><i style={{ width: ((index + 1) / questionSet.length * 100) + "%" }} /></div>
-        <h1 className="question-title">{current.question}</h1><div className="answer-list">{current.answers.map((a, i) => <button key={a} disabled={!!feedback} className={choice === i ? "answer selected" : "answer"} onClick={() => setChoice(i)}><span>0{i + 1}</span>{a}<b>{choice === i ? "✓" : "＋"}</b></button>)}</div>
-        {feedback ? <><p className="feedback">{feedback}</p><button className="button button-dark button-full" onClick={next}>{index + 1 === questionSet.length ? "دیدن نتیجه" : "سؤال بعدی"} <span>←</span></button></> : <button className="button button-dark button-full" disabled={choice === null} onClick={answer}>ثبت پاسخ <span>←</span></button>}
-      </section>}
+        {notice && <div className="toast" role="status"><span>✦</span>{notice}<button onClick={()=>setNotice("")}>×</button></div>}
+        {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><div className="modal-card" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setSelected(null)}>×</button><div className={"game-art modal-art "+selected.tone}><span>{selected.symbol}</span><small>PROJECT X / GAME</small></div><span className="overline">{selected.category}</span><h2>{selected.title}</h2><p>یک تجربه گروهی برای ساختن لحظه‌های متفاوت.</p><button className="signup-button" onClick={()=>{setSelected(null);setTab("home");document.getElementById("create-room")?.scrollIntoView({behavior:"smooth"})}}>ساخت اتاق برای این بازی ←</button></div></div>}
+      </section>
 
-      {stage === "result" && <section className="stage-card result-card wrap"><div className="stage-kicker">پایان این دورهمی</div><div className="result-symbol">✳</div><h1 className="stage-title">این تازه شروع ماجراست.</h1><p>نتیجه‌ی این اجرای آزمایشی</p><div className="result-score">{players[0]?.score ?? 0}<small>امتیاز</small></div><div className="member-list">{ranking.map((p, i) => <div className="member" key={p.id}><span className="member-avatar">{i + 1}</span><strong>{p.name}</strong><small>{p.score} امتیاز</small></div>)}</div><button className="button button-dark button-full" onClick={reset}>ساخت دورهمی جدید <span>←</span></button><p className="fine-print">نتیجه فقط در همین اجرای آزمایشی نگهداری شده است.</p></section>}
+      <nav className="mobile-nav"><button className={tab==="home"?"chosen":""} onClick={()=>setTab("home")}><span>⌂</span>خانه</button><button className={tab==="games"?"chosen":""} onClick={()=>setTab("games")}><span>▦</span>بازی‌ها</button><button className={tab==="friends"?"chosen":""} onClick={()=>setTab("friends")}><span>♧</span>دوستان</button><button className={tab==="profile"?"chosen":""} onClick={()=>setTab("profile")}><span>◉</span>پروفایل</button></nav>
 
-      <footer className="footer wrap"><a className="wordmark" href="#" onClick={(e) => { e.preventDefault(); reset(); }}><span className="mark">x</span><span>project<span className="wordmark-light">x</span></span></a><span>برای لحظه‌هایی که با هم ساخته می‌شوند.</span><span>© 2026 Project X · پیش‌نمایش مفهومی</span></footer>
+      {auth && <div className="modal-backdrop" onClick={()=>{setAuth(null);setNotice("")}}><div className="auth-modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>{setAuth(null);setNotice("")}}>×</button><div className="brand auth-brand"><span className="brand-mark">x</span><span>project<span className="brand-x">x</span></span></div><span className="overline">{auth==="signup"?"به جمع ما اضافه شو":"خوش برگشتی"}</span><h2>{auth==="signup"?"ساخت حساب کاربری":"ورود به حساب"}</h2><p>برای شروع تجربه شخصی Project X</p>{auth==="signup" && <><label>نام نمایشی</label><input value={name} onChange={e=>setName(e.target.value)} placeholder="نام شما"/></>}<label>ایمیل</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@example.com"/><label>رمز عبور</label><input type="password" placeholder="حداقل ۸ کاراکتر"/><button className="signup-button auth-submit" onClick={submitAuth}>{auth==="signup"?"ساخت حساب":"ورود"} <span>←</span></button><button className="switch-auth" onClick={()=>{setAuth(auth==="signup"?"login":"signup");setNotice("")}}>{auth==="signup"?"حساب داری؟ وارد شو":"حساب نداری؟ ثبت‌نام کن"}</button>{notice && <p className="auth-note">{notice}</p>}<small className="demo-note">نسخه نمایشی · اتصال احراز هویت هنوز انجام نشده</small></div></div>}
     </main>
   );
 }
