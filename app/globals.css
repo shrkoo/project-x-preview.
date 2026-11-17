@@ -310,3 +310,53 @@ body{background:#070a18;color:#f7f7ff}
   .banner-art{left:-10px;opacity:.58}
   .feature-strip{grid-template-columns:1fr}
 }
+
+
+/* New Project X product areas */
+.leader-row{display:flex;align-items:center;gap:13px;padding:14px 4px;border-bottom:1px solid #27365f;color:#f5f4ff}
+.leader-row:last-of-type{border-bottom:0}
+.leader-row>b{width:26px;color:#bca0ff;font-size:17px}
+.leader-avatar{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(140deg,#ff6bc8,#7559ff 60%,#35d5e8);font-weight:800;color:#fff}
+.leader-row>strong{min-width:60px}
+.leader-row>small{color:#7788b2;font-size:9px;flex:1}
+.leader-row>em{font-style:normal;color:#62e1ed;font-weight:800;font-size:11px}
+.reward-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.reward-card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:24px 13px;border-radius:18px;border:1px solid #2c3b68;background:linear-gradient(145deg,#151f40,#0b1329);box-shadow:0 12px 32px #02061580}
+.reward-card>span{font-size:40px;filter:drop-shadow(0 0 18px #a16aff88)}
+.reward-card strong{color:#f7f4ff;font-size:13px}
+.reward-card small{color:#8f9fc4;font-size:10px}
+.reward-card em{font-style:normal;color:#c4a4ff;font-size:10px;border:1px solid #7958c966;border-radius:20px;padding:5px 11px;background:#8154ff18}
+.premium-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:850px}
+.premium-card{padding:26px;border:1px solid #344576;border-radius:20px;background:linear-gradient(145deg,#141e3c,#0b1228);box-shadow:0 15px 40px #02061588}
+.premium-card.featured-premium{border-color:#a77bff;box-shadow:0 0 35px #8d57ff30,0 15px 40px #02061588}
+.premium-card>span{color:#c4a6ff;font-size:12px}
+.premium-card h2{font-size:29px;color:#fff;margin:17px 0}
+.premium-card h2 small{font-size:11px;color:#9ba9cc}
+.premium-card p,.premium-card li{color:#9eacce;font-size:11px;line-height:2.3}
+.premium-card ul{padding-right:18px;margin:18px 0 24px}
+.premium-card .signup-button{width:100%;padding:13px}
+.settings-card{max-width:850px;padding:8px 22px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:19px 0;border-bottom:1px solid #29375f}
+.setting-row:last-child{border-bottom:0}
+.setting-row strong,.setting-row small{display:block}
+.setting-row strong{color:#f2f4ff;font-size:12px}
+.setting-row small{color:#8798bd;font-size:10px;margin-top:5px}
+.toggle-switch,.theme-choice{border:1px solid #3c4d7c;border-radius:10px;padding:8px 15px;background:#111b37;color:#a9b7d9;font-size:10px}
+.toggle-switch.on,.theme-choice.active{border-color:#8d6aff;background:linear-gradient(100deg,#8455ee55,#18bad533);color:#f4edff;box-shadow:0 0 18px #8556f52b}
+.theme-choices{display:flex;gap:7px}
+.social-auth{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+.social-auth button{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border:1px solid #3b4a77;border-radius:11px;background:#111a34;color:#fff;font-size:15px;font-weight:800}
+.social-auth button span{font-size:10px;font-weight:600}
+.social-auth button:hover{border-color:#a783ff;background:#1a2547}
+@media(max-width:720px){
+ .reward-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .reward-card{padding:17px 9px}
+ .premium-grid{grid-template-columns:1fr}
+ .premium-card{padding:20px}
+ .settings-card{padding:6px 14px}
+ .setting-row{gap:8px}
+ .setting-row .outline-button{font-size:9px;padding:9px}
+ .leader-row{gap:8px}
+ .leader-row>small{font-size:8px}
+ .leader-row>em{font-size:9px}
+}
