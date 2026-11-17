@@ -195,7 +195,7 @@ export default {
     }
    }
    if (path === "/rooms" && request.method === "GET") {
-    const rows=await db.prepare("SELECT r.id,r.code,r.name,r.game_title AS gameTitle,r.status,r.max_players AS maxPlayers,r.created_at AS createdAt,u.display_name AS ownerName,(SELECT COUNT(*) FROM room_members m WHERE m.room_id=r.id) AS playerCount FROM rooms r JOIN users u ON u.id=r.owner_id WHERE r.status IN ('waiting','playing') ORDER BY r.created_at DESC LIMIT 40").all();
+    const rows=await db.prepare("SELECT r.id,r.code,r.name,r.game_title AS gameTitle,r.status,r.max_players AS maxPlayers,r.created_at AS createdAt,u.display_name AS ownerName,r.owner_id AS ownerId,(SELECT COUNT(*) FROM room_members m WHERE m.room_id=r.id) AS playerCount FROM rooms r JOIN users u ON u.id=r.owner_id WHERE r.status IN ('waiting','playing') ORDER BY r.created_at DESC LIMIT 40").all();
     return json({rooms:rows.results||[]});
    }
    if (path === "/rooms" && request.method === "POST") {
@@ -210,7 +210,7 @@ export default {
    }
    const joinMatch=path.match(/^\/rooms\/([A-Z0-9]+)\/join$/);
    if(joinMatch && request.method==="POST") {
-    const room=await db.prepare("SELECT * FROM rooms WHERE code=? AND status='waiting'").bind(joinMatch[1]).first();
+    const room=await db.prepare("SELECT * FROM rooms WHERE code=? AND status IN ('waiting','playing')").bind(joinMatch[1]).first();
     if(!room) return fail("اتاق پیدا نشد یا دیگر فعال نیست.",404);
     const count=await db.prepare("SELECT COUNT(*) AS n FROM room_members WHERE room_id=?").bind(room.id).first();
     const already=await db.prepare("SELECT 1 AS yes FROM room_members WHERE room_id=? AND user_id=?").bind(room.id,user.id).first();
