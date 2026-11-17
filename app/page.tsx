@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { apiRequest, clearSession, setSession } from "./lib/api";
 
 type Tab = "home" | "games" | "friends" | "profile" | "leaderboard" | "rewards" | "premium" | "settings";
 type Game = { title: string; category: string; players: string; time: string; tone: string; symbol: string };
-type Room = { id: string; name: string; game: string; createdAt: string };
-type LocalAccount = { name: string; email: string };
+type Room = { id: string; code?: string; name: string; game: string; createdAt?: string };
+type LocalAccount = { id?: string; name: string; email: string; xp?: number; gamesPlayed?: number };
 const games: Game[] = [
   { title: "حقیقت یا چالش", category: "جمع‌های دوستانه", players: "۲ تا ۱۲ نفر", time: "۱۰ دقیقه", tone: "violet", symbol: "✳" },
   { title: "چقدر منو می‌شناسی؟", category: "شناخت دوستان", players: "۲ تا ۸ نفر", time: "۵ دقیقه", tone: "orange", symbol: "♡" },
@@ -40,60 +41,62 @@ export default function Home() {
   const [selectedTheme, setSelectedTheme] = useState<"neon" | "light">("neon");
   const [xp, setXp] = useState(0);
   const [gamesPlayed, setGamesPlayed] = useState(0);
+  const [leaderboardRows, setLeaderboardRows] = useState<Array<{name:string;xp:number;gamesPlayed:number}>>([]);
 
   useEffect(() => {
-    const savedAccount = readStore<LocalAccount | null>("projectx-account", null);
-    setAccount(savedAccount);
-    if (savedAccount) { setName(savedAccount.name); setEmail(savedAccount.email); }
-    setRooms(readStore<Room[]>("projectx-rooms", []));
-    setXp(readStore<number>("projectx-xp", 0));
-    setGamesPlayed(readStore<number>("projectx-games-played", 0));
     setNotificationsOn(readStore<boolean>("projectx-notifications", true));
     setSoundOn(readStore<boolean>("projectx-sound", true));
     setSelectedTheme(readStore<"neon" | "light">("projectx-theme", "neon"));
+    if (!localStorage.getItem("projectx-token")) return;
+    apiRequest<{user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number}}>("/auth/me").then(async data => {
+      const next={id:data.user.id,name:data.user.displayName,email:data.user.email,xp:data.user.xp,gamesPlayed:data.user.gamesPlayed};
+      setAccount(next);setName(next.name);setEmail(next.email);setXp(next.xp);setGamesPlayed(next.gamesPlayed);
+      const result=await apiRequest<{rooms:Array<any>}>("/rooms");
+      setRooms(result.rooms.map(r=>({id:r.id,code:r.code,name:r.name,game:r.gameTitle||"",createdAt:r.createdAt})));
+    }).catch(()=>{clearSession();setNotice("نشست قبلی معتبر نبود؛ دوباره وارد شو.");});
   }, []);
+  useEffect(() => {
+    if (tab==="leaderboard" && account) apiRequest<{leaderboard:Array<{name:string;xp:number;gamesPlayed:number}>}>("/leaderboard").then(d=>setLeaderboardRows(d.leaderboard)).catch(()=>setNotice("دریافت جدول امتیازها ناموفق بود."));
+  }, [tab,account]);
 
   function notify(message: string) { setNotice(message); }
-  function createRoom() {
-    const cleanName = roomName.trim();
-    if (!cleanName) { notify("برای اتاقت یک اسم انتخاب کن."); return; }
-    const room: Room = { id: Math.random().toString(36).slice(2, 8).toUpperCase(), name: cleanName, game: selected?.title || "انتخاب نشده", createdAt: new Date().toISOString() };
-    const next = [room, ...rooms].slice(0, 10);
-    setRooms(next);
-    localStorage.setItem("projectx-rooms", JSON.stringify(next));
-    setActiveRoom(room);
-    setRoomName("");
-    setSelected(null);
-    notify("اتاق روی همین دستگاه ساخته و ذخیره شد.");
+  async function createRoom() {
+    const cleanName=roomName.trim();
+    if(!cleanName){notify("برای اتاقت یک اسم انتخاب کن.");return;}
+    if(!account){setAuth("login");notify("برای ساخت اتاق ابتدا وارد حساب شو.");return;}
+    try{
+      const data=await apiRequest<{room:any}>("/rooms",{method:"POST",body:JSON.stringify({name:cleanName,gameTitle:selected?.title||""})});
+      const room:Room={id:data.room.id,code:data.room.code,name:data.room.name,game:data.room.gameTitle||"",createdAt:new Date().toISOString()};
+      setRooms(current=>[room,...current].slice(0,20));setActiveRoom(room);setRoomName("");setSelected(null);
+      notify("اتاق روی سرور ساخته شد؛ کد دعوت آماده است.");
+    }catch(error){notify(error instanceof Error?error.message:"ساخت اتاق ناموفق بود.");}
   }
-  function saveProfile() {
-    const cleanName = name.trim();
-    if (!cleanName) { notify("لطفاً نام نمایشی را وارد کن."); return; }
-    const next = { name: cleanName, email: email.trim() };
-    setAccount(next);
-    localStorage.setItem("projectx-account", JSON.stringify(next));
-    notify("تغییرات پروفایل روی همین دستگاه ذخیره شد.");
+  async function saveProfile() {
+    const cleanName=name.trim();if(!cleanName){notify("لطفاً نام نمایشی را وارد کن.");return;}
+    try{await apiRequest("/auth/profile",{method:"PATCH",body:JSON.stringify({name:cleanName})});setAccount(current=>current?{...current,name:cleanName}:current);notify("پروفایل در حساب آنلاین به‌روزرسانی شد.");}
+    catch(error){notify(error instanceof Error?error.message:"ذخیره پروفایل ناموفق بود.");}
   }
-  function submitAuth() {
-    const cleanEmail = email.trim().toLowerCase();
-    if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) { notify("یک ایمیل معتبر وارد کن."); return; }
-    if (password.length < 8) { notify("رمز عبور باید حداقل ۸ کاراکتر باشد."); return; }
-    if (auth === "signup") {
-      if (!name.trim()) { notify("نام نمایشی را وارد کن."); return; }
-      const next = { name: name.trim(), email: cleanEmail };
-      localStorage.setItem("projectx-account", JSON.stringify(next));
-      setAccount(next); setName(next.name); setEmail(next.email);
-      setAuth(null); setPassword(""); notify("حساب نمایشی روی همین دستگاه ساخته شد.");
-    } else {
-      if (!account || account.email.toLowerCase() !== cleanEmail) { notify("حسابی با این ایمیل روی این دستگاه پیدا نشد؛ اول ثبت‌نام کن."); return; }
-      setName(account.name); setAuth(null); setPassword(""); notify("وارد حساب محلی خودت شدی.");
-    }
+  async function submitAuth() {
+    const cleanEmail=email.trim().toLowerCase();
+    if(!/^\S+@\S+\.\S+$/.test(cleanEmail)){notify("یک ایمیل معتبر وارد کن.");return;}
+    if(password.length<10){notify("رمز عبور باید حداقل ۱۰ کاراکتر باشد.");return;}
+    if(auth==="signup"&&!name.trim()){notify("نام نمایشی را وارد کن.");return;}
+    try{
+      const endpoint=auth==="signup"?"/auth/register":"/auth/login";
+      const data=await apiRequest<{token:string;user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number};emailVerificationRequired?:boolean}>(endpoint,{method:"POST",body:JSON.stringify({email:cleanEmail,password,...(auth==="signup"?{name:name.trim()}:{})})});
+      setSession(data.token);
+      const next={id:data.user.id,name:data.user.displayName,email:data.user.email,xp:data.user.xp,gamesPlayed:data.user.gamesPlayed};
+      setAccount(next);setName(next.name);setEmail(next.email);setXp(next.xp||0);setGamesPlayed(next.gamesPlayed||0);setAuth(null);setPassword("");
+      const roomsData=await apiRequest<{rooms:Array<any>}>("/rooms");setRooms(roomsData.rooms.map(r=>({id:r.id,code:r.code,name:r.name,game:r.gameTitle||"",createdAt:r.createdAt})));
+      notify(data.emailVerificationRequired?"حساب آنلاین ساخته شد؛ تأیید ایمیل هنوز فعال نشده است.":auth==="signup"?"حساب آنلاین ساخته شد.":"با موفقیت وارد شدی.");
+    }catch(error){notify(error instanceof Error?error.message:"ورود یا ثبت‌نام ناموفق بود.");}
   }
-  function logout() {
-    localStorage.removeItem("projectx-account"); setAccount(null); setName(""); setEmail(""); setPassword(""); notify("از حساب محلی خارج شدی.");
+  async function logout() {
+    try{await apiRequest("/auth/logout",{method:"POST"});}catch{}
+    clearSession();setAccount(null);setName("");setEmail("");setPassword("");setRooms([]);notify("از حساب خارج شدی.");
   }
   async function shareRoom(room: Room) {
-    const invite = `به دورهمی «${room.name}» در Project X بیا! کد اتاق: ${room.id}\n${window.location.origin}`;
+    const invite = `به دورهمی «${room.name}» در Project X بیا! کد اتاق: ${room.code || room.id}\n${window.location.origin}`;
     try {
       if (navigator.share) await navigator.share({ title: "دعوت به Project X", text: invite });
       else if (navigator.clipboard) { await navigator.clipboard.writeText(invite); notify("متن دعوت کپی شد؛ برای دوستت بفرست."); }
@@ -104,13 +107,10 @@ export default function Home() {
     const choices = prompts[game.title] || ["آماده‌ای؟ نوبت توست!"];
     setRound(choices[Math.floor(Math.random() * choices.length)]);
   }
-  function finishRound() {
-    const nextXp = xp + 10, nextPlayed = gamesPlayed + 1;
-    setXp(nextXp); setGamesPlayed(nextPlayed);
-    localStorage.setItem("projectx-xp", JSON.stringify(nextXp));
-    localStorage.setItem("projectx-games-played", JSON.stringify(nextPlayed));
-    notify("۱۰ امتیاز آزمایشی ثبت شد و روی همین دستگاه ذخیره شد.");
-    if (selected) startGame(selected);
+  async function finishRound() {
+    if(!account){notify("برای ثبت امتیاز آنلاین وارد حساب شو.");setAuth("login");return;}
+    try{const data=await apiRequest<{xp:number;gamesPlayed:number;awarded:number}>("/rounds/finish",{method:"POST",body:JSON.stringify({gameTitle:selected?.title||"",prompt:round})});setXp(data.xp);setGamesPlayed(data.gamesPlayed);setAccount(current=>current?{...current,xp:data.xp,gamesPlayed:data.gamesPlayed}:current);notify(`+${data.awarded} امتیاز در حساب آنلاین ثبت شد.`);if(selected)startGame(selected);}
+    catch(error){notify(error instanceof Error?error.message:"ثبت امتیاز ناموفق بود.");}
   }
   function saveSetting<T,>(key: string, value: T) { localStorage.setItem(key, JSON.stringify(value)); }
 
@@ -128,7 +128,7 @@ export default function Home() {
         <button className={tab === "rewards" ? "rail-link active" : "rail-link"} onClick={() => setTab("rewards")}><span>🎁</span> پاداش‌ها</button>
         <button className={tab === "premium" ? "rail-link active" : "rail-link"} onClick={() => setTab("premium")}><span>👑</span> اشتراک ویژه</button>
         <button className={tab === "settings" ? "rail-link active" : "rail-link"} onClick={() => setTab("settings")}><span>⚙</span> تنظیمات</button>
-        <div className="rail-bottom"><div className="rail-avatar">{name ? name.slice(0,1) : "م"}</div><div><strong>{name || "مهمان"}</strong><small>{account ? "حساب محلی" : "حساب کاربری"}</small></div><button onClick={() => account ? logout() : setAuth("login")} aria-label={account ? "خروج" : "ورود"}>{account ? "↙" : "↗"}</button></div>
+        <div className="rail-bottom"><div className="rail-avatar">{name ? name.slice(0,1) : "م"}</div><div><strong>{name || "مهمان"}</strong><small>{account ? "حساب آنلاین" : "مهمان"}</small></div><button onClick={() => account ? logout() : setAuth("login")} aria-label={account ? "خروج" : "ورود"}>{account ? "↙" : "↗"}</button></div>
       </aside>
       <section className="main-panel">
         <header className="topbar">
@@ -143,7 +143,7 @@ export default function Home() {
           <div className="section-title"><div><span className="overline">منتخب برای تو</span><h2>بازی‌های محبوب</h2></div><button className="text-button" onClick={() => setTab("games")}>همه بازی‌ها <span>←</span></button></div>
           <div className="game-grid">{games.map(g => <button className="game-card" key={g.title} onClick={() => {setSelected(g);setRound("");}}><div className={"game-art "+g.tone}><span>{g.symbol}</span><small>PROJECT X / GAME</small></div><div className="game-info"><div><strong>{g.title}</strong><small>{g.category}</small></div><span className="card-arrow">↗</span></div><div className="game-meta"><span>♧ {g.players}</span><span>◷ {g.time}</span></div></button>)}</div>
           <section className="lower-grid" id="create-room"><div className="panel-card create-panel"><div className="section-title compact"><div><span className="overline">شروع کن</span><h2>اتاق جدید بساز</h2></div><span className="panel-icon">＋</span></div><p>یک اسم برای جمع‌تان انتخاب کن. بقیه‌اش با هم ساخته می‌شود.</p><div className="room-input-row"><input value={roomName} onChange={e=>setRoomName(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")createRoom();}} placeholder="مثلاً دورهمی جمعه‌شب" maxLength={36}/><button onClick={createRoom}>ساخت اتاق <span>←</span></button></div></div><div className="panel-card invite-panel"><span className="invite-icon">♧</span><div><span className="overline">تنها بازی نکن</span><h3>آدم‌های خودت رو بیار</h3><p>دعوت‌نامه را با دوستانت به اشتراک بگذار.</p><button className="text-button" onClick={()=>setTab("friends")}>رفتن به دوستان ←</button></div></div></section>
-          {rooms.length > 0 && <section className="rooms-section"><div className="section-title"><div><span className="overline">اتاق‌های این دستگاه</span><h2>دورهمی‌های اخیر</h2></div></div><div className="room-list">{rooms.map(r=><div className="room-row" key={r.id}><div><strong>{r.name}</strong><small>کد {r.id} · {r.game}</small></div><button className="text-button" onClick={()=>setActiveRoom(r)}>باز کردن</button><button className="text-button" onClick={()=>shareRoom(r)}>دعوت ↗</button></div>)}</div></section>}
+          {rooms.length > 0 && <section className="rooms-section"><div className="section-title"><div><span className="overline">اتاق‌های این دستگاه</span><h2>دورهمی‌های اخیر</h2></div></div><div className="room-list">{rooms.map(r=><div className="room-row" key={r.id}><div><strong>{r.name}</strong><small>کد {r.code || r.id} · {r.game}</small></div><button className="text-button" onClick={()=>setActiveRoom(r)}>باز کردن</button><button className="text-button" onClick={()=>shareRoom(r)}>دعوت ↗</button></div>)}</div></section>}
         </div>}
         {tab === "games" && <div className="content"><div className="page-heading"><span className="overline">کتابخانه سرگرمی</span><h1>بازی‌ای برای هر جمع</h1><p>یک بازی انتخاب کن تا نمونه قابل‌بازی آن را همین‌جا امتحان کنی.</p></div><div className="game-grid all-games">{games.map(g=><button className="game-card" key={g.title} onClick={()=>{setSelected(g);setRound("");}}><div className={"game-art "+g.tone}><span>{g.symbol}</span><small>PROJECT X / GAME</small></div><div className="game-info"><div><strong>{g.title}</strong><small>{g.category}</small></div><span className="card-arrow">↗</span></div><div className="game-meta"><span>♧ {g.players}</span><span>◷ {g.time}</span></div></button>)}</div></div>}
         {tab === "friends" && <div className="content"><div className="page-heading"><span className="overline">دایره آدم‌های تو</span><h1>بازی با دوستات بهتره.</h1><p>فعلاً می‌توانی دعوت‌نامه اتاق‌ها را از همین دستگاه برای دوستانت بفرستی.</p></div><div className="empty-state"><div className="empty-symbol">♧</div><h2>دعوت دوستان</h2><p>اول یک اتاق بساز؛ بعد کد و لینک دعوتش را با پیام‌رسان دلخواهت به اشتراک بگذار.</p><button className="signup-button" onClick={()=>{setTab("home");document.getElementById("create-room")?.scrollIntoView({behavior:"smooth"});}}>ساخت اولین اتاق <span>←</span></button></div>{rooms.length>0 && <div className="room-list friend-rooms">{rooms.map(r=><div className="room-row" key={r.id}><div><strong>{r.name}</strong><small>کد دعوت: {r.id}</small></div><button className="signup-button" onClick={()=>shareRoom(r)}>ارسال دعوت ↗</button></div>)}</div>}</div>}
@@ -153,11 +153,11 @@ export default function Home() {
         {tab === "settings" && <div className="content"><div className="page-heading"><span className="overline">کنترل تجربه تو</span><h1>تنظیمات</h1><p>ظاهر و اعلان‌های برنامه را مدیریت کن.</p></div><div className="panel-card settings-card"><div className="setting-row"><div><strong>اعلان‌ها</strong><small>نمایش اعلان‌های داخل برنامه</small></div><button className={notificationsOn?"toggle-switch on":"toggle-switch"} onClick={()=>{const v=!notificationsOn;setNotificationsOn(v);saveSetting("projectx-notifications",v);}}>{notificationsOn?"روشن":"خاموش"}</button></div><div className="setting-row"><div><strong>صدای بازی</strong><small>صدای رویدادهای بازی</small></div><button className={soundOn?"toggle-switch on":"toggle-switch"} onClick={()=>{const v=!soundOn;setSoundOn(v);saveSetting("projectx-sound",v);}}>{soundOn?"روشن":"خاموش"}</button></div><div className="setting-row"><div><strong>قالب ظاهری</strong><small>انتخاب ظاهر برنامه</small></div><div className="theme-choices"><button className={selectedTheme==="neon"?"theme-choice active":"theme-choice"} onClick={()=>{setSelectedTheme("neon");saveSetting("projectx-theme","neon");}}>تیره</button><button className={selectedTheme==="light"?"theme-choice active":"theme-choice"} onClick={()=>{setSelectedTheme("light");saveSetting("projectx-theme","light");}}>روشن</button></div></div><div className="setting-row"><div><strong>حساب کاربری</strong><small>مدیریت ورود و اطلاعات پروفایل</small></div><button className="outline-button" onClick={()=>setAuth(account?"login":"signup")}>{account?"مدیریت حساب":"ثبت‌نام / ورود"}</button></div></div></div>}
         {tab === "profile" && <div className="content"><div className="page-heading"><span className="overline">هویت تو در Project X</span><h1>پروفایل کاربری</h1><p>اطلاعاتت را ذخیره کن تا دفعه بعد هم روی همین دستگاه بماند.</p></div><div className="profile-card"><div className="profile-avatar">{name ? name.slice(0,1) : "م"}</div><div className="profile-fields"><label>نام نمایشی</label><input value={name} onChange={e=>setName(e.target.value)} placeholder="نامی که دوستانت می‌بینند"/><label>ایمیل</label><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@example.com" type="email"/><button className="signup-button" onClick={saveProfile}>ذخیره تغییرات <span>←</span></button>{account && <button className="text-button" onClick={logout}>خروج از حساب محلی</button>}</div></div></div>}
         {notice && <div className="toast" role="status"><span>✦</span>{notice}<button onClick={()=>setNotice("")} aria-label="بستن">×</button></div>}
-        {activeRoom && <div className="modal-backdrop" onClick={()=>setActiveRoom(null)}><div className="modal-card" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setActiveRoom(null)}>×</button><div className="overline">اتاق دورهمی</div><h2>{activeRoom.name}</h2><p>کد دعوت: <b>{activeRoom.id}</b></p><p>بازی انتخاب‌شده: {activeRoom.game}</p><button className="signup-button" onClick={()=>shareRoom(activeRoom)}>اشتراک‌گذاری دعوت ↗</button></div></div>}
+        {activeRoom && <div className="modal-backdrop" onClick={()=>setActiveRoom(null)}><div className="modal-card" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setActiveRoom(null)}>×</button><div className="overline">اتاق دورهمی</div><h2>{activeRoom.name}</h2><p>کد دعوت: <b>{activeRoom.code || activeRoom.id}</b></p><p>بازی انتخاب‌شده: {activeRoom.game}</p><button className="signup-button" onClick={()=>shareRoom(activeRoom)}>اشتراک‌گذاری دعوت ↗</button></div></div>}
         {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><div className="modal-card" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setSelected(null)}>×</button><div className={"game-art modal-art "+selected.tone}><span>{selected.symbol}</span><small>PROJECT X / GAME</small></div><span className="overline">{selected.category}</span><h2>{selected.title}</h2>{round ? <div className="round-prompt"><p>{round}</p><div className="modal-actions"><button className="outline-button" onClick={()=>startGame(selected)}>سؤال بعدی ↻</button><button className="signup-button" onClick={finishRound}>ثبت پایان دور +۱۰ XP</button></div></div> : <p>یک تجربه گروهی برای ساختن لحظه‌های متفاوت. برای شروع، یک سؤال یا چالش بگیر.</p>}<div className="modal-actions"><button className="signup-button" onClick={()=>startGame(selected)}>شروع بازی ←</button><button className="outline-button" onClick={()=>{setRoomName(selected.title);setSelected(null);setTab("home");setTimeout(()=>document.getElementById("create-room")?.scrollIntoView({behavior:"smooth"}),50);}}>ساخت اتاق این بازی</button></div></div></div>}
       </section>
       <nav className="mobile-nav"><button className={tab==="home"?"chosen":""} onClick={()=>setTab("home")}><span>⌂</span>خانه</button><button className={tab==="games"?"chosen":""} onClick={()=>setTab("games")}><span>▦</span>بازی‌ها</button><button className={tab==="friends"?"chosen":""} onClick={()=>setTab("friends")}><span>♧</span>دوستان</button><button className={tab==="profile"?"chosen":""} onClick={()=>setTab("profile")}><span>◉</span>پروفایل</button><button className={tab==="settings"?"chosen":""} onClick={()=>setTab("settings")}><span>⚙</span>تنظیمات</button></nav>
-      {auth && <div className="modal-backdrop" onClick={()=>{setAuth(null);setNotice("");}}><div className="auth-modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>{setAuth(null);setNotice("");}}>×</button><div className="brand auth-brand"><span className="brand-mark">X</span><span>project<span className="brand-x">x</span></span></div><span className="overline">{auth==="signup"?"به جمع ما اضافه شو":"خوش برگشتی"}</span><h2>{auth==="signup"?"ساخت حساب کاربری":"ورود به حساب"}</h2><p>این نسخه اطلاعات حساب را فقط روی همین دستگاه نگه می‌دارد.</p>{auth==="signup" && <><label>نام نمایشی</label><input value={name} onChange={e=>setName(e.target.value)} placeholder="نام شما"/></>}<label>ایمیل</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@example.com"/><label>رمز عبور</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")submitAuth();}} placeholder="حداقل ۸ کاراکتر"/><div className="social-auth"><button onClick={()=>notify("ورود با Google هنوز به سرویس OAuth متصل نشده است.")}>G <span>ادامه با Google</span></button><button onClick={()=>notify("ورود با Apple هنوز به سرویس Apple Sign in متصل نشده است.")}>● <span>ادامه با Apple</span></button></div><button className="signup-button auth-submit" onClick={submitAuth}>{auth==="signup"?"ساخت حساب":"ورود"} <span>←</span></button><button className="switch-auth" onClick={()=>{setAuth(auth==="signup"?"login":"signup");setNotice("");}}>{auth==="signup"?"حساب داری؟ وارد شو":"حساب نداری؟ ثبت‌نام کن"}</button><small className="demo-note">حساب محلی آزمایشی · ورود واقعی و همگام‌سازی آنلاین هنوز متصل نیست</small></div></div>}
+      {auth && <div className="modal-backdrop" onClick={()=>{setAuth(null);setNotice("");}}><div className="auth-modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>{setAuth(null);setNotice("");}}>×</button><div className="brand auth-brand"><span className="brand-mark">X</span><span>project<span className="brand-x">x</span></span></div><span className="overline">{auth==="signup"?"به جمع ما اضافه شو":"خوش برگشتی"}</span><h2>{auth==="signup"?"ساخت حساب کاربری":"ورود به حساب"}</h2><p>حساب کاربری به سرور Project X متصل است.</p>{auth==="signup" && <><label>نام نمایشی</label><input value={name} onChange={e=>setName(e.target.value)} placeholder="نام شما"/></>}<label>ایمیل</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@example.com"/><label>رمز عبور</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")submitAuth();}} placeholder="حداقل ۱۰ کاراکتر"/><div className="social-auth"><button onClick={()=>notify("ورود با Google هنوز به سرویس OAuth متصل نشده است.")}>G <span>ادامه با Google</span></button><button onClick={()=>notify("ورود با Apple هنوز به سرویس Apple Sign in متصل نشده است.")}>● <span>ادامه با Apple</span></button></div><button className="signup-button auth-submit" onClick={submitAuth}>{auth==="signup"?"ساخت حساب":"ورود"} <span>←</span></button><button className="switch-auth" onClick={()=>{setAuth(auth==="signup"?"login":"signup");setNotice("");}}>{auth==="signup"?"حساب داری؟ وارد شو":"حساب نداری؟ ثبت‌نام کن"}</button><small className="demo-note">ورود ایمیل و رمز عبور آنلاین فعال است؛ تأیید ایمیل و ورود Google/Apple هنوز تنظیم نشده‌اند.</small></div></div>}
     </main>
   );
 }
