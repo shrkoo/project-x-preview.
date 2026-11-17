@@ -161,6 +161,39 @@ export default {
     return json({ticket,expiresIn:60});
    }
    if (!user) return fail("برای استفاده از این بخش وارد حساب شو.",401);
+   const gameMatch=path.match(/^\/rooms\/([A-Z0-9]+)\/game(?:\/(start|next))?$/);
+   if(gameMatch) {
+    const room=await db.prepare("SELECT id,code,name,game_title,owner_id,status FROM rooms WHERE code=?").bind(gameMatch[1]).first();
+    if(!room) return fail("اتاق پیدا نشد.",404);
+    const member=await db.prepare("SELECT 1 AS yes FROM room_members WHERE room_id=? AND user_id=?").bind(room.id,user.id).first();
+    if(!member) return fail("عضو این اتاق نیستی.",403);
+    if(request.method==="GET") {
+      const state=await db.prepare("SELECT phase,round_number AS roundNumber,turn_user_id AS turnUserId,current_prompt AS prompt FROM game_room_state WHERE room_id=?").bind(room.id).first();
+      return json({room:{code:room.code,name:room.name,gameTitle:room.game_title,status:room.status},state:state||{phase:"lobby",roundNumber:0,prompt:null}});
+    }
+    if(request.method==="POST" && (gameMatch[2]==="start" || gameMatch[2]==="next")) {
+      if(room.owner_id!==user.id) return fail("فقط سازنده اتاق می‌تواند دور بازی را مدیریت کند.",403);
+      const body=await readBody(request), title=String(body?.gameTitle||room.game_title||"حقیقت یا چالش");
+      const bank={
+       "حقیقت یا چالش":["یک خاطره خنده‌دار از این جمع تعریف کن.","آخرین باری که از ته دل خندیدی چه زمانی بود؟","به یکی از افراد جمع یک تعریف واقعی بگو."],
+       "چقدر منو می‌شناسی؟":["غذای مورد علاقه میزبان چیست؟","اگر میزبان سفر رایگان داشته باشد کجا می‌رود؟","چه چیزی بیشتر از همه میزبان را خوشحال می‌کند؟"],
+       "نبرد اطلاعات":["کدام سیاره به سیاره سرخ معروف است؟","بزرگ‌ترین اقیانوس جهان کدام است؟","نماد شیمیایی طلا چیست؟"],
+       "انتخاب غیرممکن":["یک سال بدون موسیقی یا یک سال بدون فیلم؟","سفر به گذشته یا آینده؟","همیشه تابستان یا همیشه زمستان؟"]
+      };
+      if(!bank[title]) return fail("بازی انتخاب‌شده معتبر نیست.");
+      const prompt=bank[title][crypto.getRandomValues(new Uint32Array(1))[0]%bank[title].length];
+      const existing=await db.prepare("SELECT round_number AS roundNumber FROM game_room_state WHERE room_id=?").bind(room.id).first();
+      const roundNumber=gameMatch[2]==="start"?1:(existing?.roundNumber||0)+1;
+      await db.batch([
+        db.prepare("INSERT INTO game_room_state (room_id,phase,round_number,turn_user_id,started_at,updated_at,current_prompt) VALUES (?,'playing',?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?) ON CONFLICT(room_id) DO UPDATE SET phase='playing',round_number=excluded.round_number,turn_user_id=excluded.turn_user_id,updated_at=CURRENT_TIMESTAMP,current_prompt=excluded.current_prompt").bind(room.id,roundNumber,user.id,prompt),
+        db.prepare("UPDATE rooms SET game_title=?,status='playing' WHERE id=?").bind(title,room.id)
+      ]);
+      const event={type:"game_round",roomCode:room.code,gameTitle:title,roundNumber,prompt};
+      const hub=env.ROOM_HUB.get(env.ROOM_HUB.idFromName(room.code));
+      await hub.fetch("https://room-hub.internal/broadcast",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(event)});
+      return json({ok:true,gameTitle:title,roundNumber,prompt,phase:"playing"});
+    }
+   }
    if (path === "/rooms" && request.method === "GET") {
     const rows=await db.prepare("SELECT r.id,r.code,r.name,r.game_title AS gameTitle,r.status,r.max_players AS maxPlayers,r.created_at AS createdAt,u.display_name AS ownerName,(SELECT COUNT(*) FROM room_members m WHERE m.room_id=r.id) AS playerCount FROM rooms r JOIN users u ON u.id=r.owner_id WHERE r.status='waiting' ORDER BY r.created_at DESC LIMIT 40").all();
     return json({rooms:rows.results||[]});
@@ -262,9 +295,16 @@ export default {
       if(room.status!=="waiting" && room.status!=="playing") return fail("این دور دیگر فعال نیست.",409);
       roomId=room.id;
     }
-    const now=Date.now(), last=await db.prepare("SELECT last_awarded_at AS last FROM game_round_claims WHERE user_id=?").bind(user.id).first();
-    if(last && now-last.last<30000) return fail("برای ثبت امتیاز بعدی کمی صبر کن.",429);
-    await db.prepare("INSERT INTO game_round_claims (user_id,last_awarded_at) VALUES (?,?) ON CONFLICT(user_id) DO UPDATE SET last_awarded_at=excluded.last_awarded_at").bind(user.id,now).run();
+    const now=Date.now(), last=await db.prepare("SELECT last_awarded_at AS last,last_round_number AS lastRound FROM game_round_claims WHERE user_id=?").bind(user.id).first();
+    let roundNumber=-1;
+    if(roomId) {
+      const state=await db.prepare("SELECT round_number AS roundNumber,current_prompt AS currentPrompt,phase FROM game_room_state WHERE room_id=?").bind(roomId).first();
+      if(!state || state.phase!=="playing" || state.currentPrompt!==prompt) return fail("این دور از طرف سرور فعال نیست یا قبلاً تغییر کرده است.",409);
+      roundNumber=state.roundNumber;
+      if(last && last.lastRound===roundNumber) return fail("امتیاز این دور قبلاً برایت ثبت شده است.",409);
+    }
+    if(last && now-last.last<3000) return fail("برای ثبت امتیاز بعدی کمی صبر کن.",429);
+    await db.prepare("INSERT INTO game_round_claims (user_id,last_awarded_at,last_round_number) VALUES (?,?,?) ON CONFLICT(user_id) DO UPDATE SET last_awarded_at=excluded.last_awarded_at,last_round_number=excluded.last_round_number").bind(user.id,now,roundNumber).run();
     const id=crypto.randomUUID();
     if(roomId) await db.prepare("INSERT INTO game_rounds (id,room_id,user_id,game_title,prompt,points) VALUES (?,?,?,?,?,10)").bind(id,roomId,user.id,game,prompt).run();
     await db.prepare("UPDATE users SET xp=xp+10,games_played=games_played+1 WHERE id=?").bind(user.id).run();
