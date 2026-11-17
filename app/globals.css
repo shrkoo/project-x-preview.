@@ -608,3 +608,17 @@ button:focus-visible,input:focus-visible{outline:2px solid #8fc1ff;outline-offse
  .premium-card{padding:20px}
  .settings-card{padding:6px 14px}
 }
+
+
+/* Subtle spatial depth and motion — reduced-motion safe */
+@keyframes px-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes px-orbit{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes px-enter{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+.hero-banner{animation:px-enter .65s cubic-bezier(.2,.7,.2,1) both}
+.art-center{animation:px-float 5s ease-in-out infinite}
+.ring-b{animation:px-orbit 36s linear infinite}
+.feature-pill,.game-card,.panel-card,.reward-card,.premium-card{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+.feature-pill:hover,.reward-card:hover{transform:translateY(-2px);border-color:#52749a;box-shadow:0 13px 28px #02071180}
+@media(prefers-reduced-motion:reduce){
+ *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+}
