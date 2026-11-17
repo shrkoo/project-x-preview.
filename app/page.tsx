@@ -60,7 +60,7 @@ export default function Home() {
     setSoundOn(readStore<boolean>("projectx-sound", true));
     setSelectedTheme(readStore<"neon" | "light">("projectx-theme", "neon"));
     if (!localStorage.getItem("projectx-token")) return;
-    apiRequest<{user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number}}>("/auth/me").then(async data => {
+    apiRequest<{user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number;role?:string}}>("/auth/me").then(async data => {
       const next={id:data.user.id,name:data.user.displayName,email:data.user.email,xp:data.user.xp,gamesPlayed:data.user.gamesPlayed,role:data.user.role};
       setAccount(next);setName(next.name);setEmail(next.email);setXp(next.xp);setGamesPlayed(next.gamesPlayed);
       const result=await apiRequest<{rooms:Array<any>}>("/rooms");
