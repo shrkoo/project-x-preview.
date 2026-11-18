@@ -97,7 +97,7 @@ function ProjectXMark() {
 function LanguageFlag({ code }: { code: Language }) {
   if (code === "en") return <svg viewBox="0 0 48 34" role="img" aria-label="United Kingdom flag"><defs><clipPath id="px-uk-clip"><rect width="48" height="34" rx="5"/></clipPath></defs><g clipPath="url(#px-uk-clip)"><path fill="#012169" d="M0 0h48v34H0z"/><path stroke="#fff" strokeWidth="8" d="M0 0 48 34M48 0 0 34"/><path stroke="#C8102E" strokeWidth="3.2" d="M0 0 48 34M48 0 0 34"/><path stroke="#fff" strokeWidth="11" d="M24 0v34M0 17h48"/><path stroke="#C8102E" strokeWidth="6" d="M24 0v34M0 17h48"/></g></svg>;
   if (code === "fa") return <svg viewBox="0 0 48 34" role="img" aria-label="Iran flag"><defs><clipPath id="px-ir-clip"><rect width="48" height="34" rx="5"/></clipPath></defs><g clipPath="url(#px-ir-clip)"><path fill="#239F40" d="M0 0h48v11.34H0z"/><path fill="#fff" d="M0 11.33h48v11.34H0z"/><path fill="#DA0000" d="M0 22.66h48V34H0z"/><g fill="#DA0000"><path d="m24 12.8-1.4 2.1 1.4 2.1 1.4-2.1Z"/><path d="M20.5 14.1h1v5.5h-1zm6 0h1v5.5h-1z"/></g><g fill="#239F40"><path d="M17 10.8h1v1.5h-1zm3 0h1v1.5h-1zm6 0h1v1.5h-1zm3 0h1v1.5h-1zM17 21.7h1v1.5h-1zm3 0h1v1.5h-1zm6 0h1v1.5h-1zm3 0h1v1.5h-1z"/></g></g></svg>;
-  if (code === "ar") return <span className="px-language-script" role="img" aria-label="Arabic language">ع</span>;
+  if (code === "ar") return <svg viewBox="0 0 48 34" role="img" aria-label="Pan-Arab flag"><defs><clipPath id="px-ar-clip"><rect width="48" height="34" rx="5"/></clipPath></defs><g clipPath="url(#px-ar-clip)"><path fill="#CE1126" d="M0 0h48v11.33H0z"/><path fill="#fff" d="M0 11.33h48v11.34H0z"/><path fill="#000" d="M0 22.67h48V34H0z"/><path fill="#007A3D" d="M0 0 17 17 0 34Z"/></g></svg>;
   return <svg viewBox="0 0 48 34" role="img" aria-label="Kurdistan flag"><defs><clipPath id="px-ku-clip"><rect width="48" height="34" rx="5"/></clipPath></defs><g clipPath="url(#px-ku-clip)"><path fill="#ED1C24" d="M0 0h48v11.34H0z"/><path fill="#fff" d="M0 11.33h48v11.34H0z"/><path fill="#009B3A" d="M0 22.66h48V34H0z"/><circle cx="24" cy="17" r="5.2" fill="#FCDD09"/>{Array.from({length:21},(_,i)=><path key={i} d="M24 9.8 25.1 14.8 22.9 14.8Z" fill="#FCDD09" transform={`rotate(${i*360/21} 24 17)`}/>)}</g></svg>;
 }
 function GoogleMark() {
@@ -264,7 +264,7 @@ export default function Onboarding({ onComplete }: Props) {
       <section className="px-onboarding-stage">
         {stage === "language" && <div className="px-glass-panel px-language-panel">
           <div className="px-eyebrow">PROJECT X / YOUR EXPERIENCE</div>
-          <div className="px-stage-symbol">✧</div>
+          <div className="px-language-brand-emblem" aria-label="Project X"><span className="px-language-brand-x"><ProjectXMark /></span><span className="px-language-brand-name">PROJECT <b>X</b></span></div>
           <h1>{t("choose")}</h1><p className="px-stage-subtitle">{t("chooseSub")}</p>
           <div className="px-language-grid">
             {([
