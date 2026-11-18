@@ -10,7 +10,7 @@ export function clearSession() {
 
 export function createPasswordSalt() {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
-  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  return Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
 }
 
 export async function derivePasswordHash(password: string, salt: string) {
