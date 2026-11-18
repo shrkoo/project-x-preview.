@@ -921,3 +921,13 @@ button:focus-visible,input:focus-visible{outline:2px solid #8fc1ff;outline-offse
 .px-language-brand-name b{color:var(--px-accent,#a78bfa)}
 .px-language-flag svg{display:block;width:52px;height:37px;border-radius:6px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.20)}
 @media(max-width:480px){.px-language-brand-emblem{margin:2px auto 16px;gap:7px}.px-language-brand-x{width:66px;height:66px;border-radius:21px}.px-language-brand-x .px-real-brand-mark{font-size:42px}}
+
+
+/* Text-only language choices, centered beneath the Project X emblem */
+.px-language-option{justify-content:center;gap:0}
+.px-language-label{flex:1;align-items:center;justify-content:center;text-align:center;font-size:16px;line-height:1.4}
+.px-language-option .px-radio{position:absolute;inset-inline-end:14px;margin:0}
+@media(max-width:560px){
+  .px-language-label{font-size:14px}
+  .px-language-option .px-radio{inset-inline-end:11px}
+}
