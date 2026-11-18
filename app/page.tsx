@@ -144,6 +144,10 @@ export default function Home() {
         credentials={email:cleanEmail,name:name.trim(),salt,passwordHash};
       }else{
         const challenge=await apiRequest<{salt:string}>(`/auth/password-salt?email=${encodeURIComponent(cleanEmail)}`);
+        if(challenge.salt==="AAAAAAAAAAAAAAAAAAAAAA"){
+          notify("حسابی با این ایمیل وجود ندارد. ابتدا ثبت‌نام کن.");
+          return;
+        }
         const passwordHash=await derivePasswordHash(password,challenge.salt);
         credentials={email:cleanEmail,passwordHash};
       }
