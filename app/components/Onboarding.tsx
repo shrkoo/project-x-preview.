@@ -11,18 +11,18 @@ type Mode = "login" | "signup";
 
 const copy: Record<Language, Record<string, string>> = {
   en: {
-    choose: "Choose your language", chooseSub: "Select the language you want to use across Project X.",
+    choose: "Choose your language", chooseSub: "Select the language you want to use across NOVYRA.",
     continue: "Continue", languageNote: "You can change this anytime in Settings.",
-    welcome: "Welcome to Project X", welcomeSub: "Your people. Your moments. Your world.",
+    welcome: "Welcome to NOVYRA", welcomeSub: "Your people. Your moments. Your world.",
     signIn: "Sign in", create: "Create account", loginTitle: "Welcome back", signupTitle: "Create your account",
     loginSub: "Sign in to continue to your space.", signupSub: "A few details and your space is ready.",
     google: "Continue with Google", apple: "Continue with Apple", or: "OR CONTINUE WITH EMAIL",
     name: "Full name", email: "Email address", password: "Password", confirm: "Confirm password",
-    forgot: "Forgot password?", noAccount: "New to Project X?", haveAccount: "Already have an account?",
+    forgot: "Forgot password?", noAccount: "New to NOVYRA?", haveAccount: "Already have an account?",
     createLink: "Create account", loginLink: "Sign in", minPassword: "Use at least 10 characters.",
     profileTitle: "Make it yours", profileSub: "Choose an avatar or add your own photo. You can skip this for now.",
     readyAvatars: "Choose an avatar", upload: "Upload your photo", changePhoto: "Change photo",
-    displayName: "Display name", finish: "Enter Project X", skip: "Skip for now",
+    displayName: "Display name", finish: "Enter NOVYRA", skip: "Skip for now",
     emailSent: "If this email is registered, recovery instructions will be sent.", oauthUnavailable: "Google and Apple sign-in need provider credentials before they can be activated.",
     back: "Back", resetTitle: "Reset your password", sendReset: "Send recovery link",
     passwordMismatch: "Passwords do not match.", authError: "Something went wrong. Please try again.",
@@ -30,18 +30,18 @@ const copy: Record<Language, Record<string, string>> = {
     missingName: "Enter your name.", photoError: "Choose an image file smaller than 8 MB."
   },
   fa: {
-    choose: "زبان خود را انتخاب کنید", chooseSub: "زبان مورد نظرتان را برای تمام بخش‌های Project X انتخاب کنید.",
+    choose: "زبان خود را انتخاب کنید", chooseSub: "زبان مورد نظرتان را برای تمام بخش‌های NOVYRA انتخاب کنید.",
     continue: "ادامه", languageNote: "هر زمان بخواهید می‌توانید از تنظیمات زبان را تغییر دهید.",
-    welcome: "به Project X خوش آمدید", welcomeSub: "دوستان شما، لحظه‌های شما، دنیای شما.",
+    welcome: "به NOVYRA خوش آمدید", welcomeSub: "دوستان شما، لحظه‌های شما، دنیای شما.",
     signIn: "ورود", create: "ساخت حساب", loginTitle: "خوش برگشتید", signupTitle: "حساب خود را بسازید",
     loginSub: "برای ورود به فضای خود وارد حساب شوید.", signupSub: "چند اطلاعات ساده وارد کنید تا فضای شما آماده شود.",
     google: "ادامه با Google", apple: "ادامه با Apple", or: "یا با ایمیل ادامه دهید",
     name: "نام و نام خانوادگی", email: "آدرس ایمیل", password: "رمز عبور", confirm: "تکرار رمز عبور",
-    forgot: "رمز عبور را فراموش کرده‌اید؟", noAccount: "تازه به Project X آمده‌اید؟", haveAccount: "از قبل حساب دارید؟",
+    forgot: "رمز عبور را فراموش کرده‌اید؟", noAccount: "تازه به NOVYRA آمده‌اید؟", haveAccount: "از قبل حساب دارید؟",
     createLink: "ساخت حساب", loginLink: "ورود", minPassword: "حداقل ۱۰ نویسه وارد کنید.",
     profileTitle: "پروفایل خود را بسازید", profileSub: "یک آواتار انتخاب کنید یا عکس خودتان را بارگذاری کنید. می‌توانید فعلاً رد کنید.",
     readyAvatars: "انتخاب آواتار", upload: "بارگذاری عکس شخصی", changePhoto: "تغییر عکس",
-    displayName: "نام نمایشی", finish: "ورود به Project X", skip: "فعلاً رد می‌کنم",
+    displayName: "نام نمایشی", finish: "ورود به NOVYRA", skip: "فعلاً رد می‌کنم",
     emailSent: "اگر حسابی با این ایمیل وجود داشته باشد، راهنمای بازیابی ارسال می‌شود.", oauthUnavailable: "برای فعال‌شدن ورود Google و Apple، اطلاعات اتصال رسمی این سرویس‌ها لازم است.",
     back: "بازگشت", resetTitle: "بازیابی رمز عبور", sendReset: "ارسال لینک بازیابی",
     passwordMismatch: "رمزهای عبور یکسان نیستند.", authError: "مشکلی پیش آمد. دوباره تلاش کنید.",
@@ -49,18 +49,18 @@ const copy: Record<Language, Record<string, string>> = {
     missingName: "نام خود را وارد کنید.", photoError: "یک تصویر کوچک‌تر از ۸ مگابایت انتخاب کنید."
   },
   ar: {
-    choose: "اختر لغتك", chooseSub: "اختر اللغة التي تريد استخدامها في جميع أنحاء Project X.",
+    choose: "اختر لغتك", chooseSub: "اختر اللغة التي تريد استخدامها في جميع أنحاء NOVYRA.",
     continue: "متابعة", languageNote: "يمكنك تغيير اللغة لاحقاً من الإعدادات.",
-    welcome: "مرحباً بك في Project X", welcomeSub: "أصدقاؤك، لحظاتك، عالمك.",
+    welcome: "مرحباً بك في NOVYRA", welcomeSub: "أصدقاؤك، لحظاتك، عالمك.",
     signIn: "تسجيل الدخول", create: "إنشاء حساب", loginTitle: "مرحباً بعودتك", signupTitle: "أنشئ حسابك",
     loginSub: "سجّل الدخول للمتابعة إلى مساحتك.", signupSub: "أدخل بعض التفاصيل للبدء.",
     google: "المتابعة باستخدام Google", apple: "المتابعة باستخدام Apple", or: "أو المتابعة بالبريد الإلكتروني",
     name: "الاسم الكامل", email: "البريد الإلكتروني", password: "كلمة المرور", confirm: "تأكيد كلمة المرور",
-    forgot: "هل نسيت كلمة المرور؟", noAccount: "جديد في Project X؟", haveAccount: "لديك حساب بالفعل؟",
+    forgot: "هل نسيت كلمة المرور؟", noAccount: "جديد في NOVYRA؟", haveAccount: "لديك حساب بالفعل؟",
     createLink: "إنشاء حساب", loginLink: "تسجيل الدخول", minPassword: "استخدم ١٠ أحرف على الأقل.",
     profileTitle: "اجعل ملفك الشخصي مميزاً", profileSub: "اختر صورة رمزية أو أضف صورتك. يمكنك التخطي الآن.",
     readyAvatars: "اختر صورة رمزية", upload: "تحميل صورتك", changePhoto: "تغيير الصورة",
-    displayName: "الاسم الظاهر", finish: "الدخول إلى Project X", skip: "تخطي الآن",
+    displayName: "الاسم الظاهر", finish: "الدخول إلى NOVYRA", skip: "تخطي الآن",
     emailSent: "إذا كان البريد مسجلاً، فستصلك تعليمات الاستعادة.", oauthUnavailable: "يلزم إعداد بيانات Google وApple الرسمية لتفعيل تسجيل الدخول.",
     back: "رجوع", resetTitle: "إعادة تعيين كلمة المرور", sendReset: "إرسال رابط الاستعادة",
     passwordMismatch: "كلمتا المرور غير متطابقتين.", authError: "حدث خطأ. حاول مرة أخرى.",
@@ -68,18 +68,18 @@ const copy: Record<Language, Record<string, string>> = {
     missingName: "أدخل اسمك.", photoError: "اختر صورة يقل حجمها عن ٨ ميغابايت."
   },
   ku: {
-    choose: "زمانی خۆت هەڵبژێرە", chooseSub: "زمانی بەکارهێنانی هەموو بەشەکانی Project X هەڵبژێرە.",
+    choose: "زمانی خۆت هەڵبژێرە", chooseSub: "زمانی بەکارهێنانی هەموو بەشەکانی NOVYRA هەڵبژێرە.",
     continue: "بەردەوام بە", languageNote: "دەتوانیت دواتر لە ڕێکخستنەکان زمان بگۆڕیت.",
-    welcome: "بەخێربێیت بۆ Project X", welcomeSub: "هاوڕێکانت، ساتەکانت، جیهانی تۆ.",
+    welcome: "بەخێربێیت بۆ NOVYRA", welcomeSub: "هاوڕێکانت، ساتەکانت، جیهانی تۆ.",
     signIn: "چوونەژوورەوە", create: "دروستکردنی هەژمار", loginTitle: "بەخێرهاتیتەوە", signupTitle: "هەژمارەکەت دروست بکە",
     loginSub: "بۆ بەردەوامبوون بچۆ ژوورەوە.", signupSub: "چەند زانیارییەک بنووسە بۆ دەستپێکردن.",
     google: "بەردەوامبوون بە Google", apple: "بەردەوامبوون بە Apple", or: "یان بە ئیمەیڵ بەردەوام بە",
     name: "ناوی تەواو", email: "ناونیشانی ئیمەیڵ", password: "وشەی نهێنی", confirm: "دووبارەکردنەوەی وشەی نهێنی",
-    forgot: "وشەی نهێنیت لەبیرچووە؟", noAccount: "تازە هاتوویتە Project X؟", haveAccount: "پێشتر هەژمارت هەیە؟",
+    forgot: "وشەی نهێنیت لەبیرچووە؟", noAccount: "تازە هاتوویتە NOVYRA؟", haveAccount: "پێشتر هەژمارت هەیە؟",
     createLink: "دروستکردنی هەژمار", loginLink: "چوونەژوورەوە", minPassword: "لانیکەم ١٠ پیت بەکاربهێنە.",
     profileTitle: "پرۆفایلەکەت تایبەت بکە", profileSub: "ئاوەتارێک هەڵبژێرە یان وێنەی خۆت باربکە. دەتوانیت ئێستا تێپەڕێنیت.",
     readyAvatars: "ئاوەتار هەڵبژێرە", upload: "بارکردنی وێنەی خۆت", changePhoto: "گۆڕینی وێنە",
-    displayName: "ناوی پیشاندراو", finish: "چوونە ژوورەوەی Project X", skip: "ئێستا تێپەڕێنە",
+    displayName: "ناوی پیشاندراو", finish: "چوونە ژوورەوەی NOVYRA", skip: "ئێستا تێپەڕێنە",
     emailSent: "ئەگەر ئەم ئیمەیڵە تۆمارکرابێت، ڕێنمایی گەڕاندنەوەی بۆ دەنێردرێت.", oauthUnavailable: "بۆ چالاککردنی چوونەژوورەوەی Google و Apple، زانیارییە فەرمییەکانی پێویستن.",
     back: "گەڕانەوە", resetTitle: "نوێکردنەوەی وشەی نهێنی", sendReset: "ناردنی بەستەری گەڕاندنەوە",
     passwordMismatch: "وشە نهێنییەکان یەکسان نین.", authError: "هەڵەیەک ڕوویدا. دووبارە هەوڵ بدەوە.",
@@ -91,7 +91,7 @@ const copy: Record<Language, Record<string, string>> = {
 const avatarChoices = ["✦", "🌙", "🦊", "🐼", "🐺", "🦁", "🐸", "🐙", "🪐", "⚡", "🌊", "🦋"];
 
 function ProjectXMark() {
-  // Match the exact X monogram used by the live Project X app navigation.
+  // Match the exact X monogram used by the live NOVYRA app navigation.
   return <span className="px-real-brand-mark" aria-hidden="true">X</span>;
 }
 function GoogleMark() {
@@ -267,7 +267,7 @@ export default function Onboarding({ onComplete }: Props) {
     finally { setBusy(false); }
   }
   function socialUnavailable() {
-    window.location.assign("https://project-x-api.projectx-novyratam.workers.dev/auth/google/start");
+    window.location.assign("https://novyra-api.projectx-novyratam.workers.dev/auth/google/start");
   }
   function appleUnavailable() {
     setNotice(language === "en" ? "Apple sign-in is not configured yet." : "ورود با Apple هنوز پیکربندی نشده است.");
@@ -317,8 +317,8 @@ export default function Onboarding({ onComplete }: Props) {
       <header className="px-onboarding-brand"><span className="px-logo"><ProjectXMark /></span><span className="px-brand-wordmark">project<span className="px-brand-lower-x">x</span></span></header>
       <section className="px-onboarding-stage">
         {stage === "language" && <div className="px-glass-panel px-language-panel">
-          <div className="px-eyebrow">PROJECT X / YOUR EXPERIENCE</div>
-          <div className="px-language-brand-emblem" aria-label="Project X"><span className="px-language-brand-x"><ProjectXMark /></span><span className="px-language-brand-name">PROJECT <b>X</b></span></div>
+          <div className="px-eyebrow">NOVYRA / YOUR EXPERIENCE</div>
+          <div className="px-language-brand-emblem" aria-label="NOVYRA"><span className="px-language-brand-x"><ProjectXMark /></span><span className="px-language-brand-name">PROJECT <b>X</b></span></div>
           <h1>{t("choose")}</h1><p className="px-stage-subtitle">{t("chooseSub")}</p>
           <div className="px-language-grid">
             {([
@@ -337,7 +337,7 @@ export default function Onboarding({ onComplete }: Props) {
         {stage === "auth" && <div className="px-glass-panel px-auth-panel">
           <button className="px-back-button" onClick={() => setStage("language")} aria-label={t("back")}>←</button>
           <div className="px-auth-emblem"><span>X</span><i /><b /></div>
-          <div className="px-eyebrow">PROJECT X / {recoveryMode ? "ACCOUNT RECOVERY" : "YOUR SPACE"}</div>
+          <div className="px-eyebrow">NOVYRA / {recoveryMode ? "ACCOUNT RECOVERY" : "YOUR SPACE"}</div>
           <h1>{recoveryMode ? t("resetTitle") : mode === "login" ? t("loginTitle") : t("signupTitle")}</h1>
           <p className="px-stage-subtitle">{recoveryMode ? t("minPassword") : mode === "login" ? t("loginSub") : t("signupSub")}</p>
           {!recoveryMode && <div className="px-social-stack">
@@ -353,11 +353,11 @@ export default function Onboarding({ onComplete }: Props) {
           <button type="button" className="px-primary-action" disabled={busy} onClick={recoveryMode ? resetPassword : submitAuth}>{busy ? "..." : recoveryMode ? t("sendReset") : mode === "login" ? t("signIn") : t("create")} <span>↗</span></button>
           {!recoveryMode && <div className="px-switch-mode"><span>{mode === "login" ? t("noAccount") : t("haveAccount")}</span><button onClick={() => { setMode(mode === "login" ? "signup" : "login"); setNotice(""); }}>{mode === "login" ? t("createLink") : t("loginLink")}</button></div>}
           {recoveryMode && <button className="px-switch-mode px-back-link" onClick={() => setRecoveryMode(false)}>{t("back")}</button>}
-          <p className="px-auth-security">SECURE ACCESS · PROJECT X</p>
+          <p className="px-auth-security">SECURE ACCESS · NOVYRA</p>
         </div>}
 
         {stage === "passwordSetup" && <div className="px-glass-panel px-auth-panel">
-          <div className="px-eyebrow">PROJECT X / ACCOUNT SECURITY</div>
+          <div className="px-eyebrow">NOVYRA / ACCOUNT SECURITY</div>
           <h1>{language === "en" ? "Create a password" : "تعیین رمز عبور"}</h1>
           <p className="px-stage-subtitle">{language === "en" ? "Your Google account is connected. Add a password so you can also sign in with email." : "حساب Google متصل شد. برای ورود با ایمیل نیز یک رمز عبور تعیین کن."}</p>
           <label className="px-field"><span>{t("password")}</span><input type="password" autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t("minPassword")} /></label>
@@ -366,7 +366,7 @@ export default function Onboarding({ onComplete }: Props) {
           <button type="button" className="px-skip-action" disabled={busy} onClick={skipGooglePassword}>{language === "en" ? "Skip for now" : "فعلاً رد می‌کنم"}</button>
         </div>}
         {stage === "profile" && <div className="px-glass-panel px-profile-panel">
-          <div className="px-eyebrow">PROJECT X / PERSONAL PROFILE</div>
+          <div className="px-eyebrow">NOVYRA / PERSONAL PROFILE</div>
           <div className="px-profile-preview">{photo ? <img src={photo} alt="Profile preview" /> : <span>{avatar || (profileName || user?.displayName || "X").slice(0, 1)}</span>}</div>
           <h1>{t("profileTitle")}</h1><p className="px-stage-subtitle">{t("profileSub")}</p>
           <div className="px-avatar-heading">{t("readyAvatars")}</div>
@@ -379,7 +379,7 @@ export default function Onboarding({ onComplete }: Props) {
         </div>}
       </section>
       {notice && <div className="px-onboarding-notice" role="status">{notice}<button onClick={() => setNotice("")}>×</button></div>}
-      <footer className="px-onboarding-footer"><span>PROJECT X</span><i /> <span>BUILT FOR YOUR MOMENTS</span></footer>
+      <footer className="px-onboarding-footer"><span>NOVYRA</span><i /> <span>BUILT FOR YOUR MOMENTS</span></footer>
     </main>
   );
 }
