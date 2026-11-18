@@ -93,7 +93,7 @@ export default function Home() {
     const load=()=>apiRequest<{messages:Array<{id:string;body:string;sender:string;createdAt:string}>}>(`/rooms/${activeRoom.code}/messages`).then(d=>{if(alive)setRoomMessages(d.messages);}).catch(()=>{});
     apiRequest<{ticket:string}>("/auth/ws-ticket",{method:"POST"}).then(({ticket})=>{
       if(!alive)return;
-      socket=new WebSocket(`wss://projectx-api.projectx-novyratam.workers.dev/rooms/${activeRoom.code}/live?ticket=${encodeURIComponent(ticket)}`);roomSocket.current=socket;
+      socket=new WebSocket(`wss://project-x-api.projectx-novyratam.workers.dev/rooms/${activeRoom.code}/live?ticket=${encodeURIComponent(ticket)}`);roomSocket.current=socket;
       socket.onmessage=event=>{try{const data=JSON.parse(event.data);if(data.type==="message")setRoomMessages(current=>current.some(m=>m.id===data.message.id)?current:[...current,data.message]);if(data.type==="game_round"){setRound(data.prompt);setSelected(games.find(g=>g.title===data.gameTitle)||null);notify(`دور ${data.roundNumber} شروع شد.`);}}catch{}};
       socket.onerror=()=>{if(alive&&!poll){load();poll=window.setInterval(load,5000);}};
       socket.onclose=()=>{if(alive&&!poll){load();poll=window.setInterval(load,5000);}};
@@ -225,7 +225,7 @@ export default function Home() {
   return (
     <main className={selectedTheme === "light" ? "app-shell theme-light" : "app-shell"} dir={appLanguage === "en" ? "ltr" : "rtl"}>
       <aside className="side-rail">
-        <button className="brand brand-button" onClick={() => setTab("home")}><span className="brand-mark">X</span><span>project<span className="brand-x">x</span></span></button>
+        <button className="brand brand-button" onClick={() => setTab("home")}><span className="brand-mark">X</span><span>NOVYRA</span></button>
         <div className="rail-label">فضای شما</div>
         <button className={tab === "home" ? "rail-link active" : "rail-link"} onClick={() => setTab("home")}><span>⌂</span> خانه</button>
         <button className={tab === "games" ? "rail-link active" : "rail-link"} onClick={() => setTab("games")}><span>▦</span> بازی‌ها</button>
@@ -241,7 +241,7 @@ export default function Home() {
       </aside>
       <section className="main-panel">
         <header className="topbar">
-          <div className="mobile-brand"><span className="brand-mark">X</span><b>project<span className="brand-x">x</span></b></div>
+          <div className="mobile-brand"><span className="brand-mark">X</span><b>NOVYRA</b></div>
           <div className="breadcrumb">فضای شخصی <span>/</span> {({home:"خانه",games:"بازی‌ها",friends:"دوستان",profile:"پروفایل",leaderboard:"جدول مسابقات",rewards:"پاداش‌ها",premium:"اشتراک ویژه",settings:"تنظیمات",admin:"مدیریت"} as Record<Tab,string>)[tab]}</div>
           <div className="top-actions"><button className="icon-button" onClick={() => notify(rooms.length ? `تو ${rooms.length} اتاق ذخیره‌شده داری.` : "هنوز اتاقی نساختی.")}>♧</button>{account ? <button className="login-button" onClick={logout}>خروج</button> : <button className="login-button" onClick={() => openAuth("login")}>ورود</button>}<button className="signup-button" onClick={() => account ? setTab("profile") : openAuth("signup")}>{account ? "پروفایل من" : "ساخت حساب"} <span>←</span></button></div>
         </header>
@@ -270,7 +270,7 @@ export default function Home() {
       {auth && <div className="modal-backdrop" onClick={()=>{setAuth(null);setNotice("");setForgotMode(false);}}>
         <div className="auth-modal" role="dialog" aria-modal="true" aria-label={recoveryToken?"تغییر رمز عبور":forgotMode?"بازیابی رمز عبور":auth==="signup"?"ساخت حساب کاربری":"ورود به حساب"} onClick={e=>e.stopPropagation()}>
           <button className="modal-close" onClick={()=>{setAuth(null);setNotice("");setForgotMode(false);}}>×</button>
-          <div className="brand auth-brand"><span className="brand-mark">X</span><span>project<span className="brand-x">x</span></span></div>
+          <div className="brand auth-brand"><span className="brand-mark">X</span><span>NOVYRA</span></div>
           {recoveryToken ? <>
             <span className="overline">امنیت حساب</span><h2>انتخاب رمز جدید</h2><p>یک رمز تازه و حداقل ۱۰ کاراکتری انتخاب کن.</p>
             <label>رمز عبور جدید</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="حداقل ۱۰ کاراکتر" onKeyDown={e=>{if(e.key==="Enter")document.getElementById("reset-password-submit")?.click();}}/>
@@ -285,7 +285,7 @@ export default function Home() {
             {auth==="signup" && <><label>نام نمایشی</label><input value={name} onChange={e=>setName(e.target.value)} placeholder="نام شما"/></>}
             <label>ایمیل</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@example.com"/>
             <label>رمز عبور</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")submitAuth();}} placeholder="حداقل ۱۰ کاراکتر"/>
-            <div className="social-auth"><button onClick={()=>{window.location.assign("https://projectx-api.projectx-novyratam.workers.dev/auth/google/start");}}>G <span>ادامه با Google</span></button><button onClick={()=>notify("ورود با Apple هنوز به سرویس Apple Sign in متصل نشده است.")}>● <span>ادامه با Apple</span></button></div>
+            <div className="social-auth"><button onClick={()=>{window.location.assign("https://project-x-api.projectx-novyratam.workers.dev/auth/google/start");}}>G <span>ادامه با Google</span></button><button onClick={()=>notify("ورود با Apple هنوز به سرویس Apple Sign in متصل نشده است.")}>● <span>ادامه با Apple</span></button></div>
             <button className="signup-button auth-submit" onClick={submitAuth}>{auth==="signup"?"ساخت حساب":"ورود"} <span>←</span></button>
             <button className="switch-auth" onClick={()=>{setAuth(auth==="signup"?"login":"signup");setNotice("");setForgotMode(false);}}>{auth==="signup"?"حساب داری؟ وارد شو":"حساب نداری؟ ثبت‌نام کن"}</button>
             {auth==="login" && <button className="switch-auth" onClick={()=>setForgotMode(true)}>فراموشی رمز عبور؟</button>}
