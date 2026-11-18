@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { apiRequest, setSession } from "../lib/api";
 
 type Language = "en" | "fa" | "ar" | "ku";
@@ -90,6 +90,19 @@ const copy: Record<Language, Record<string, string>> = {
 
 const avatarChoices = ["✦", "🌙", "🦊", "🐼", "🐺", "🦁", "🐸", "🐙", "🪐", "⚡", "🌊", "🦋"];
 
+function ProjectXMark() {
+  return <svg viewBox="0 0 80 80" role="img" aria-label="Project X logo">
+    <defs><linearGradient id="px-mark-fill" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#F4FBFF"/><stop offset=".48" stopColor="#9BD8FF"/><stop offset="1" stopColor="#4B91C4"/></linearGradient></defs>
+    <path d="M19 13 39 32 59 13 69 23 49 40 69 57 59 67 39 48 19 67 9 57 29 40 9 23Z" fill="url(#px-mark-fill)" stroke="#EAF8FF" strokeWidth="1.6" strokeLinejoin="round"/>
+    <path d="m19 13 20 19 20-19M29 40 9 57m40-17 20 17" fill="none" stroke="#fff" strokeOpacity=".58" strokeWidth="2"/>
+  </svg>;
+}
+function LanguageFlag({ code }: { code: Language }) {
+  if (code === "en") return <svg viewBox="0 0 48 34" aria-label="United Kingdom flag"><clipPath id="px-flag-clip"><rect width="48" height="34" rx="5"/></clipPath><g clipPath="url(#px-flag-clip)"><path fill="#17366B" d="M0 0h48v34H0z"/><path stroke="#fff" strokeWidth="8" d="m0 0 48 34M48 0 0 34"/><path stroke="#C8102E" strokeWidth="3" d="m0 0 48 34M48 0 0 34"/><path stroke="#fff" strokeWidth="12" d="M24 0v34M0 17h48"/><path stroke="#C8102E" strokeWidth="6" d="M24 0v34M0 17h48"/></g></svg>;
+  if (code === "fa") return <svg viewBox="0 0 48 34" aria-label="Iran flag"><rect width="48" height="11.34" rx="3" fill="#239F40"/><rect y="11.3" width="48" height="11.4" fill="#fff"/><rect y="22.6" width="48" height="11.4" rx="3" fill="#DA0000"/><path d="m24 12.4-2 2.3 2 2.3 2-2.3Z" fill="#DA0000"/><path d="M20 11.7h1.5v1.1H20zm6.5 0H28v1.1h-1.5z" fill="#239F40"/></svg>;
+  if (code === "ar") return <svg viewBox="0 0 48 34" aria-label="Arabic language flag"><rect width="48" height="34" rx="5" fill="#006C45"/><path d="M8 13h31M8 17h27" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/><path d="M13 23h23" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/></svg>;
+  return <svg viewBox="0 0 48 34" aria-label="Kurdistan flag"><rect width="48" height="11.34" rx="3" fill="#ED1C24"/><rect y="11.3" width="48" height="11.4" fill="#fff"/><rect y="22.6" width="48" height="11.4" rx="3" fill="#009B3A"/><circle cx="24" cy="17" r="5.3" fill="#FCDD09"/><path d="m24 10.5 1.3 4.4 4.5-.8-3.1 3.4 3.1 3.4-4.5-.8L24 24.5l-1.3-4.4-4.5.8 3.1-3.4-3.1-3.4 4.5.8Z" fill="#FCDD09"/></svg>;
+}
 function GoogleMark() {
   return <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-15Z"/><path fill="#FF3D00" d="M24 44c5.5 0 10.1-1.8 13.5-4.8l-6.6-5.1c-1.8 1.2-4 1.9-6.9 1.9-5.3 0-9.8-3.6-11.4-8.4H5.8v5.2A20 20 0 0 0 24 44Z"/><path fill="#4CAF50" d="M12.6 27.6a12 12 0 0 1 0-7.2v-5.2H5.8a20 20 0 0 0 0 17.6l6.8-5.2Z"/><path fill="#1976D2" d="M24 12.1c3 0 5.7 1 7.8 3.1l5.9-5.9C34.1 6 29.5 4 24 4A20 20 0 0 0 5.8 15.2l6.8 5.2c1.6-4.8 6.1-8.3 11.4-8.3Z"/></svg>;
 }
@@ -119,7 +132,7 @@ export default function Onboarding({ onComplete }: Props) {
   const [user, setUser] = useState<User | null>(null);
   const [recoveryMode, setRecoveryMode] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
-  const t = useMemo(() => (key: string) => copy[language][key] || key, [language]);
+  const t = (key: string) => copy[language][key] || key;
   const dir = language === "en" ? "ltr" : "rtl";
 
   useEffect(() => {
@@ -250,7 +263,7 @@ export default function Onboarding({ onComplete }: Props) {
     <main className="px-onboarding" dir={dir} lang={language}>
       <div className="px-ambient px-ambient-one" /><div className="px-ambient px-ambient-two" />
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
-      <header className="px-onboarding-brand"><span className="px-logo">X</span><span>PROJECT <b>X</b></span></header>
+      <header className="px-onboarding-brand"><span className="px-logo"><ProjectXMark /></span><span className="px-brand-wordmark">PROJECT <b>X</b></span></header>
       <section className="px-onboarding-stage">
         {stage === "language" && <div className="px-glass-panel px-language-panel">
           <div className="px-eyebrow">PROJECT X / YOUR EXPERIENCE</div>
@@ -258,12 +271,12 @@ export default function Onboarding({ onComplete }: Props) {
           <h1>{t("choose")}</h1><p className="px-stage-subtitle">{t("chooseSub")}</p>
           <div className="px-language-grid">
             {([
-              ["en", "English", "EN", "A"],
-              ["fa", "فارسی", "FA", "ف"],
-              ["ar", "العربية", "AR", "ع"],
-              ["ku", "کوردی", "KU", "ک"]
-            ] as [Language, string, string, string][]).map(([code, label, tag, glyph]) => <button type="button" key={code} className={"px-language-option" + (language === code ? " is-selected" : "")} onClick={() => chooseLanguage(code)} aria-pressed={language === code}>
-              <span className="px-language-glyph">{glyph}</span><span className="px-language-label">{label}<small>{tag}</small></span><span className="px-radio">{language === code ? "✓" : ""}</span>
+              ["en", "English", "EN"],
+              ["fa", "فارسی", "FA"],
+              ["ar", "العربية", "AR"],
+              ["ku", "کوردی", "KU"]
+            ] as [Language, string, string][]).map(([code, label, tag]) => <button type="button" key={code} className={"px-language-option" + (language === code ? " is-selected" : "")} onClick={() => chooseLanguage(code)} aria-pressed={language === code}>
+              <span className="px-language-flag"><LanguageFlag code={code}/></span><span className="px-language-label">{label}<small>{tag}</small></span><span className="px-radio">{language === code ? "✓" : ""}</span>
             </button>)}
           </div>
           <button className="px-primary-action" onClick={continueLanguage}>{t("continue")} <span>↗</span></button>
