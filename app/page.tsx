@@ -141,8 +141,14 @@ export default function Home() {
       setSession(data.token);
       const next={id:data.user.id,name:data.user.displayName,email:data.user.email,xp:data.user.xp,gamesPlayed:data.user.gamesPlayed,role:data.user.role};
       setAccount(next);setName(next.name);setEmail(next.email);setXp(next.xp||0);setGamesPlayed(next.gamesPlayed||0);setAuth(null);setPassword("");
-      const roomsData=await apiRequest<{rooms:Array<any>}>("/rooms");setRooms(roomsData.rooms.map(r=>({id:r.id,code:r.code,name:r.name,game:r.gameTitle||"",createdAt:r.createdAt})));
       notify(auth==="signup"?(data.verificationSent?"حساب ساخته شد؛ لینک تأیید ایمیل را بررسی کن.":"حساب ساخته شد؛ ارسال ایمیل هنوز به سرویس ایمیل نیاز دارد."):"با موفقیت وارد شدی.");
+      try {
+        const roomsData=await apiRequest<{rooms:Array<any>}>("/rooms");
+        setRooms(roomsData.rooms.map(r=>({id:r.id,code:r.code,name:r.name,game:r.gameTitle||"",createdAt:r.createdAt})));
+      } catch {
+        setRooms([]);
+        notify("ورود به حساب موفق بود؛ دریافت فهرست اتاق‌ها موقتاً ناموفق شد.");
+      }
     }catch(error){notify(error instanceof Error?error.message:"ورود یا ثبت‌نام ناموفق بود.");}
   }
   async function logout() {
