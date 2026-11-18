@@ -113,7 +113,7 @@ export default {
     const email = cleanEmail(body?.email ?? body?.emailAddress), displayName = cleanName(body?.name ?? body?.displayName);
     const salt=String(body?.salt ?? body?.passwordSalt ?? body?.password_salt ?? "");
     const suppliedHash=String(body?.passwordHash ?? body?.password_hash ?? body?.hash ?? "");
-    if (!/^\\S+@\\S+\\.\\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
+    if (!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
     if (displayName.length < 2) return fail("نام نمایشی باید حداقل ۲ حرف باشد.");
     if (!salt || salt.length < 16 || salt.length > 128) return fail("داده امنیتی نمک رمز از صفحه دریافت نشد؛ صفحه را تازه‌سازی کن.");
     if (!/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("خروجی رمز عبور از صفحه ناقص است؛ صفحه را تازه‌سازی کن.");
