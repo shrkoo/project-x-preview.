@@ -119,7 +119,12 @@ export default {
     if (!/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("خروجی رمز عبور از صفحه ناقص است؛ صفحه را تازه‌سازی کن.");
     const id = crypto.randomUUID(), hash = suppliedHash;
     try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role) VALUES (?,?,?,?,?,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user").run(); }
-    catch { return fail("این ایمیل قبلاً ثبت شده یا امکان ساخت حساب وجود ندارد.",409); }
+    catch (insertError) {
+      const existing=await db.prepare("SELECT id FROM users WHERE email=? LIMIT 1").bind(email).first();
+      if(existing) return fail("برای این ایمیل حسابی وجود دارد. از ورود یا ورود با Google استفاده کن.",409);
+      console.error("project-x-register-insert-error",insertError);
+      return fail("ساخت حساب در پایگاه‌داده ناموفق بود؛ مشکل از ایمیل تکراری نیست. لطفاً بعداً دوباره تلاش کن.",500);
+    }
     let verificationSent=false;
     if(env.RESEND_API_KEY && env.EMAIL_FROM) {
       try {
