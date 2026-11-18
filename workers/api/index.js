@@ -1,5 +1,5 @@
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://shrkoo.github.io",
+  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Access-Control-Max-Age": "86400",
@@ -71,7 +71,7 @@ export default {
     }});
    }
    if (path === "/auth/google/callback" && request.method === "GET") {
-    const failRedirect=(reason)=>Response.redirect(`${env.APP_URL || "https://shrkoo.github.io/project-x-preview./"}#google_error=${encodeURIComponent(reason)}`,302);
+    const failRedirect=(reason)=>Response.redirect(`${env.APP_URL || "https://novyra.pages.dev/"}#google_error=${encodeURIComponent(reason)}`,302);
     const code=url.searchParams.get("code"), state=url.searchParams.get("state"), cookie=request.headers.get("Cookie")||"";
     const cookieState=cookie.match(/(?:^|;\s*)px_google_state=([^;]+)/)?.[1]||"";
     const cleanCookie={ "Set-Cookie":"px_google_state=; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=0" };
@@ -98,7 +98,7 @@ export default {
       await db.prepare("UPDATE users SET verified_at=COALESCE(verified_at,CURRENT_TIMESTAMP) WHERE id=?").bind(user.id).run();
     }
     const session=await createSession(db,user.id);
-    const target=env.APP_URL || "https://shrkoo.github.io/project-x-preview./";
+    const target=env.APP_URL || "https://novyra.pages.dev/";
     return new Response(null,{status:302,headers:{"Location":`${target}#google_token=${encodeURIComponent(session.token)}`,"Set-Cookie":"px_google_state=; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=0",...corsHeaders}});
    }
 
@@ -129,7 +129,7 @@ export default {
     if(env.RESEND_API_KEY && env.EMAIL_FROM) {
       try {
         const token=await issueEmailToken(db,id,"verify",24*60*60*1000);
-        const link=(env.APP_URL || "https://shrkoo.github.io/project-x-preview.") + "/?verify=" + encodeURIComponent(token);
+        const link=(env.APP_URL || "https://novyra.pages.dev") + "/?verify=" + encodeURIComponent(token);
         await sendMail(env,email,"تأیید ایمیل NOVYRA",'<div dir="rtl" style="font-family:Arial"><h2>به NOVYRA خوش آمدی</h2><p>برای فعال‌سازی حساب روی لینک زیر بزن:</p><a href="' + link + '">تأیید ایمیل</a><p>این لینک تا ۲۴ ساعت معتبر است.</p></div>');
         verificationSent=true;
       } catch (mailError) {
@@ -161,7 +161,7 @@ export default {
       const pending=await db.prepare("SELECT COUNT(*) AS total FROM email_tokens WHERE user_id=? AND kind='password_reset' AND expires_at>?").bind(target.id,Date.now()).first();
       if((pending?.total||0)<3) {
         const token=await issueEmailToken(db,target.id,"password_reset",60*60*1000);
-        const link=(env.APP_URL || "https://shrkoo.github.io/project-x-preview.") + "/?reset=" + encodeURIComponent(token);
+        const link=(env.APP_URL || "https://novyra.pages.dev") + "/?reset=" + encodeURIComponent(token);
         await sendMail(env,target.email,"بازیابی رمز عبور NOVYRA",'<div dir="rtl" style="font-family:Arial"><h2>بازیابی رمز عبور</h2><p>برای انتخاب رمز جدید روی لینک زیر بزن:</p><a href="' + link + '">تغییر رمز عبور</a><p>این لینک تا یک ساعت معتبر است.</p><p>اگر این درخواست را ندادی، این پیام را نادیده بگیر.</p></div>');
       }
     }
@@ -219,7 +219,7 @@ export default {
       const pending=await db.prepare("SELECT COUNT(*) AS total FROM email_tokens WHERE user_id=? AND kind='verify' AND expires_at>?").bind(user.id,Date.now()).first();
       if((pending?.total||0)>=3) return fail("برای ارسال دوباره کمی صبر کن.",429);
       const token=await issueEmailToken(db,user.id,"verify",24*60*60*1000);
-      const link=(env.APP_URL || "https://shrkoo.github.io/project-x-preview.") + "/?verify=" + encodeURIComponent(token);
+      const link=(env.APP_URL || "https://novyra.pages.dev") + "/?verify=" + encodeURIComponent(token);
       await sendMail(env,target.email,"تأیید ایمیل NOVYRA",'<div dir="rtl" style="font-family:Arial"><h2>تأیید ایمیل</h2><p>برای تأیید حساب روی لینک زیر بزن:</p><a href="' + link + '">تأیید ایمیل</a><p>این لینک تا ۲۴ ساعت معتبر است.</p></div>');
       return json({ok:true,message:"لینک تأیید دوباره ارسال شد."});
     }
