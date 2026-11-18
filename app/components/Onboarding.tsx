@@ -151,7 +151,9 @@ export default function Onboarding({ onComplete }: Props) {
     const saved = localStorage.getItem("projectx-language") as Language | null;
     if (saved && copy[saved]) {
       setLanguage(saved);
-      setStage(localStorage.getItem("projectx-token") ? "language" : "auth");
+      // Language selection is always the first screen for a signed-out visitor.
+      // Do not auto-advance merely because a language was saved previously.
+      if (!localStorage.getItem("projectx-token")) setStage("language");
     }
     const reset = new URLSearchParams(window.location.search).get("reset");
     if (reset) {
