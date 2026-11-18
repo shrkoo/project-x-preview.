@@ -47,7 +47,7 @@ async function authenticate(request, db) {
   return await db.prepare("SELECT u.id,u.email,u.display_name,u.xp,u.games_played,u.role FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
 }
 function cleanName(value) { return String(value || "").trim().replace(/[<>]/g, "").slice(0, 32); }
-function cleanEmail(value) { return String(value || "").trim().toLowerCase().slice(0, 254); }
+function cleanEmail(value) { return String(value ?? "").normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g, "").replace(/\s+/g, "").toLowerCase().slice(0, 254); }
 export default {
  async fetch(request, env) {
   const origin = request.headers.get("Origin");
@@ -110,7 +110,7 @@ export default {
 
    if (path === "/auth/register" && request.method === "POST") {
     const body = await readBody(request);
-    const email = cleanEmail(body?.email), displayName = cleanName(body?.name);
+    const email = cleanEmail(body?.email ?? body?.emailAddress), displayName = cleanName(body?.name ?? body?.displayName);
     const salt=String(body?.salt ?? body?.passwordSalt ?? body?.password_salt ?? "");
     const suppliedHash=String(body?.passwordHash ?? body?.password_hash ?? body?.hash ?? "");
     if (!/^\\S+@\\S+\\.\\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
