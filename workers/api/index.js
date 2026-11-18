@@ -200,6 +200,12 @@ export default {
    const user = await authenticate(request,db);
    if (path.startsWith("/auth/") && path !== "/auth/register" && path !== "/auth/login") {
     if (!user) return fail("برای ادامه وارد حساب شو.",401);
+    if (path === "/auth/set-password" && request.method === "POST") {
+      const body=await readBody(request), salt=String(body?.salt||""), suppliedHash=String(body?.passwordHash||"");
+      if(!/^(?:[A-Za-z0-9_-]{22}|[a-f0-9]{32})$/.test(salt) || !/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("اطلاعات رمز عبور معتبر نیست.");
+      await db.prepare("UPDATE users SET password_hash=?,password_salt=? WHERE id=?").bind(suppliedHash,salt,user.id).run();
+      return json({ok:true,message:"رمز عبور با موفقیت تنظیم شد."});
+    }
     if (path === "/auth/me" && request.method === "GET") return json({user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role}});
     if (path === "/auth/resend-verification" && request.method === "POST") {
       if(!env.RESEND_API_KEY || !env.EMAIL_FROM) return fail("سرویس ارسال ایمیل هنوز تنظیم نشده است.",503);
