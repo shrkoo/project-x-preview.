@@ -127,6 +127,27 @@ export default function Onboarding({ onComplete }: Props) {
   const dir = language === "en" ? "ltr" : "rtl";
 
   useEffect(() => {
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const googleToken = hash.get("google_token");
+    const googleError = hash.get("google_error");
+    if (googleToken) {
+      setSession(googleToken);
+      window.history.replaceState({}, "", window.location.pathname + window.location.search);
+      apiRequest<{user:User}>("/auth/me").then(data => {
+        setUser(data.user);
+        setProfileName(data.user.displayName || "");
+        setEmail(data.user.email);
+        const savedLanguage=(localStorage.getItem("projectx-language") as Language) || "en";
+        if(localStorage.getItem("projectx-profile-complete:"+data.user.id)==="1") onComplete(data.user,savedLanguage);
+        else setStage("profile");
+      }).catch(() => { localStorage.removeItem("projectx-token"); setNotice("ورود با Google کامل نشد؛ دوباره تلاش کن."); });
+    } else if (googleError) {
+      window.history.replaceState({}, "", window.location.pathname + window.location.search);
+      setNotice(googleError);
+    }
+  }, [onComplete]);
+
+  useEffect(() => {
     const saved = localStorage.getItem("projectx-language") as Language | null;
     if (saved && copy[saved]) {
       setLanguage(saved);
@@ -210,7 +231,7 @@ export default function Onboarding({ onComplete }: Props) {
     finally { setBusy(false); }
   }
   function socialUnavailable() {
-    setNotice(t("oauthUnavailable"));
+    window.location.assign("https://project-x-api.projectx-novyratam.workers.dev/auth/google/start");
   }
   function handlePhoto(file?: File) {
     if (!file) return;
