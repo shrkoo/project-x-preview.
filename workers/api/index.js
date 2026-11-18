@@ -58,6 +58,50 @@ export default {
   const db = env.DB;
   try {
    if (path === "/health" && request.method === "GET") return json({ ok: true, service: "project-x-api", database: "connected", region: "EU" });
+
+   if (path === "/auth/google/start" && request.method === "GET") {
+    if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) return fail("ورود با Google هنوز پیکربندی نشده است.",503);
+    const state=randomToken(32);
+    const redirectUri=env.GOOGLE_REDIRECT_URI || `${url.origin}/auth/google/callback`;
+    const params=new URLSearchParams({client_id:env.GOOGLE_CLIENT_ID,redirect_uri:redirectUri,response_type:"code",scope:"openid email profile",state,prompt:"select_account"});
+    return new Response(null,{status:302,headers:{
+      "Location":`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`,
+      "Set-Cookie":`px_google_state=${state}; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=600`,
+      ...corsHeaders
+    }});
+   }
+   if (path === "/auth/google/callback" && request.method === "GET") {
+    const failRedirect=(reason)=>Response.redirect(`${env.APP_URL || "https://shrkoo.github.io/project-x-preview./"}#google_error=${encodeURIComponent(reason)}`,302);
+    const code=url.searchParams.get("code"), state=url.searchParams.get("state"), cookie=request.headers.get("Cookie")||"";
+    const cookieState=cookie.match(/(?:^|;\\s*)px_google_state=([^;]+)/)?.[1]||"";
+    const cleanCookie={ "Set-Cookie":"px_google_state=; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=0" };
+    if(!code || !state || !cookieState || state!==cookieState) return failRedirect("اعتبارسنجی امنیتی Google ناموفق بود؛ دوباره تلاش کن.");
+    if(!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) return failRedirect("تنظیمات Google OAuth کامل نیست.");
+    const redirectUri=env.GOOGLE_REDIRECT_URI || `${url.origin}/auth/google/callback`;
+    const tokenResponse=await fetch("https://oauth2.googleapis.com/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({code,client_id:env.GOOGLE_CLIENT_ID,client_secret:env.GOOGLE_CLIENT_SECRET,redirect_uri:redirectUri,grant_type:"authorization_code"})});
+    if(!tokenResponse.ok) return failRedirect("دریافت مجوز از Google ناموفق بود؛ تنظیمات Redirect URI را بررسی کن.");
+    const tokenData=await tokenResponse.json();
+    if(!tokenData.id_token) return failRedirect("Google اطلاعات هویتی معتبری برنگرداند.");
+    const verifyResponse=await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(tokenData.id_token)}`);
+    if(!verifyResponse.ok) return failRedirect("تأیید هویت Google ناموفق بود.");
+    const claims=await verifyResponse.json();
+    const now=Math.floor(Date.now()/1000);
+    if(claims.aud!==env.GOOGLE_CLIENT_ID || !["accounts.google.com","https://accounts.google.com"].includes(claims.iss) || Number(claims.exp)<=now || claims.email_verified!=="true" || !claims.sub || !/^\\S+@\\S+\\.\\S+$/.test(claims.email||"")) return failRedirect("اطلاعات حساب Google معتبر یا تأییدشده نیست.");
+    const email=cleanEmail(claims.email), displayName=cleanName(claims.name||claims.given_name||email.split("@")[0]);
+    let user=await db.prepare("SELECT id,email,display_name,xp,games_played,role FROM users WHERE email=?").bind(email).first();
+    if(!user) {
+      const id=crypto.randomUUID(), salt=randomToken(16), hash=await digest(randomToken(48));
+      const role=email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user";
+      await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,verified_at) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)").bind(id,email,displayName,hash,salt,role).run();
+      user={id,email,display_name:displayName,xp:0,games_played:0,role};
+    } else {
+      await db.prepare("UPDATE users SET verified_at=COALESCE(verified_at,CURRENT_TIMESTAMP) WHERE id=?").bind(user.id).run();
+    }
+    const session=await createSession(db,user.id);
+    const target=env.APP_URL || "https://shrkoo.github.io/project-x-preview./";
+    return new Response(null,{status:302,headers:{"Location":`${target}#google_token=${encodeURIComponent(session.token)}`,"Set-Cookie":"px_google_state=; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=0",...corsHeaders}});
+   }
+
    if (path === "/auth/register" && request.method === "POST") {
     const body = await readBody(request);
     const email = cleanEmail(body?.email), displayName = cleanName(body?.name), password = String(body?.password || "");
