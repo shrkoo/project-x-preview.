@@ -114,16 +114,20 @@ export default {
     const salt=String(body?.salt||""), suppliedHash=String(body?.passwordHash||"");
     if (!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
     if (displayName.length < 2) return fail("نام نمایشی باید حداقل ۲ حرف باشد.");
-    if(!/^[A-Za-z0-9_-]{22}$/.test(salt) || !/^[a-f0-9]{64}$/.test(suppliedHash)) return fail("اطلاعات رمز عبور معتبر نیست.");
+    if(!/^(?:[A-Za-z0-9_-]{22}|[a-f0-9]{32})$/.test(salt) || !/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("اطلاعات رمز عبور معتبر نیست؛ صفحه را تازه‌سازی کن و دوباره تلاش کن.");
     const id = crypto.randomUUID(), hash = suppliedHash;
     try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role) VALUES (?,?,?,?,?,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user").run(); }
     catch { return fail("این ایمیل قبلاً ثبت شده یا امکان ساخت حساب وجود ندارد.",409); }
     let verificationSent=false;
     if(env.RESEND_API_KEY && env.EMAIL_FROM) {
-      const token=await issueEmailToken(db,id,"verify",24*60*60*1000);
-      const link=`${env.APP_URL || "https://shrkoo.github.io/project-x-preview."}/?verify=${encodeURIComponent(token)}`;
-      await sendMail(env,email,"تأیید ایمیل Project X",`<div dir="rtl" style="font-family:Arial"><h2>به Project X خوش آمدی</h2><p>برای فعال‌سازی حساب روی لینک زیر بزن:</p><a href="${link}">تأیید ایمیل</a><p>این لینک تا ۲۴ ساعت معتبر است.</p></div>`);
-      verificationSent=true;
+      try {
+        const token=await issueEmailToken(db,id,"verify",24*60*60*1000);
+        const link=(env.APP_URL || "https://shrkoo.github.io/project-x-preview.") + "/?verify=" + encodeURIComponent(token);
+        await sendMail(env,email,"تأیید ایمیل Project X",'<div dir="rtl" style="font-family:Arial"><h2>به Project X خوش آمدی</h2><p>برای فعال‌سازی حساب روی لینک زیر بزن:</p><a href="' + link + '">تأیید ایمیل</a><p>این لینک تا ۲۴ ساعت معتبر است.</p></div>');
+        verificationSent=true;
+      } catch (mailError) {
+        console.error("project-x-verification-email-error",mailError);
+      }
     }
     const session = await createSession(db,id);
     return json({ token:session.token, expiresAt:session.expiresAt, user:{id,email,displayName,xp:0,gamesPlayed:0,role:email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user"}, emailVerificationRequired:env.REQUIRE_EMAIL_VERIFICATION==="true", verificationSent, message:verificationSent?"لینک تأیید ارسال شد.":"حساب ساخته شد؛ تنظیمات ارسال ایمیل هنوز لازم است." },201);
@@ -144,7 +148,7 @@ export default {
    if (path === "/auth/forgot-password" && request.method === "POST") {
     if(!env.RESEND_API_KEY || !env.EMAIL_FROM) return fail("سرویس ارسال ایمیل هنوز تنظیم نشده است.",503);
     const body=await readBody(request), email=cleanEmail(body?.email);
-    if(!/^\\S+@\\S+\\.\\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
+    if(!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
     const target=await db.prepare("SELECT id,email FROM users WHERE email=?").bind(email).first();
     if(target) {
       const pending=await db.prepare("SELECT COUNT(*) AS total FROM email_tokens WHERE user_id=? AND kind='password_reset' AND expires_at>?").bind(target.id,Date.now()).first();
@@ -158,7 +162,7 @@ export default {
    }
    if (path === "/auth/reset-password" && request.method === "POST") {
     const body=await readBody(request), token=String(body?.token||""), salt=String(body?.salt||""), suppliedHash=String(body?.passwordHash||"");
-    if(!/^[A-Za-z0-9_-]{22}$/.test(salt) || !/^[a-f0-9]{64}$/.test(suppliedHash)) return fail("اطلاعات رمز جدید معتبر نیست.");
+    if(!/^(?:[A-Za-z0-9_-]{22}|[a-f0-9]{32})$/.test(salt) || !/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("اطلاعات رمز جدید معتبر نیست.");
     const tokenHash=await digest(token);
     const record=await db.prepare("SELECT id,user_id FROM email_tokens WHERE token_hash=? AND kind='password_reset' AND expires_at>? AND used_at IS NULL").bind(tokenHash,Date.now()).first();
     if(!record) return fail("لینک بازیابی معتبر نیست یا منقضی شده است.",410);
