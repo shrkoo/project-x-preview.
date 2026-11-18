@@ -1,4 +1,4 @@
-name: Build and deploy Project X preview
+name: Build and deploy NOVYRA preview
 
 on:
   push:
