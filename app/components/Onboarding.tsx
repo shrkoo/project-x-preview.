@@ -233,6 +233,9 @@ export default function Onboarding({ onComplete }: Props) {
   function socialUnavailable() {
     window.location.assign("https://project-x-api.projectx-novyratam.workers.dev/auth/google/start");
   }
+  function appleUnavailable() {
+    setNotice(language === "en" ? "Apple sign-in is not configured yet." : "ورود با Apple هنوز پیکربندی نشده است.");
+  }
   function handlePhoto(file?: File) {
     if (!file) return;
     if (!file.type.startsWith("image/") || file.size > 8 * 1024 * 1024) { setNotice(t("photoError")); return; }
@@ -303,7 +306,7 @@ export default function Onboarding({ onComplete }: Props) {
           <p className="px-stage-subtitle">{recoveryMode ? t("minPassword") : mode === "login" ? t("loginSub") : t("signupSub")}</p>
           {!recoveryMode && <div className="px-social-stack">
             <button type="button" className="px-social-button px-google-button" onClick={socialUnavailable}><GoogleMark/><span>{t("google")}</span></button>
-            <button type="button" className="px-social-button px-apple-button" onClick={socialUnavailable}><AppleMark/><span>{t("apple")}</span></button>
+            <button type="button" className="px-social-button px-apple-button" onClick={appleUnavailable}><AppleMark/><span>{t("apple")}</span></button>
           </div>}
           {!recoveryMode && <div className="px-separator"><span>{t("or")}</span></div>}
           {!recoveryMode && mode === "signup" && <label className="px-field"><span>{t("name")}</span><input autoComplete="name" value={name} onChange={e => setName(e.target.value)} placeholder={t("name")} /></label>}
