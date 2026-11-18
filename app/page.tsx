@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { apiRequest, clearSession, setSession } from "./lib/api";
+import { apiRequest, clearSession, setSession, createPasswordSalt, derivePasswordHash } from "./lib/api";
 import Onboarding from "./components/Onboarding";
 type AppLanguage = "en" | "fa" | "ar" | "ku";
 
@@ -137,7 +137,17 @@ export default function Home() {
     if(auth==="signup"&&!name.trim()){notify("نام نمایشی را وارد کن.");return;}
     try{
       const endpoint=auth==="signup"?"/auth/register":"/auth/login";
-      const data=await apiRequest<{token:string;user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number;role?:string};emailVerificationRequired?:boolean;verificationSent?:boolean}>(endpoint,{method:"POST",body:JSON.stringify({email:cleanEmail,password,...(auth==="signup"?{name:name.trim()}:{})})});
+      let credentials:Record<string,string>;
+      if(auth==="signup"){
+        const salt=createPasswordSalt();
+        const passwordHash=await derivePasswordHash(password,salt);
+        credentials={email:cleanEmail,name:name.trim(),salt,passwordHash};
+      }else{
+        const challenge=await apiRequest<{salt:string}>(`/auth/password-salt?email=${encodeURIComponent(cleanEmail)}`);
+        const passwordHash=await derivePasswordHash(password,challenge.salt);
+        credentials={email:cleanEmail,passwordHash};
+      }
+      const data=await apiRequest<{token:string;user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number;role?:string};emailVerificationRequired?:boolean;verificationSent?:boolean}>(endpoint,{method:"POST",body:JSON.stringify(credentials)});
       setSession(data.token);
       const next={id:data.user.id,name:data.user.displayName,email:data.user.email,xp:data.user.xp,gamesPlayed:data.user.gamesPlayed,role:data.user.role};
       setAccount(next);setName(next.name);setEmail(next.email);setXp(next.xp||0);setGamesPlayed(next.gamesPlayed||0);setAuth(null);setPassword("");
