@@ -114,7 +114,7 @@ export default {
     const salt=String(body?.salt||""), suppliedHash=String(body?.passwordHash||"");
     if (!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
     if (displayName.length < 2) return fail("نام نمایشی باید حداقل ۲ حرف باشد.");
-    if(!/^(?:[A-Za-z0-9_-]{22}|[a-f0-9]{32})$/.test(salt) || !/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("اطلاعات رمز عبور معتبر نیست؛ صفحه را تازه‌سازی کن و دوباره تلاش کن.");
+    if(!/^[A-Za-z0-9_-]{16,64}$/.test(salt) || !/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("داده امنیتی رمز نامعتبر است؛ لطفاً دوباره تلاش کن.");
     const id = crypto.randomUUID(), hash = suppliedHash;
     try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role) VALUES (?,?,?,?,?,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user").run(); }
     catch { return fail("این ایمیل قبلاً ثبت شده یا امکان ساخت حساب وجود ندارد.",409); }
