@@ -6,7 +6,7 @@ import { apiRequest, setSession, createPasswordSalt, derivePasswordHash } from "
 type Language = "en" | "fa" | "ar" | "ku";
 type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string };
 type Props = { onComplete: (user: User | null, language: Language) => void };
-type Stage = "language" | "auth" | "profile";
+type Stage = "language" | "auth" | "profile" | "passwordSetup";
 type Mode = "login" | "signup";
 
 const copy: Record<Language, Record<string, string>> = {
@@ -138,8 +138,7 @@ export default function Onboarding({ onComplete }: Props) {
         setProfileName(data.user.displayName || "");
         setEmail(data.user.email);
         const savedLanguage=(localStorage.getItem("projectx-language") as Language) || "en";
-        if(localStorage.getItem("projectx-profile-complete:"+data.user.id)==="1") onComplete(data.user,savedLanguage);
-        else setStage("profile");
+        setStage("passwordSetup");
       }).catch(() => { localStorage.removeItem("projectx-token"); setNotice("ورود با Google کامل نشد؛ دوباره تلاش کن."); });
     } else if (googleError) {
       window.history.replaceState({}, "", window.location.pathname + window.location.search);
@@ -222,6 +221,25 @@ export default function Onboarding({ onComplete }: Props) {
     } finally {
       setBusy(false);
     }
+  }
+  async function saveGooglePassword() {
+    if (password.length < 10) { setNotice(t("weakPassword")); return; }
+    if (password !== confirmPassword) { setNotice(t("passwordMismatch")); return; }
+    setBusy(true); setNotice("");
+    try {
+      const salt = createPasswordSalt();
+      const passwordHash = await derivePasswordHash(password, salt);
+      await apiRequest("/auth/set-password", { method: "POST", body: JSON.stringify({ salt, passwordHash }) });
+      setPassword(""); setConfirmPassword("");
+      if (user && localStorage.getItem("projectx-profile-complete:" + user.id) === "1") onComplete(user, language);
+      else setStage("profile");
+      setNotice(language === "en" ? "Password saved. You can now sign in with email and password." : "رمز عبور ذخیره شد؛ از این پس می‌توانی با ایمیل و رمز وارد شوی.");
+    } catch (error) { setNotice(error instanceof Error ? error.message : t("authError")); }
+    finally { setBusy(false); }
+  }
+  function skipGooglePassword() {
+    if (user && localStorage.getItem("projectx-profile-complete:" + user.id) === "1") onComplete(user, language);
+    else setStage("profile");
   }
   async function requestRecovery() {
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) { setNotice(t("invalidEmail")); return; }
@@ -338,6 +356,15 @@ export default function Onboarding({ onComplete }: Props) {
           <p className="px-auth-security">SECURE ACCESS · PROJECT X</p>
         </div>}
 
+        {stage === "passwordSetup" && <div className="px-glass-panel px-auth-panel">
+          <div className="px-eyebrow">PROJECT X / ACCOUNT SECURITY</div>
+          <h1>{language === "en" ? "Create a password" : "تعیین رمز عبور"}</h1>
+          <p className="px-stage-subtitle">{language === "en" ? "Your Google account is connected. Add a password so you can also sign in with email." : "حساب Google متصل شد. برای ورود با ایمیل نیز یک رمز عبور تعیین کن."}</p>
+          <label className="px-field"><span>{t("password")}</span><input type="password" autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t("minPassword")} /></label>
+          <label className="px-field"><span>{t("confirm")}</span><input type="password" autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder={t("confirm")} /></label>
+          <button type="button" className="px-primary-action" disabled={busy} onClick={saveGooglePassword}>{busy ? "..." : (language === "en" ? "Save password" : "ذخیره رمز عبور")} <span>↗</span></button>
+          <button type="button" className="px-skip-action" disabled={busy} onClick={skipGooglePassword}>{language === "en" ? "Skip for now" : "فعلاً رد می‌کنم"}</button>
+        </div>}
         {stage === "profile" && <div className="px-glass-panel px-profile-panel">
           <div className="px-eyebrow">PROJECT X / PERSONAL PROFILE</div>
           <div className="px-profile-preview">{photo ? <img src={photo} alt="Profile preview" /> : <span>{avatar || (profileName || user?.displayName || "X").slice(0, 1)}</span>}</div>
