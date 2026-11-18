@@ -102,14 +102,20 @@ export default {
     return new Response(null,{status:302,headers:{"Location":`${target}#google_token=${encodeURIComponent(session.token)}`,"Set-Cookie":"px_google_state=; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=0",...corsHeaders}});
    }
 
+   if (path === "/auth/password-salt" && request.method === "GET") {
+    const email=cleanEmail(url.searchParams.get("email"));
+    const user=await db.prepare("SELECT password_salt FROM users WHERE email=?").bind(email).first();
+    return json({salt:user?.password_salt || "AAAAAAAAAAAAAAAAAAAAAA"});
+   }
+
    if (path === "/auth/register" && request.method === "POST") {
     const body = await readBody(request);
-    const email = cleanEmail(body?.email), displayName = cleanName(body?.name), password = String(body?.password || "");
+    const email = cleanEmail(body?.email), displayName = cleanName(body?.name);
+    const salt=String(body?.salt||""), suppliedHash=String(body?.passwordHash||"");
     if (!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
     if (displayName.length < 2) return fail("نام نمایشی باید حداقل ۲ حرف باشد.");
-    if (password.length < 10) return fail("رمز عبور باید حداقل ۱۰ کاراکتر باشد.");
-    if (password.length > 128) return fail("رمز عبور بیش از حد طولانی است.");
-    const id = crypto.randomUUID(), salt = randomToken(16), hash = await passwordHash(password,salt);
+    if(!/^[A-Za-z0-9_-]{22}$/.test(salt) || !/^[a-f0-9]{64}$/.test(suppliedHash)) return fail("اطلاعات رمز عبور معتبر نیست.");
+    const id = crypto.randomUUID(), hash = suppliedHash;
     try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role) VALUES (?,?,?,?,?,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user").run(); }
     catch { return fail("این ایمیل قبلاً ثبت شده یا امکان ساخت حساب وجود ندارد.",409); }
     let verificationSent=false;
@@ -136,36 +142,39 @@ export default {
     return json({ok:true,message:"ایمیل با موفقیت تأیید شد."});
    }
    if (path === "/auth/forgot-password" && request.method === "POST") {
+    if(!env.RESEND_API_KEY || !env.EMAIL_FROM) return fail("سرویس ارسال ایمیل هنوز تنظیم نشده است.",503);
     const body=await readBody(request), email=cleanEmail(body?.email);
-    const target=await db.prepare("SELECT id,email,display_name FROM users WHERE email=?").bind(email).first();
-    if(target && env.RESEND_API_KEY && env.EMAIL_FROM) {
-      const token=await issueEmailToken(db,target.id,"password_reset",60*60*1000);
-      const link=`${env.APP_URL || "https://shrkoo.github.io/project-x-preview."}/?reset=${encodeURIComponent(token)}`;
-      await sendMail(env,target.email,"بازیابی رمز عبور Project X",`<div dir="rtl" style="font-family:Arial"><h2>بازیابی رمز عبور</h2><p>برای انتخاب رمز جدید روی لینک زیر بزن:</p><a href="${link}">تغییر رمز عبور</a><p>این لینک تا یک ساعت معتبر است.</p></div>`);
+    if(!/^\\S+@\\S+\\.\\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
+    const target=await db.prepare("SELECT id,email FROM users WHERE email=?").bind(email).first();
+    if(target) {
+      const pending=await db.prepare("SELECT COUNT(*) AS total FROM email_tokens WHERE user_id=? AND kind='password_reset' AND expires_at>?").bind(target.id,Date.now()).first();
+      if((pending?.total||0)<3) {
+        const token=await issueEmailToken(db,target.id,"password_reset",60*60*1000);
+        const link=(env.APP_URL || "https://shrkoo.github.io/project-x-preview.") + "/?reset=" + encodeURIComponent(token);
+        await sendMail(env,target.email,"بازیابی رمز عبور Project X",'<div dir="rtl" style="font-family:Arial"><h2>بازیابی رمز عبور</h2><p>برای انتخاب رمز جدید روی لینک زیر بزن:</p><a href="' + link + '">تغییر رمز عبور</a><p>این لینک تا یک ساعت معتبر است.</p><p>اگر این درخواست را ندادی، این پیام را نادیده بگیر.</p></div>');
+      }
     }
-    return json({ok:true,message:"اگر حسابی با این ایمیل وجود داشته باشد و سرویس ایمیل تنظیم شده باشد، راهنمای بازیابی ارسال می‌شود."});
+    return json({ok:true,message:"اگر حسابی با این ایمیل وجود داشته باشد، راهنمای بازیابی ارسال می‌شود."});
    }
    if (path === "/auth/reset-password" && request.method === "POST") {
-    const body=await readBody(request), token=String(body?.token||""), password=String(body?.password||"");
-    if(password.length<10 || password.length>128) return fail("رمز جدید باید بین ۱۰ تا ۱۲۸ کاراکتر باشد.");
+    const body=await readBody(request), token=String(body?.token||""), salt=String(body?.salt||""), suppliedHash=String(body?.passwordHash||"");
+    if(!/^[A-Za-z0-9_-]{22}$/.test(salt) || !/^[a-f0-9]{64}$/.test(suppliedHash)) return fail("اطلاعات رمز جدید معتبر نیست.");
     const tokenHash=await digest(token);
     const record=await db.prepare("SELECT id,user_id FROM email_tokens WHERE token_hash=? AND kind='password_reset' AND expires_at>? AND used_at IS NULL").bind(tokenHash,Date.now()).first();
     if(!record) return fail("لینک بازیابی معتبر نیست یا منقضی شده است.",410);
-    const salt=randomToken(16), hash=await passwordHash(password,salt);
     await db.batch([
-      db.prepare("UPDATE users SET password_hash=?,password_salt=? WHERE id=?").bind(hash,salt,record.user_id),
+      db.prepare("UPDATE users SET password_hash=?,password_salt=? WHERE id=?").bind(suppliedHash,salt,record.user_id),
       db.prepare("UPDATE email_tokens SET used_at=CURRENT_TIMESTAMP WHERE id=?").bind(record.id),
       db.prepare("DELETE FROM sessions WHERE user_id=?").bind(record.user_id)
     ]);
     return json({ok:true,message:"رمز عبور تغییر کرد؛ دوباره وارد شو."});
    }
    if (path === "/auth/login" && request.method === "POST") {
-    const body = await readBody(request), email = cleanEmail(body?.email), password = String(body?.password || "");
+    const body = await readBody(request), email = cleanEmail(body?.email), suppliedHash = String(body?.passwordHash || "");
     const user = await db.prepare("SELECT * FROM users WHERE email=?").bind(email).first();
     if (!user) return fail("ایمیل یا رمز عبور اشتباه است.",401);
     if(env.REQUIRE_EMAIL_VERIFICATION==="true" && !user.verified_at) return fail("ابتدا ایمیل خود را تأیید کن.",403);
-    const candidate = await passwordHash(password,user.password_salt);
-    if (candidate !== user.password_hash) return fail("ایمیل یا رمز عبور اشتباه است.",401);
+    if (!/^[a-f0-9]{64}$/.test(suppliedHash) || suppliedHash !== user.password_hash) return fail("ایمیل یا رمز عبور اشتباه است.",401);
     const session = await createSession(db,user.id);
     return json({ token:session.token, expiresAt:session.expiresAt, user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role} });
    }
@@ -186,6 +195,17 @@ export default {
    if (path.startsWith("/auth/") && path !== "/auth/register" && path !== "/auth/login") {
     if (!user) return fail("برای ادامه وارد حساب شو.",401);
     if (path === "/auth/me" && request.method === "GET") return json({user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role}});
+    if (path === "/auth/resend-verification" && request.method === "POST") {
+      if(!env.RESEND_API_KEY || !env.EMAIL_FROM) return fail("سرویس ارسال ایمیل هنوز تنظیم نشده است.",503);
+      const target=await db.prepare("SELECT email,verified_at FROM users WHERE id=?").bind(user.id).first();
+      if(target?.verified_at) return json({ok:true,alreadyVerified:true,message:"ایمیل قبلاً تأیید شده است."});
+      const pending=await db.prepare("SELECT COUNT(*) AS total FROM email_tokens WHERE user_id=? AND kind='verify' AND expires_at>?").bind(user.id,Date.now()).first();
+      if((pending?.total||0)>=3) return fail("برای ارسال دوباره کمی صبر کن.",429);
+      const token=await issueEmailToken(db,user.id,"verify",24*60*60*1000);
+      const link=(env.APP_URL || "https://shrkoo.github.io/project-x-preview.") + "/?verify=" + encodeURIComponent(token);
+      await sendMail(env,target.email,"تأیید ایمیل Project X",'<div dir="rtl" style="font-family:Arial"><h2>تأیید ایمیل</h2><p>برای تأیید حساب روی لینک زیر بزن:</p><a href="' + link + '">تأیید ایمیل</a><p>این لینک تا ۲۴ ساعت معتبر است.</p></div>');
+      return json({ok:true,message:"لینک تأیید دوباره ارسال شد."});
+    }
     if (path === "/auth/profile" && request.method === "PATCH") {
       const body=await readBody(request), name=cleanName(body?.name);
       if(name.length<2) return fail("نام نمایشی معتبر نیست.");
