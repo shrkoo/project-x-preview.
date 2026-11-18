@@ -94,12 +94,6 @@ function ProjectXMark() {
   // Match the exact X monogram used by the live Project X app navigation.
   return <span className="px-real-brand-mark" aria-hidden="true">X</span>;
 }
-function LanguageFlag({ code }: { code: Language }) {
-  if (code === "en") return <svg viewBox="0 0 48 34" role="img" aria-label="United Kingdom flag"><defs><clipPath id="px-uk-clip"><rect width="48" height="34" rx="5"/></clipPath></defs><g clipPath="url(#px-uk-clip)"><path fill="#012169" d="M0 0h48v34H0z"/><path stroke="#fff" strokeWidth="8" d="M0 0 48 34M48 0 0 34"/><path stroke="#C8102E" strokeWidth="3.2" d="M0 0 48 34M48 0 0 34"/><path stroke="#fff" strokeWidth="11" d="M24 0v34M0 17h48"/><path stroke="#C8102E" strokeWidth="6" d="M24 0v34M0 17h48"/></g></svg>;
-  if (code === "fa") return <svg viewBox="0 0 48 34" role="img" aria-label="Iran flag"><defs><clipPath id="px-ir-clip"><rect width="48" height="34" rx="5"/></clipPath></defs><g clipPath="url(#px-ir-clip)"><path fill="#239F40" d="M0 0h48v11.34H0z"/><path fill="#fff" d="M0 11.33h48v11.34H0z"/><path fill="#DA0000" d="M0 22.66h48V34H0z"/><g fill="#DA0000"><path d="m24 12.8-1.4 2.1 1.4 2.1 1.4-2.1Z"/><path d="M20.5 14.1h1v5.5h-1zm6 0h1v5.5h-1z"/></g><g fill="#239F40"><path d="M17 10.8h1v1.5h-1zm3 0h1v1.5h-1zm6 0h1v1.5h-1zm3 0h1v1.5h-1zM17 21.7h1v1.5h-1zm3 0h1v1.5h-1zm6 0h1v1.5h-1zm3 0h1v1.5h-1z"/></g></g></svg>;
-  if (code === "ar") return <svg viewBox="0 0 48 34" role="img" aria-label="Pan-Arab flag"><defs><clipPath id="px-ar-clip"><rect width="48" height="34" rx="5"/></clipPath></defs><g clipPath="url(#px-ar-clip)"><path fill="#CE1126" d="M0 0h48v11.33H0z"/><path fill="#fff" d="M0 11.33h48v11.34H0z"/><path fill="#000" d="M0 22.67h48V34H0z"/><path fill="#007A3D" d="M0 0 17 17 0 34Z"/></g></svg>;
-  return <svg viewBox="0 0 48 34" role="img" aria-label="Kurdistan flag"><defs><clipPath id="px-ku-clip"><rect width="48" height="34" rx="5"/></clipPath></defs><g clipPath="url(#px-ku-clip)"><path fill="#ED1C24" d="M0 0h48v11.34H0z"/><path fill="#fff" d="M0 11.33h48v11.34H0z"/><path fill="#009B3A" d="M0 22.66h48V34H0z"/><circle cx="24" cy="17" r="5.2" fill="#FCDD09"/>{Array.from({length:21},(_,i)=><path key={i} d="M24 9.8 25.1 14.8 22.9 14.8Z" fill="#FCDD09" transform={`rotate(${i*360/21} 24 17)`}/>)}</g></svg>;
-}
 function GoogleMark() {
   return <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-15Z"/><path fill="#FF3D00" d="M24 44c5.5 0 10.1-1.8 13.5-4.8l-6.6-5.1c-1.8 1.2-4 1.9-6.9 1.9-5.3 0-9.8-3.6-11.4-8.4H5.8v5.2A20 20 0 0 0 24 44Z"/><path fill="#4CAF50" d="M12.6 27.6a12 12 0 0 1 0-7.2v-5.2H5.8a20 20 0 0 0 0 17.6l6.8-5.2Z"/><path fill="#1976D2" d="M24 12.1c3 0 5.7 1 7.8 3.1l5.9-5.9C34.1 6 29.5 4 24 4A20 20 0 0 0 5.8 15.2l6.8 5.2c1.6-4.8 6.1-8.3 11.4-8.3Z"/></svg>;
 }
@@ -268,12 +262,12 @@ export default function Onboarding({ onComplete }: Props) {
           <h1>{t("choose")}</h1><p className="px-stage-subtitle">{t("chooseSub")}</p>
           <div className="px-language-grid">
             {([
-              ["en", "English", "EN"],
-              ["fa", "فارسی", "FA"],
-              ["ar", "العربية", "AR"],
-              ["ku", "کوردی", "KU"]
-            ] as [Language, string, string][]).map(([code, label, tag]) => <button type="button" key={code} className={"px-language-option" + (language === code ? " is-selected" : "")} onClick={() => chooseLanguage(code)} aria-pressed={language === code}>
-              <span className="px-language-flag"><LanguageFlag code={code}/></span><span className="px-language-label">{label}<small>{tag}</small></span><span className="px-radio">{language === code ? "✓" : ""}</span>
+              ["en", "English"],
+              ["fa", "فارسی"],
+              ["ar", "العربية"],
+              ["ku", "کوردی"]
+            ] as [Language, string][]).map(([code, label]) => <button type="button" key={code} className={"px-language-option" + (language === code ? " is-selected" : "")} onClick={() => chooseLanguage(code)} aria-pressed={language === code}>
+              <span className="px-language-label">{label}</span><span className="px-radio">{language === code ? "✓" : ""}</span>
             </button>)}
           </div>
           <button className="px-primary-action" onClick={continueLanguage}>{t("continue")} <span>↗</span></button>
