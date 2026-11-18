@@ -22,7 +22,7 @@
     {
       "binding": "DB",
       "database_name": "project-x-main",
-      "database_id": "5a8c8d60-10ab-4bb3-888e-f5cd228d3e1a",
+      "database_id": "04aef3ef-8143-4fc2-af7b-7f40c06534e1",
       "migrations_dir": "migrations"
     }
   ],
