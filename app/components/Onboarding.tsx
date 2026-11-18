@@ -90,9 +90,9 @@ const copy: Record<Language, Record<string, string>> = {
 
 const avatarChoices = ["✦", "🌙", "🦊", "🐼", "🐺", "🦁", "🐸", "🐙", "🪐", "⚡", "🌊", "🦋"];
 
-function ProjectXMark() {
+function NovyraMark() {
   // Match the exact X monogram used by the live NOVYRA app navigation.
-  return <span className="px-real-brand-mark" aria-hidden="true">X</span>;
+  return <span className="px-real-brand-mark" aria-hidden="true">N</span>;
 }
 function GoogleMark() {
   return <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-15Z"/><path fill="#FF3D00" d="M24 44c5.5 0 10.1-1.8 13.5-4.8l-6.6-5.1c-1.8 1.2-4 1.9-6.9 1.9-5.3 0-9.8-3.6-11.4-8.4H5.8v5.2A20 20 0 0 0 24 44Z"/><path fill="#4CAF50" d="M12.6 27.6a12 12 0 0 1 0-7.2v-5.2H5.8a20 20 0 0 0 0 17.6l6.8-5.2Z"/><path fill="#1976D2" d="M24 12.1c3 0 5.7 1 7.8 3.1l5.9-5.9C34.1 6 29.5 4 24 4A20 20 0 0 0 5.8 15.2l6.8 5.2c1.6-4.8 6.1-8.3 11.4-8.3Z"/></svg>;
@@ -314,11 +314,11 @@ export default function Onboarding({ onComplete }: Props) {
     <main className="px-onboarding" dir={dir} lang={language}>
       <div className="px-ambient px-ambient-one" /><div className="px-ambient px-ambient-two" />
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
-      <header className="px-onboarding-brand"><span className="px-logo"><ProjectXMark /></span><span className="px-brand-wordmark">project<span className="px-brand-lower-x">x</span></span></header>
+      <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">project<span className="px-brand-lower-x">x</span></span></header>
       <section className="px-onboarding-stage">
         {stage === "language" && <div className="px-glass-panel px-language-panel">
           <div className="px-eyebrow">NOVYRA / YOUR EXPERIENCE</div>
-          <div className="px-language-brand-emblem" aria-label="NOVYRA"><span className="px-language-brand-x"><ProjectXMark /></span><span className="px-language-brand-name">PROJECT <b>X</b></span></div>
+          <div className="px-language-brand-emblem" aria-label="NOVYRA"><span className="px-language-brand-x"><NovyraMark /></span><span className="px-language-brand-name">PROJECT <b>X</b></span></div>
           <h1>{t("choose")}</h1><p className="px-stage-subtitle">{t("chooseSub")}</p>
           <div className="px-language-grid">
             {([
@@ -336,7 +336,7 @@ export default function Onboarding({ onComplete }: Props) {
 
         {stage === "auth" && <div className="px-glass-panel px-auth-panel">
           <button className="px-back-button" onClick={() => setStage("language")} aria-label={t("back")}>←</button>
-          <div className="px-auth-emblem"><span>X</span><i /><b /></div>
+          <div className="px-auth-emblem"><span>N</span><i /><b /></div>
           <div className="px-eyebrow">NOVYRA / {recoveryMode ? "ACCOUNT RECOVERY" : "YOUR SPACE"}</div>
           <h1>{recoveryMode ? t("resetTitle") : mode === "login" ? t("loginTitle") : t("signupTitle")}</h1>
           <p className="px-stage-subtitle">{recoveryMode ? t("minPassword") : mode === "login" ? t("loginSub") : t("signupSub")}</p>
@@ -367,7 +367,7 @@ export default function Onboarding({ onComplete }: Props) {
         </div>}
         {stage === "profile" && <div className="px-glass-panel px-profile-panel">
           <div className="px-eyebrow">NOVYRA / PERSONAL PROFILE</div>
-          <div className="px-profile-preview">{photo ? <img src={photo} alt="Profile preview" /> : <span>{avatar || (profileName || user?.displayName || "X").slice(0, 1)}</span>}</div>
+          <div className="px-profile-preview">{photo ? <img src={photo} alt="Profile preview" /> : <span>{avatar || (profileName || user?.displayName || "N").slice(0, 1)}</span>}</div>
           <h1>{t("profileTitle")}</h1><p className="px-stage-subtitle">{t("profileSub")}</p>
           <div className="px-avatar-heading">{t("readyAvatars")}</div>
           <div className="px-avatar-grid">{avatarChoices.map(item => <button key={item} className={"px-avatar-choice" + (avatar === item && !photo ? " is-selected" : "")} onClick={() => { setAvatar(item); setPhoto(""); }} aria-label={"Avatar " + item}>{item}</button>)}</div>
