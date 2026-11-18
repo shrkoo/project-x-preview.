@@ -91,17 +91,14 @@ const copy: Record<Language, Record<string, string>> = {
 const avatarChoices = ["✦", "🌙", "🦊", "🐼", "🐺", "🦁", "🐸", "🐙", "🪐", "⚡", "🌊", "🦋"];
 
 function ProjectXMark() {
-  return <svg viewBox="0 0 80 80" role="img" aria-label="Project X logo">
-    <defs><linearGradient id="px-mark-fill" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#F4FBFF"/><stop offset=".48" stopColor="#9BD8FF"/><stop offset="1" stopColor="#4B91C4"/></linearGradient></defs>
-    <path d="M19 13 39 32 59 13 69 23 49 40 69 57 59 67 39 48 19 67 9 57 29 40 9 23Z" fill="url(#px-mark-fill)" stroke="#EAF8FF" strokeWidth="1.6" strokeLinejoin="round"/>
-    <path d="m19 13 20 19 20-19M29 40 9 57m40-17 20 17" fill="none" stroke="#fff" strokeOpacity=".58" strokeWidth="2"/>
-  </svg>;
+  // Match the exact X monogram used by the live Project X app navigation.
+  return <span className="px-real-brand-mark" aria-hidden="true">X</span>;
 }
 function LanguageFlag({ code }: { code: Language }) {
-  if (code === "en") return <svg viewBox="0 0 48 34" aria-label="United Kingdom flag"><clipPath id="px-flag-clip"><rect width="48" height="34" rx="5"/></clipPath><g clipPath="url(#px-flag-clip)"><path fill="#17366B" d="M0 0h48v34H0z"/><path stroke="#fff" strokeWidth="8" d="m0 0 48 34M48 0 0 34"/><path stroke="#C8102E" strokeWidth="3" d="m0 0 48 34M48 0 0 34"/><path stroke="#fff" strokeWidth="12" d="M24 0v34M0 17h48"/><path stroke="#C8102E" strokeWidth="6" d="M24 0v34M0 17h48"/></g></svg>;
-  if (code === "fa") return <svg viewBox="0 0 48 34" aria-label="Iran flag"><rect width="48" height="11.34" rx="3" fill="#239F40"/><rect y="11.3" width="48" height="11.4" fill="#fff"/><rect y="22.6" width="48" height="11.4" rx="3" fill="#DA0000"/><path d="m24 12.4-2 2.3 2 2.3 2-2.3Z" fill="#DA0000"/><path d="M20 11.7h1.5v1.1H20zm6.5 0H28v1.1h-1.5z" fill="#239F40"/></svg>;
-  if (code === "ar") return <svg viewBox="0 0 48 34" aria-label="Arabic language flag"><rect width="48" height="34" rx="5" fill="#006C45"/><path d="M8 13h31M8 17h27" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/><path d="M13 23h23" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/></svg>;
-  return <svg viewBox="0 0 48 34" aria-label="Kurdistan flag"><rect width="48" height="11.34" rx="3" fill="#ED1C24"/><rect y="11.3" width="48" height="11.4" fill="#fff"/><rect y="22.6" width="48" height="11.4" rx="3" fill="#009B3A"/><circle cx="24" cy="17" r="5.3" fill="#FCDD09"/><path d="m24 10.5 1.3 4.4 4.5-.8-3.1 3.4 3.1 3.4-4.5-.8L24 24.5l-1.3-4.4-4.5.8 3.1-3.4-3.1-3.4 4.5.8Z" fill="#FCDD09"/></svg>;
+  if (code === "en") return <svg viewBox="0 0 48 34" role="img" aria-label="United Kingdom flag"><defs><clipPath id="px-uk-clip"><rect width="48" height="34" rx="5"/></clipPath></defs><g clipPath="url(#px-uk-clip)"><path fill="#012169" d="M0 0h48v34H0z"/><path stroke="#fff" strokeWidth="8" d="M0 0 48 34M48 0 0 34"/><path stroke="#C8102E" strokeWidth="3.2" d="M0 0 48 34M48 0 0 34"/><path stroke="#fff" strokeWidth="11" d="M24 0v34M0 17h48"/><path stroke="#C8102E" strokeWidth="6" d="M24 0v34M0 17h48"/></g></svg>;
+  if (code === "fa") return <svg viewBox="0 0 48 34" role="img" aria-label="Iran flag"><defs><clipPath id="px-ir-clip"><rect width="48" height="34" rx="5"/></clipPath></defs><g clipPath="url(#px-ir-clip)"><path fill="#239F40" d="M0 0h48v11.34H0z"/><path fill="#fff" d="M0 11.33h48v11.34H0z"/><path fill="#DA0000" d="M0 22.66h48V34H0z"/><g fill="#DA0000"><path d="m24 12.8-1.4 2.1 1.4 2.1 1.4-2.1Z"/><path d="M20.5 14.1h1v5.5h-1zm6 0h1v5.5h-1z"/></g><g fill="#239F40"><path d="M17 10.8h1v1.5h-1zm3 0h1v1.5h-1zm6 0h1v1.5h-1zm3 0h1v1.5h-1zM17 21.7h1v1.5h-1zm3 0h1v1.5h-1zm6 0h1v1.5h-1zm3 0h1v1.5h-1z"/></g></g></svg>;
+  if (code === "ar") return <span className="px-language-script" role="img" aria-label="Arabic language">ع</span>;
+  return <svg viewBox="0 0 48 34" role="img" aria-label="Kurdistan flag"><defs><clipPath id="px-ku-clip"><rect width="48" height="34" rx="5"/></clipPath></defs><g clipPath="url(#px-ku-clip)"><path fill="#ED1C24" d="M0 0h48v11.34H0z"/><path fill="#fff" d="M0 11.33h48v11.34H0z"/><path fill="#009B3A" d="M0 22.66h48V34H0z"/><circle cx="24" cy="17" r="5.2" fill="#FCDD09"/>{Array.from({length:21},(_,i)=><path key={i} d="M24 9.8 25.1 14.8 22.9 14.8Z" fill="#FCDD09" transform={`rotate(${i*360/21} 24 17)`}/>)}</g></svg>;
 }
 function GoogleMark() {
   return <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-15Z"/><path fill="#FF3D00" d="M24 44c5.5 0 10.1-1.8 13.5-4.8l-6.6-5.1c-1.8 1.2-4 1.9-6.9 1.9-5.3 0-9.8-3.6-11.4-8.4H5.8v5.2A20 20 0 0 0 24 44Z"/><path fill="#4CAF50" d="M12.6 27.6a12 12 0 0 1 0-7.2v-5.2H5.8a20 20 0 0 0 0 17.6l6.8-5.2Z"/><path fill="#1976D2" d="M24 12.1c3 0 5.7 1 7.8 3.1l5.9-5.9C34.1 6 29.5 4 24 4A20 20 0 0 0 5.8 15.2l6.8 5.2c1.6-4.8 6.1-8.3 11.4-8.3Z"/></svg>;
@@ -263,7 +260,7 @@ export default function Onboarding({ onComplete }: Props) {
     <main className="px-onboarding" dir={dir} lang={language}>
       <div className="px-ambient px-ambient-one" /><div className="px-ambient px-ambient-two" />
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
-      <header className="px-onboarding-brand"><span className="px-logo"><ProjectXMark /></span><span className="px-brand-wordmark">PROJECT <b>X</b></span></header>
+      <header className="px-onboarding-brand"><span className="px-logo"><ProjectXMark /></span><span className="px-brand-wordmark">project<span className="px-brand-lower-x">x</span></span></header>
       <section className="px-onboarding-stage">
         {stage === "language" && <div className="px-glass-panel px-language-panel">
           <div className="px-eyebrow">PROJECT X / YOUR EXPERIENCE</div>
