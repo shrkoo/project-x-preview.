@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { apiRequest, setSession } from "../lib/api";
+import { apiRequest, setSession, createPasswordSalt, derivePasswordHash } from "../lib/api";
 
 type Language = "en" | "fa" | "ar" | "ku";
 type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string };
@@ -186,9 +186,23 @@ export default function Onboarding({ onComplete }: Props) {
     setBusy(true); setNotice("");
     try {
       const endpoint = mode === "signup" ? "/auth/register" : "/auth/login";
+      let credentials: Record<string, string>;
+      if (mode === "signup") {
+        const salt = createPasswordSalt();
+        const passwordHash = await derivePasswordHash(password, salt);
+        credentials = { email: cleanEmail, name: name.trim(), salt, passwordHash };
+      } else {
+        const challenge = await apiRequest<{salt:string}>(`/auth/password-salt?email=${encodeURIComponent(cleanEmail)}`);
+        if (challenge.salt === "AAAAAAAAAAAAAAAAAAAAAA") {
+          setNotice(language === "en" ? "No account found. Create an account first." : "حسابی با این ایمیل پیدا نشد؛ ابتدا ثبت‌نام کنید.");
+          return;
+        }
+        const passwordHash = await derivePasswordHash(password, challenge.salt);
+        credentials = { email: cleanEmail, passwordHash };
+      }
       const data = await apiRequest<{token:string;user:User;verificationSent?:boolean;emailVerificationRequired?:boolean}>(endpoint, {
         method: "POST",
-        body: JSON.stringify({ email: cleanEmail, password, ...(mode === "signup" ? { name: name.trim() } : {}) })
+        body: JSON.stringify(credentials)
       });
       setSession(data.token);
       setUser(data.user);
@@ -224,7 +238,9 @@ export default function Onboarding({ onComplete }: Props) {
     if (password !== confirmPassword) { setNotice(t("passwordMismatch")); return; }
     setBusy(true); setNotice("");
     try {
-      await apiRequest("/auth/reset-password", { method: "POST", body: JSON.stringify({ token, password }) });
+      const salt = createPasswordSalt();
+      const passwordHash = await derivePasswordHash(password, salt);
+      await apiRequest("/auth/reset-password", { method: "POST", body: JSON.stringify({ token, salt, passwordHash }) });
       localStorage.removeItem("projectx-reset-token");
       setRecoveryMode(false); setPassword(""); setConfirmPassword("");
       setNotice(language === "en" ? "Password updated. Sign in with your new password." : "رمز عبور تغییر کرد. با رمز جدید وارد شوید.");
