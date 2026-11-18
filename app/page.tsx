@@ -34,6 +34,7 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [recoveryToken,setRecoveryToken]=useState("");
+  const [forgotMode,setForgotMode]=useState(false);
   const [roomName, setRoomName] = useState("");
   const [notice, setNotice] = useState("");
   const [selected, setSelected] = useState<Game | null>(null);
@@ -67,7 +68,7 @@ export default function Home() {
     const params=new URLSearchParams(window.location.search);
     const verifyToken=params.get("verify"), resetToken=params.get("reset");
     if(verifyToken){apiRequest("/auth/verify-email",{method:"POST",body:JSON.stringify({token:verifyToken})}).then(()=>notify("ایمیل با موفقیت تأیید شد.")).catch(error=>notify(error instanceof Error?error.message:"تأیید ایمیل ناموفق بود."));params.delete("verify");window.history.replaceState({}, "", window.location.pathname+(params.toString()?"?"+params.toString():""));}
-    if(resetToken){setRecoveryToken(resetToken);setAuth("login");params.delete("reset");window.history.replaceState({}, "", window.location.pathname+(params.toString()?"?"+params.toString():""));}
+    if(resetToken){setRecoveryToken(resetToken);setForgotMode(false);setAuth("login");params.delete("reset");window.history.replaceState({}, "", window.location.pathname+(params.toString()?"?"+params.toString():""));}
     setNotificationsOn(readStore<boolean>("projectx-notifications", true));
     setSoundOn(readStore<boolean>("projectx-sound", true));
     setSelectedTheme(readStore<"neon" | "light">("projectx-theme", "neon"));
@@ -112,6 +113,7 @@ export default function Home() {
     setSelected(null);
     setActiveRoom(null);
     setNotice("");
+    setForgotMode(false);
     setAuth(mode);
   }
   async function createRoom() {
@@ -265,7 +267,32 @@ export default function Home() {
         {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><div className="modal-card" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setSelected(null)}>×</button><div className={"game-art modal-art "+selected.tone}><span>{selected.symbol}</span><small>PROJECT X / GAME</small></div><span className="overline">{selected.category}</span><h2>{selected.title}</h2>{round ? <div className="round-prompt"><p>{round}</p><div className="modal-actions"><button className="outline-button" onClick={()=>startGame(selected)}>سؤال بعدی ↻</button><button className="signup-button" onClick={finishRound}>ثبت پایان دور +۱۰ XP</button></div></div> : <p>یک تجربه گروهی برای ساختن لحظه‌های متفاوت. برای شروع، یک سؤال یا چالش بگیر.</p>}<div className="modal-actions"><button className="signup-button" onClick={()=>startGame(selected)}>شروع بازی ←</button><button className="outline-button" onClick={()=>{setRoomName(selected.title);setSelected(null);setTab("home");setTimeout(()=>document.getElementById("create-room")?.scrollIntoView({behavior:"smooth"}),50);}}>ساخت اتاق این بازی</button></div></div></div>}
       </section>
       <nav className="mobile-nav"><button className={tab==="home"?"chosen":""} onClick={()=>setTab("home")}><span>⌂</span>خانه</button><button className={tab==="games"?"chosen":""} onClick={()=>setTab("games")}><span>▦</span>بازی‌ها</button><button className={tab==="friends"?"chosen":""} onClick={()=>setTab("friends")}><span>♧</span>دوستان</button><button className={tab==="profile"?"chosen":""} onClick={()=>setTab("profile")}><span>◉</span>پروفایل</button><button className={tab==="settings"?"chosen":""} onClick={()=>setTab("settings")}><span>⚙</span>تنظیمات</button></nav>
-      {auth && <div className="modal-backdrop" onClick={()=>{setAuth(null);setNotice("");}}><div className="auth-modal" role="dialog" aria-modal="true" aria-label={auth==="signup"?"ساخت حساب کاربری":"ورود به حساب"} onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>{setAuth(null);setNotice("");}}>×</button><div className="brand auth-brand"><span className="brand-mark">X</span><span>project<span className="brand-x">x</span></span></div><span className="overline">{auth==="signup"?"به جمع ما اضافه شو":"خوش برگشتی"}</span><h2>{auth==="signup"?"ساخت حساب کاربری":"ورود به حساب"}</h2><p>حساب کاربری به سرور Project X متصل است.</p>{auth==="signup" && <><label>نام نمایشی</label><input value={name} onChange={e=>setName(e.target.value)} placeholder="نام شما"/></>}<label>ایمیل</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@example.com"/><label>رمز عبور</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")submitAuth();}} placeholder="حداقل ۱۰ کاراکتر"/><div className="social-auth"><button onClick={()=>{window.location.assign("https://project-x-api.projectx-novyratam.workers.dev/auth/google/start");}}>G <span>ادامه با Google</span></button><button onClick={()=>notify("ورود با Apple هنوز به سرویس Apple Sign in متصل نشده است.")}>● <span>ادامه با Apple</span></button></div>{recoveryToken ? <><label>رمز عبور جدید</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="حداقل ۱۰ کاراکتر"/><button className="signup-button auth-submit" onClick={async()=>{try{await apiRequest("/auth/reset-password",{method:"POST",body:JSON.stringify({token:recoveryToken,password})});setRecoveryToken("");setPassword("");notify("رمز عبور تغییر کرد؛ حالا وارد شو.");}catch(error){notify(error instanceof Error?error.message:"بازیابی رمز ناموفق بود.");}}}>ثبت رمز جدید ←</button></> : <button className="signup-button auth-submit" onClick={submitAuth}>{auth==="signup"?"ساخت حساب":"ورود"} <span>←</span></button>}<button className="switch-auth" onClick={()=>{setAuth(auth==="signup"?"login":"signup");setNotice("");}}>{auth==="signup"?"حساب داری؟ وارد شو":"حساب نداری؟ ثبت‌نام کن"}</button>{auth==="login" && !recoveryToken && <button className="switch-auth" onClick={async()=>{try{await apiRequest("/auth/forgot-password",{method:"POST",body:JSON.stringify({email:email.trim()})});notify("اگر حسابی با این ایمیل وجود داشته باشد، راهنمای بازیابی ارسال می‌شود.");}catch(error){notify(error instanceof Error?error.message:"درخواست بازیابی ارسال نشد.");}}}>فراموشی رمز عبور؟</button>}<small className="demo-note">ورود ایمیل و رمز عبور آنلاین فعال است؛ ورود با Apple هنوز تنظیم نشده است.</small></div></div>}
+      {auth && <div className="modal-backdrop" onClick={()=>{setAuth(null);setNotice("");setForgotMode(false);}}>
+        <div className="auth-modal" role="dialog" aria-modal="true" aria-label={recoveryToken?"تغییر رمز عبور":forgotMode?"بازیابی رمز عبور":auth==="signup"?"ساخت حساب کاربری":"ورود به حساب"} onClick={e=>e.stopPropagation()}>
+          <button className="modal-close" onClick={()=>{setAuth(null);setNotice("");setForgotMode(false);}}>×</button>
+          <div className="brand auth-brand"><span className="brand-mark">X</span><span>project<span className="brand-x">x</span></span></div>
+          {recoveryToken ? <>
+            <span className="overline">امنیت حساب</span><h2>انتخاب رمز جدید</h2><p>یک رمز تازه و حداقل ۱۰ کاراکتری انتخاب کن.</p>
+            <label>رمز عبور جدید</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="حداقل ۱۰ کاراکتر" onKeyDown={e=>{if(e.key==="Enter")document.getElementById("reset-password-submit")?.click();}}/>
+            <button id="reset-password-submit" className="signup-button auth-submit" onClick={async()=>{if(password.length<10||password.length>128){notify("رمز جدید باید بین ۱۰ تا ۱۲۸ کاراکتر باشد.");return;}try{const salt=createPasswordSalt();const passwordHash=await derivePasswordHash(password,salt);await apiRequest("/auth/reset-password",{method:"POST",body:JSON.stringify({token:recoveryToken,salt,passwordHash})});setRecoveryToken("");setPassword("");setAuth("login");notify("رمز عبور با موفقیت تغییر کرد؛ حالا وارد شو.");}catch(error){notify(error instanceof Error?error.message:"بازیابی رمز ناموفق بود.");}}}>ثبت رمز جدید ←</button>
+          </> : forgotMode ? <>
+            <span className="overline">بازیابی دسترسی</span><h2>فراموشی رمز عبور</h2><p>ایمیل حساب را وارد کن تا لینک امن بازیابی برایت ارسال شود.</p>
+            <label>ایمیل</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@example.com"/>
+            <button className="signup-button auth-submit" onClick={async()=>{const clean=email.trim().toLowerCase();if(!/^\S+@\S+\.\S+$/.test(clean)){notify("یک ایمیل معتبر وارد کن.");return;}try{const result=await apiRequest<{message:string}>("/auth/forgot-password",{method:"POST",body:JSON.stringify({email:clean})});notify(result.message||"اگر حسابی با این ایمیل وجود داشته باشد، لینک بازیابی ارسال می‌شود.");}catch(error){notify(error instanceof Error?error.message:"درخواست بازیابی ارسال نشد.");}}}>ارسال لینک بازیابی ←</button>
+            <button className="switch-auth" onClick={()=>setForgotMode(false)}>بازگشت به ورود</button>
+          </> : <>
+            <span className="overline">{auth==="signup"?"به جمع ما اضافه شو":"خوش برگشتی"}</span><h2>{auth==="signup"?"ساخت حساب کاربری":"ورود به حساب"}</h2><p>حساب کاربری به سرور Project X متصل است.</p>
+            {auth==="signup" && <><label>نام نمایشی</label><input value={name} onChange={e=>setName(e.target.value)} placeholder="نام شما"/></>}
+            <label>ایمیل</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@example.com"/>
+            <label>رمز عبور</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")submitAuth();}} placeholder="حداقل ۱۰ کاراکتر"/>
+            <div className="social-auth"><button onClick={()=>{window.location.assign("https://project-x-api.projectx-novyratam.workers.dev/auth/google/start");}}>G <span>ادامه با Google</span></button><button onClick={()=>notify("ورود با Apple هنوز به سرویس Apple Sign in متصل نشده است.")}>● <span>ادامه با Apple</span></button></div>
+            <button className="signup-button auth-submit" onClick={submitAuth}>{auth==="signup"?"ساخت حساب":"ورود"} <span>←</span></button>
+            <button className="switch-auth" onClick={()=>{setAuth(auth==="signup"?"login":"signup");setNotice("");setForgotMode(false);}}>{auth==="signup"?"حساب داری؟ وارد شو":"حساب نداری؟ ثبت‌نام کن"}</button>
+            {auth==="login" && <button className="switch-auth" onClick={()=>setForgotMode(true)}>فراموشی رمز عبور؟</button>}
+            <small className="demo-note">ورود ایمیل و رمز عبور آنلاین فعال است؛ ورود با Apple هنوز تنظیم نشده است.</small>
+          </>}
+        </div>
+      </div>}
     </main>
   );
 }
