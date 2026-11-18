@@ -133,8 +133,8 @@ export default function Home() {
     catch(error){notify(error instanceof Error?error.message:"ذخیره پروفایل ناموفق بود.");}
   }
   async function submitAuth() {
-    const cleanEmail=email.trim().toLowerCase();
-    if(!/^\S+@\S+\.\S+$/.test(cleanEmail)){notify("یک ایمیل معتبر وارد کن.");return;}
+    const cleanEmail=email.normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g,"").replace(/\s+/g,"").toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(cleanEmail)){notify("ایمیل را کامل و به انگلیسی وارد کن؛ مثل name@example.com.");return;}
     if(password.length<10){notify("رمز عبور باید حداقل ۱۰ کاراکتر باشد.");return;}
     if(auth==="signup"&&!name.trim()){notify("نام نمایشی را وارد کن.");return;}
     try{
@@ -277,7 +277,7 @@ export default function Home() {
             <button id="reset-password-submit" className="signup-button auth-submit" onClick={async()=>{if(password.length<10||password.length>128){notify("رمز جدید باید بین ۱۰ تا ۱۲۸ کاراکتر باشد.");return;}try{const salt=createPasswordSalt();const passwordHash=await derivePasswordHash(password,salt);await apiRequest("/auth/reset-password",{method:"POST",body:JSON.stringify({token:recoveryToken,salt,passwordHash})});setRecoveryToken("");setPassword("");setAuth("login");notify("رمز عبور با موفقیت تغییر کرد؛ حالا وارد شو.");}catch(error){notify(error instanceof Error?error.message:"بازیابی رمز ناموفق بود.");}}}>ثبت رمز جدید ←</button>
           </> : forgotMode ? <>
             <span className="overline">بازیابی دسترسی</span><h2>فراموشی رمز عبور</h2><p>ایمیل حساب را وارد کن تا لینک امن بازیابی برایت ارسال شود.</p>
-            <label>ایمیل</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@example.com"/>
+            <label>ایمیل</label><input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} dir="ltr" value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@example.com"/>
             <button className="signup-button auth-submit" onClick={async()=>{const clean=email.trim().toLowerCase();if(!/^\S+@\S+\.\S+$/.test(clean)){notify("یک ایمیل معتبر وارد کن.");return;}try{const result=await apiRequest<{message:string}>("/auth/forgot-password",{method:"POST",body:JSON.stringify({email:clean})});notify(result.message||"اگر حسابی با این ایمیل وجود داشته باشد، لینک بازیابی ارسال می‌شود.");}catch(error){notify(error instanceof Error?error.message:"درخواست بازیابی ارسال نشد.");}}}>ارسال لینک بازیابی ←</button>
             <button className="switch-auth" onClick={()=>setForgotMode(false)}>بازگشت به ورود</button>
           </> : <>
