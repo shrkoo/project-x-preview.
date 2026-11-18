@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Project X — فضای بازی و دورهمی",
+  title: "NOVYRA — فضای بازی و دورهمی",
   description: "یک پلتفرم برای بازی، دوستان و ساختن لحظه‌های مشترک.",
-  applicationName: "Project X",
+  applicationName: "NOVYRA",
 };
 
 export const viewport: Viewport = {
