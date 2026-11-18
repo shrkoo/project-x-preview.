@@ -984,3 +984,8 @@ button:focus-visible,input:focus-visible{outline:2px solid #8fc1ff;outline-offse
 .px-onboarding-notice{background:#fff;color:#303b49;border:1px solid #dfe4ea;box-shadow:0 8px 24px rgba(24,36,52,.08)}
 .px-onboarding-notice button{color:#687382}
 @media(prefers-reduced-motion:reduce){.px-onboarding *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Reliable navigation and account modal visibility on mobile */
+.settings-card{position:relative;z-index:2}
+.modal-backdrop{z-index:1000;pointer-events:auto}
+.auth-modal{max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}
