@@ -57,7 +57,7 @@ export default {
   const path = url.pathname.replace(/\/+$/, "") || "/";
   const db = env.DB;
   try {
-   if (path === "/health" && request.method === "GET") return json({ ok: true, service: "project-x-api", database: "connected", region: "EU" });
+   if (path === "/health" && request.method === "GET") return json({ ok: true, service: "novyra-api", database: "connected", region: "EU" });
 
    if (path === "/auth/google/start" && request.method === "GET") {
     if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) return fail("ورود با Google هنوز پیکربندی نشده است.",503);
@@ -130,7 +130,7 @@ export default {
       try {
         const token=await issueEmailToken(db,id,"verify",24*60*60*1000);
         const link=(env.APP_URL || "https://shrkoo.github.io/project-x-preview.") + "/?verify=" + encodeURIComponent(token);
-        await sendMail(env,email,"تأیید ایمیل Project X",'<div dir="rtl" style="font-family:Arial"><h2>به Project X خوش آمدی</h2><p>برای فعال‌سازی حساب روی لینک زیر بزن:</p><a href="' + link + '">تأیید ایمیل</a><p>این لینک تا ۲۴ ساعت معتبر است.</p></div>');
+        await sendMail(env,email,"تأیید ایمیل NOVYRA",'<div dir="rtl" style="font-family:Arial"><h2>به NOVYRA خوش آمدی</h2><p>برای فعال‌سازی حساب روی لینک زیر بزن:</p><a href="' + link + '">تأیید ایمیل</a><p>این لینک تا ۲۴ ساعت معتبر است.</p></div>');
         verificationSent=true;
       } catch (mailError) {
         console.error("project-x-verification-email-error",mailError);
@@ -162,7 +162,7 @@ export default {
       if((pending?.total||0)<3) {
         const token=await issueEmailToken(db,target.id,"password_reset",60*60*1000);
         const link=(env.APP_URL || "https://shrkoo.github.io/project-x-preview.") + "/?reset=" + encodeURIComponent(token);
-        await sendMail(env,target.email,"بازیابی رمز عبور Project X",'<div dir="rtl" style="font-family:Arial"><h2>بازیابی رمز عبور</h2><p>برای انتخاب رمز جدید روی لینک زیر بزن:</p><a href="' + link + '">تغییر رمز عبور</a><p>این لینک تا یک ساعت معتبر است.</p><p>اگر این درخواست را ندادی، این پیام را نادیده بگیر.</p></div>');
+        await sendMail(env,target.email,"بازیابی رمز عبور NOVYRA",'<div dir="rtl" style="font-family:Arial"><h2>بازیابی رمز عبور</h2><p>برای انتخاب رمز جدید روی لینک زیر بزن:</p><a href="' + link + '">تغییر رمز عبور</a><p>این لینک تا یک ساعت معتبر است.</p><p>اگر این درخواست را ندادی، این پیام را نادیده بگیر.</p></div>');
       }
     }
     return json({ok:true,message:"اگر حسابی با این ایمیل وجود داشته باشد، راهنمای بازیابی ارسال می‌شود."});
@@ -220,7 +220,7 @@ export default {
       if((pending?.total||0)>=3) return fail("برای ارسال دوباره کمی صبر کن.",429);
       const token=await issueEmailToken(db,user.id,"verify",24*60*60*1000);
       const link=(env.APP_URL || "https://shrkoo.github.io/project-x-preview.") + "/?verify=" + encodeURIComponent(token);
-      await sendMail(env,target.email,"تأیید ایمیل Project X",'<div dir="rtl" style="font-family:Arial"><h2>تأیید ایمیل</h2><p>برای تأیید حساب روی لینک زیر بزن:</p><a href="' + link + '">تأیید ایمیل</a><p>این لینک تا ۲۴ ساعت معتبر است.</p></div>');
+      await sendMail(env,target.email,"تأیید ایمیل NOVYRA",'<div dir="rtl" style="font-family:Arial"><h2>تأیید ایمیل</h2><p>برای تأیید حساب روی لینک زیر بزن:</p><a href="' + link + '">تأیید ایمیل</a><p>این لینک تا ۲۴ ساعت معتبر است.</p></div>');
       return json({ok:true,message:"لینک تأیید دوباره ارسال شد."});
     }
     if (path === "/auth/profile" && request.method === "PATCH") {
@@ -402,7 +402,7 @@ export default {
    }
    return fail("مسیر API پیدا نشد.",404);
   } catch (error) {
-   console.error("project-x-api-error",error);
+   console.error("novyra-api-error",error);
    return fail("خطای داخلی سرور. دوباره تلاش کن.",500);
   }
  }
