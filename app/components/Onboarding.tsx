@@ -267,7 +267,7 @@ export default function Onboarding({ onComplete }: Props) {
     finally { setBusy(false); }
   }
   function socialUnavailable() {
-    window.location.assign("https://novyra-api.projectx-novyratam.workers.dev/auth/google/start");
+    window.location.assign("https://project-x-api.projectx-novyratam.workers.dev/auth/google/start");
   }
   function appleUnavailable() {
     setNotice(language === "en" ? "Apple sign-in is not configured yet." : "ورود با Apple هنوز پیکربندی نشده است.");
@@ -314,7 +314,7 @@ export default function Onboarding({ onComplete }: Props) {
     <main className="px-onboarding" dir={dir} lang={language}>
       <div className="px-ambient px-ambient-one" /><div className="px-ambient px-ambient-two" />
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
-      <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">project<span className="px-brand-lower-x">x</span></span></header>
+      <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">NOVYRA</span></header>
       <section className="px-onboarding-stage">
         {stage === "language" && <div className="px-glass-panel px-language-panel">
           <div className="px-eyebrow">NOVYRA / YOUR EXPERIENCE</div>
