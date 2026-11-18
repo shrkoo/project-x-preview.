@@ -73,7 +73,7 @@ export default {
    if (path === "/auth/google/callback" && request.method === "GET") {
     const failRedirect=(reason)=>Response.redirect(`${env.APP_URL || "https://shrkoo.github.io/project-x-preview./"}#google_error=${encodeURIComponent(reason)}`,302);
     const code=url.searchParams.get("code"), state=url.searchParams.get("state"), cookie=request.headers.get("Cookie")||"";
-    const cookieState=cookie.match(/(?:^|;\\s*)px_google_state=([^;]+)/)?.[1]||"";
+    const cookieState=cookie.match(/(?:^|;\s*)px_google_state=([^;]+)/)?.[1]||"";
     const cleanCookie={ "Set-Cookie":"px_google_state=; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=0" };
     if(!code || !state || !cookieState || state!==cookieState) return failRedirect("اعتبارسنجی امنیتی Google ناموفق بود؛ دوباره تلاش کن.");
     if(!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) return failRedirect("تنظیمات Google OAuth کامل نیست.");
@@ -86,7 +86,7 @@ export default {
     if(!verifyResponse.ok) return failRedirect("تأیید هویت Google ناموفق بود.");
     const claims=await verifyResponse.json();
     const now=Math.floor(Date.now()/1000);
-    if(claims.aud!==env.GOOGLE_CLIENT_ID || !["accounts.google.com","https://accounts.google.com"].includes(claims.iss) || Number(claims.exp)<=now || claims.email_verified!=="true" || !claims.sub || !/^\\S+@\\S+\\.\\S+$/.test(claims.email||"")) return failRedirect("اطلاعات حساب Google معتبر یا تأییدشده نیست.");
+    if(claims.aud!==env.GOOGLE_CLIENT_ID || !["accounts.google.com","https://accounts.google.com"].includes(claims.iss) || Number(claims.exp)<=now || claims.email_verified!=="true" || !claims.sub || !/^\S+@\S+\.\S+$/.test(claims.email||"")) return failRedirect("اطلاعات حساب Google معتبر یا تأییدشده نیست.");
     const email=cleanEmail(claims.email), displayName=cleanName(claims.name||claims.given_name||email.split("@")[0]);
     let user=await db.prepare("SELECT id,email,display_name,xp,games_played,role FROM users WHERE email=?").bind(email).first();
     if(!user) {
