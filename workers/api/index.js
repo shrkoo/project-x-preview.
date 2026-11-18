@@ -111,10 +111,12 @@ export default {
    if (path === "/auth/register" && request.method === "POST") {
     const body = await readBody(request);
     const email = cleanEmail(body?.email), displayName = cleanName(body?.name);
-    const salt=String(body?.salt||""), suppliedHash=String(body?.passwordHash||"");
-    if (!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
+    const salt=String(body?.salt ?? body?.passwordSalt ?? body?.password_salt ?? "");
+    const suppliedHash=String(body?.passwordHash ?? body?.password_hash ?? body?.hash ?? "");
+    if (!/^\\S+@\\S+\\.\\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
     if (displayName.length < 2) return fail("نام نمایشی باید حداقل ۲ حرف باشد.");
-    if(!/^[A-Za-z0-9_-]{16,64}$/.test(salt) || !/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("داده امنیتی رمز نامعتبر است؛ لطفاً دوباره تلاش کن.");
+    if (!salt || salt.length < 16 || salt.length > 128) return fail("داده امنیتی نمک رمز از صفحه دریافت نشد؛ صفحه را تازه‌سازی کن.");
+    if (!/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("خروجی رمز عبور از صفحه ناقص است؛ صفحه را تازه‌سازی کن.");
     const id = crypto.randomUUID(), hash = suppliedHash;
     try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role) VALUES (?,?,?,?,?,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user").run(); }
     catch { return fail("این ایمیل قبلاً ثبت شده یا امکان ساخت حساب وجود ندارد.",409); }
