@@ -27,7 +27,7 @@ const readStore = <T,>(key: string, fallback: T): T => {
 
 export default function Home() {
   const [tab, setTab] = useState<Tab>("home");
-  const [appLanguage, setAppLanguage] = useState<AppLanguage>("en");
+  const [appLanguage, setAppLanguage] = useState<AppLanguage>("fa");
   const [onboardingRequired, setOnboardingRequired] = useState(true);
   const [auth, setAuth] = useState<"login" | "signup" | null>(null);
   const [name, setName] = useState("");
@@ -288,7 +288,7 @@ export default function Home() {
             <div className="social-auth"><button onClick={()=>{window.location.assign("https://project-x-api.projectx-novyratam.workers.dev/auth/google/start");}}>G <span>ادامه با Google</span></button><button onClick={()=>notify("ورود با Apple هنوز به سرویس Apple Sign in متصل نشده است.")}>● <span>ادامه با Apple</span></button></div>
             <button className="signup-button auth-submit" onClick={submitAuth}>{auth==="signup"?"ساخت حساب":"ورود"} <span>←</span></button>
             <button className="switch-auth" onClick={()=>{setAuth(auth==="signup"?"login":"signup");setNotice("");setForgotMode(false);}}>{auth==="signup"?"حساب داری؟ وارد شو":"حساب نداری؟ ثبت‌نام کن"}</button>
-            {auth==="login" && <button className="switch-auth" onClick={()=>notify("بازیابی رمز از طریق ایمیل فعلاً فعال نیست؛ تا زمان اتصال سرویس ایمیل، رمز فعلی را در جای امن نگه دار.")}>بازیابی رمز عبور (به‌زودی)</button>}
+            {auth==="login" && <button className="switch-auth" onClick={()=>{setForgotMode(true);setNotice("");}}>فراموشی رمز عبور</button>}
             <small className="demo-note">ورود ایمیل و رمز عبور آنلاین فعال است؛ ورود با Apple هنوز تنظیم نشده است.</small>
           </>}
         </div>
