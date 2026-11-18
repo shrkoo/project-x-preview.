@@ -931,3 +931,56 @@ button:focus-visible,input:focus-visible{outline:2px solid #8fc1ff;outline-offse
   .px-language-label{font-size:14px}
   .px-language-option .px-radio{inset-inline-end:11px}
 }
+
+/* NOVYRA onboarding: calm, accessible, low-stimulation interface */
+.px-onboarding{
+  --px-glass-text:#202733;--px-glass-muted:#687382;--px-glass-blue:#536b86;--px-glass-line:#e1e5eb;
+  color:var(--px-glass-text);background:#f5f6f8;
+  font-family:Inter,"SF Pro Display",Arial,sans-serif;
+}
+.px-onboarding:before,.px-ambient,.px-glass-orbit{display:none!important}
+.px-onboarding-brand{color:#303b49}
+.px-logo{background:#e8edf2;color:#34465a;box-shadow:none;border:1px solid #dce2e9}
+.px-glass-panel{border:1px solid #e1e5eb;background:#fff;box-shadow:0 12px 36px rgba(24,36,52,.07);backdrop-filter:none;-webkit-backdrop-filter:none}
+.px-glass-panel:before,.px-glass-panel:after{display:none}
+.px-eyebrow{color:#718096;letter-spacing:.12em}
+.px-glass-panel h1{color:#202733;font-weight:650}
+.px-stage-subtitle{color:#687382}
+.px-language-option{color:#273342;background:#fff;border:1px solid #e1e5eb;box-shadow:none;backdrop-filter:none;transition:border-color .15s,background-color .15s}
+.px-language-option:hover{transform:none;border-color:#aab6c4;background:#f8fafc}
+.px-language-option.is-selected{border-color:#71869e;background:#f1f4f7;box-shadow:inset 0 0 0 1px #71869e}
+.px-language-label small{color:#7b8491}
+.px-radio{border-color:#aeb8c4;color:#fff}
+.px-language-option.is-selected .px-radio{background:#536b86;border-color:#536b86;box-shadow:none}
+.px-primary-action{color:#fff;background:#536b86;border:1px solid #536b86;box-shadow:none;border-radius:12px;transition:background-color .15s,border-color .15s}
+.px-primary-action:hover{transform:none;filter:none;background:#435a73;box-shadow:none}
+.px-primary-action span{font-size:14px}
+.px-footnote,.px-onboarding-footer{color:#7b8491}
+.px-onboarding-footer i{background:#aab4c0}
+.px-auth-emblem{color:#40556c;background:#e9eef3;box-shadow:none}
+.px-auth-emblem i,.px-auth-emblem b{display:none}
+.px-back-button{color:#536b86;background:#f5f6f8;border:1px solid #e1e5eb}
+.px-social-button{box-shadow:none;transition:background-color .15s,border-color .15s}
+.px-social-button:hover{transform:none;box-shadow:none}
+.px-google-button{color:#293443;background:#fff;border:1px solid #dfe4ea;box-shadow:none}
+.px-apple-button{color:#293443;background:#f4f6f8;border:1px solid #dfe4ea;box-shadow:none}
+.px-separator{color:#7b8491}
+.px-separator:before,.px-separator:after{background:#e4e8ed}
+.px-field{color:#455264}
+.px-field input{color:#202733;background:#fbfcfd;border:1px solid #dfe4ea;box-shadow:none}
+.px-field input::placeholder{color:#9aa3ae}
+.px-field input:focus{border-color:#8295aa;box-shadow:0 0 0 2px rgba(83,107,134,.12)}
+.px-password-wrap button{color:#687382;background:transparent}
+.px-eye-icon{width:19px;height:19px;opacity:.72}
+.px-forgot-link,.px-switch-mode button{color:#536b86}
+.px-switch-mode{color:#687382}
+.px-auth-security{color:#87919e}
+.px-profile-preview{background:#e9eef3;color:#40556c;border-color:#dfe5eb;box-shadow:none}
+.px-avatar-choice{background:#f7f8fa;color:#344254;border:1px solid #e1e5eb;box-shadow:none}
+.px-avatar-choice.is-selected{border-color:#71869e;background:#edf1f5;box-shadow:inset 0 0 0 1px #71869e}
+.px-upload-button{color:#45576b;background:#f7f8fa;border:1px solid #dfe4ea}
+.px-upload-button span{color:#536b86}
+.px-skip-action{color:#687382}
+.px-onboarding-notice{background:#fff;color:#303b49;border:1px solid #dfe4ea;box-shadow:0 8px 24px rgba(24,36,52,.08)}
+.px-onboarding-notice button{color:#687382}
+@media(prefers-reduced-motion:reduce){.px-onboarding *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
