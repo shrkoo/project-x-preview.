@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { apiRequest, setSession } from "../lib/api";
 
 type Language = "en" | "fa" | "ar" | "ku";
@@ -275,7 +275,7 @@ export default function Onboarding({ onComplete }: Props) {
               ["fa", "فارسی", "FA"],
               ["ar", "العربية", "AR"],
               ["ku", "کوردی", "KU"]
-            ] as [Language, string, string, string][]).map(([code, label, tag]) => <button type="button" key={code} className={"px-language-option" + (language === code ? " is-selected" : "")} onClick={() => chooseLanguage(code)} aria-pressed={language === code}>
+            ] as [Language, string, string][]).map(([code, label, tag]) => <button type="button" key={code} className={"px-language-option" + (language === code ? " is-selected" : "")} onClick={() => chooseLanguage(code)} aria-pressed={language === code}>
               <span className="px-language-flag"><LanguageFlag code={code}/></span><span className="px-language-label">{label}<small>{tag}</small></span><span className="px-radio">{language === code ? "✓" : ""}</span>
             </button>)}
           </div>
