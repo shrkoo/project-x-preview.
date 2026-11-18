@@ -106,7 +106,7 @@ function EyeMark({ visible }: { visible: boolean }) {
 }
 
 export default function Onboarding({ onComplete }: Props) {
-  const [language, setLanguage] = useState<Language>("en");
+  const [language, setLanguage] = useState<Language>("fa");
   const [stage, setStage] = useState<Stage>("language");
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
