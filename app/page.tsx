@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { apiRequest, clearSession, setSession } from "./lib/api";
+import Onboarding from "./components/Onboarding";
+type AppLanguage = "en" | "fa" | "ar" | "ku";
 
 type Tab = "home" | "games" | "friends" | "profile" | "leaderboard" | "rewards" | "premium" | "settings" | "admin";
 type Game = { title: string; category: string; players: string; time: string; tone: string; symbol: string };
@@ -25,6 +27,8 @@ const readStore = <T,>(key: string, fallback: T): T => {
 
 export default function Home() {
   const [tab, setTab] = useState<Tab>("home");
+  const [appLanguage, setAppLanguage] = useState<AppLanguage>("en");
+  const [onboardingRequired, setOnboardingRequired] = useState(true);
   const [auth, setAuth] = useState<"login" | "signup" | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -53,6 +57,13 @@ export default function Home() {
   const [joinCode, setJoinCode] = useState("");
 
   useEffect(() => {
+    const savedLanguage = localStorage.getItem("projectx-language") as AppLanguage | null;
+    if (savedLanguage && ["en","fa","ar","ku"].includes(savedLanguage)) {
+      setAppLanguage(savedLanguage);
+      document.documentElement.lang = savedLanguage;
+      document.documentElement.dir = savedLanguage === "en" ? "ltr" : "rtl";
+    }
+    setOnboardingRequired(!savedLanguage || !localStorage.getItem("projectx-token"));
     const params=new URLSearchParams(window.location.search);
     const verifyToken=params.get("verify"), resetToken=params.get("reset");
     if(verifyToken){apiRequest("/auth/verify-email",{method:"POST",body:JSON.stringify({token:verifyToken})}).then(()=>notify("ایمیل با موفقیت تأیید شد.")).catch(error=>notify(error instanceof Error?error.message:"تأیید ایمیل ناموفق بود."));params.delete("verify");window.history.replaceState({}, "", window.location.pathname+(params.toString()?"?"+params.toString():""));}
@@ -164,8 +175,20 @@ export default function Home() {
   }
   function saveSetting<T,>(key: string, value: T) { localStorage.setItem(key, JSON.stringify(value)); }
 
+  if (onboardingRequired) return <Onboarding onComplete={(user, language) => {
+    setAppLanguage(language);
+    setOnboardingRequired(false);
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === "en" ? "ltr" : "rtl";
+    if (user) {
+      const next = { id:user.id, name:user.displayName, email:user.email, xp:user.xp, gamesPlayed:user.gamesPlayed, role:user.role };
+      setAccount(next); setName(next.name); setEmail(next.email); setXp(next.xp || 0); setGamesPlayed(next.gamesPlayed || 0);
+      apiRequest<{rooms:Array<any>}>("/rooms").then(result => setRooms(result.rooms.map(r => ({id:r.id,code:r.code,name:r.name,game:r.gameTitle||"",createdAt:r.createdAt,ownerId:r.ownerId})))).catch(() => {});
+    }
+  }} />;
+
   return (
-    <main className={selectedTheme === "light" ? "app-shell theme-light" : "app-shell"} dir="rtl">
+    <main className={selectedTheme === "light" ? "app-shell theme-light" : "app-shell"} dir={appLanguage === "en" ? "ltr" : "rtl"}>
       <aside className="side-rail">
         <button className="brand brand-button" onClick={() => setTab("home")}><span className="brand-mark">X</span><span>project<span className="brand-x">x</span></span></button>
         <div className="rail-label">فضای شما</div>
