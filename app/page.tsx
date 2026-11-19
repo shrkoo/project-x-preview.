@@ -28,8 +28,8 @@ const readStore = <T,>(key: string, fallback: T): T => {
 export default function Home() {
   const [tab, setTab] = useState<Tab>("home");
   const [appLanguage, setAppLanguage] = useState<AppLanguage>("fa");
-  const [onboardingRequired, setOnboardingRequired] = useState(false);
-  const [sessionChecking, setSessionChecking] = useState(false);
+  const [onboardingRequired, setOnboardingRequired] = useState(true);
+  const [startupReady, setStartupReady] = useState(false);
   const [auth, setAuth] = useState<"login" | "signup" | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -73,10 +73,10 @@ export default function Home() {
     setSoundOn(readStore<boolean>("projectx-sound", true));
     setSelectedTheme(readStore<"neon" | "light">("projectx-theme", "neon"));
     const token=localStorage.getItem("projectx-token");
-    if (!token) { setOnboardingRequired(true); setSessionChecking(false); return; }
-    // A saved session opens the home screen immediately; account validation and room loading continue in the background.
+    if (!token) { setOnboardingRequired(true); setStartupReady(true); return; }
+    // A saved session opens the home screen immediately; validation continues silently in the background.
     setOnboardingRequired(false);
-    setSessionChecking(false);
+    setStartupReady(true);
     apiRequest<{user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number;role?:string}}>("/auth/me").then(data => {
       const next={id:data.user.id,name:data.user.displayName,email:data.user.email,xp:data.user.xp,gamesPlayed:data.user.gamesPlayed,role:data.user.role};
       setAccount(next);setName(next.name);setEmail(next.email);setXp(next.xp);setGamesPlayed(next.gamesPlayed);
@@ -221,7 +221,7 @@ export default function Home() {
   }
   function saveSetting<T,>(key: string, value: T) { localStorage.setItem(key, JSON.stringify(value)); }
 
-  if (sessionChecking) return <main className="app-shell" aria-label="NOVYRA"><div className="loading-screen"><div className="brand-mark">N</div><p>در حال بررسی ورود شما…</p></div></main>;
+  if (!startupReady) return null;
   if (onboardingRequired) return <Onboarding onComplete={(user, language) => {
     setAppLanguage(language);
     setOnboardingRequired(false);
