@@ -155,20 +155,20 @@ function PostCard({
     {post.body && <p className="social-post-body">{post.body}</p>}
     <PostMedia post={post} />
     <div className="social-post-actions">
-      <button type="button" className={post.likedByMe ? "is-liked" : ""} onClick={() => onLike(post)} aria-label={t("likes")}>
+      <button type="button" className={post.likedByMe ? "is-liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 4.7-8.8 10.1-8.8 10.1S3.2 13.4 3.2 8.7A4.2 4.2 0 0 1 11 6.3a4.2 4.2 0 0 1 9.8 2.4Z" /></svg>
         <span>{post.likeCount.toLocaleString()}</span>
       </button>
       <button type="button" onClick={() => onToggleComments(post)}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 20l1-4.1a8.5 8.5 0 1 1 16.5-4.4Z" /></svg>
-        <span>{t("comments")} · {post.commentCount.toLocaleString()}</span>
+        <span>{t.comments} · {post.commentCount.toLocaleString()}</span>
       </button>
     </div>
     {commentsOpen && <div className="social-comments">
-      {commentsLoading ? <p className="social-muted">{t("loading")}</p> : comments.length ? comments.map(comment => <div className="social-comment" key={comment.id}><Avatar name={comment.authorName} /><div><strong>{comment.authorName}</strong><p>{comment.body}</p></div></div>) : <p className="social-muted">{t("emptyComments")}</p>}
+      {commentsLoading ? <p className="social-muted">{t.loading}</p> : comments.length ? comments.map(comment => <div className="social-comment" key={comment.id}><Avatar name={comment.authorName} /><div><strong>{comment.authorName}</strong><p>{comment.body}</p></div></div>) : <p className="social-muted">{t.emptyComments}</p>}
       <form className="social-comment-form" onSubmit={event => { event.preventDefault(); onSubmitComment(post); }}>
-        <input value={commentDraft} onChange={event => onCommentDraft(event.target.value)} placeholder={t("writeComment")} maxLength={1000} />
-        <button type="submit" disabled={!commentDraft.trim()}>{t("send")}</button>
+        <input value={commentDraft} onChange={event => onCommentDraft(event.target.value)} placeholder={t.writeComment} maxLength={1000} />
+        <button type="submit" disabled={!commentDraft.trim()}>{t.send}</button>
       </form>
     </div>}
   </article>;
