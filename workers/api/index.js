@@ -94,7 +94,7 @@ function renderNovyraEmail({eyebrow,title,intro,actionLabel,actionUrl,notice,foo
               <td style="padding:0 9px;"><a href="https://x.com/HomaAi2026" target="_blank" aria-label="X"><img src="https://cdn.simpleicons.org/x/263449" width="19" height="19" alt="X" style="display:block;border:0;"></a></td>
               <td style="padding:0 9px;"><a href="https://www.tiktok.com/@homaai8" target="_blank" aria-label="TikTok"><img src="https://cdn.simpleicons.org/tiktok/263449" width="19" height="19" alt="TikTok" style="display:block;border:0;"></a></td>
               <td style="padding:0 9px;"><a href="https://www.youtube.com/@homaai2026" target="_blank" aria-label="YouTube"><img src="https://cdn.simpleicons.org/youtube/263449" width="21" height="21" alt="YouTube" style="display:block;border:0;"></a></td>
-              <td style="padding:0 9px;"><a href="https://www.linkedin.com/in/shirko-alizadeh-a95001447/" target="_blank" aria-label="LinkedIn"><img src="https://cdn.simpleicons.org/linkedin/263449" width="19" height="19" alt="LinkedIn" style="display:block;border:0;"></a></td>
+              <td style="padding:0 9px;"><a href="https://www.linkedin.com/in/shirko-alizadeh-a95001447/" target="_blank" aria-label="LinkedIn" style="display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;background:#0A66C2;color:#ffffff;font-family:Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;border-radius:4px;">in</a></td>
             </tr>
           </table>
           <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:20px auto 0;">
