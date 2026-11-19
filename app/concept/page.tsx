@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const tabs = [
   { id: "home", label: "خانه", icon: "⌂" },
@@ -21,6 +21,10 @@ export default function ConceptPage() {
   const [joined, setJoined] = useState<string[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [roomName, setRoomName] = useState("");
+  const [showAiMenu, setShowAiMenu] = useState(false);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const startProfilePress = () => { longPressTimer.current = setTimeout(() => setShowAiMenu(true), 500); };
+  const cancelProfilePress = () => { if (longPressTimer.current) clearTimeout(longPressTimer.current); };
 
   return (
     <main className="nv-concept" dir="rtl">
@@ -58,10 +62,13 @@ export default function ConceptPage() {
 
           {tab === "inbox" && <section className="nv-page-panel"><span className="nv-kicker">ارتباط‌ها</span><h1>پیام‌های تو</h1><div className="nv-empty"><span>◌</span><strong>هنوز گفت‌وگویی نداری</strong><p>وقتی با کسی ارتباط بگیری، پیام‌هایت اینجا دیده می‌شوند.</p><button className="nv-primary" onClick={()=>setTab("discover")}>پیدا کردن آدم‌های تازه</button></div></section>}
 
+          {tab === "ai" && <section className="nv-page-panel"><span className="nv-kicker">دستیار هوشمند</span><h1>هوش مصنوعی NOVYRA</h1><p>ایده‌پردازی، نوشتن، پرسش و پاسخ و کمک برای کارهای روزمره.</p><div className="nv-ai-card"><div className="nv-ai-mark">✳</div><strong>از کجا شروع کنیم؟</strong><p>در این پیش‌نمایش، بخش هوش مصنوعی به‌صورت نمونه طراحی شده است.</p><button className="nv-primary" onClick={() => setTab("home")}>بازگشت به خانه</button></div></section>}
+
           {tab === "profile" && <section className="nv-page-panel"><span className="nv-kicker">فضای شخصی</span><h1>حساب من</h1><div className="nv-profile-card"><div className="nv-profile-avatar">ش</div><div><strong>کاربر NOVYRA</strong><span>خوش اومدی به جمع ما</span></div></div><div className="nv-settings-list">{["ویرایش پروفایل","حریم خصوصی و امنیت","اعلان‌ها","زبان برنامه","درباره NOVYRA"].map(x=><button key={x}>{x}<b>←</b></button>)}</div></section>}
         </div>
 
-        <nav className="nv-bottom">{tabs.map(item=><button key={item.id} className={tab===item.id?"active":""} onClick={()=>setTab(item.id)}><span>{item.icon}</span><small>{item.label}</small></button>)}</nav>
+        <nav className="nv-bottom">{tabs.map(item=><button key={item.id} className={tab===item.id?"active":""} onPointerDown={item.id==="profile"?startProfilePress:undefined} onPointerUp={item.id==="profile"?cancelProfilePress:undefined} onPointerLeave={item.id==="profile"?cancelProfilePress:undefined} onContextMenu={item.id==="profile"?(e)=>{e.preventDefault();setShowAiMenu(true);}:undefined} onClick={()=>{if(item.id==="profile" && showAiMenu){setShowAiMenu(false);return;}setTab(item.id);}}><span>{item.icon}</span><small>{item.label}</small></button>)}</nav>
+        {showAiMenu && <div className="nv-ai-menu-backdrop" onClick={()=>setShowAiMenu(false)}><div className="nv-ai-menu" onClick={e=>e.stopPropagation()}><span className="nv-ai-menu-kicker">میان‌بر</span><button onClick={()=>{setShowAiMenu(false);setTab("ai");}}><span className="nv-ai-menu-icon">✳</span><span><strong>هوش مصنوعی</strong><small>ورود به دستیار هوشمند</small></span><b>←</b></button></div></div>}
         <footer className="nv-footer">NOVYRA <span>·</span> ارتباط، با آرامش</footer>
       </div>
       <style jsx global>{`
@@ -101,7 +108,7 @@ export default function ConceptPage() {
         .nv-settings-list{background:#fff;border:1px solid #e9eee6;border-radius:15px;overflow:hidden}.nv-settings-list button{width:100%;padding:16px 18px;border:0;border-bottom:1px solid #eff1ec;background:white;text-align:right;display:flex;justify-content:space-between;color:#48584b;font:500 12px 'Vazirmatn';cursor:pointer}.nv-settings-list button:last-child{border:0}.nv-settings-list b{color:#9aa69b}
         .nv-bottom{position:absolute;bottom:0;right:0;left:0;height:76px;background:#fbfcf8;border-top:1px solid #e9ede6;display:flex;align-items:center;justify-content:center;gap:clamp(20px,7vw,75px)}
         .nv-bottom button{border:0;background:none;color:#98a198;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:54px;cursor:pointer;font-family:'Vazirmatn'}.nv-bottom button span{font-size:22px;line-height:1.1}.nv-bottom button small{font-size:9px}.nv-bottom button.active{color:#315840}.nv-bottom button.active span{transform:translateY(-2px)}
-        .nv-footer{position:absolute;bottom:-27px;left:0;right:0;text-align:center;color:#9ba59b;font-size:9px;letter-spacing:2px}.nv-footer span{padding:0 5px}
+        .nv-ai-card{margin-top:26px;padding:24px;background:#fff;border:1px solid #e8eee6;border-radius:18px;max-width:460px}.nv-ai-mark{width:48px;height:48px;border-radius:16px;background:#e5eee3;color:#315840;display:grid;place-items:center;font-size:24px;margin-bottom:16px}.nv-ai-card strong{font-size:15px}.nv-ai-card p{font-size:12px;line-height:2;color:#829087}.nv-ai-menu-backdrop{position:fixed;inset:0;z-index:20;background:#101b1630;display:flex;align-items:flex-end;justify-content:center;padding:0 16px 92px}.nv-ai-menu{width:min(320px,100%);background:#fbfcf8;border:1px solid #e7ece4;border-radius:18px;padding:12px;box-shadow:0 14px 40px #10201725}.nv-ai-menu-kicker{display:block;padding:5px 10px 9px;color:#8b978c;font-size:10px}.nv-ai-menu button{width:100%;display:flex;align-items:center;gap:12px;padding:12px;border:0;border-radius:12px;background:#edf3eb;color:#2d4936;text-align:right;font-family:inherit;cursor:pointer}.nv-ai-menu-icon{width:38px;height:38px;border-radius:12px;background:#dce9d9;display:grid;place-items:center;font-size:19px}.nv-ai-menu button span:nth-child(2){display:flex;flex-direction:column;gap:3px;flex:1}.nv-ai-menu strong{font-size:12px}.nv-ai-menu small{font-size:10px;color:#849087}.nv-ai-menu b{font-size:17px}.nv-footer{position:absolute;bottom:-27px;left:0;right:0;text-align:center;color:#9ba59b;font-size:9px;letter-spacing:2px}.nv-footer span{padding:0 5px}
         @media(max-width:650px){.nv-concept{padding:0;background:#f8f8f3}.nv-app{min-height:100vh;border:0;border-radius:0;padding-bottom:75px;box-shadow:none}.nv-top{height:64px;padding:0 20px}.nv-content{padding:25px 18px 24px}.nv-greeting{font-size:17px;margin-bottom:18px}.nv-hero{min-height:310px;padding:27px 23px;border-radius:20px;align-items:flex-start}.nv-hero h1{font-size:32px}.nv-hero p{font-size:12px;max-width:270px}.nv-hero-art{width:140px;height:140px;left:-26px;top:auto;bottom:5px;transform:none;opacity:.45}.ring-a{width:135px;height:135px}.ring-b{width:100px;height:100px}.nv-center{width:58px;height:58px;border-radius:20px;font-size:43px}.star-a{top:2px;left:15px}.star-b{bottom:12px;right:12px}.nv-feature{min-height:138px;padding:15px}.nv-feature-title{font-size:13px}.nv-feature-desc{font-size:10px}.nv-section-head{margin-top:28px}.nv-section-head h2{font-size:17px}.nv-room{padding:10px;gap:10px}.nv-room-symbol{width:39px;height:39px}.nv-join{padding:7px 10px}.nv-page-panel{padding:14px 0;min-height:calc(100vh - 170px)}.nv-page-panel h1{font-size:25px}.nv-topic-grid{gap:9px}.nv-topic{padding:16px 12px;font-size:11px}.nv-bottom{height:70px;gap:0;justify-content:space-around}.nv-bottom button{min-width:48px}.nv-bottom button span{font-size:20px}.nv-bottom button small{font-size:9px}}
       `}</style>
     </main>
