@@ -151,8 +151,8 @@ function PostCard({
       <div className="nv-post-actions">
         <button type="button" className={post.likedByMe ? "liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}><svg viewBox="0 0 24 24"><path d="M20.8 8.7c0 4.7-8.8 10.1-8.8 10.1S3.2 13.4 3.2 8.7A4.2 4.2 0 0 1 11 6.3a4.2 4.2 0 0 1 9.8 2.4Z"/></svg><small>{post.likeCount.toLocaleString()}</small></button>
         <button type="button" onClick={() => onToggleComments(post)} aria-label={t.comments}><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 20l1-4.1a8.5 8.5 0 1 1 16.5-4.4Z"/></svg><small>{post.commentCount.toLocaleString()}</small></button>
-        <button type="button" aria-label="Share"><svg viewBox="0 0 24 24"><path d="m21 3-7.2 18-3.6-7.2L3 10.2 21 3Z M10.2 13.8 21 3"/></svg><small>Share</small></button>
-        <button type="button" aria-label="Save"><svg viewBox="0 0 24 24"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg><small>Save</small></button>
+        <button type="button" aria-label="Share" onClick={() => { const url = window.location.href; if (navigator.share) void navigator.share({ title: "NOVYRA", text: post.body, url }).catch(() => undefined); else void navigator.clipboard?.writeText(url); }}><svg viewBox="0 0 24 24"><path d="m21 3-7.2 18-3.6-7.2L3 10.2 21 3Z M10.2 13.8 21 3"/></svg><small>Share</small></button>
+        <button type="button" aria-label="Save" onClick={() => { const key = "novyra-saved-posts"; const saved = JSON.parse(localStorage.getItem(key) || "[]") as string[]; localStorage.setItem(key, JSON.stringify(saved.includes(post.id) ? saved.filter(id => id !== post.id) : [...saved, post.id])); }}><svg viewBox="0 0 24 24"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg><small>Save</small></button>
       </div>
       <div className="nv-post-caption"><div className="nv-progress"><i /></div><p><strong>{post.authorName}</strong> {post.body}</p></div>
     </div>
