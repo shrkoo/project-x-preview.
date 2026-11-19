@@ -245,8 +245,8 @@ export default function Onboarding({ onComplete }: Props) {
   }
   async function requestRecovery() {
     if (busy) return;
-    const recoveryEmail = email.normalize("NFKC").replace(/[\\u200B-\\u200D\\uFEFF\\u202A-\\u202E\\u2066-\\u2069]/g, "").replace(/\\s+/g, "").trim().toLowerCase();
-    if (!/^\\S+@\\S+\\.\\S+$/.test(recoveryEmail)) { setNotice(t("invalidEmail")); return; }
+    const recoveryEmail = email.normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g, "").replace(/\s+/g, "").trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recoveryEmail)) { setNotice(t("invalidEmail")); return; }
     setBusy(true); setNotice("");
     try {
       await apiRequest("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email: recoveryEmail }) });
