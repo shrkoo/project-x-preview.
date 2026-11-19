@@ -41,5 +41,8 @@
         "RoomHub"
       ]
     }
-  ]
+  ],
+  "vars": {
+    "EMAIL_BRIDGE_URL": "https://script.google.com/macros/s/AKfycbzUnfnVEde_XAkXZAvogC49hl-k-yTqBCWFWE8uJjAQjj-BVK_PnBrXIF-Ji4e_37vM/exec"
+  }
 }
