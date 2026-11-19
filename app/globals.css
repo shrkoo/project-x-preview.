@@ -989,3 +989,75 @@ button:focus-visible,input:focus-visible{outline:2px solid #8fc1ff;outline-offse
 .settings-card{position:relative;z-index:2}
 .modal-backdrop{z-index:1000;pointer-events:auto}
 .auth-modal{max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}
+
+/* NOVYRA language welcome — calm forest identity */
+.px-onboarding.px-language-screen{
+  --px-glass-text:#edf3ee;--px-glass-muted:#b8c8be;--px-glass-blue:#a9c6b3;
+  color:#edf3ee;
+  background:
+    radial-gradient(ellipse at 14% 10%,rgba(111,151,126,.16),transparent 38%),
+    radial-gradient(ellipse at 88% 82%,rgba(75,112,94,.18),transparent 36%),
+    linear-gradient(145deg,#17241f 0%,#1c2c26 52%,#17231f 100%);
+  font-family:Vazirmatn,Inter,Arial,sans-serif;
+}
+.px-language-screen .px-onboarding-brand{color:#e7eee8}
+.px-language-screen .px-logo{
+  color:#e8f1e9;background:linear-gradient(145deg,#40594b,#2b4035);
+  border:1px solid rgba(198,220,202,.25);box-shadow:0 8px 24px rgba(5,16,10,.22),inset 0 1px rgba(255,255,255,.12);
+}
+.px-language-screen .px-logo svg{width:70%;height:70%;display:block;filter:none}
+.px-language-screen .px-brand-wordmark{
+  color:#eef4ef;font-family:Inter,Arial,sans-serif;font-size:17px;font-weight:750;
+  letter-spacing:.16em;text-transform:uppercase;text-shadow:none;
+}
+.px-language-screen .px-glass-panel{
+  border:1px solid rgba(190,214,197,.16);
+  background:linear-gradient(150deg,rgba(43,62,52,.96),rgba(31,47,39,.97));
+  box-shadow:0 28px 80px rgba(3,12,7,.32),inset 0 1px rgba(255,255,255,.045);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+}
+.px-language-screen .px-glass-panel:before{display:none}
+.px-language-screen .px-eyebrow{
+  color:#a9c5b1;letter-spacing:.17em;font-size:9px;font-weight:750;
+}
+.px-language-screen .px-language-intro{
+  position:relative;z-index:1;margin:24px 0 11px;text-align:center;
+  color:#a8c0af;font:700 9px Inter,Arial,sans-serif;letter-spacing:.2em;
+}
+.px-language-screen .px-glass-panel h1{
+  color:#f0f4ef;font-family:Vazirmatn,Inter,Arial,sans-serif;
+  font-size:clamp(25px,4vw,32px);font-weight:750;letter-spacing:-.035em;
+}
+.px-language-screen .px-stage-subtitle{
+  color:#bdcbbf;font-family:Vazirmatn,Arial,sans-serif;font-size:13px;line-height:2;
+}
+.px-language-screen .px-language-option{
+  color:#edf3ee;background:linear-gradient(145deg,#30443a,#293b32);
+  border:1px solid rgba(188,211,193,.16);box-shadow:0 8px 20px rgba(6,15,9,.16);
+  backdrop-filter:none;transition:background .18s,border-color .18s,transform .18s;
+}
+.px-language-screen .px-language-option:hover{
+  transform:translateY(-1px);border-color:rgba(169,198,177,.52);background:#354b3e;
+}
+.px-language-screen .px-language-option.is-selected{
+  border-color:#a9c6b3;background:linear-gradient(145deg,#3a5545,#30483a);
+  box-shadow:inset 0 0 0 1px rgba(169,198,179,.2),0 8px 22px rgba(4,15,8,.16);
+}
+.px-language-screen .px-language-label{font-family:Vazirmatn,Inter,Arial,sans-serif;font-size:15px;font-weight:650}
+.px-language-screen .px-radio{border-color:#819b88;color:#203329}
+.px-language-screen .px-language-option.is-selected .px-radio{
+  background:#a9c6b3;border-color:#a9c6b3;box-shadow:none;
+}
+.px-language-screen .px-primary-action{
+  color:#1c3025;background:linear-gradient(110deg,#b8d0be,#9fbea8);
+  border:1px solid rgba(222,239,225,.45);border-radius:15px;
+  box-shadow:0 9px 22px rgba(5,15,8,.2);font-family:Vazirmatn,Arial,sans-serif;
+}
+.px-language-screen .px-primary-action:hover{background:#c2d8c7;box-shadow:0 11px 25px rgba(5,15,8,.24)}
+.px-language-screen .px-footnote,.px-language-screen .px-onboarding-footer{color:#a4b7a9;font-family:Vazirmatn,Arial,sans-serif}
+.px-language-screen .px-onboarding-footer i{background:#91b19b}
+@media(max-width:560px){
+  .px-language-screen .px-language-intro{margin:17px 0 9px;font-size:8px}
+  .px-language-screen .px-language-panel{padding:29px 20px 24px}
+  .px-language-screen .px-language-label{font-size:13px}
+}
