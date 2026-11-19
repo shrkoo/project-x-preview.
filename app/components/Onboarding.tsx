@@ -5,7 +5,7 @@ import { apiRequest, setSession, createPasswordSalt, derivePasswordHash } from "
 
 type Language = "en" | "fa" | "ar" | "ku";
 type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string };
-type Props = { onComplete: (user: User | null, language: Language) => void };
+type Props = { onComplete: (user: User | null, language: Language) => void; initialNotice?: string };
 type Stage = "language" | "auth" | "profile" | "passwordSetup";
 type Mode = "login" | "signup";
 
@@ -107,7 +107,7 @@ function EyeMark({ visible }: { visible: boolean }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true" className="px-eye-icon"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="12" r="2.8" fill="none" stroke="currentColor" strokeWidth="1.6"/>{visible && <path d="m4 20 16-16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>}</svg>;
 }
 
-export default function Onboarding({ onComplete }: Props) {
+export default function Onboarding({ onComplete, initialNotice }: Props) {
   const [language, setLanguage] = useState<Language>("fa");
   const [stage, setStage] = useState<Stage>("language");
   const [mode, setMode] = useState<Mode>("login");
@@ -128,6 +128,8 @@ export default function Onboarding({ onComplete }: Props) {
   const fileInput = useRef<HTMLInputElement>(null);
   const t = (key: string) => copy[language][key] || key;
   const dir = language === "en" ? "ltr" : "rtl";
+
+  useEffect(() => { if (initialNotice) setNotice(initialNotice); }, [initialNotice]);
 
   useEffect(() => {
     const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
