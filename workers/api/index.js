@@ -48,6 +48,55 @@ async function sendMail(env,to,subject,html) {
  return true;
 }
 const hasMailProvider = env => Boolean((String(env.EMAIL_BRIDGE_URL||"").trim() && String(env.EMAIL_BRIDGE_SECRET||"").trim()) || (env.RESEND_API_KEY && env.EMAIL_FROM));
+
+const escapeEmailHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+function renderNovyraEmail({eyebrow,title,intro,actionLabel,actionUrl,notice,footerNote}) {
+  const safeUrl=escapeEmailHtml(actionUrl);
+  const safeTitle=escapeEmailHtml(title);
+  const safeIntro=escapeEmailHtml(intro);
+  const safeAction=escapeEmailHtml(actionLabel);
+  const safeNotice=escapeEmailHtml(notice);
+  const safeFooter=escapeEmailHtml(footerNote || "این پیام به‌صورت خودکار از طرف تیم NOVYRA ارسال شده است.");
+  const safeEyebrow=escapeEmailHtml(eyebrow || "NOVYRA ACCOUNT");
+  return `<!doctype html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${safeTitle} | NOVYRA</title></head>
+<body style="margin:0;padding:0;background:#f3f5f9;font-family:Tahoma,Arial,sans-serif;color:#172033;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${safeTitle} — NOVYRA</div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f3f5f9;padding:36px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #e7eaf0;border-radius:18px;overflow:hidden;">
+        <tr><td style="background:#111c31;padding:27px 32px;text-align:left;direction:ltr;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr>
+            <td style="width:38px;height:38px;border:1px solid #7186a8;border-radius:11px;text-align:center;vertical-align:middle;color:#ffffff;font-size:20px;font-weight:700;">N</td>
+            <td style="padding-left:12px;color:#ffffff;font-size:19px;font-weight:700;letter-spacing:3px;">NOVYRA</td>
+          </tr></table>
+          <div style="margin-top:15px;color:#aebbd0;font-size:10px;letter-spacing:2px;">BUILT FOR YOUR MOMENTS</div>
+        </td></tr>
+        <tr><td style="padding:38px 36px 30px;text-align:right;direction:rtl;">
+          <div style="color:#64748b;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:13px;">${safeEyebrow}</div>
+          <h1 style="margin:0 0 17px;color:#111c31;font-size:25px;line-height:1.6;font-weight:700;">${safeTitle}</h1>
+          <p style="margin:0 0 27px;color:#475467;font-size:15px;line-height:2.1;">${safeIntro}</p>
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 22px;">
+            <tr><td align="center" bgcolor="#172b4d" style="border-radius:10px;">
+              <a href="${safeUrl}" target="_blank" style="display:inline-block;padding:15px 29px;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;border-radius:10px;">${safeAction}</a>
+            </td></tr>
+          </table>
+          <div style="background:#f5f7fb;border:1px solid #e8edf5;border-radius:10px;padding:14px 16px;color:#526078;font-size:12px;line-height:2;">${safeNotice}</div>
+          <p style="margin:23px 0 0;color:#7b8495;font-size:12px;line-height:2;">اگر دکمه بالا باز نشد، این نشانی را در مرورگر خود کپی کنید:<br><a href="${safeUrl}" style="color:#345b91;word-break:break-all;text-decoration:underline;">${safeUrl}</a></p>
+        </td></tr>
+        <tr><td style="padding:22px 30px;background:#fafbfc;border-top:1px solid #edf0f4;text-align:center;">
+          <div style="color:#25334b;font-size:13px;font-weight:700;letter-spacing:1px;">The NOVYRA Team</div>
+          <div style="margin-top:9px;color:#8992a2;font-size:11px;line-height:1.9;">${safeFooter}</div>
+          <div style="margin-top:13px;color:#a0a8b5;font-size:10px;letter-spacing:1px;">NOVYRA · BUILT FOR YOUR MOMENTS</div>
+        </td></tr>
+      </table>
+      <div style="padding:18px 10px;color:#98a1af;font-size:10px;text-align:center;">لطفاً به این ایمیل پاسخ ندهید؛ این پیام به‌صورت خودکار ارسال شده است.</div>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
 async function issueEmailToken(db,userId,kind,ttlMs) {
  const token=randomToken(32), tokenHash=await digest(token), expires=Date.now()+ttlMs;
  await db.prepare("INSERT INTO email_tokens (id,user_id,token_hash,kind,expires_at) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),userId,tokenHash,kind,expires).run();
@@ -151,7 +200,7 @@ export default {
       try {
         const token=await issueEmailToken(db,id,"verify",24*60*60*1000);
         const link=(env.APP_URL || "https://novyra.pages.dev") + "/?verify=" + encodeURIComponent(token);
-        await sendMail(env,email,"تأیید ایمیل NOVYRA",'<div dir="rtl" style="font-family:Arial"><h2>به NOVYRA خوش آمدی</h2><p>برای فعال‌سازی حساب روی لینک زیر بزن:</p><a href="' + link + '">تأیید ایمیل</a><p>این لینک تا ۲۴ ساعت معتبر است.</p></div>');
+        await sendMail(env,email,"تأیید ایمیل NOVYRA",renderNovyraEmail({eyebrow:"WELCOME TO NOVYRA",title:"به NOVYRA خوش آمدی",intro:"برای فعال‌سازی حساب و تأیید نشانی ایمیل خود، دکمه زیر را انتخاب کن.",actionLabel:"تأیید ایمیل",actionUrl:link,notice:"این لینک تا ۲۴ ساعت معتبر است.",footerNote:"اگر این حساب را ایجاد نکرده‌اید، این پیام را نادیده بگیرید."}));
         verificationSent=true;
       } catch (mailError) {
         console.error("project-x-verification-email-error",mailError);
@@ -183,7 +232,7 @@ export default {
       if((pending?.total||0)<3) {
         const token=await issueEmailToken(db,target.id,"password_reset",60*60*1000);
         const link=(env.APP_URL || "https://novyra.pages.dev") + "/?reset=" + encodeURIComponent(token);
-        await sendMail(env,target.email,"بازیابی رمز عبور NOVYRA",'<div dir="rtl" style="font-family:Arial"><h2>بازیابی رمز عبور</h2><p>برای انتخاب رمز جدید روی لینک زیر بزن:</p><a href="' + link + '">تغییر رمز عبور</a><p>این لینک تا یک ساعت معتبر است.</p><p>اگر این درخواست را ندادی، این پیام را نادیده بگیر.</p></div>');
+        await sendMail(env,target.email,"بازیابی رمز عبور NOVYRA",renderNovyraEmail({eyebrow:"ACCOUNT SECURITY",title:"بازیابی رمز عبور",intro:"درخواست انتخاب رمز عبور جدید برای حساب NOVYRA شما ثبت شده است. برای ادامه، دکمه زیر را انتخاب کنید.",actionLabel:"تغییر رمز عبور",actionUrl:link,notice:"این لینک فقط تا یک ساعت معتبر است و پس از آن منقضی می‌شود.",footerNote:"اگر شما این درخواست را ثبت نکرده‌اید، این ایمیل را نادیده بگیرید؛ رمز عبور حساب شما تغییر نخواهد کرد."}));
       }
     }
     return json({ok:true,message:"اگر حسابی با این ایمیل وجود داشته باشد، راهنمای بازیابی ارسال می‌شود."});
@@ -241,7 +290,7 @@ export default {
       if((pending?.total||0)>=3) return fail("برای ارسال دوباره کمی صبر کن.",429);
       const token=await issueEmailToken(db,user.id,"verify",24*60*60*1000);
       const link=(env.APP_URL || "https://novyra.pages.dev") + "/?verify=" + encodeURIComponent(token);
-      await sendMail(env,target.email,"تأیید ایمیل NOVYRA",'<div dir="rtl" style="font-family:Arial"><h2>تأیید ایمیل</h2><p>برای تأیید حساب روی لینک زیر بزن:</p><a href="' + link + '">تأیید ایمیل</a><p>این لینک تا ۲۴ ساعت معتبر است.</p></div>');
+      await sendMail(env,target.email,"تأیید ایمیل NOVYRA",renderNovyraEmail({eyebrow:"EMAIL VERIFICATION",title:"تأیید نشانی ایمیل",intro:"برای تکمیل تأیید حساب NOVYRA خود، دکمه زیر را انتخاب کنید.",actionLabel:"تأیید ایمیل",actionUrl:link,notice:"این لینک تا ۲۴ ساعت معتبر است.",footerNote:"اگر این درخواست را ثبت نکرده‌اید، می‌توانید این پیام را نادیده بگیرید."}));
       return json({ok:true,message:"لینک تأیید دوباره ارسال شد."});
     }
     if (path === "/auth/profile" && request.method === "PATCH") {
