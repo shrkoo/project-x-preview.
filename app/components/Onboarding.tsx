@@ -153,9 +153,8 @@ export default function Onboarding({ onComplete }: Props) {
     const saved = localStorage.getItem("projectx-language") as Language | null;
     if (saved && copy[saved]) {
       setLanguage(saved);
-      // Language selection is always the first screen for a signed-out visitor.
-      // Do not auto-advance merely because a language was saved previously.
-      if (!localStorage.getItem("projectx-token")) setStage("language");
+      // Returning signed-out users go straight to sign-in; language is first-run only.
+      setStage("auth");
     }
     const reset = new URLSearchParams(window.location.search).get("reset");
     if (reset) {
@@ -174,6 +173,7 @@ export default function Onboarding({ onComplete }: Props) {
   }
   function continueLanguage() {
     localStorage.setItem("projectx-language", language);
+    localStorage.setItem("projectx-first-run-complete", "1");
     document.documentElement.lang = language;
     document.documentElement.dir = language === "en" ? "ltr" : "rtl";
     if (localStorage.getItem("projectx-token")) onComplete(null, language);
@@ -208,6 +208,7 @@ export default function Onboarding({ onComplete }: Props) {
         body: JSON.stringify(credentials)
       });
       setSession(data.token);
+      localStorage.setItem("projectx-account", JSON.stringify({ name: data.user.displayName || name.trim(), email: data.user.email }));
       setUser(data.user);
       setProfileName(data.user.displayName || name);
       setEmail(data.user.email);
@@ -310,6 +311,7 @@ export default function Onboarding({ onComplete }: Props) {
       if (photo) localStorage.setItem("projectx-avatar:" + user.id, photo);
       else if (avatar) localStorage.setItem("projectx-avatar:" + user.id, avatar);
       localStorage.setItem("projectx-profile-complete:" + user.id, "1");
+      localStorage.setItem("projectx-account", JSON.stringify({ name: skip ? user.displayName : cleanName, email: user.email }));
       onComplete({ ...user, displayName: skip ? user.displayName : cleanName }, language);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : t("authError"));
