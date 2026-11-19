@@ -22,11 +22,20 @@ const passwordHash = async (password, salt) => {
 };
 
 async function sendMail(env,to,subject,html) {
+ if(env.EMAIL_BRIDGE_URL && env.EMAIL_BRIDGE_SECRET) {
+  const response=await fetch(env.EMAIL_BRIDGE_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({secret:env.EMAIL_BRIDGE_SECRET,to,subject,html}),redirect:"follow"});
+  if(!response.ok) throw new Error("email_bridge_http_error");
+  let result;
+  try { result=await response.json(); } catch { throw new Error("email_bridge_invalid_response"); }
+  if(result?.success!==true) throw new Error("email_bridge_delivery_failed");
+  return true;
+ }
  if(!env.RESEND_API_KEY || !env.EMAIL_FROM) return false;
  const response=await fetch("https://api.resend.com/emails",{method:"POST",headers:{"Authorization":`Bearer ${env.RESEND_API_KEY}`,"Content-Type":"application/json"},body:JSON.stringify({from:env.EMAIL_FROM,to:[to],subject,html})});
  if(!response.ok) throw new Error("email_provider_error");
  return true;
 }
+const hasMailProvider = env => Boolean((env.EMAIL_BRIDGE_URL && env.EMAIL_BRIDGE_SECRET) || (env.RESEND_API_KEY && env.EMAIL_FROM));
 async function issueEmailToken(db,userId,kind,ttlMs) {
  const token=randomToken(32), tokenHash=await digest(token), expires=Date.now()+ttlMs;
  await db.prepare("INSERT INTO email_tokens (id,user_id,token_hash,kind,expires_at) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),userId,tokenHash,kind,expires).run();
@@ -126,7 +135,7 @@ export default {
       return fail("ساخت حساب در پایگاه‌داده ناموفق بود؛ مشکل از ایمیل تکراری نیست. لطفاً بعداً دوباره تلاش کن.",500);
     }
     let verificationSent=false;
-    if(env.RESEND_API_KEY && env.EMAIL_FROM) {
+    if(hasMailProvider(env)) {
       try {
         const token=await issueEmailToken(db,id,"verify",24*60*60*1000);
         const link=(env.APP_URL || "https://novyra.pages.dev") + "/?verify=" + encodeURIComponent(token);
@@ -153,7 +162,7 @@ export default {
     return json({ok:true,message:"ایمیل با موفقیت تأیید شد."});
    }
    if (path === "/auth/forgot-password" && request.method === "POST") {
-    if(!env.RESEND_API_KEY || !env.EMAIL_FROM) return fail("سرویس ارسال ایمیل هنوز تنظیم نشده است.",503);
+    if(!hasMailProvider(env)) return fail("سرویس ارسال ایمیل هنوز تنظیم نشده است.",503);
     const body=await readBody(request), email=cleanEmail(body?.email);
     if(!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
     const target=await db.prepare("SELECT id,email FROM users WHERE email=?").bind(email).first();
@@ -213,7 +222,7 @@ export default {
     }
     if (path === "/auth/me" && request.method === "GET") return json({user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role}});
     if (path === "/auth/resend-verification" && request.method === "POST") {
-      if(!env.RESEND_API_KEY || !env.EMAIL_FROM) return fail("سرویس ارسال ایمیل هنوز تنظیم نشده است.",503);
+      if(!hasMailProvider(env)) return fail("سرویس ارسال ایمیل هنوز تنظیم نشده است.",503);
       const target=await db.prepare("SELECT email,verified_at FROM users WHERE id=?").bind(user.id).first();
       if(target?.verified_at) return json({ok:true,alreadyVerified:true,message:"ایمیل قبلاً تأیید شده است."});
       const pending=await db.prepare("SELECT COUNT(*) AS total FROM email_tokens WHERE user_id=? AND kind='verify' AND expires_at>?").bind(user.id,Date.now()).first();
