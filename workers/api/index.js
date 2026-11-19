@@ -26,10 +26,20 @@ async function sendMail(env,to,subject,html) {
   const bridgeUrl=String(env.EMAIL_BRIDGE_URL).trim();
   const bridgeSecret=String(env.EMAIL_BRIDGE_SECRET).trim();
   const response=await fetch(bridgeUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({secret:bridgeSecret,to,subject,html}),redirect:"follow"});
-  if(!response.ok) throw new Error("email_bridge_http_error");
+  const responseText=await response.text();
+  if(!response.ok) {
+    console.error("novyra-email-bridge-http",response.status,responseText.slice(0,500));
+    throw new Error("email_bridge_http_"+response.status);
+  }
   let result;
-  try { result=await response.json(); } catch { throw new Error("email_bridge_invalid_response"); }
-  if(result?.success!==true) throw new Error("email_bridge_delivery_failed");
+  try { result=JSON.parse(responseText); } catch {
+    console.error("novyra-email-bridge-invalid-json",response.headers.get("content-type"),responseText.slice(0,500));
+    throw new Error("email_bridge_invalid_response");
+  }
+  if(result?.success!==true) {
+    console.error("novyra-email-bridge-rejected",JSON.stringify(result).slice(0,500));
+    throw new Error("email_bridge_delivery_failed");
+  }
   return true;
  }
  if(!env.RESEND_API_KEY || !env.EMAIL_FROM) return false;
@@ -413,7 +423,11 @@ export default {
    }
    return fail("مسیر API پیدا نشد.",404);
   } catch (error) {
-   console.error("novyra-api-error",error);
+   console.error("novyra-api-error",path,error);
+   if(path==="/auth/forgot-password") {
+    const code=String(error?.message||"unknown_error").replace(/[^a-zA-Z0-9_-]/g,"_").slice(0,80);
+    return fail("ارسال ایمیل بازیابی ناموفق بود. کد خطا: "+code,502);
+   }
    return fail("خطای داخلی سرور. دوباره تلاش کن.",500);
   }
  }
