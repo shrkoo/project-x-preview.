@@ -1865,3 +1865,60 @@ button{cursor:pointer}
  .nv-top-tabs{gap:18px}
  .nv-post-card{border-radius:24px!important}
 }
+
+
+/* Final reference pass: unify every interactive surface */
+.social-app button:not(.novyra-bottom-tab):not(.nv-story):not(.nv-post-actions button):not(.nv-reel-actions button):not(.nv-top-tabs>button:not(.nv-round-action)){
+  -webkit-tap-highlight-color:transparent;
+}
+.social-app button:focus-visible{
+  outline:2px solid #FFC15A!important;outline-offset:3px!important;
+}
+.nv-top-tabs .nv-round-action,.nv-post-more,.nv-profile-cover button,
+.social-notification-button{
+  background:rgba(255,255,255,.15)!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+  color:#fff!important;border-radius:50%!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 7px 18px rgba(0,0,0,.22)!important;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  transition:transform .16s ease,background .16s ease,box-shadow .16s ease;
+}
+.nv-top-tabs .nv-round-action:active,.nv-post-more:active,
+.nv-profile-cover button:active,.social-notification-button:active{
+  transform:scale(.93);background:rgba(255,255,255,.24)!important;
+}
+.social-thought-launcher,.social-create-card,.social-person-card,
+.social-profile-edit,.social-profile-settings,.social-comments{
+  background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.045))!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 28px rgba(0,0,0,.2)!important;
+}
+.social-create-footer button,.social-search-form button,.social-person-card>button,
+.social-comment-form button,.social-profile-edit button,.social-logout-button,
+.social-empty-state button{
+  background:linear-gradient(135deg,#FFC15A 0%,#FF9B3E 48%,#FF7A2F 100%)!important;
+  color:#28160d!important;border:1px solid rgba(255,255,255,.22)!important;
+  border-radius:14px!important;font-weight:800!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 5px 0 rgba(133,62,25,.48),0 10px 22px rgba(255,122,47,.22)!important;
+}
+.social-create-footer button:active,.social-search-form button:active,
+.social-person-card>button:active,.social-comment-form button:active,
+.social-profile-edit button:active,.social-logout-button:active,
+.social-empty-state button:active{
+  transform:translateY(3px) scale(.98)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 0 rgba(133,62,25,.42),0 5px 12px rgba(255,122,47,.16)!important;
+}
+.social-media-type button{
+  border:1px solid rgba(255,255,255,.15)!important;border-radius:12px!important;
+  background:rgba(255,255,255,.1)!important;color:#fff!important;padding:9px 15px!important;
+}
+.social-media-type button.selected{
+  background:linear-gradient(135deg,#FFC15A,#FF7A2F)!important;color:#28160d!important;
+  border-color:rgba(255,255,255,.28)!important;
+}
+.nv-story:focus-visible,.nv-post-actions button:focus-visible,
+.nv-reel-actions button:focus-visible,.novyra-bottom-tab:focus-visible{
+  outline:2px solid #FFC15A;outline-offset:3px;
+}
+.nv-post-actions button,.nv-reel-actions button{transition:transform .16s ease,color .16s ease}
+.nv-post-actions button:active,.nv-reel-actions button:active{transform:scale(.9)}
