@@ -551,7 +551,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
 
       <nav className="social-mobile-nav-wrap">
         <MobileBottomNav active={active} userId={account.id} displayName={profile?.displayName || account.displayName}
-          onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} />
+          onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} onOpenGame={() => window.alert("بخش بازی هنوز در این نسخه فعال نشده است.")} />
       </nav>
     </div>
   </main>;
