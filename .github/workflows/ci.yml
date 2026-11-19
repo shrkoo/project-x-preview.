@@ -38,7 +38,7 @@ jobs:
           db = sqlite3.connect(":memory:")
           db.execute("PRAGMA foreign_keys = ON")
           db.execute("CREATE TABLE users (id TEXT PRIMARY KEY)")
-          db.executescript(Path("workers/api/migrations/0002_social_core.sql").read_text())
+          db.executescript(Path("workers/api/migrations/0001_social_core.sql").read_text())
           expected = {"social_posts", "social_post_likes", "social_post_comments", "social_follows", "ai_daily_usage"}
           actual = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
           assert expected.issubset(actual), f"Missing tables: {expected - actual}"
