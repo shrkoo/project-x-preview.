@@ -24,7 +24,7 @@ const copy: Record<Language, Record<string, string>> = {
     readyAvatars: "Choose an avatar", upload: "Upload your photo", changePhoto: "Change photo",
     displayName: "Display name", finish: "Enter NOVYRA", skip: "Skip for now",
     emailSent: "If this email is registered, recovery instructions will be sent.", oauthUnavailable: "Google and Apple sign-in need provider credentials before they can be activated.",
-    back: "Back", resetTitle: "Reset your password", sendReset: "Send recovery link",
+    back: "Back", resetTitle: "Reset your password", sendReset: "Send recovery link", recoverySub: "Enter your account email and we will send a recovery link.", updatePassword: "Update password",
     passwordMismatch: "Passwords do not match.", authError: "Something went wrong. Please try again.",
     invalidEmail: "Enter a valid email address.", weakPassword: "Password must be at least 10 characters.",
     missingName: "Enter your name.", photoError: "Choose an image file smaller than 8 MB."
@@ -43,7 +43,7 @@ const copy: Record<Language, Record<string, string>> = {
     readyAvatars: "انتخاب آواتار", upload: "بارگذاری عکس شخصی", changePhoto: "تغییر عکس",
     displayName: "نام نمایشی", finish: "ورود به NOVYRA", skip: "فعلاً رد می‌کنم",
     emailSent: "اگر حسابی با این ایمیل وجود داشته باشد، راهنمای بازیابی ارسال می‌شود.", oauthUnavailable: "برای فعال‌شدن ورود Google و Apple، اطلاعات اتصال رسمی این سرویس‌ها لازم است.",
-    back: "بازگشت", resetTitle: "بازیابی رمز عبور", sendReset: "ارسال لینک بازیابی",
+    back: "بازگشت", resetTitle: "بازیابی رمز عبور", sendReset: "ارسال لینک بازیابی", recoverySub: "ایمیل حسابت را وارد کن تا لینک بازیابی برایت ارسال شود.", updatePassword: "تغییر رمز عبور",
     passwordMismatch: "رمزهای عبور یکسان نیستند.", authError: "مشکلی پیش آمد. دوباره تلاش کنید.",
     invalidEmail: "یک ایمیل معتبر وارد کنید.", weakPassword: "رمز عبور باید حداقل ۱۰ نویسه باشد.",
     missingName: "نام خود را وارد کنید.", photoError: "یک تصویر کوچک‌تر از ۸ مگابایت انتخاب کنید."
@@ -62,7 +62,7 @@ const copy: Record<Language, Record<string, string>> = {
     readyAvatars: "اختر صورة رمزية", upload: "تحميل صورتك", changePhoto: "تغيير الصورة",
     displayName: "الاسم الظاهر", finish: "الدخول إلى NOVYRA", skip: "تخطي الآن",
     emailSent: "إذا كان البريد مسجلاً، فستصلك تعليمات الاستعادة.", oauthUnavailable: "يلزم إعداد بيانات Google وApple الرسمية لتفعيل تسجيل الدخول.",
-    back: "رجوع", resetTitle: "إعادة تعيين كلمة المرور", sendReset: "إرسال رابط الاستعادة",
+    back: "رجوع", resetTitle: "إعادة تعيين كلمة المرور", sendReset: "إرسال رابط الاستعادة", recoverySub: "أدخل بريد حسابك لإرسال رابط الاستعادة.", updatePassword: "تحديث كلمة المرور",
     passwordMismatch: "كلمتا المرور غير متطابقتين.", authError: "حدث خطأ. حاول مرة أخرى.",
     invalidEmail: "أدخل بريداً إلكترونياً صالحاً.", weakPassword: "يجب أن تتكون كلمة المرور من ١٠ أحرف على الأقل.",
     missingName: "أدخل اسمك.", photoError: "اختر صورة يقل حجمها عن ٨ ميغابايت."
@@ -81,7 +81,7 @@ const copy: Record<Language, Record<string, string>> = {
     readyAvatars: "ئاوەتار هەڵبژێرە", upload: "بارکردنی وێنەی خۆت", changePhoto: "گۆڕینی وێنە",
     displayName: "ناوی پیشاندراو", finish: "چوونە ژوورەوەی NOVYRA", skip: "ئێستا تێپەڕێنە",
     emailSent: "ئەگەر ئەم ئیمەیڵە تۆمارکرابێت، ڕێنمایی گەڕاندنەوەی بۆ دەنێردرێت.", oauthUnavailable: "بۆ چالاککردنی چوونەژوورەوەی Google و Apple، زانیارییە فەرمییەکانی پێویستن.",
-    back: "گەڕانەوە", resetTitle: "نوێکردنەوەی وشەی نهێنی", sendReset: "ناردنی بەستەری گەڕاندنەوە",
+    back: "گەڕانەوە", resetTitle: "نوێکردنەوەی وشەی نهێنی", sendReset: "ناردنی بەستەری گەڕاندنەوە", recoverySub: "ئیمەیڵی هەژمارەکەت بنووسە بۆ ناردنی بەستەری گەڕاندنەوە.", updatePassword: "گۆڕینی وشەی نهێنی",
     passwordMismatch: "وشە نهێنییەکان یەکسان نین.", authError: "هەڵەیەک ڕوویدا. دووبارە هەوڵ بدەوە.",
     invalidEmail: "ئیمەیڵێکی دروست بنووسە.", weakPassword: "وشەی نهێنی دەبێت لانیکەم ١٠ پیت بێت.",
     missingName: "ناوەکەت بنووسە.", photoError: "وێنەیەک هەڵبژێرە کە لە ٨ مێگابایت بچووکتر بێت."
@@ -122,6 +122,7 @@ export default function Onboarding({ onComplete }: Props) {
   const [photo, setPhoto] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [recoveryMode, setRecoveryMode] = useState(false);
+  const [resetTokenMode, setResetTokenMode] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const t = (key: string) => copy[language][key] || key;
   const dir = language === "en" ? "ltr" : "rtl";
@@ -160,6 +161,7 @@ export default function Onboarding({ onComplete }: Props) {
       setStage("auth");
       setMode("login");
       setRecoveryMode(true);
+      setResetTokenMode(true);
     }
     document.documentElement.lang = saved || "en";
     document.documentElement.dir = saved === "en" ? "ltr" : "rtl";
@@ -260,7 +262,7 @@ export default function Onboarding({ onComplete }: Props) {
       const passwordHash = await derivePasswordHash(password, salt);
       await apiRequest("/auth/reset-password", { method: "POST", body: JSON.stringify({ token, salt, passwordHash }) });
       localStorage.removeItem("projectx-reset-token");
-      setRecoveryMode(false); setPassword(""); setConfirmPassword("");
+      setRecoveryMode(false); setResetTokenMode(false); setPassword(""); setConfirmPassword("");
       setNotice(language === "en" ? "Password updated. Sign in with your new password." : "رمز عبور تغییر کرد. با رمز جدید وارد شوید.");
       window.history.replaceState({}, "", window.location.pathname);
     } catch (error) { setNotice(error instanceof Error ? error.message : t("authError")); }
@@ -339,20 +341,20 @@ export default function Onboarding({ onComplete }: Props) {
           <div className="px-auth-emblem"><span>N</span><i /><b /></div>
           <div className="px-eyebrow">NOVYRA / {recoveryMode ? "ACCOUNT RECOVERY" : "YOUR SPACE"}</div>
           <h1>{recoveryMode ? t("resetTitle") : mode === "login" ? t("loginTitle") : t("signupTitle")}</h1>
-          <p className="px-stage-subtitle">{recoveryMode ? t("minPassword") : mode === "login" ? t("loginSub") : t("signupSub")}</p>
+          <p className="px-stage-subtitle">{recoveryMode ? (resetTokenMode ? t("minPassword") : t("recoverySub")) : mode === "login" ? t("loginSub") : t("signupSub")}</p>
           {!recoveryMode && <div className="px-social-stack">
             <button type="button" className="px-social-button px-google-button" onClick={socialUnavailable}><GoogleMark/><span>{t("google")}</span></button>
             <button type="button" className="px-social-button px-apple-button" onClick={appleUnavailable}><AppleMark/><span>{t("apple")}</span></button>
           </div>}
           {!recoveryMode && <div className="px-separator"><span>{t("or")}</span></div>}
           {!recoveryMode && mode === "signup" && <label className="px-field"><span>{t("name")}</span><input autoComplete="name" value={name} onChange={e => setName(e.target.value)} placeholder={t("name")} /></label>}
-          {!recoveryMode && <label className="px-field"><span>{t("email")}</span><input type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@example.com" /></label>}
-          <label className="px-field"><span>{recoveryMode ? t("password") : t("password")}</span><span className="px-password-wrap"><input type={showPassword ? "text" : "password"} autoComplete={recoveryMode ? "new-password" : mode === "signup" ? "new-password" : "current-password"} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("minPassword")} /><button type="button" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? "Hide password" : "Show password"}><EyeMark visible={showPassword}/></button></span></label>
-          {(recoveryMode || mode === "signup") && <label className="px-field"><span>{t("confirm")}</span><span className="px-password-wrap"><input type={showConfirm ? "text" : "password"} autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder={t("confirm")} /><button type="button" onClick={() => setShowConfirm(v => !v)} aria-label={showConfirm ? "Hide password" : "Show password"}><EyeMark visible={showConfirm}/></button></span></label>}
-          {mode === "login" && !recoveryMode && <button type="button" className="px-forgot-link" onClick={requestRecovery}>{t("forgot")}</button>}
-          <button type="button" className="px-primary-action" disabled={busy} onClick={recoveryMode ? resetPassword : submitAuth}>{busy ? "..." : recoveryMode ? t("sendReset") : mode === "login" ? t("signIn") : t("create")} <span>↗</span></button>
+          {(!recoveryMode || !resetTokenMode) && <label className="px-field"><span>{t("email")}</span><input type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@example.com" /></label>}
+          {(!recoveryMode || resetTokenMode) && <label className="px-field"><span>{t("password")}</span><span className="px-password-wrap"><input type={showPassword ? "text" : "password"} autoComplete={recoveryMode ? "new-password" : mode === "signup" ? "new-password" : "current-password"} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("minPassword")} /><button type="button" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? "Hide password" : "Show password"}><EyeMark visible={showPassword}/></button></span></label>}
+          {(resetTokenMode || (!recoveryMode && mode === "signup")) && <label className="px-field"><span>{t("confirm")}</span><span className="px-password-wrap"><input type={showConfirm ? "text" : "password"} autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder={t("confirm")} /><button type="button" onClick={() => setShowConfirm(v => !v)} aria-label={showConfirm ? "Hide password" : "Show password"}><EyeMark visible={showConfirm}/></button></span></label>}
+          {mode === "login" && !recoveryMode && <button type="button" className="px-forgot-link" onClick={() => { setRecoveryMode(true); setResetTokenMode(false); setNotice(""); }}>{t("forgot")}</button>}
+          <button type="button" className="px-primary-action" disabled={busy} onClick={recoveryMode ? (resetTokenMode ? resetPassword : requestRecovery) : submitAuth}>{busy ? "..." : recoveryMode ? (resetTokenMode ? t("updatePassword") : t("sendReset")) : mode === "login" ? t("signIn") : t("create")} <span>↗</span></button>
           {!recoveryMode && <div className="px-switch-mode"><span>{mode === "login" ? t("noAccount") : t("haveAccount")}</span><button onClick={() => { setMode(mode === "login" ? "signup" : "login"); setNotice(""); }}>{mode === "login" ? t("createLink") : t("loginLink")}</button></div>}
-          {recoveryMode && <button className="px-switch-mode px-back-link" onClick={() => setRecoveryMode(false)}>{t("back")}</button>}
+          {recoveryMode && <button className="px-switch-mode px-back-link" onClick={() => { setRecoveryMode(false); setResetTokenMode(false); setNotice(""); }}>{t("back")}</button>}
           <p className="px-auth-security">SECURE ACCESS · NOVYRA</p>
         </div>}
 
