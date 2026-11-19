@@ -23,7 +23,8 @@ export default function ConceptPage() {
   const [roomName, setRoomName] = useState("");
   const [showAiMenu, setShowAiMenu] = useState(false);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const startProfilePress = () => { longPressTimer.current = setTimeout(() => setShowAiMenu(true), 500); };
+  const longPressTriggered = useRef(false);
+  const startProfilePress = () => { longPressTriggered.current = false; longPressTimer.current = setTimeout(() => { longPressTriggered.current = true; setShowAiMenu(true); }, 500); };
   const cancelProfilePress = () => { if (longPressTimer.current) clearTimeout(longPressTimer.current); };
 
   return (
@@ -67,7 +68,7 @@ export default function ConceptPage() {
           {tab === "profile" && <section className="nv-page-panel"><span className="nv-kicker">فضای شخصی</span><h1>حساب من</h1><div className="nv-profile-card"><div className="nv-profile-avatar">ش</div><div><strong>کاربر NOVYRA</strong><span>خوش اومدی به جمع ما</span></div></div><div className="nv-settings-list">{["ویرایش پروفایل","حریم خصوصی و امنیت","اعلان‌ها","زبان برنامه","درباره NOVYRA"].map(x=><button key={x}>{x}<b>←</b></button>)}</div></section>}
         </div>
 
-        <nav className="nv-bottom">{tabs.map(item=><button key={item.id} className={tab===item.id?"active":""} onPointerDown={item.id==="profile"?startProfilePress:undefined} onPointerUp={item.id==="profile"?cancelProfilePress:undefined} onPointerLeave={item.id==="profile"?cancelProfilePress:undefined} onContextMenu={item.id==="profile"?(e)=>{e.preventDefault();setShowAiMenu(true);}:undefined} onClick={()=>{if(item.id==="profile" && showAiMenu){setShowAiMenu(false);return;}setTab(item.id);}}><span>{item.icon}</span><small>{item.label}</small></button>)}</nav>
+        <nav className="nv-bottom">{tabs.map(item=><button key={item.id} className={tab===item.id?"active":""} onPointerDown={item.id==="profile"?startProfilePress:undefined} onPointerUp={item.id==="profile"?cancelProfilePress:undefined} onPointerLeave={item.id==="profile"?cancelProfilePress:undefined} onContextMenu={item.id==="profile"?(e)=>{e.preventDefault();setShowAiMenu(true);}:undefined} onClick={()=>{if(item.id==="profile" && longPressTriggered.current){longPressTriggered.current=false;return;}setTab(item.id);}}><span>{item.icon}</span><small>{item.label}</small></button>)}</nav>
         {showAiMenu && <div className="nv-ai-menu-backdrop" onClick={()=>setShowAiMenu(false)}><div className="nv-ai-menu" onClick={e=>e.stopPropagation()}><span className="nv-ai-menu-kicker">میان‌بر</span><button onClick={()=>{setShowAiMenu(false);setTab("ai");}}><span className="nv-ai-menu-icon">✳</span><span><strong>هوش مصنوعی</strong><small>ورود به دستیار هوشمند</small></span><b>←</b></button></div></div>}
         <footer className="nv-footer">NOVYRA <span>·</span> ارتباط، با آرامش</footer>
       </div>
