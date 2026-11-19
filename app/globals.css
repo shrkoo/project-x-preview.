@@ -1144,3 +1144,119 @@ button:focus-visible,input:focus-visible{outline:2px solid #8fc1ff;outline-offse
   .px-onboarding .px-auth-panel{padding:29px 22px 24px;border-radius:23px}
   .px-onboarding .px-auth-panel .px-stage-subtitle{margin-bottom:17px}
 }
+
+
+/* NOVYRA refined auth palette — warm forest, soft sage and quiet contrast */
+.px-onboarding:not(.px-language-screen){
+  --novyra-forest:#182720;
+  --novyra-panel:#293b31;
+  --novyra-panel-deep:#223329;
+  --novyra-sage:#b4cbb8;
+  --novyra-sage-bright:#c4d8c7;
+  --novyra-ivory:#f0f1e8;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(145,177,151,.13),transparent 43%),
+    radial-gradient(ellipse at 5% 85%,rgba(94,126,100,.10),transparent 35%),
+    linear-gradient(155deg,#17251f 0%,#1d2d24 48%,#17251f 100%);
+}
+.px-onboarding:not(.px-language-screen) .px-onboarding-brand{
+  gap:11px;color:#f0f1e8;
+}
+.px-onboarding:not(.px-language-screen) .px-logo{
+  width:43px;height:43px;flex-basis:43px;padding:7px;
+  border-radius:13px;color:#e9f0e8;background:#344b3c;
+  border:1px solid rgba(198,218,198,.25);
+  box-shadow:0 5px 18px rgba(4,13,8,.2);
+}
+.px-onboarding:not(.px-language-screen) .px-brand-wordmark{
+  color:#f0f1e8;font-size:15px;letter-spacing:.19em;font-weight:760;
+}
+.px-onboarding:not(.px-language-screen) .px-auth-panel{
+  width:min(100%,450px);padding:35px 34px 29px;
+  border-radius:25px;
+  border:1px solid rgba(194,214,194,.17);
+  background:linear-gradient(155deg,rgba(47,67,54,.98),rgba(34,51,41,.985));
+  box-shadow:0 28px 80px rgba(3,11,6,.32),inset 0 1px rgba(255,255,255,.055);
+}
+.px-onboarding:not(.px-language-screen) .px-auth-emblem{
+  width:54px;height:54px;margin-bottom:15px;border-radius:17px;
+  color:#eaf1e9;background:linear-gradient(145deg,#405c48,#304738);
+  border-color:rgba(207,226,207,.22);
+}
+.px-onboarding:not(.px-language-screen) .px-auth-panel h1{
+  margin-top:8px;margin-bottom:8px;color:#f3f2e9;
+  font-size:clamp(27px,4vw,33px);font-weight:760;letter-spacing:-.035em;
+}
+.px-onboarding:not(.px-language-screen) .px-auth-panel .px-stage-subtitle{
+  margin:0 auto 21px;max-width:34ch;color:#c1cdbf;line-height:2;
+}
+.px-onboarding:not(.px-language-screen) .px-social-stack{margin:20px 0 17px}
+.px-onboarding:not(.px-language-screen) .px-google-button{
+  min-height:51px;border-radius:14px;background:#e9eee5;
+  border-color:#d5dfd2;color:#29392e;font-weight:650;
+}
+.px-onboarding:not(.px-language-screen) .px-google-button:hover{
+  background:#f3f4ed;border-color:#b8cdb9;
+}
+.px-onboarding:not(.px-language-screen) .px-separator{
+  margin:17px 0;color:#aebdad;font-size:10px;letter-spacing:.12em;
+}
+.px-onboarding:not(.px-language-screen) .px-field{
+  display:block;margin:0 0 15px;color:#dce4d9;font-size:12px;font-weight:600;
+}
+.px-onboarding:not(.px-language-screen) .px-field>span:first-child{
+  display:block;margin-bottom:8px;
+}
+.px-onboarding:not(.px-language-screen) .px-field input{
+  min-height:51px;padding:0 15px;border-radius:13px;
+  background:#1d2e24;border:1px solid rgba(190,211,190,.2);
+  color:#f2f2e9;font-size:14px;
+}
+.px-onboarding:not(.px-language-screen) .px-field input::placeholder{color:#91a294}
+.px-onboarding:not(.px-language-screen) .px-field input:focus{
+  outline:none;border-color:#a9c5ad;
+  box-shadow:0 0 0 3px rgba(169,197,173,.13);
+}
+.px-onboarding:not(.px-language-screen) .px-password-wrap button{
+  color:#b9cbbb;background:transparent;
+}
+.px-onboarding:not(.px-language-screen) .px-forgot-link{
+  display:block;margin:1px 0 20px;color:#c0d4c1;font-size:12px;
+}
+.px-onboarding:not(.px-language-screen) .px-primary-action{
+  min-height:53px;border-radius:14px;
+  color:#203328;background:linear-gradient(110deg,#c3d7c4,#a9c5ad);
+  border:1px solid rgba(232,241,229,.42);
+  box-shadow:0 8px 20px rgba(5,14,8,.18);
+  font-size:14px;font-weight:750;
+}
+.px-onboarding:not(.px-language-screen) .px-primary-action:hover{
+  background:#d0e0cf;box-shadow:0 10px 23px rgba(5,14,8,.2);
+}
+.px-onboarding:not(.px-language-screen) .px-switch-mode{
+  margin-top:21px;color:#c0cbbf;font-size:12px;
+}
+.px-onboarding:not(.px-language-screen) .px-switch-mode button{
+  color:#d0e1cf;font-weight:750;
+}
+.px-onboarding:not(.px-language-screen) .px-auth-security{
+  margin-top:22px;color:#a7b8a7;font-size:9px;letter-spacing:.16em;
+}
+.px-onboarding:not(.px-language-screen) .px-back-button{
+  width:35px;height:35px;border-radius:11px;color:#d1dfd0;
+  background:#304638;border:1px solid rgba(193,215,194,.17);
+}
+.px-onboarding:not(.px-language-screen) .px-onboarding-footer{
+  color:#a9b8a7;letter-spacing:.15em;font-size:9px;
+}
+@media(max-width:560px){
+  .px-onboarding:not(.px-language-screen) .px-auth-panel{
+    padding:29px 22px 25px;border-radius:22px;
+  }
+  .px-onboarding:not(.px-language-screen) .px-auth-panel h1{font-size:27px}
+  .px-onboarding:not(.px-language-screen) .px-field input{min-height:49px}
+}
+@media(prefers-reduced-motion:reduce){
+  .px-onboarding:not(.px-language-screen) .px-google-button,
+  .px-onboarding:not(.px-language-screen) .px-primary-action{transition:none}
+}
