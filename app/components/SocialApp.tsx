@@ -40,7 +40,7 @@ type Props = {
 
 const copy: Record<Language, Record<string, string>> = {
   fa: {
-    home: "خانه", search: "جست‌وجو", create: "ساخت پست", reels: "ویدئوها", profile: "پروفایل", ai: "هوش مصنوعی",
+    home: "خانه", search: "جست‌وجو", create: "ساخت پست", reels: "ویدئوها", profile: "پروفایل", friends: "دوستان", inbox: "پیام‌ها", ai: "هوش مصنوعی",
     hello: "فضای تو، صدای تو", feed: "تازه‌های NOVYRA", feedHint: "چیزهایی که افراد منتشر کرده‌اند",
     shareThought: "چه چیزی در ذهنت می‌گذرد؟", writePost: "چیزی بنویس…", publish: "انتشار", publishing: "در حال انتشار…",
     mediaLink: "لینک مستقیم تصویر یا ویدئو (اختیاری)", mediaHint: "فقط نشانی HTTPS فایل رسانه؛ بارگذاری مستقیم فایل هنوز فعال نیست.",
@@ -58,7 +58,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "نمایش همه", backHome: "بازگشت به خانه", profileUpdated: "نام نمایشی به‌روزرسانی شد."
   },
   en: {
-    home: "Home", search: "Search", create: "Create post", reels: "Reels", profile: "Profile", ai: "AI assistant",
+    home: "Home", search: "Search", create: "Create post", reels: "Reels", profile: "Profile", friends: "Friends", inbox: "Inbox", ai: "AI assistant",
     hello: "Your space. Your voice.", feed: "What’s happening", feedHint: "Recent posts from the NOVYRA community",
     shareThought: "What’s on your mind?", writePost: "Write something…", publish: "Publish", publishing: "Publishing…",
     mediaLink: "Direct image or video link (optional)", mediaHint: "HTTPS media file URL only. Direct file uploads are not enabled yet.",
@@ -76,7 +76,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "View all", backHome: "Back home", profileUpdated: "Your display name has been updated."
   },
   ar: {
-    home: "الرئيسية", search: "بحث", create: "إنشاء منشور", reels: "فيديوهات", profile: "الملف الشخصي", ai: "مساعد الذكاء الاصطناعي",
+    home: "الرئيسية", search: "بحث", create: "إنشاء منشور", reels: "فيديوهات", profile: "الملف الشخصي", friends: "الأصدقاء", inbox: "الرسائل", ai: "مساعد الذكاء الاصطناعي",
     hello: "مساحتك. صوتك.", feed: "أحدث المنشورات", feedHint: "ما يشاركه مجتمع NOVYRA",
     shareThought: "بماذا تفكر؟", writePost: "اكتب شيئاً…", publish: "نشر", publishing: "جارٍ النشر…",
     mediaLink: "رابط صورة أو فيديو مباشر (اختياري)", mediaHint: "رابط HTTPS لملف الوسائط فقط. رفع الملفات غير متاح بعد.",
@@ -94,7 +94,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "عرض الكل", backHome: "العودة للرئيسية", profileUpdated: "تم تحديث اسم العرض."
   },
   ku: {
-    home: "سەرەکی", search: "گەڕان", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", ai: "یاریدەدەری زیرەک",
+    home: "سەرەکی", search: "گەڕان", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک",
     hello: "شوێنی تۆ. دەنگی تۆ.", feed: "نوێترین بڵاوکراوەکان", feedHint: "ئەوەی ئەندامانی NOVYRA بڵاوی دەکەنەوە",
     shareThought: "لە مێشکتدا چییە؟", writePost: "شتێک بنووسە…", publish: "بڵاوکردنەوە", publishing: "لە بڵاوکردنەوەدایە…",
     mediaLink: "بەستەری ڕاستەوخۆی وێنە یان ڤیدیۆ (ئارەزوومەندانە)", mediaHint: "تەنها بەستەری HTTPS ـی فایل. بارکردنی ڕاستەوخۆی فایل هێشتا چالاک نییە.",
@@ -135,40 +135,31 @@ function PostCard({
   post, t, onLike, onToggleComments, commentsOpen, comments, commentDraft, onCommentDraft,
   onSubmitComment, commentsLoading
 }: {
-  post: Post;
-  t: Record<string, string>;
-  onLike: (post: Post) => void;
-  onToggleComments: (post: Post) => void;
-  commentsOpen: boolean;
-  comments: Comment[];
-  commentDraft: string;
-  onCommentDraft: (value: string) => void;
-  onSubmitComment: (post: Post) => void;
-  commentsLoading: boolean;
+  post: Post; t: Record<string, string>; onLike: (post: Post) => void;
+  onToggleComments: (post: Post) => void; commentsOpen: boolean; comments: Comment[];
+  commentDraft: string; onCommentDraft: (value: string) => void;
+  onSubmitComment: (post: Post) => void; commentsLoading: boolean;
 }) {
   const date = new Date(post.createdAt);
-  return <article className="social-post-card">
-    <div className="social-post-author">
-      <Avatar name={post.authorName} />
-      <div className="social-post-author-meta"><strong>{post.authorName}</strong><time dateTime={post.createdAt}>{Number.isNaN(date.getTime()) ? "" : date.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time></div>
-    </div>
-    {post.body && <p className="social-post-body">{post.body}</p>}
-    <PostMedia post={post} />
-    <div className="social-post-actions">
-      <button type="button" className={post.likedByMe ? "is-liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 4.7-8.8 10.1-8.8 10.1S3.2 13.4 3.2 8.7A4.2 4.2 0 0 1 11 6.3a4.2 4.2 0 0 1 9.8 2.4Z" /></svg>
-        <span>{post.likeCount.toLocaleString()}</span>
-      </button>
-      <button type="button" onClick={() => onToggleComments(post)}>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 20l1-4.1a8.5 8.5 0 1 1 16.5-4.4Z" /></svg>
-        <span>{t.comments} · {post.commentCount.toLocaleString()}</span>
-      </button>
+  const fallback = `https://picsum.photos/seed/novyra-${encodeURIComponent(post.id)}/900/1100`;
+  return <article className="nv-post-card">
+    <div className="nv-post-image" style={{ backgroundImage: post.mediaType === "image" && post.mediaUrl ? `url("${post.mediaUrl}")` : `url("${fallback}")` }}>
+      {post.mediaType === "video" && post.mediaUrl && <video src={post.mediaUrl} controls playsInline preload="metadata" />}
+      <div className="nv-post-shade" />
+      <div className="nv-post-author"><Avatar name={post.authorName} /><div><strong>{post.authorName} <span className="nv-verified">●</span></strong><small>@{post.authorName.toLowerCase().replace(/[^a-z0-9]/g,"")} · {Number.isNaN(date.getTime()) ? "NOVYRA" : date.toLocaleDateString()}</small></div></div>
+      <button className="nv-post-more" type="button" aria-label="More">•••</button>
+      <div className="nv-post-actions">
+        <button type="button" className={post.likedByMe ? "liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}><svg viewBox="0 0 24 24"><path d="M20.8 8.7c0 4.7-8.8 10.1-8.8 10.1S3.2 13.4 3.2 8.7A4.2 4.2 0 0 1 11 6.3a4.2 4.2 0 0 1 9.8 2.4Z"/></svg><small>{post.likeCount.toLocaleString()}</small></button>
+        <button type="button" onClick={() => onToggleComments(post)} aria-label={t.comments}><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 20l1-4.1a8.5 8.5 0 1 1 16.5-4.4Z"/></svg><small>{post.commentCount.toLocaleString()}</small></button>
+        <button type="button" aria-label="Share"><svg viewBox="0 0 24 24"><path d="m21 3-7.2 18-3.6-7.2L3 10.2 21 3Z M10.2 13.8 21 3"/></svg><small>Share</small></button>
+        <button type="button" aria-label="Save"><svg viewBox="0 0 24 24"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg><small>Save</small></button>
+      </div>
+      <div className="nv-post-caption"><div className="nv-progress"><i /></div><p><strong>{post.authorName}</strong> {post.body}</p></div>
     </div>
     {commentsOpen && <div className="social-comments">
       {commentsLoading ? <p className="social-muted">{t.loading}</p> : comments.length ? comments.map(comment => <div className="social-comment" key={comment.id}><Avatar name={comment.authorName} /><div><strong>{comment.authorName}</strong><p>{comment.body}</p></div></div>) : <p className="social-muted">{t.emptyComments}</p>}
       <form className="social-comment-form" onSubmit={event => { event.preventDefault(); onSubmitComment(post); }}>
-        <input value={commentDraft} onChange={event => onCommentDraft(event.target.value)} placeholder={t.writeComment} maxLength={1000} />
-        <button type="submit" disabled={!commentDraft.trim()}>{t.send}</button>
+        <input value={commentDraft} onChange={event => onCommentDraft(event.target.value)} placeholder={t.writeComment} maxLength={1000} /><button type="submit" disabled={!commentDraft.trim()}>{t.send}</button>
       </form>
     </div>}
   </article>;
@@ -177,7 +168,7 @@ function PostCard({
 export default function SocialApp({ account, language, notice, onClearNotice, onLanguageChange, onLogout }: Props) {
   const t = copy[language];
   const dir = language === "en" ? "ltr" : "rtl";
-  const [active, setActive] = useState<NavKey>("reels");
+  const [active, setActive] = useState<NavKey>("home");
   const [aiOpen, setAiOpen] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [reels, setReels] = useState<Post[]>([]);
@@ -496,6 +487,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           </section>}
 
           {!aiOpen && active === "home" && <section className="social-feed-screen">
+            <div className="nv-top-tabs"><button className="active" onClick={() => navigate("home")}>Feed<i /></button><button onClick={() => navigate("home")}>Following</button><button onClick={() => navigate("reels")}>Reels</button><span className="nv-top-spacer" /><button className="nv-round-action" onClick={() => navigate("search")} aria-label="Search">⌕</button><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications">♧<i /></button></div>
+            <div className="nv-stories"><button className="nv-story add" onClick={() => navigate("create")}><span><b>＋</b></span><small>Add Story</small></button>{["Lizaa","Jacks","Luiz","Julien","Nina"].map((name,i)=><button className="nv-story" key={name}><span><img src={`https://picsum.photos/seed/novyra-story-${i}/120/120`} alt="" /></span><small>{name}</small></button>)}</div>
             <div className="social-feed-intro"><div><h2>{t.feed}</h2><p>{t.feedHint}</p></div><button type="button" onClick={() => navigate("create")}>＋</button></div>
             <button type="button" className="social-thought-launcher" onClick={() => navigate("create")}><Avatar name={account.displayName} /><span>{t.shareThought}</span><b>＋</b></button>
             {loading ? <p className="social-muted social-center">{t.loading}</p> : posts.length ? <div className="social-post-list">{posts.map(renderPost)}</div> : <div className="social-empty-state"><span className="social-empty-mark">N</span><h2>{t.noPosts}</h2><p>{t.noPostsHint}</p><button type="button" onClick={() => navigate("create")}>{t.create} <span>↗</span></button></div>}
@@ -537,7 +530,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               <div className="social-profile-main"><h2>{profile?.displayName || account.displayName}</h2><p>{account.email}</p></div>
               <div className="social-profile-stats"><div><strong>{profile?.postCount ?? profilePosts.length}</strong><small>{t.postCount}</small></div><div><strong>{profile?.followerCount ?? 0}</strong><small>{t.followers}</small></div><div><strong>{profile?.followingCount ?? 0}</strong><small>{t.followingCount}</small></div></div>
             </div>
-            <form className="social-profile-edit" onSubmit={saveProfile}><label>{t.editProfile}<input value={profileName} onChange={event => setProfileName(event.target.value)} maxLength={32} /></label><button type="submit" disabled={profileSaving || profileName.trim().length < 2}>{profileSaving ? "…" : t.save}</button></form>
+            <form className="social-profile-edit" onSubmit={saveProfile}><label>{t.editProfile}<input id="nv-profile-name" value={profileName} onChange={event => setProfileName(event.target.value)} maxLength={32} /></label><button type="submit" disabled={profileSaving || profileName.trim().length < 2}>{profileSaving ? "…" : t.save}</button></form>
             <div className="social-profile-settings">
               <label>{t.language}<select value={language} onChange={event => changeLanguage(event.target.value)}><option value="fa">فارسی</option><option value="en">English</option><option value="ar">العربية</option><option value="ku">کوردی</option></select></label>
               <button type="button" className="social-logout-button" onClick={logout}>{t.logout} <span>↗</span></button>
@@ -551,7 +544,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
 
       <nav className="social-mobile-nav-wrap">
         <MobileBottomNav active={active} userId={account.id} displayName={profile?.displayName || account.displayName}
-          onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} onOpenGame={() => window.alert("بخش بازی هنوز در این نسخه فعال نشده است.")} />
+          onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} />
       </nav>
     </div>
   </main>;
