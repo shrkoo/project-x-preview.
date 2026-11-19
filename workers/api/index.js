@@ -22,8 +22,10 @@ const passwordHash = async (password, salt) => {
 };
 
 async function sendMail(env,to,subject,html) {
- if(env.EMAIL_BRIDGE_URL && env.EMAIL_BRIDGE_SECRET) {
-  const response=await fetch(env.EMAIL_BRIDGE_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({secret:env.EMAIL_BRIDGE_SECRET,to,subject,html}),redirect:"follow"});
+ if(String(env.EMAIL_BRIDGE_URL||"").trim() && String(env.EMAIL_BRIDGE_SECRET||"").trim()) {
+  const bridgeUrl=String(env.EMAIL_BRIDGE_URL).trim();
+  const bridgeSecret=String(env.EMAIL_BRIDGE_SECRET).trim();
+  const response=await fetch(bridgeUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({secret:bridgeSecret,to,subject,html}),redirect:"follow"});
   if(!response.ok) throw new Error("email_bridge_http_error");
   let result;
   try { result=await response.json(); } catch { throw new Error("email_bridge_invalid_response"); }
@@ -35,7 +37,7 @@ async function sendMail(env,to,subject,html) {
  if(!response.ok) throw new Error("email_provider_error");
  return true;
 }
-const hasMailProvider = env => Boolean((env.EMAIL_BRIDGE_URL && env.EMAIL_BRIDGE_SECRET) || (env.RESEND_API_KEY && env.EMAIL_FROM));
+const hasMailProvider = env => Boolean((String(env.EMAIL_BRIDGE_URL||"").trim() && String(env.EMAIL_BRIDGE_SECRET||"").trim()) || (env.RESEND_API_KEY && env.EMAIL_FROM));
 async function issueEmailToken(db,userId,kind,ttlMs) {
  const token=randomToken(32), tokenHash=await digest(token), expires=Date.now()+ttlMs;
  await db.prepare("INSERT INTO email_tokens (id,user_id,token_hash,kind,expires_at) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),userId,tokenHash,kind,expires).run();
