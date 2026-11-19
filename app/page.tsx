@@ -88,7 +88,7 @@ export default function Home() {
     setNotice("");
   }
 
-  if (!startupReady) return <main className="novyra-startup" aria-label="NOVYRA"><span className="novyra-startup-mark">N</span><span>NOVYRA</span></main>;
+  if (!startupReady) return <main className="social-startup" aria-label="NOVYRA"><span className="social-startup-mark">N</span><span>NOVYRA</span></main>;
 
   if (!account) return <Onboarding onComplete={completeOnboarding} initialNotice={notice} />;
 
