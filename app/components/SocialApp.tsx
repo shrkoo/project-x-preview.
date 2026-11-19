@@ -455,7 +455,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" /></svg>
             {notificationCount > 0 && <i />}
           </button>
-          <Avatar name={account.displayName} />
+          <Avatar name={profile?.displayName || account.displayName} />
         </div>
       </header>
 
@@ -471,7 +471,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             <span className="social-side-dot" />{t[item]}
           </button>)}
           <button type="button" className="social-side-ai" onClick={() => setAiOpen(true)}><span>✦</span>{t.ai}</button>
-          <div className="social-sidebar-account"><Avatar name={account.displayName} /><div><strong>{account.displayName}</strong><small>{account.email}</small></div></div>
+          <div className="social-sidebar-account"><Avatar name={profile?.displayName || account.displayName} /><div><strong>{profile?.displayName || account.displayName}</strong><small>{account.email}</small></div></div>
         </aside>
 
         <section className="social-main-column">
@@ -550,7 +550,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
       </div>
 
       <nav className="social-mobile-nav-wrap">
-        <MobileBottomNav active={active} userId={account.id} displayName={account.displayName}
+        <MobileBottomNav active={active} userId={account.id} displayName={profile?.displayName || account.displayName}
           onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} />
       </nav>
     </div>
