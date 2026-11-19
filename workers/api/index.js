@@ -97,9 +97,17 @@ function renderNovyraEmail({eyebrow,title,intro,actionLabel,actionUrl,notice,foo
               <td style="padding:0 9px;"><a href="https://www.linkedin.com/in/shirko-alizadeh-a95001447/" target="_blank" aria-label="LinkedIn"><img src="https://cdn.simpleicons.org/linkedin/263449" width="19" height="19" alt="LinkedIn" style="display:block;border:0;"></a></td>
             </tr>
           </table>
-          <div style="margin-top:19px;color:#667085;font-size:11px;line-height:2;">NOVYRA یک محصول دیجیتال با تمرکز بر تجربه‌ای هوشمند، قابل‌اعتماد و حرفه‌ای است.</div>
-          <div style="margin-top:8px;color:#25334b;font-size:11px;font-weight:700;">شرکت زاوس روحانی</div>
-          <div style="margin-top:11px;color:#a0a8b5;font-size:10px;letter-spacing:1px;">NOVYRA · BUILT FOR YOUR MOMENTS</div>
+          <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:20px auto 0;">
+            <tr>
+              <td width="36" height="36" align="center" valign="middle" bgcolor="#172b4d" style="border-radius:9px;color:#ffffff;font-family:Arial,sans-serif;font-size:23px;font-weight:700;letter-spacing:-2px;">N</td>
+              <td style="padding-left:10px;text-align:left;vertical-align:middle;">
+                <div style="color:#172b4d;font-family:Arial,sans-serif;font-size:17px;font-weight:700;letter-spacing:2px;">NOVYRA</div>
+                <div style="margin-top:2px;color:#9aa4b2;font-size:8px;letter-spacing:2px;">SMARTER DIGITAL EXPERIENCES</div>
+              </td>
+            </tr>
+          </table>
+          <div style="margin-top:17px;color:#667085;font-size:11px;line-height:2;">NOVYRA با تمرکز بر تجربه‌ای هوشمند، ساده و قابل‌اعتماد طراحی شده است.</div>
+          <div style="margin-top:10px;color:#a0a8b5;font-size:10px;letter-spacing:1px;">BUILT FOR YOUR MOMENTS</div>
         </td></tr>
       </table>
       <div style="padding:18px 10px;color:#98a1af;font-size:10px;text-align:center;">لطفاً به این ایمیل پاسخ ندهید؛ این پیام به‌صورت خودکار ارسال شده است.</div>
