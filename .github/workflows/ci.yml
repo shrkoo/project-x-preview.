@@ -28,6 +28,8 @@ jobs:
           node -e "const a=require('/tmp/npm-audit.json'); console.log(JSON.stringify(a.vulnerabilities || {}, null, 2))"
       - name: Type check
         run: npm run typecheck
+      - name: Check Worker JavaScript syntax
+        run: node --check workers/api/index.js
       - name: Build static site
         run: npm run build
       - name: Add GitHub Pages marker
