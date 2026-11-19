@@ -5,13 +5,13 @@ import { useEffect, useRef, useState } from "react";
 export type NavKey = "home" | "search" | "create" | "reels" | "profile";
 
 function HomeIcon() {
-  return <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M3.5 11.4 13 3.8l9.5 7.6v10.1a1 1 0 0 1-1 1h-6v-7h-5v7h-6a1 1 0 0 1-1-1V11.4Z" /></svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 3.5l8 7V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19z" /></svg>;
 }
 function SearchIcon() {
-  return <svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="11.5" cy="11.5" r="7.2" /><path d="m17 17 5.2 5.2" /></svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5 20 20" /></svg>;
 }
 function ReelsIcon() {
-  return <svg viewBox="0 0 26 26" aria-hidden="true"><rect x="2.8" y="5.2" width="20.4" height="15.6" rx="2.2" /><path d="m9.2 5.2 4.1 5.1m3.7-5.1 4.1 5.1M2.8 10.3h20.4" /><path d="m11 13.1 5.1 2.4-5.1 2.4z" className="novyra-reels-play" /></svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M3 11a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M10.1 6.4a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0 M10.1 15.6a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0 M5.5 11a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0 M14.7 11a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0 M10.5 11a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0" /><path d="M16 18l4.5 3.5-6.5-.5z" /></svg>;
 }
 
 type Props = {
@@ -20,14 +20,15 @@ type Props = {
   displayName?: string;
   onNavigate: (key: NavKey) => void;
   onOpenAI: () => void;
+  onOpenGame?: () => void;
 };
 
-export default function MobileBottomNav({ active, userId, displayName, onNavigate, onOpenAI }: Props) {
+export default function MobileBottomNav({ active, userId, displayName, onNavigate, onOpenAI, onOpenGame }: Props) {
   const [avatar, setAvatar] = useState("");
   const [initial, setInitial] = useState("N");
-  const [aiMenuOpen, setAiMenuOpen] = useState(false);
-  const longPressTimer = useRef<number | null>(null);
-  const longPressTriggered = useRef(false);
+  const [homeMenuOpen, setHomeMenuOpen] = useState(false);
+  const homeTimer = useRef<number | null>(null);
+  const homeClicked = useRef(false);
 
   useEffect(() => {
     try {
@@ -40,76 +41,56 @@ export default function MobileBottomNav({ active, userId, displayName, onNavigat
   }, [userId, displayName]);
 
   useEffect(() => () => {
-    if (longPressTimer.current !== null) window.clearTimeout(longPressTimer.current);
+    if (homeTimer.current !== null) window.clearTimeout(homeTimer.current);
   }, []);
 
-  function startProfilePress() {
-    longPressTriggered.current = false;
-    if (longPressTimer.current !== null) window.clearTimeout(longPressTimer.current);
-    longPressTimer.current = window.setTimeout(() => {
-      longPressTriggered.current = true;
-      setAiMenuOpen(true);
-    }, 500);
+  function handleHomePress() {
+    if (homeTimer.current !== null) window.clearTimeout(homeTimer.current);
+    homeClicked.current = true;
+    setHomeMenuOpen(false);
+    onNavigate("home");
+    homeTimer.current = window.setTimeout(() => {
+      setHomeMenuOpen(true);
+      homeTimer.current = null;
+    }, 1000);
   }
 
-  function endProfilePress() {
-    if (longPressTimer.current !== null) {
-      window.clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  }
-
-  function handleProfileClick() {
-    if (longPressTriggered.current) {
-      longPressTriggered.current = false;
-      return;
-    }
-    setAiMenuOpen(false);
-    onNavigate("profile");
+  function closeMenu() {
+    if (homeTimer.current !== null) window.clearTimeout(homeTimer.current);
+    homeTimer.current = null;
+    setHomeMenuOpen(false);
   }
 
   return (
     <nav className="novyra-bottom-nav" aria-label="Main navigation">
+      {homeMenuOpen && <button className="novyra-menu-dismiss" aria-label="Close menu" onClick={closeMenu} />}
       <div className="novyra-bottom-items">
-        <button type="button" className={`novyra-nav-item ${active === "home" ? "is-active" : ""}`} onClick={() => onNavigate("home")} aria-label="Home" aria-current={active === "home" ? "page" : undefined}>
-          <HomeIcon />
-          {active === "home" && <i className="novyra-active-dot" />}
-        </button>
-        <button type="button" className={`novyra-nav-item ${active === "search" ? "is-active" : ""}`} onClick={() => onNavigate("search")} aria-label="Search" aria-current={active === "search" ? "page" : undefined}>
-          <SearchIcon />
-          {active === "search" && <i className="novyra-active-dot" />}
-        </button>
-        <button type="button" className={`novyra-create-button ${active === "create" ? "is-active" : ""}`} onClick={() => { setAiMenuOpen(false); onNavigate("create"); }} aria-label="Create">
-          <span aria-hidden="true">+</span>
-          <span className="novyra-new-badge">NEW</span>
-        </button>
-        <button type="button" className={`novyra-nav-item novyra-reels-item ${active === "reels" ? "is-active" : ""}`} onClick={() => onNavigate("reels")} aria-label="Reels" aria-current={active === "reels" ? "page" : undefined}>
-          <ReelsIcon />
-          {active === "reels" && <i className="novyra-active-dot" />}
-        </button>
-        <div className="novyra-profile-wrap">
-          {aiMenuOpen && <div className="novyra-ai-shortcut" role="menu">
-            <button type="button" role="menuitem" onClick={() => { setAiMenuOpen(false); onOpenAI(); }}>
-              <span className="novyra-ai-spark">✦</span>
-              <span>هوش مصنوعی</span>
+        <div className="novyra-home-wrap">
+          {homeMenuOpen && <div className="novyra-home-menu" role="menu">
+            <button type="button" role="menuitem" onClick={() => { closeMenu(); onOpenAI(); }}>
+              <span className="novyra-menu-glyph">✦</span><span>هوش مصنوعی</span>
+            </button>
+            <button type="button" role="menuitem" onClick={() => { closeMenu(); onOpenGame?.(); }}>
+              <span className="novyra-menu-glyph">◈</span><span>بازی</span>
             </button>
           </div>}
-          <button
-            type="button"
-            className={`novyra-profile-button ${active === "profile" ? "is-active" : ""}`}
-            onPointerDown={startProfilePress}
-            onPointerUp={endProfilePress}
-            onPointerLeave={endProfilePress}
-            onPointerCancel={endProfilePress}
-            onContextMenu={event => event.preventDefault()}
-            onClick={handleProfileClick}
-            aria-label="Profile — نگه‌دار برای هوش مصنوعی"
-            aria-current={active === "profile" ? "page" : undefined}
-          >
-            {avatar.startsWith("data:image/") || avatar.startsWith("https://") ? <img src={avatar} alt="" /> : <span>{avatar || initial}</span>}
-            {active === "profile" && <i className="novyra-active-dot" />}
+          <button type="button" className={`novyra-nav-item ${active === "home" ? "is-active" : ""}`} onClick={handleHomePress} aria-label="Home" aria-current={active === "home" ? "page" : undefined}>
+            <HomeIcon />{active === "home" && <i className="novyra-active-dot" />}
           </button>
         </div>
+        <button type="button" className={`novyra-nav-item ${active === "search" ? "is-active" : ""}`} onClick={() => { closeMenu(); onNavigate("search"); }} aria-label="Search" aria-current={active === "search" ? "page" : undefined}>
+          <SearchIcon />{active === "search" && <i className="novyra-active-dot" />}
+        </button>
+        <button type="button" className={`novyra-create-button ${active === "create" ? "is-active" : ""}`} onClick={() => { closeMenu(); onNavigate("create"); }} aria-label="Create">
+          <span aria-hidden="true">+</span><span className="novyra-new-badge">NEW</span>
+        </button>
+        <button type="button" className={`novyra-nav-item novyra-reels-item ${active === "reels" ? "is-active" : ""}`} onClick={() => { closeMenu(); onNavigate("reels"); }} aria-label="Reels" aria-current={active === "reels" ? "page" : undefined}>
+          <ReelsIcon />{active === "reels" && <i className="novyra-active-dot" />}
+        </button>
+        <button type="button" className={`novyra-profile-button ${active === "profile" ? "is-active" : ""}`} onClick={() => { closeMenu(); onNavigate("profile"); }} aria-label="Profile" aria-current={active === "profile" ? "page" : undefined}>
+          {avatar.startsWith("data:image/") || avatar.startsWith("https://") ? <img src={avatar} alt="" /> : <span>{avatar || initial}</span>}
+          {active === "profile" && <i className="novyra-active-dot" />}
+        </button>
       </div>
       <div className="novyra-home-indicator" aria-hidden="true"><span /></div>
     </nav>
