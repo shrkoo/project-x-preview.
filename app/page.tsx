@@ -74,15 +74,22 @@ export default function Home() {
     setSelectedTheme(readStore<"neon" | "light">("projectx-theme", "neon"));
     const token=localStorage.getItem("projectx-token");
     if (!token) { setOnboardingRequired(true); setSessionChecking(false); return; }
-    apiRequest<{user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number;role?:string}}>("/auth/me").then(async data => {
+    // A saved session opens the home screen immediately; account validation and room loading continue in the background.
+    setOnboardingRequired(false);
+    setSessionChecking(false);
+    apiRequest<{user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number;role?:string}}>("/auth/me").then(data => {
       const next={id:data.user.id,name:data.user.displayName,email:data.user.email,xp:data.user.xp,gamesPlayed:data.user.gamesPlayed,role:data.user.role};
       setAccount(next);setName(next.name);setEmail(next.email);setXp(next.xp);setGamesPlayed(next.gamesPlayed);
       localStorage.setItem("projectx-account",JSON.stringify({name:next.name,email:next.email}));
-      const result=await apiRequest<{rooms:Array<any>}>("/rooms");
-      setRooms(result.rooms.map(r=>({id:r.id,code:r.code,name:r.name,game:r.gameTitle||"",createdAt:r.createdAt,ownerId:r.ownerId})));
-      setOnboardingRequired(false);
-      setSessionChecking(false);
-    }).catch(()=>{clearSession();setOnboardingRequired(true);setNotice("نشست قبلی معتبر نبود؛ دوباره وارد شو.");setSessionChecking(false);});
+      apiRequest<{rooms:Array<any>}>("/rooms").then(result => {
+        setRooms(result.rooms.map(r=>({id:r.id,code:r.code,name:r.name,game:r.gameTitle||"",createdAt:r.createdAt,ownerId:r.ownerId})));
+      }).catch(()=>setRooms([]));
+    }).catch(()=>{
+      clearSession();
+      setAccount(null);
+      setOnboardingRequired(true);
+      setNotice("نشست قبلی معتبر نبود؛ دوباره وارد شو.");
+    });
   }, []);
   useEffect(() => {
     if (tab==="leaderboard" && account) apiRequest<{leaderboard:Array<{name:string;xp:number;gamesPlayed:number}>}>("/leaderboard").then(d=>setLeaderboardRows(d.leaderboard)).catch(()=>setNotice("دریافت جدول امتیازها ناموفق بود."));
