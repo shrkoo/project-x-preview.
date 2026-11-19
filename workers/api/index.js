@@ -228,7 +228,7 @@ export default {
     if(!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
     const target=await db.prepare("SELECT id,email FROM users WHERE email=?").bind(email).first();
     if(target) {
-      const pending=await db.prepare("SELECT COUNT(*) AS total FROM email_tokens WHERE user_id=? AND kind='password_reset' AND expires_at>?").bind(target.id,Date.now()).first();
+      const pending=await db.prepare("SELECT COUNT(*) AS total FROM email_tokens WHERE user_id=? AND kind='password_reset' AND expires_at>? AND used_at IS NULL").bind(target.id,Date.now()).first();
       if((pending?.total||0)<3) {
         const token=await issueEmailToken(db,target.id,"password_reset",60*60*1000);
         const link=(env.APP_URL || "https://novyra.pages.dev") + "/?reset=" + encodeURIComponent(token);
