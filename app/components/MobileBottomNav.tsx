@@ -34,12 +34,6 @@ export default function MobileBottomNav({ active, userId, displayName, onNavigat
     } catch { /* neutral avatar fallback */ }
   }, [userId, displayName]);
 
-  const items: Array<{ key: NavKey; label: string; icon: "home" | "friends" | "inbox" | "profile" }> = [
-    { key: "home", label: "Home", icon: "home" },
-    { key: "friends", label: "Friends", icon: "friends" },
-    { key: "inbox", label: "Inbox", icon: "inbox" },
-    { key: "profile", label: "Profile", icon: "profile" }
-  ];
   return <nav className="novyra-bottom-nav" aria-label="Main navigation">
     <div className="novyra-bottom-items">
       <button type="button" className={`novyra-bottom-tab ${active === "home" ? "is-active" : ""}`} onClick={() => onNavigate("home")}>
