@@ -11,7 +11,7 @@ type Mode = "login" | "signup";
 
 const copy: Record<Language, Record<string, string>> = {
   en: {
-    choose: "Choose your language", chooseSub: "Select the language you want to use across NOVYRA.",
+    choose: "Choose your language", chooseSub: "A calm, seamless experience across every part of NOVYRA.",
     continue: "Continue", languageNote: "You can change this anytime in Settings.",
     welcome: "Welcome to NOVYRA", welcomeSub: "Your people. Your moments. Your world.",
     signIn: "Sign in", create: "Create account", loginTitle: "Welcome back", signupTitle: "Create your account",
@@ -30,8 +30,8 @@ const copy: Record<Language, Record<string, string>> = {
     missingName: "Enter your name.", photoError: "Choose an image file smaller than 8 MB."
   },
   fa: {
-    choose: "زبان خود را انتخاب کنید", chooseSub: "زبان مورد نظرتان را برای تمام بخش‌های NOVYRA انتخاب کنید.",
-    continue: "ادامه", languageNote: "هر زمان بخواهید می‌توانید از تنظیمات زبان را تغییر دهید.",
+    choose: "زبانت را انتخاب کن", chooseSub: "برای تجربه‌ای روان و یکپارچه در تمام بخش‌های NOVYRA.",
+    continue: "ادامه", languageNote: "هر زمان بخواهی، می‌توانی زبان را از تنظیمات تغییر بدهی.",
     welcome: "به NOVYRA خوش آمدید", welcomeSub: "دوستان شما، لحظه‌های شما، دنیای شما.",
     signIn: "ورود", create: "ساخت حساب", loginTitle: "خوش برگشتید", signupTitle: "حساب خود را بسازید",
     loginSub: "برای ورود به فضای خود وارد حساب شوید.", signupSub: "چند اطلاعات ساده وارد کنید تا فضای شما آماده شود.",
@@ -49,7 +49,7 @@ const copy: Record<Language, Record<string, string>> = {
     missingName: "نام خود را وارد کنید.", photoError: "یک تصویر کوچک‌تر از ۸ مگابایت انتخاب کنید."
   },
   ar: {
-    choose: "اختر لغتك", chooseSub: "اختر اللغة التي تريد استخدامها في جميع أنحاء NOVYRA.",
+    choose: "اختر لغتك", chooseSub: "تجربة هادئة وسلسة في جميع أقسام NOVYRA.",
     continue: "متابعة", languageNote: "يمكنك تغيير اللغة لاحقاً من الإعدادات.",
     welcome: "مرحباً بك في NOVYRA", welcomeSub: "أصدقاؤك، لحظاتك، عالمك.",
     signIn: "تسجيل الدخول", create: "إنشاء حساب", loginTitle: "مرحباً بعودتك", signupTitle: "أنشئ حسابك",
@@ -68,7 +68,7 @@ const copy: Record<Language, Record<string, string>> = {
     missingName: "أدخل اسمك.", photoError: "اختر صورة يقل حجمها عن ٨ ميغابايت."
   },
   ku: {
-    choose: "زمانی خۆت هەڵبژێرە", chooseSub: "زمانی بەکارهێنانی هەموو بەشەکانی NOVYRA هەڵبژێرە.",
+    choose: "زمانی خۆت هەڵبژێرە", chooseSub: "بۆ ئەزموونێکی ئارام و یەکگرتوو لە هەموو بەشەکانی NOVYRA.",
     continue: "بەردەوام بە", languageNote: "دەتوانیت دواتر لە ڕێکخستنەکان زمان بگۆڕیت.",
     welcome: "بەخێربێیت بۆ NOVYRA", welcomeSub: "هاوڕێکانت، ساتەکانت، جیهانی تۆ.",
     signIn: "چوونەژوورەوە", create: "دروستکردنی هەژمار", loginTitle: "بەخێرهاتیتەوە", signupTitle: "هەژمارەکەت دروست بکە",
@@ -91,8 +91,10 @@ const copy: Record<Language, Record<string, string>> = {
 const avatarChoices = ["✦", "🌙", "🦊", "🐼", "🐺", "🦁", "🐸", "🐙", "🪐", "⚡", "🌊", "🦋"];
 
 function NovyraMark() {
-  // Match the exact X monogram used by the live NOVYRA app navigation.
-  return <span className="px-real-brand-mark" aria-hidden="true">N</span>;
+  return <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+    <path d="M10 36V12c0-2 2.4-2.8 3.7-1.3L34 35V12" fill="none" stroke="currentColor" strokeWidth="5.2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M34 35h4" fill="none" stroke="currentColor" strokeWidth="5.2" strokeLinecap="round"/>
+  </svg>;
 }
 function GoogleMark() {
   return <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-15Z"/><path fill="#FF3D00" d="M24 44c5.5 0 10.1-1.8 13.5-4.8l-6.6-5.1c-1.8 1.2-4 1.9-6.9 1.9-5.3 0-9.8-3.6-11.4-8.4H5.8v5.2A20 20 0 0 0 24 44Z"/><path fill="#4CAF50" d="M12.6 27.6a12 12 0 0 1 0-7.2v-5.2H5.8a20 20 0 0 0 0 17.6l6.8-5.2Z"/><path fill="#1976D2" d="M24 12.1c3 0 5.7 1 7.8 3.1l5.9-5.9C34.1 6 29.5 4 24 4A20 20 0 0 0 5.8 15.2l6.8 5.2c1.6-4.8 6.1-8.3 11.4-8.3Z"/></svg>;
@@ -315,14 +317,14 @@ export default function Onboarding({ onComplete }: Props) {
   }
 
   return (
-    <main className="px-onboarding" dir={dir} lang={language}>
+    <main className={"px-onboarding" + (stage === "language" ? " px-language-screen" : "")} dir={dir} lang={language}>
       <div className="px-ambient px-ambient-one" /><div className="px-ambient px-ambient-two" />
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
       <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">NOVYRA</span></header>
       <section className="px-onboarding-stage">
         {stage === "language" && <div className="px-glass-panel px-language-panel">
           <div className="px-eyebrow">NOVYRA / YOUR EXPERIENCE</div>
-          <div className="px-language-brand-emblem" aria-label="NOVYRA"><span className="px-language-brand-x"><NovyraMark /></span><span className="px-language-brand-name">PROJECT <b>X</b></span></div>
+          <div className="px-language-intro">A WORLD, IN YOUR LANGUAGE</div>
           <h1>{t("choose")}</h1><p className="px-stage-subtitle">{t("chooseSub")}</p>
           <div className="px-language-grid">
             {([
