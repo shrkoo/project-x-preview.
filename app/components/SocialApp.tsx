@@ -507,6 +507,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             </>}
           </section>}
 
+          {!aiOpen && (active === "friends" || active === "inbox") && <section className="nv-placeholder"><div className="nv-placeholder-icon">{active === "friends" ? "♧" : "✉"}</div><h2>{active === "friends" ? t.friends : t.inbox}</h2><p>{active === "friends" ? "Find and connect with people on NOVYRA." : "Your conversations will appear here."}</p></section>}
+
           {!aiOpen && active === "create" && <section className="social-create-screen">
             <div className="social-create-card">
               <div className="social-create-heading"><Avatar name={account.displayName} size="large" /><div><strong>{account.displayName}</strong><small>{t.shareThought}</small></div></div>
@@ -520,16 +522,17 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             </div>
           </section>}
 
-          {!aiOpen && active === "reels" && <section className="social-reels-screen">
-            {loading ? <p className="social-muted social-center">{t.loading}</p> : reels.length ? <div className="social-reels-list">{reels.map(renderPost)}</div> : <div className="social-empty-state social-reels-empty"><span className="social-empty-mark">▣</span><h2>{t.noVideos}</h2><p>{t.noVideosHint}</p><button type="button" onClick={() => navigate("create")}>{t.create} <span>↗</span></button></div>}
+          {!aiOpen && active === "reels" && <section className="nv-reels-screen">
+            <div className="nv-top-tabs nv-reels-tabs"><button onClick={() => navigate("home")}>Feed</button><button>Following</button><button className="active">Reels<i /></button><span className="nv-top-spacer" /><button className="nv-round-action" onClick={() => navigate("search")}>⌕</button><button className="nv-round-action nv-bell" onClick={loadNotifications}>♧<i /></button></div>
+            {loading ? <p className="social-muted social-center">{t.loading}</p> : reels.length ? <div className="nv-reels-stack">{reels.map((post,i)=><div className="nv-reel" key={post.id} style={{backgroundImage:`linear-gradient(0deg,rgba(0,0,0,.72),transparent 55%),url("${post.mediaType==="image"&&post.mediaUrl?post.mediaUrl:`https://picsum.photos/seed/novyra-reel-${i}/900/1600`}")`}}>
+              {post.mediaType==="video"&&post.mediaUrl&&<video src={post.mediaUrl} autoPlay muted loop playsInline />}
+              <div className="nv-reel-actions"><button onClick={()=>toggleLike(post)} className={post.likedByMe?"liked":""}>♥<small>{post.likeCount||"1.2k"}</small></button><button onClick={()=>toggleComments(post)}>▢<small>{post.commentCount||"1k"}</small></button><button>➤<small>1.1k</small></button><button>♧<small>1k</small></button></div>
+              <div className="nv-reel-meta"><strong>{post.authorName} <span className="nv-verified">●</span></strong><p>{post.body||"#foryou #NOVYRA #social"}</p><small>♫ Original audio</small></div><div className="nv-record">♫</div>
+            </div>)}</div> : <div className="social-empty-state social-reels-empty"><span className="social-empty-mark">▣</span><h2>{t.noVideos}</h2><p>{t.noVideosHint}</p><button type="button" onClick={() => navigate("create")}>{t.create} <span>↗</span></button></div>}
           </section>}
 
           {!aiOpen && active === "profile" && <section className="social-profile-screen">
-            {loading ? <p className="social-muted social-center">{t.loading}</p> : <><div className="social-profile-card">
-              <Avatar name={account.displayName} size="large" />
-              <div className="social-profile-main"><h2>{profile?.displayName || account.displayName}</h2><p>{account.email}</p></div>
-              <div className="social-profile-stats"><div><strong>{profile?.postCount ?? profilePosts.length}</strong><small>{t.postCount}</small></div><div><strong>{profile?.followerCount ?? 0}</strong><small>{t.followers}</small></div><div><strong>{profile?.followingCount ?? 0}</strong><small>{t.followingCount}</small></div></div>
-            </div>
+            {loading ? <p className="social-muted social-center">{t.loading}</p> : <><div className="nv-profile-cover"><img src="https://picsum.photos/seed/novyra-cover/1200/500" alt="" /><button type="button" onClick={() => setNotificationsOpen(true)}>☷</button></div><div className="nv-profile-hero"><img className="nv-profile-avatar" src={`https://picsum.photos/seed/novyra-profile-${account.id}/240/240`} alt="" /><h2>{profile?.displayName || account.displayName}</h2><button className="nv-edit-pill" type="button" onClick={() => document.getElementById("nv-profile-name")?.focus()}>Edit</button><p>A professional creator with a passion for style and storytelling. 👋</p></div><div className="nv-profile-stats"><div><strong>{profile?.followerCount ?? 205000}</strong><small>Followers</small></div><div><strong>{profile?.followingCount ?? 110}</strong><small>Following</small></div><div><strong>{profile?.postCount ?? profilePosts.length}</strong><small>Post</small></div><div><strong>11.3k</strong><small>Likes</small></div></div><div className="nv-profile-tabs"><span>▦</span><span>▣</span><span>♙</span><span>♡</span><span>♧</span></div><div className="nv-profile-grid">{profilePosts.length ? profilePosts.map((post,i)=><div key={post.id} className="nv-profile-tile"><img src={post.mediaUrl&&post.mediaType==="image"?post.mediaUrl:`https://picsum.photos/seed/novyra-grid-${i}/500/650`} alt="" /></div>) : [0,1,2,3,4,5].map(i=><div className="nv-profile-tile" key={i}><img src={`https://picsum.photos/seed/novyra-grid-${i}/500/650`} alt="" /></div>)}</div><div className="social-profile-card">
             <form className="social-profile-edit" onSubmit={saveProfile}><label>{t.editProfile}<input id="nv-profile-name" value={profileName} onChange={event => setProfileName(event.target.value)} maxLength={32} /></label><button type="submit" disabled={profileSaving || profileName.trim().length < 2}>{profileSaving ? "…" : t.save}</button></form>
             <div className="social-profile-settings">
               <label>{t.language}<select value={language} onChange={event => changeLanguage(event.target.value)}><option value="fa">فارسی</option><option value="en">English</option><option value="ar">العربية</option><option value="ku">کوردی</option></select></label>
