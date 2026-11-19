@@ -14,20 +14,20 @@ function ReelsIcon() {
   return <svg viewBox="0 0 26 26" aria-hidden="true"><rect x="2.8" y="5.2" width="20.4" height="15.6" rx="2.2" /><path d="m9.2 5.2 4.1 5.1m3.7-5.1 4.1 5.1M2.8 10.3h20.4" /><path d="m11 13.1 5.1 2.4-5.1 2.4z" className="novyra-reels-play" /></svg>;
 }
 
-export default function MobileBottomNav() {
+export default function MobileBottomNav({ userId, displayName }: { userId?: string; displayName?: string }) {
   const [active, setActive] = useState<NavKey>("reels");
   const [avatar, setAvatar] = useState("");
   const [initial, setInitial] = useState("N");
 
   useEffect(() => {
     try {
-      const account = JSON.parse(localStorage.getItem("projectx-account") || "{}");
-      const userId = localStorage.getItem("projectx-user-id");
       const savedAvatar = userId ? localStorage.getItem("projectx-avatar:" + userId) : null;
       if (savedAvatar) setAvatar(savedAvatar);
-      if (account?.name) setInitial(String(account.name).trim().slice(0, 1) || "N");
+      const account = JSON.parse(localStorage.getItem("projectx-account") || "{}");
+      const label = displayName || account?.name;
+      if (label) setInitial(String(label).trim().slice(0, 1) || "N");
     } catch { /* Keep the neutral NOVYRA avatar fallback. */ }
-  }, []);
+  }, [userId, displayName]);
 
   const choose = (key: NavKey) => setActive(key);
 
