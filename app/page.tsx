@@ -29,6 +29,7 @@ export default function Home() {
   const [tab, setTab] = useState<Tab>("home");
   const [appLanguage, setAppLanguage] = useState<AppLanguage>("fa");
   const [onboardingRequired, setOnboardingRequired] = useState(true);
+  const [sessionChecking, setSessionChecking] = useState(true);
   const [auth, setAuth] = useState<"login" | "signup" | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -72,7 +73,7 @@ export default function Home() {
     setSoundOn(readStore<boolean>("projectx-sound", true));
     setSelectedTheme(readStore<"neon" | "light">("projectx-theme", "neon"));
     const token=localStorage.getItem("projectx-token");
-    if (!token) { setOnboardingRequired(true); return; }
+    if (!token) { setOnboardingRequired(true); setSessionChecking(false); return; }
     apiRequest<{user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number;role?:string}}>("/auth/me").then(async data => {
       const next={id:data.user.id,name:data.user.displayName,email:data.user.email,xp:data.user.xp,gamesPlayed:data.user.gamesPlayed,role:data.user.role};
       setAccount(next);setName(next.name);setEmail(next.email);setXp(next.xp);setGamesPlayed(next.gamesPlayed);
@@ -80,7 +81,8 @@ export default function Home() {
       const result=await apiRequest<{rooms:Array<any>}>("/rooms");
       setRooms(result.rooms.map(r=>({id:r.id,code:r.code,name:r.name,game:r.gameTitle||"",createdAt:r.createdAt,ownerId:r.ownerId})));
       setOnboardingRequired(false);
-    }).catch(()=>{clearSession();setOnboardingRequired(true);setNotice("نشست قبلی معتبر نبود؛ دوباره وارد شو.");});
+      setSessionChecking(false);
+    }).catch(()=>{clearSession();setOnboardingRequired(true);setNotice("نشست قبلی معتبر نبود؛ دوباره وارد شو.");setSessionChecking(false);});
   }, []);
   useEffect(() => {
     if (tab==="leaderboard" && account) apiRequest<{leaderboard:Array<{name:string;xp:number;gamesPlayed:number}>}>("/leaderboard").then(d=>setLeaderboardRows(d.leaderboard)).catch(()=>setNotice("دریافت جدول امتیازها ناموفق بود."));
@@ -212,6 +214,7 @@ export default function Home() {
   }
   function saveSetting<T,>(key: string, value: T) { localStorage.setItem(key, JSON.stringify(value)); }
 
+  if (sessionChecking) return <main className="app-shell" aria-label="NOVYRA"><div className="loading-screen"><div className="brand-mark">N</div><p>در حال بررسی ورود شما…</p></div></main>;
   if (onboardingRequired) return <Onboarding onComplete={(user, language) => {
     setAppLanguage(language);
     setOnboardingRequired(false);
