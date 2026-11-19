@@ -209,18 +209,18 @@ export default function Onboarding({ onComplete }: Props) {
       });
       setSession(data.token);
       localStorage.setItem("projectx-account", JSON.stringify({ name: data.user.displayName || name.trim(), email: data.user.email }));
-      setUser(data.user);
-      setProfileName(data.user.displayName || name);
-      setEmail(data.user.email);
+      const signedInUser = { ...data.user, displayName: data.user.displayName || name.trim() };
+      setUser(signedInUser);
+      setProfileName(signedInUser.displayName);
+      setEmail(signedInUser.email);
       setPassword(""); setConfirmPassword("");
       if (mode === "signup") {
-        setStage("profile");
-        if (data.verificationSent) setNotice(language === "en" ? "Check your email to verify your account." : "لینک تأیید ایمیل را بررسی کنید.");
-        else if (data.emailVerificationRequired) setNotice(language === "en" ? "Email verification is required, but email delivery is not configured yet." : "تأیید ایمیل لازم است؛ سرویس ارسال ایمیل هنوز تنظیم نشده است.");
+        localStorage.setItem("projectx-profile-complete:" + signedInUser.id, "1");
+        localStorage.setItem("projectx-account", JSON.stringify({ name: signedInUser.displayName, email: signedInUser.email }));
       } else {
-        localStorage.setItem("projectx-profile-complete:" + data.user.id, "1");
-        onComplete(data.user, language);
+        localStorage.setItem("projectx-profile-complete:" + signedInUser.id, "1");
       }
+      onComplete(signedInUser, language);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : t("authError"));
     } finally {
