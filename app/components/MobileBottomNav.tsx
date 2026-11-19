@@ -106,7 +106,7 @@ export default function MobileBottomNav({ active, userId, displayName, onNavigat
             aria-label="Profile — نگه‌دار برای هوش مصنوعی"
             aria-current={active === "profile" ? "page" : undefined}
           >
-            {avatar ? <img src={avatar} alt="" /> : <span>{initial}</span>}
+            {avatar.startsWith("data:image/") || avatar.startsWith("https://") ? <img src={avatar} alt="" /> : <span>{avatar || initial}</span>}
             {active === "profile" && <i className="novyra-active-dot" />}
           </button>
         </div>
