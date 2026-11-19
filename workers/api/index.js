@@ -85,10 +85,21 @@ function renderNovyraEmail({eyebrow,title,intro,actionLabel,actionUrl,notice,foo
           <div style="background:#f5f7fb;border:1px solid #e8edf5;border-radius:10px;padding:14px 16px;color:#526078;font-size:12px;line-height:2;">${safeNotice}</div>
           <p style="margin:23px 0 0;color:#7b8495;font-size:12px;line-height:2;">اگر دکمه بالا باز نشد، این نشانی را در مرورگر خود کپی کنید:<br><a href="${safeUrl}" style="color:#345b91;word-break:break-all;text-decoration:underline;">${safeUrl}</a></p>
         </td></tr>
-        <tr><td style="padding:22px 30px;background:#fafbfc;border-top:1px solid #edf0f4;text-align:center;">
+        <tr><td style="padding:26px 24px;background:#fafbfc;border-top:1px solid #edf0f4;text-align:center;">
           <div style="color:#25334b;font-size:13px;font-weight:700;letter-spacing:1px;">The NOVYRA Team</div>
           <div style="margin-top:9px;color:#8992a2;font-size:11px;line-height:1.9;">${safeFooter}</div>
-          <div style="margin-top:13px;color:#a0a8b5;font-size:10px;letter-spacing:1px;">NOVYRA · BUILT FOR YOUR MOMENTS</div>
+          <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:20px auto 0;">
+            <tr>
+              <td style="padding:0 9px;"><a href="https://www.instagram.com/homaai2026/" target="_blank" aria-label="Instagram"><img src="https://cdn.simpleicons.org/instagram/263449" width="19" height="19" alt="Instagram" style="display:block;border:0;"></a></td>
+              <td style="padding:0 9px;"><a href="https://x.com/HomaAi2026" target="_blank" aria-label="X"><img src="https://cdn.simpleicons.org/x/263449" width="19" height="19" alt="X" style="display:block;border:0;"></a></td>
+              <td style="padding:0 9px;"><a href="https://www.tiktok.com/@homaai8" target="_blank" aria-label="TikTok"><img src="https://cdn.simpleicons.org/tiktok/263449" width="19" height="19" alt="TikTok" style="display:block;border:0;"></a></td>
+              <td style="padding:0 9px;"><a href="https://www.youtube.com/@homaai2026" target="_blank" aria-label="YouTube"><img src="https://cdn.simpleicons.org/youtube/263449" width="21" height="21" alt="YouTube" style="display:block;border:0;"></a></td>
+              <td style="padding:0 9px;"><a href="https://www.linkedin.com/in/shirko-alizadeh-a95001447/" target="_blank" aria-label="LinkedIn"><img src="https://cdn.simpleicons.org/linkedin/263449" width="19" height="19" alt="LinkedIn" style="display:block;border:0;"></a></td>
+            </tr>
+          </table>
+          <div style="margin-top:19px;color:#667085;font-size:11px;line-height:2;">NOVYRA یک محصول دیجیتال با تمرکز بر تجربه‌ای هوشمند، قابل‌اعتماد و حرفه‌ای است.</div>
+          <div style="margin-top:8px;color:#25334b;font-size:11px;font-weight:700;">شرکت زاوس روحانی</div>
+          <div style="margin-top:11px;color:#a0a8b5;font-size:10px;letter-spacing:1px;">NOVYRA · BUILT FOR YOUR MOMENTS</div>
         </td></tr>
       </table>
       <div style="padding:18px 10px;color:#98a1af;font-size:10px;text-align:center;">لطفاً به این ایمیل پاسخ ندهید؛ این پیام به‌صورت خودکار ارسال شده است.</div>
