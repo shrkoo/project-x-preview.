@@ -350,28 +350,28 @@ export default {
    // NOVYRA social core — additive routes; existing account and legacy API routes stay intact.
    if ((path === "/social/feed" || path === "/social/reels") && request.method === "GET") {
     const reelsOnly = path === "/social/reels";
-    const rows = await db.prepare(\`
+    const rows = await db.prepare(`
       SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
         p.author_id AS authorId,u.display_name AS authorName,
         (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
         (SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,
         EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe
       FROM social_posts p JOIN users u ON u.id=p.author_id
-      \${reelsOnly ? "WHERE p.media_type='video'" : ""}
+      ${reelsOnly ? "WHERE p.media_type='video'" : ""}
       ORDER BY p.created_at DESC LIMIT 50
-    \`).bind(user.id).all();
+    `).bind(user.id).all();
     return json({ posts: (rows.results || []).map(shapeSocialPost) });
    }
 
    if (path === "/social/profile" && request.method === "GET") {
     const [stats, posts] = await Promise.all([
-      db.prepare(\`
+      db.prepare(`
         SELECT
           (SELECT COUNT(*) FROM social_posts WHERE author_id=?) AS postCount,
           (SELECT COUNT(*) FROM social_follows WHERE followed_id=?) AS followerCount,
           (SELECT COUNT(*) FROM social_follows WHERE follower_id=?) AS followingCount
-      \`).bind(user.id,user.id,user.id).first(),
-      db.prepare(\`
+      `).bind(user.id,user.id,user.id).first(),
+      db.prepare(`
         SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
           p.author_id AS authorId,u.display_name AS authorName,
           (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
@@ -379,7 +379,7 @@ export default {
           EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe
         FROM social_posts p JOIN users u ON u.id=p.author_id
         WHERE p.author_id=? ORDER BY p.created_at DESC LIMIT 50
-      \`).bind(user.id,user.id).all()
+      `).bind(user.id,user.id).all()
     ]);
     return json({
       profile:{id:user.id,email:user.email,displayName:user.display_name,postCount:stats?.postCount||0,followerCount:stats?.followerCount||0,followingCount:stats?.followingCount||0},
@@ -389,9 +389,9 @@ export default {
 
    if (path === "/social/search" && request.method === "GET") {
     const q=String(url.searchParams.get("q")||"").trim().slice(0,100);
-    const likeQuery=\`%\${q}%\`;
+    const likeQuery=`%${q}%`;
     const usersResult= q
-      ? await db.prepare(\`
+      ? await db.prepare(`
           SELECT u.id,u.display_name AS displayName,
             (SELECT COUNT(*) FROM social_posts p WHERE p.author_id=u.id) AS postCount,
             (SELECT COUNT(*) FROM social_follows f WHERE f.followed_id=u.id) AS followerCount,
@@ -399,8 +399,8 @@ export default {
             EXISTS(SELECT 1 FROM social_follows mine WHERE mine.follower_id=? AND mine.followed_id=u.id) AS followedByMe
           FROM users u WHERE u.id<>? AND u.display_name LIKE ?
           ORDER BY followerCount DESC,u.created_at DESC LIMIT 40
-        \`).bind(user.id,user.id,likeQuery).all()
-      : await db.prepare(\`
+        `).bind(user.id,user.id,likeQuery).all()
+      : await db.prepare(`
           SELECT u.id,u.display_name AS displayName,
             (SELECT COUNT(*) FROM social_posts p WHERE p.author_id=u.id) AS postCount,
             (SELECT COUNT(*) FROM social_follows f WHERE f.followed_id=u.id) AS followerCount,
@@ -408,10 +408,10 @@ export default {
             EXISTS(SELECT 1 FROM social_follows mine WHERE mine.follower_id=? AND mine.followed_id=u.id) AS followedByMe
           FROM users u WHERE u.id<>?
           ORDER BY u.created_at DESC LIMIT 30
-        \`).bind(user.id,user.id).all();
+        `).bind(user.id,user.id).all();
     let postsResult={results:[]};
     if(q) {
-      postsResult=await db.prepare(\`
+      postsResult=await db.prepare(`
         SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
           p.author_id AS authorId,u.display_name AS authorName,
           (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
@@ -420,7 +420,7 @@ export default {
         FROM social_posts p JOIN users u ON u.id=p.author_id
         WHERE p.body LIKE ?
         ORDER BY p.created_at DESC LIMIT 30
-      \`).bind(user.id,likeQuery).all();
+      `).bind(user.id,likeQuery).all();
     }
     return json({users:usersResult.results||[],posts:(postsResult.results||[]).map(shapeSocialPost)});
    }
@@ -438,10 +438,10 @@ export default {
     const id=crypto.randomUUID();
     await db.prepare("INSERT INTO social_posts (id,author_id,body,media_url,media_type) VALUES (?,?,?,?,?)")
       .bind(id,user.id,postBody,mediaUrl||null,mediaUrl?mediaType:null).run();
-    await db.prepare(\`
+    await db.prepare(`
       INSERT INTO notifications (id,user_id,kind,title,body)
       SELECT lower(hex(randomblob(16))),f.follower_id,'new_post','پست تازه',? FROM social_follows f WHERE f.followed_id=?
-    \`).bind("پست تازه‌ای از "+user.display_name+" منتشر شد.",user.id).run();
+    `).bind("پست تازه‌ای از "+user.display_name+" منتشر شد.",user.id).run();
     return json({ok:true,id,message:"پست منتشر شد."},201);
    }
 
@@ -468,11 +468,11 @@ export default {
     const post=await db.prepare("SELECT author_id FROM social_posts WHERE id=?").bind(postId).first();
     if(!post) return fail("پست پیدا نشد.",404);
     if(request.method==="GET") {
-      const comments=await db.prepare(\`
+      const comments=await db.prepare(`
         SELECT c.id,c.body,c.created_at AS createdAt,c.author_id AS authorId,u.display_name AS authorName
         FROM social_post_comments c JOIN users u ON u.id=c.author_id
         WHERE c.post_id=? ORDER BY c.created_at ASC LIMIT 100
-      \`).bind(postId).all();
+      `).bind(postId).all();
       return json({comments:(comments.results||[]).map(row=>({...row,createdAt:isoDate(row.createdAt)}))});
     }
     if(request.method==="POST") {
@@ -512,12 +512,12 @@ export default {
     })).filter(item=>item.content);
     if(!safeMessages.length || safeMessages[safeMessages.length-1].role!=="user") return fail("پیام معتبر وارد کن.");
     const day=new Date().toISOString().slice(0,10);
-    const usage=await db.prepare(\`
+    const usage=await db.prepare(`
       INSERT INTO ai_daily_usage (user_id,usage_day,request_count,updated_at) VALUES (?,?,1,CURRENT_TIMESTAMP)
       ON CONFLICT(user_id,usage_day) DO UPDATE SET request_count=request_count+1,updated_at=CURRENT_TIMESTAMP
       WHERE request_count<30
       RETURNING request_count
-    \`).bind(user.id,day).first();
+    `).bind(user.id,day).first();
     if(!usage) return fail("سهمیه روزانه دستیار هوشمند به پایان رسیده است.",429);
     try {
       const result=await env.AI.run("@cf/google/gemma-4-26b-a4b-it",{
