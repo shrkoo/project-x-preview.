@@ -171,7 +171,7 @@ export default function Home() {
   }
   async function logout() {
     try{await apiRequest("/auth/logout",{method:"POST"});}catch{}
-    clearSession();setAccount(null);setName("");setEmail("");setPassword("");setRooms([]);notify("از حساب خارج شدی.");
+    clearSession();setAccount(null);setName("");setEmail("");setPassword("");setRooms([]);setOnboardingRequired(true);notify("از حساب خارج شدی.");
   }
   async function shareRoom(room: Room) {
     const invite = `به دورهمی «${room.name}» در NOVYRA بیا! کد اتاق: ${room.code || room.id}\n${window.location.origin}`;
