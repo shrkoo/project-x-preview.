@@ -1645,3 +1645,93 @@ button{cursor:pointer}
 
 /* Keep the active search lens legible while its stroke turns white. */
 .novyra-nav-item.is-active svg circle{fill:none;stroke:currentColor}
+
+
+/* NOVYRA compact sculpted navigation */
+.novyra-bottom-nav{
+  position:fixed;z-index:50;left:0;right:0;bottom:0;
+  height:calc(74px + env(safe-area-inset-bottom));
+  padding:0 18px env(safe-area-inset-bottom);
+  display:none;background:rgba(10,18,19,.94);
+  border-top:1px solid rgba(190,214,195,.08);
+  -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
+}
+.novyra-bottom-items{
+  width:100%;max-width:470px;height:58px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.novyra-nav-item{
+  position:relative;flex:0 0 42px;width:42px;height:48px;
+  display:flex;align-items:center;justify-content:center;
+  border:0;border-radius:14px;background:transparent;color:#8e9a9b;
+  transition:color .16s ease,transform .16s ease;
+}
+.novyra-nav-item svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.novyra-nav-item.is-active{color:#fff}
+.novyra-nav-item:active{transform:scale(.93)}
+.novyra-nav-item .novyra-active-dot,.novyra-profile-button .novyra-active-dot{
+  position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;background:#fff;
+}
+.novyra-reels-item svg{fill:#fff;stroke:#fff;stroke-width:.4}
+.novyra-create-button{
+  position:relative;flex:0 0 72px;width:72px;height:42px;
+  display:grid;place-items:center;border:1px solid rgba(255,255,255,.75);
+  border-radius:15px;background:linear-gradient(155deg,#fff,#dce5dc);
+  color:#101a15;box-shadow:0 3px 0 rgba(110,130,113,.28),0 8px 18px rgba(0,0,0,.22);
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.novyra-create-button>span:first-child{font:300 29px/1 Arial,sans-serif;margin-top:-2px}
+.novyra-create-button:active{transform:scale(.95);box-shadow:0 1px 0 rgba(110,130,113,.25),0 3px 9px rgba(0,0,0,.2)}
+.novyra-new-badge{
+  position:absolute;top:-7px;right:-7px;padding:3px 6px;border-radius:8px;
+  background:#e5bd69;color:#151a14;font:800 8px/1 Arial,sans-serif;
+  box-shadow:0 2px 8px #0005;
+}
+.novyra-profile-button{
+  position:relative;flex:0 0 36px;width:36px;height:36px;padding:0;
+  display:grid;place-items:center;border:1px solid rgba(221,235,221,.28);
+  border-radius:50%;background:#263a2c;color:#eef4ed;overflow:visible;
+}
+.novyra-profile-button img,.novyra-profile-button>span{
+  width:32px;height:32px;border-radius:50%;object-fit:cover;
+  display:grid;place-items:center;font-size:12px;font-weight:700;
+}
+.novyra-profile-button .novyra-active-dot{bottom:-7px}
+.novyra-home-wrap{position:relative;flex:0 0 42px}
+.novyra-home-menu{
+  position:absolute;left:50%;bottom:calc(100% + 13px);transform:translateX(-50%);
+  width:164px;padding:6px;border:1px solid rgba(194,214,197,.16);
+  border-radius:14px;background:#19271f;box-shadow:0 14px 36px #0008;
+  animation:novyra-menu-in .18s ease-out;
+}
+.novyra-home-menu:after{
+  content:"";position:absolute;left:50%;bottom:-6px;width:10px;height:10px;
+  transform:translateX(-50%) rotate(45deg);background:#19271f;
+  border-right:1px solid rgba(194,214,197,.16);border-bottom:1px solid rgba(194,214,197,.16);
+}
+.novyra-home-menu button{
+  position:relative;z-index:1;width:100%;height:40px;padding:0 10px;
+  display:flex;align-items:center;gap:10px;border:0;border-radius:9px;
+  background:transparent;color:#edf3ec;text-align:right;font-size:11px;
+}
+.novyra-home-menu button:hover{background:#2b4032}
+.novyra-menu-glyph{width:20px;color:#c9dfc9;font-size:17px;text-align:center}
+.novyra-menu-dismiss{position:fixed;inset:0;z-index:-1;border:0;background:transparent}
+.novyra-home-indicator{
+  position:absolute;left:50%;bottom:calc(7px + env(safe-area-inset-bottom));
+  transform:translateX(-50%);width:108px;height:4px;border-radius:9px;background:#fff;
+}
+@keyframes novyra-menu-in{from{opacity:0;transform:translate(-50%,5px) scale(.97)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@media(max-width:760px){
+  .novyra-bottom-nav{display:block;height:calc(74px + env(safe-area-inset-bottom))}
+  .social-app{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+  .novyra-bottom-items{gap:clamp(3px,2vw,12px)}
+}
+@media(max-width:370px){
+  .novyra-bottom-nav{padding-inline:12px}
+  .novyra-create-button{flex-basis:64px;width:64px}
+  .novyra-nav-item{flex-basis:38px;width:38px}
+  .novyra-home-wrap{flex-basis:38px}
+}
+@media(prefers-reduced-motion:reduce){.novyra-nav-item,.novyra-create-button,.novyra-home-menu{transition:none;animation:none}}
