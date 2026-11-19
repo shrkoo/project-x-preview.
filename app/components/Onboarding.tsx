@@ -342,13 +342,13 @@ export default function Onboarding({ onComplete }: Props) {
 
         {stage === "auth" && <div className="px-glass-panel px-auth-panel">
           <button className="px-back-button" onClick={() => setStage("language")} aria-label={t("back")}>←</button>
-          <div className="px-auth-emblem"><span>N</span><i /><b /></div>
+          <div className="px-auth-emblem" aria-label="NOVYRA"><NovyraMark /></div>
           <div className="px-eyebrow">NOVYRA / {recoveryMode ? "ACCOUNT RECOVERY" : "YOUR SPACE"}</div>
           <h1>{recoveryMode ? t("resetTitle") : mode === "login" ? t("loginTitle") : t("signupTitle")}</h1>
           <p className="px-stage-subtitle">{recoveryMode ? (resetTokenMode ? t("minPassword") : t("recoverySub")) : mode === "login" ? t("loginSub") : t("signupSub")}</p>
           {!recoveryMode && <div className="px-social-stack">
             <button type="button" className="px-social-button px-google-button" onClick={socialUnavailable}><GoogleMark/><span>{t("google")}</span></button>
-            <button type="button" className="px-social-button px-apple-button" onClick={appleUnavailable}><AppleMark/><span>{t("apple")}</span></button>
+            
           </div>}
           {!recoveryMode && <div className="px-separator"><span>{t("or")}</span></div>}
           {!recoveryMode && mode === "signup" && <label className="px-field"><span>{t("name")}</span><input autoComplete="name" value={name} onChange={e => setName(e.target.value)} placeholder={t("name")} /></label>}
