@@ -1405,3 +1405,5 @@ button:focus-visible,input:focus-visible{outline:2px solid #8fc1ff;outline-offse
 @media(prefers-reduced-motion:reduce){
   .novyra-nav-item svg,.novyra-create-button{transition:none}
 }
+
+.novyra-nav-item.is-active:not(.novyra-reels-item) svg{fill:currentColor}
