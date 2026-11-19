@@ -28,8 +28,8 @@ const readStore = <T,>(key: string, fallback: T): T => {
 export default function Home() {
   const [tab, setTab] = useState<Tab>("home");
   const [appLanguage, setAppLanguage] = useState<AppLanguage>("fa");
-  const [onboardingRequired, setOnboardingRequired] = useState(true);
-  const [sessionChecking, setSessionChecking] = useState(true);
+  const [onboardingRequired, setOnboardingRequired] = useState(false);
+  const [sessionChecking, setSessionChecking] = useState(false);
   const [auth, setAuth] = useState<"login" | "signup" | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
