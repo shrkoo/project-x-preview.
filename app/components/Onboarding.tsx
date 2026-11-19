@@ -324,7 +324,7 @@ export default function Onboarding({ onComplete }: Props) {
       <section className="px-onboarding-stage">
         {stage === "language" && <div className="px-glass-panel px-language-panel">
           <div className="px-eyebrow">NOVYRA / YOUR EXPERIENCE</div>
-          <div className="px-language-intro">A WORLD, IN YOUR LANGUAGE</div>
+          <div className="px-language-intro">{language === "fa" ? "یک جهان، به زبان تو" : language === "ku" ? "جیهانێک بە زمانی تۆ" : language === "ar" ? "عالمٌ بلغتك" : "A WORLD, IN YOUR LANGUAGE"}</div>
           <h1>{t("choose")}</h1><p className="px-stage-subtitle">{t("chooseSub")}</p>
           <div className="px-language-grid">
             {([
