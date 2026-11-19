@@ -235,7 +235,7 @@ export default function Home() {
   }} />;
 
   return (
-    <main className={selectedTheme === "light" ? "app-shell theme-light" : "app-shell"} dir={appLanguage === "en" ? "ltr" : "rtl"}>
+    <main className={selectedTheme === "light" ? "app-shell theme-light novyra-premium-shell" : "app-shell novyra-premium-shell"} dir={appLanguage === "en" ? "ltr" : "rtl"}>
       <aside className="side-rail">
         <button className="brand brand-button" onClick={() => setTab("home")}><span className="brand-mark">X</span><span>NOVYRA</span></button>
         <div className="rail-label">فضای شما</div>
