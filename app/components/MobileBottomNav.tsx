@@ -1,18 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-export type NavKey = "home" | "search" | "create" | "reels" | "profile";
-
-function HomeIcon() {
-  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 3.5l8 7V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19z" /></svg>;
-}
-function SearchIcon() {
-  return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5 20 20" /></svg>;
-}
-function ReelsIcon() {
-  return <svg viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M3 11a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M10.1 6.4a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0 M10.1 15.6a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0 M5.5 11a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0 M14.7 11a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0 M10.5 11a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0" /><path d="M16 18l4.5 3.5-6.5-.5z" /></svg>;
-}
+export type NavKey = "home" | "search" | "create" | "reels" | "profile" | "friends" | "inbox";
 
 type Props = {
   active: NavKey;
@@ -23,76 +13,49 @@ type Props = {
   onOpenGame?: () => void;
 };
 
-export default function MobileBottomNav({ active, userId, displayName, onNavigate, onOpenAI, onOpenGame }: Props) {
+function Icon({ name, filled = false }: { name: "home" | "friends" | "inbox" | "profile"; filled?: boolean }) {
+  const common = { fill: filled ? "currentColor" : "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  if (name === "home") return <svg viewBox="0 0 24 24" {...common}><path d="M3 10.8 12 3l9 7.8V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" /></svg>;
+  if (name === "friends") return <svg viewBox="0 0 24 24" {...common}><circle cx="9" cy="8" r="3.2" /><path d="M2.8 20c.3-3.6 2.4-5.5 6.2-5.5s5.9 1.9 6.2 5.5M16 5.2a3 3 0 0 1 0 5.8M17 14.7c2.6.4 3.9 2.1 4.2 5.3" /></svg>;
+  if (name === "inbox") return <svg viewBox="0 0 24 24" {...common}><path d="M4 5.5h16v13H4zM4 14h4l1.5 2h5L16 14h4" /></svg>;
+  return <svg viewBox="0 0 24 24" {...common}><circle cx="12" cy="8" r="3.5" /><path d="M4.5 21c.6-4.3 3-6.5 7.5-6.5s6.9 2.2 7.5 6.5" /></svg>;
+}
+
+export default function MobileBottomNav({ active, userId, displayName, onNavigate }: Props) {
   const [avatar, setAvatar] = useState("");
   const [initial, setInitial] = useState("N");
-  const [homeMenuOpen, setHomeMenuOpen] = useState(false);
-  const homeTimer = useRef<number | null>(null);
-  const homeClicked = useRef(false);
-
   useEffect(() => {
     try {
-      const savedAvatar = userId ? localStorage.getItem("projectx-avatar:" + userId) : null;
-      if (savedAvatar) setAvatar(savedAvatar);
+      const saved = userId ? localStorage.getItem("projectx-avatar:" + userId) : null;
+      if (saved) setAvatar(saved);
       const account = JSON.parse(localStorage.getItem("projectx-account") || "{}");
       const label = displayName || account?.name;
       if (label) setInitial(String(label).trim().slice(0, 1) || "N");
-    } catch { /* Keep the neutral NOVYRA avatar fallback. */ }
+    } catch { /* neutral avatar fallback */ }
   }, [userId, displayName]);
 
-  useEffect(() => () => {
-    if (homeTimer.current !== null) window.clearTimeout(homeTimer.current);
-  }, []);
-
-  function handleHomePress() {
-    if (homeTimer.current !== null) window.clearTimeout(homeTimer.current);
-    homeClicked.current = true;
-    setHomeMenuOpen(false);
-    onNavigate("home");
-    homeTimer.current = window.setTimeout(() => {
-      setHomeMenuOpen(true);
-      homeTimer.current = null;
-    }, 1000);
-  }
-
-  function closeMenu() {
-    if (homeTimer.current !== null) window.clearTimeout(homeTimer.current);
-    homeTimer.current = null;
-    setHomeMenuOpen(false);
-  }
-
-  return (
-    <nav className="novyra-bottom-nav" aria-label="Main navigation">
-      {homeMenuOpen && <button className="novyra-menu-dismiss" aria-label="Close menu" onClick={closeMenu} />}
-      <div className="novyra-bottom-items">
-        <div className="novyra-home-wrap">
-          {homeMenuOpen && <div className="novyra-home-menu" role="menu">
-            <button type="button" role="menuitem" onClick={() => { closeMenu(); onOpenAI(); }}>
-              <span className="novyra-menu-glyph">✦</span><span>هوش مصنوعی</span>
-            </button>
-            <button type="button" role="menuitem" onClick={() => { closeMenu(); onOpenGame?.(); }}>
-              <span className="novyra-menu-glyph">◈</span><span>بازی</span>
-            </button>
-          </div>}
-          <button type="button" className={`novyra-nav-item ${active === "home" ? "is-active" : ""}`} onClick={handleHomePress} aria-label="Home" aria-current={active === "home" ? "page" : undefined}>
-            <HomeIcon />{active === "home" && <i className="novyra-active-dot" />}
-          </button>
-        </div>
-        <button type="button" className={`novyra-nav-item ${active === "search" ? "is-active" : ""}`} onClick={() => { closeMenu(); onNavigate("search"); }} aria-label="Search" aria-current={active === "search" ? "page" : undefined}>
-          <SearchIcon />{active === "search" && <i className="novyra-active-dot" />}
-        </button>
-        <button type="button" className={`novyra-create-button ${active === "create" ? "is-active" : ""}`} onClick={() => { closeMenu(); onNavigate("create"); }} aria-label="Create">
-          <span aria-hidden="true">+</span><span className="novyra-new-badge">NEW</span>
-        </button>
-        <button type="button" className={`novyra-nav-item novyra-reels-item ${active === "reels" ? "is-active" : ""}`} onClick={() => { closeMenu(); onNavigate("reels"); }} aria-label="Reels" aria-current={active === "reels" ? "page" : undefined}>
-          <ReelsIcon />{active === "reels" && <i className="novyra-active-dot" />}
-        </button>
-        <button type="button" className={`novyra-profile-button ${active === "profile" ? "is-active" : ""}`} onClick={() => { closeMenu(); onNavigate("profile"); }} aria-label="Profile" aria-current={active === "profile" ? "page" : undefined}>
-          {avatar.startsWith("data:image/") || avatar.startsWith("https://") ? <img src={avatar} alt="" /> : <span>{avatar || initial}</span>}
-          {active === "profile" && <i className="novyra-active-dot" />}
-        </button>
-      </div>
-      <div className="novyra-home-indicator" aria-hidden="true"><span /></div>
-    </nav>
-  );
+  const items: Array<{ key: NavKey; label: string; icon: "home" | "friends" | "inbox" | "profile" }> = [
+    { key: "home", label: "Home", icon: "home" },
+    { key: "friends", label: "Friends", icon: "friends" },
+    { key: "inbox", label: "Inbox", icon: "inbox" },
+    { key: "profile", label: "Profile", icon: "profile" }
+  ];
+  return <nav className="novyra-bottom-nav" aria-label="Main navigation">
+    <div className="novyra-bottom-items">
+      <button type="button" className={`novyra-bottom-tab ${active === "home" ? "is-active" : ""}`} onClick={() => onNavigate("home")}>
+        <Icon name="home" filled={active === "home"} /><span>Home</span>
+      </button>
+      <button type="button" className={`novyra-bottom-tab ${active === "friends" ? "is-active" : ""}`} onClick={() => onNavigate("friends")}>
+        <Icon name="friends" filled={active === "friends"} /><span>Friends</span>
+      </button>
+      <button type="button" className="novyra-create-button" onClick={() => onNavigate("create")} aria-label="Create"><span>+</span></button>
+      <button type="button" className={`novyra-bottom-tab ${active === "inbox" ? "is-active" : ""}`} onClick={() => onNavigate("inbox")}>
+        <span className="novyra-inbox-icon"><Icon name="inbox" filled={active === "inbox"} /><i /></span><span>Inbox</span>
+      </button>
+      <button type="button" className={`novyra-bottom-tab novyra-profile-tab ${active === "profile" ? "is-active" : ""}`} onClick={() => onNavigate("profile")}>
+        {avatar.startsWith("data:image/") || avatar.startsWith("https://") ? <img src={avatar} alt="" /> : <span className="novyra-profile-initial">{initial}</span>}
+        <span>Profile</span>
+      </button>
+    </div>
+  </nav>;
 }
