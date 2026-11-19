@@ -64,7 +64,6 @@ export default function Home() {
       document.documentElement.lang = savedLanguage;
       document.documentElement.dir = savedLanguage === "en" ? "ltr" : "rtl";
     }
-    setOnboardingRequired(!savedLanguage || !localStorage.getItem("projectx-token"));
     const params=new URLSearchParams(window.location.search);
     const verifyToken=params.get("verify"), resetToken=params.get("reset");
     if(verifyToken){apiRequest("/auth/verify-email",{method:"POST",body:JSON.stringify({token:verifyToken})}).then(()=>notify("ایمیل با موفقیت تأیید شد.")).catch(error=>notify(error instanceof Error?error.message:"تأیید ایمیل ناموفق بود."));params.delete("verify");window.history.replaceState({}, "", window.location.pathname+(params.toString()?"?"+params.toString():""));}
@@ -72,13 +71,16 @@ export default function Home() {
     setNotificationsOn(readStore<boolean>("projectx-notifications", true));
     setSoundOn(readStore<boolean>("projectx-sound", true));
     setSelectedTheme(readStore<"neon" | "light">("projectx-theme", "neon"));
-    if (!localStorage.getItem("projectx-token")) return;
+    const token=localStorage.getItem("projectx-token");
+    if (!token) { setOnboardingRequired(true); return; }
     apiRequest<{user:{id:string;email:string;displayName:string;xp:number;gamesPlayed:number;role?:string}}>("/auth/me").then(async data => {
       const next={id:data.user.id,name:data.user.displayName,email:data.user.email,xp:data.user.xp,gamesPlayed:data.user.gamesPlayed,role:data.user.role};
       setAccount(next);setName(next.name);setEmail(next.email);setXp(next.xp);setGamesPlayed(next.gamesPlayed);
+      localStorage.setItem("projectx-account",JSON.stringify({name:next.name,email:next.email}));
       const result=await apiRequest<{rooms:Array<any>}>("/rooms");
       setRooms(result.rooms.map(r=>({id:r.id,code:r.code,name:r.name,game:r.gameTitle||"",createdAt:r.createdAt,ownerId:r.ownerId})));
-    }).catch(()=>{clearSession();setNotice("نشست قبلی معتبر نبود؛ دوباره وارد شو.");});
+      setOnboardingRequired(false);
+    }).catch(()=>{clearSession();setOnboardingRequired(true);setNotice("نشست قبلی معتبر نبود؛ دوباره وارد شو.");});
   }, []);
   useEffect(() => {
     if (tab==="leaderboard" && account) apiRequest<{leaderboard:Array<{name:string;xp:number;gamesPlayed:number}>}>("/leaderboard").then(d=>setLeaderboardRows(d.leaderboard)).catch(()=>setNotice("دریافت جدول امتیازها ناموفق بود."));
