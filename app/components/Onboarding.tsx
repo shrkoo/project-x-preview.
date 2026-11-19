@@ -244,10 +244,12 @@ export default function Onboarding({ onComplete }: Props) {
     else setStage("profile");
   }
   async function requestRecovery() {
-    if (!/^\S+@\S+\.\S+$/.test(email.trim())) { setNotice(t("invalidEmail")); return; }
+    if (busy) return;
+    const recoveryEmail = email.normalize("NFKC").replace(/[\\u200B-\\u200D\\uFEFF\\u202A-\\u202E\\u2066-\\u2069]/g, "").replace(/\\s+/g, "").trim().toLowerCase();
+    if (!/^\\S+@\\S+\\.\\S+$/.test(recoveryEmail)) { setNotice(t("invalidEmail")); return; }
     setBusy(true); setNotice("");
     try {
-      await apiRequest("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email: email.trim() }) });
+      await apiRequest("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email: recoveryEmail }) });
       setNotice(t("emailSent"));
     } catch (error) { setNotice(error instanceof Error ? error.message : t("authError")); }
     finally { setBusy(false); }
@@ -348,14 +350,14 @@ export default function Onboarding({ onComplete }: Props) {
           </div>}
           {!recoveryMode && <div className="px-separator"><span>{t("or")}</span></div>}
           {!recoveryMode && mode === "signup" && <label className="px-field"><span>{t("name")}</span><input autoComplete="name" value={name} onChange={e => setName(e.target.value)} placeholder={t("name")} /></label>}
-          {(!recoveryMode || !resetTokenMode) && <label className="px-field"><span>{t("email")}</span><input type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@example.com" /></label>}
+          {(!recoveryMode || !resetTokenMode) && <label className="px-field"><span>{t("email")}</span><input type="email" inputMode="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} dir="ltr" autoComplete="email" value={email} onChange={e => setEmail(e.target.value.replace(/[\\u200B-\\u200D\\uFEFF\\u202A-\\u202E\\u2066-\\u2069]/g, ""))} placeholder="name@example.com" /></label>}
           {(!recoveryMode || resetTokenMode) && <label className="px-field"><span>{t("password")}</span><span className="px-password-wrap"><input type={showPassword ? "text" : "password"} autoComplete={recoveryMode ? "new-password" : mode === "signup" ? "new-password" : "current-password"} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("minPassword")} /><button type="button" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? "Hide password" : "Show password"}><EyeMark visible={showPassword}/></button></span></label>}
           {(resetTokenMode || (!recoveryMode && mode === "signup")) && <label className="px-field"><span>{t("confirm")}</span><span className="px-password-wrap"><input type={showConfirm ? "text" : "password"} autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder={t("confirm")} /><button type="button" onClick={() => setShowConfirm(v => !v)} aria-label={showConfirm ? "Hide password" : "Show password"}><EyeMark visible={showConfirm}/></button></span></label>}
           {mode === "login" && !recoveryMode && <button type="button" className="px-forgot-link" onClick={() => { setRecoveryMode(true); setResetTokenMode(false); setNotice(""); }}>{t("forgot")}</button>}
           <button type="button" className="px-primary-action" disabled={busy} onClick={recoveryMode ? (resetTokenMode ? resetPassword : requestRecovery) : submitAuth}>{busy ? "..." : recoveryMode ? (resetTokenMode ? t("updatePassword") : t("sendReset")) : mode === "login" ? t("signIn") : t("create")} <span>↗</span></button>
           {!recoveryMode && <div className="px-switch-mode"><span>{mode === "login" ? t("noAccount") : t("haveAccount")}</span><button onClick={() => { setMode(mode === "login" ? "signup" : "login"); setNotice(""); }}>{mode === "login" ? t("createLink") : t("loginLink")}</button></div>}
           {recoveryMode && <button className="px-switch-mode px-back-link" onClick={() => { setRecoveryMode(false); setResetTokenMode(false); setNotice(""); }}>{t("back")}</button>}
-          <p className="px-auth-security">SECURE ACCESS · NOVYRA</p>
+          <p className="px-auth-security">{language === "en" ? "SECURE ACCESS · NOVYRA" : language === "ku" ? "چوونەژوورەوەی پارێزراو · NOVYRA" : language === "ar" ? "دخول آمن · NOVYRA" : "ورود امن · NOVYRA"}</p>
         </div>}
 
         {stage === "passwordSetup" && <div className="px-glass-panel px-auth-panel">
