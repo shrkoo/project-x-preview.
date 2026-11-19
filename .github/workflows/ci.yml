@@ -30,6 +30,20 @@ jobs:
         run: npm run typecheck
       - name: Check Worker JavaScript syntax
         run: node --check workers/api/index.js
+      - name: Validate additive D1 migration
+        run: |
+          python3 - <<'PY'
+          import sqlite3
+          from pathlib import Path
+          db = sqlite3.connect(":memory:")
+          db.execute("PRAGMA foreign_keys = ON")
+          db.execute("CREATE TABLE users (id TEXT PRIMARY KEY)")
+          db.executescript(Path("workers/api/migrations/0002_social_core.sql").read_text())
+          expected = {"social_posts", "social_post_likes", "social_post_comments", "social_follows", "ai_daily_usage"}
+          actual = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+          assert expected.issubset(actual), f"Missing tables: {expected - actual}"
+          print("D1 social migration syntax and table set: OK")
+          PY
       - name: Build static site
         run: npm run build
       - name: Add GitHub Pages marker
