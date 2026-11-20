@@ -38,6 +38,7 @@ type Person = {
   username?: string;
 };
 type Comment = { id: string; body: string; createdAt: string; authorId: string; authorName: string };
+type SharedMessage = { id: string; body: string; createdAt: string; senderId: string; senderName: string; recipientId: string; recipientName: string; sharedPostId?: string | null; postBody?: string | null; mediaUrl?: string | null; mediaType?: "image" | "video" | null; postAuthorId?: string | null; postAuthorName?: string | null; received: boolean };
 type Profile = Person & { email: string; createdAt?: string; avatarUrl?: string; avatar_url?: string; photoUrl?: string; imageUrl?: string };
 
 type Props = {
@@ -241,6 +242,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const [sharingPost, setSharingPost] = useState<Post | null>(null);
   const [shareTargets, setShareTargets] = useState<Person[]>([]);
   const [shareSending, setShareSending] = useState<string | null>(null);
+  const [sharedMessages, setSharedMessages] = useState<SharedMessage[]>([]);
   const [savedPostIds, setSavedPostIds] = useState<string[]>([]);
   const [savedPosts, setSavedPosts] = useState<Post[]>([]);
   const [explorePosts, setExplorePosts] = useState<Post[]>([]);
@@ -302,6 +304,15 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
       if (active === "search") {
         void loadExplore(true, true);
         void loadSearchHistory();
+      }
+      if (active === "inbox") {
+        setLoading(true);
+        try {
+          const data=await apiRequest<{messages:SharedMessage[]}>("/social/messages");
+          if(alive) setSharedMessages(data.messages||[]);
+        } catch(error) {
+          if(alive) {setSharedMessages([]);setPageError(error instanceof Error?error.message:t.genericError);}
+        } finally { if(alive) setLoading(false); }
       }
       if (active === "profile") {
         setLoading(true);
@@ -783,7 +794,18 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               </> : <div className="nv-live-results">{searchLoading?<p className="social-muted">در حال جستجو…</p>:searchResults.length?searchResults.map(person=><button type="button" className="nv-recent-row" key={person.id} onClick={()=>void openPersonProfile(person)}><span className="nv-recent-avatar"><AppIcon icon={UserRound}/></span><span className="nv-recent-copy"><strong>{person.username||person.displayName}</strong><small>{person.displayName}</small></span></button>):<p className="social-muted social-center">کاربری پیدا نشد.</p>}</div>}
             </div>}
           </section>}
-          {!aiOpen && (active === "friends" || active === "inbox") && <section className="nv-placeholder"><div className="nv-placeholder-icon">{active === "friends" ? <AppIcon icon={UsersRound} /> : <AppIcon icon={MessageSquare} />}</div><h2>{active === "friends" ? t.friends : t.inbox}</h2><p>{active === "friends" ? "Find and connect with people on NOVYRA." : "Your conversations will appear here."}</p></section>}
+          {!aiOpen && active === "friends" && <section className="nv-placeholder"><div className="nv-placeholder-icon"><AppIcon icon={UsersRound}/></div><h2>{t.friends}</h2><p>Find and connect with people on NOVYRA.</p></section>}
+          {!aiOpen && active === "inbox" && <section className="nv-shared-inbox" dir="rtl">
+            <header><MessageSquare/><strong>{t.inbox}</strong></header>
+            {loading?<p className="social-muted social-center">{t.loading}</p>:sharedMessages.length?sharedMessages.map(message=><article className="nv-shared-message" key={message.id}>
+              <div className="nv-shared-message-user"><Avatar name={message.received?message.senderName:message.recipientName}/><div><strong>{message.received?message.senderName:message.recipientName}</strong><small>{message.received?"برای تو فرستاد":"ارسال‌شده توسط تو"} · {formatPostAge(message.createdAt,language)}</small></div></div>
+              <p>{message.body}</p>
+              {message.sharedPostId&&<div className="nv-shared-message-post">
+                {message.mediaUrl&&message.mediaType==="video"?<video src={message.mediaUrl} controls playsInline preload="metadata"/>:message.mediaUrl&&message.mediaType==="image"?<img src={message.mediaUrl} alt="" loading="lazy"/>:null}
+                <p><bdi dir="auto">{message.postAuthorName||""}</bdi>{message.postBody ? " — "+message.postBody : ""}</p>
+              </div>}
+            </article>):<div className="nv-placeholder"><div className="nv-placeholder-icon"><AppIcon icon={MessageSquare}/></div><h2>{t.inbox}</h2><p>هنوز پستی برایت ارسال نشده است.</p></div>}
+          </section>}
 
           {!aiOpen && active === "create" && <section className="social-create-screen">
             <div className="social-create-card">
