@@ -535,8 +535,27 @@ export default {
 
    const shareTargetsMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/share-targets$/i);
    if(shareTargetsMatch && request.method==="GET") {
-    const rows=await db.prepare("SELECT u.id,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username FROM social_follows f JOIN users u ON u.id=f.followed_id WHERE f.follower_id=? AND u.id<>? ORDER BY u.display_name LIMIT 50").bind(user.id,user.id).all();
+    const rows=await db.prepare("SELECT u.id,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username FROM users u WHERE u.id<>? ORDER BY u.created_at DESC LIMIT 50").bind(user.id).all();
     return json({users:rows.results||[]});
+   }
+
+   if(path==="/social/messages" && request.method==="GET") {
+    const rows=await db.prepare(`
+      SELECT m.id,m.body,m.created_at AS createdAt,
+        m.sender_id AS senderId,sender.display_name AS senderName,
+        m.recipient_id AS recipientId,recipient.display_name AS recipientName,
+        m.shared_post_id AS sharedPostId,
+        p.body AS postBody,p.media_url AS mediaUrl,p.media_type AS mediaType,
+        p.author_id AS postAuthorId,postAuthor.display_name AS postAuthorName
+      FROM social_direct_messages m
+      JOIN users sender ON sender.id=m.sender_id
+      JOIN users recipient ON recipient.id=m.recipient_id
+      LEFT JOIN social_posts p ON p.id=m.shared_post_id
+      LEFT JOIN users postAuthor ON postAuthor.id=p.author_id
+      WHERE m.sender_id=? OR m.recipient_id=?
+      ORDER BY m.created_at DESC LIMIT 100
+    `).bind(user.id,user.id).all();
+    return json({messages:(rows.results||[]).map(row=>({...row,createdAt:isoDate(row.createdAt),received:row.recipientId===user.id}))});
    }
 
    const sharePostMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/share$/i);
