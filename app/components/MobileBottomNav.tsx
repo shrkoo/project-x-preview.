@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { House, SquarePlay, Send, Search, Sparkles, Gamepad2 } from "lucide-react";
+import { House, SquarePlay, Send, Search } from "lucide-react";
 import AppIcon from "./AppIcon";
 
 export type NavKey = "home" | "search" | "create" | "reels" | "profile" | "friends" | "inbox";
@@ -25,8 +25,6 @@ export default function MobileBottomNav({
   displayName = "Profile",
   avatarUrl,
   hasUnreadMessages = false,
-  onOpenAI,
-  onOpenGame,
 }: Props) {
   const [avatarFailed, setAvatarFailed] = useState(false);
   useEffect(() => setAvatarFailed(false), [avatarUrl]);
@@ -35,15 +33,13 @@ export default function MobileBottomNav({
   const tabs = [
     { key: "home" as const, label: labels.home, icon: House },
     { key: "reels" as const, label: labels.reels, icon: SquarePlay },
-    { key: "search" as const, label: labels.search, icon: Search },
     { key: "inbox" as const, label: labels.message, icon: Send },
+    { key: "search" as const, label: labels.search, icon: Search },
     { key: "profile" as const, label: labels.profile, icon: null },
   ];
   return (
     <nav className="novyra-bottom-nav" aria-label="Main navigation" dir="rtl">
       <div className="novyra-bottom-items">
-        <button type="button" className="novyra-bottom-tab novyra-ai-tab" onClick={onOpenAI} aria-label={labels.ai || "AI"} title={labels.ai || "AI"}><AppIcon icon={Sparkles}/></button>
-        <button type="button" className="novyra-bottom-tab novyra-game-tab" onClick={onOpenGame} aria-label={labels.games || "Games"} title={labels.games || "Games"}><AppIcon icon={Gamepad2}/></button>
         {tabs.map(({ key, label, icon }) => (
           <button key={key} type="button"
             className={`novyra-bottom-tab ${key === "profile" ? "novyra-profile-tab" : ""} ${key === "inbox" ? "novyra-inbox-tab" : ""} ${active === key ? "is-active" : ""}`}
