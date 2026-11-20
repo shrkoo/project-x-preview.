@@ -6,7 +6,7 @@ import { Play, Pause, Volume2, VolumeX, Maximize, ExternalLink } from "lucide-re
 type SharedContent={kind:"text"|"video";content:string;mediaUrl:string|null;contentType:string|null;createdAt:string};
 function stamp(value:number){if(!Number.isFinite(value))return "0:00";const m=Math.floor(value/60),s=Math.floor(value%60);return m+":"+String(s).padStart(2,"0");}
 export default function SharedLinkPage(){
- const pathname=usePathname(),token=String(pathname.split("/").filter(Boolean)[1]||"");
+ const [token,setToken]=useState("");
  const [data,setData]=useState<SharedContent|null>(null),[loading,setLoading]=useState(true),[missing,setMissing]=useState(false),[playing,setPlaying]=useState(false),[muted,setMuted]=useState(false),[time,setTime]=useState(0),[duration,setDuration]=useState(0),[volume,setVolume]=useState(1),[copied,setCopied]=useState(false);
  const videoRef=useRef<HTMLVideoElement|null>(null),playerRef=useRef<HTMLDivElement|null>(null);
  useEffect(()=>{const slug=String(window.location.pathname.split("/").filter(Boolean)[1]||"");if(!slug){setMissing(true);setLoading(false);return;}setToken(slug);},[]);
