@@ -761,3 +761,44 @@ button{-webkit-tap-highlight-color:transparent}
 .nv-home-person{display:flex;align-items:center;gap:8px;min-height:36px;color:#dedee3;font-size:12px}
 .nv-home-person-avatar{display:grid;width:34px;height:34px;place-items:center;border:1px solid #34353d;border-radius:50%;background:#17181d;color:#d8a0c7}
 .nv-home-person-avatar svg{width:17px;height:17px}
+
+/* NOVYRA dark story row + complete editorial feature post */
+.nv-ig-stories{height:auto!important;min-height:112px!important;display:flex!important;flex-direction:row!important;align-items:flex-start!important;gap:15px!important;padding:12px 14px 13px!important;background:#000!important;border-bottom:1px solid #171717!important}
+.nv-ig-story{flex:0 0 72px!important;width:72px!important;min-width:72px!important;display:flex!important;align-items:center!important;gap:6px!important}
+.nv-ig-story-ring{width:68px!important;height:68px!important;padding:3px!important;display:block!important;position:relative!important;border-radius:50%!important;background:linear-gradient(#000,#000) padding-box,conic-gradient(#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5,#feda75) border-box!important}
+.nv-ig-story-ring.own{background:linear-gradient(#000,#000) padding-box,#555 border-box!important}
+.nv-ig-story-image{display:grid!important;place-items:center!important;width:100%!important;height:100%!important;border:2px solid #000!important;border-radius:50%!important;overflow:hidden!important;color:#fff!important;font:700 22px/1 Arial,sans-serif!important}
+.nv-story-own{background:radial-gradient(circle at 50% 31%,#f0c8a5 0 16%,transparent 17%),radial-gradient(ellipse at 50% 110%,#d7e0d9 0 42%,transparent 43%),linear-gradient(145deg,#536e68,#b98b76 54%,#202c36)!important;color:transparent!important}
+.nv-story-arian{background:radial-gradient(circle at 50% 50%,#1b3157 0 24%,transparent 25%),repeating-conic-gradient(from 20deg,#18e5ff 0 5deg,#15102d 6deg 30deg,#a34dff 31deg 35deg,#111323 36deg 60deg)!important;box-shadow:inset 0 0 15px #25dfff88!important}
+.nv-story-nordic{background:linear-gradient(155deg,transparent 0 39%,#dce7e8 40% 44%,transparent 45%),linear-gradient(135deg,transparent 0 31%,#718b8a 32% 50%,transparent 51%),linear-gradient(180deg,#8cb8ca 0 45%,#243e42 46% 100%)!important;color:#f4f7f4!important;text-shadow:0 1px 5px #000!important}
+.nv-story-sara{background:radial-gradient(circle at 52% 34%,#edc09e 0 17%,transparent 18%),radial-gradient(ellipse at 52% 105%,#e5a66f 0 38%,transparent 39%),linear-gradient(140deg,#714a43,#d6a17f 55%,#342d3b)!important;color:transparent!important}
+.nv-ig-story small{font-family:Vazirmatn,Arial,sans-serif!important;font-size:10px!important;color:#f1f1f1!important}
+.nv-ig-feature-post{height:auto!important;min-height:0!important;background:#000!important;border-top:0!important;overflow:hidden!important}
+.nv-ig-post-head{height:66px!important;min-height:66px!important;display:flex!important;align-items:center!important;gap:10px!important;padding:0 13px!important;background:#000!important}
+.nv-ig-digiato-avatar{flex:0 0 40px!important;width:40px!important;height:40px!important;display:grid!important;place-items:center!important;border:2px solid #273c62!important;border-radius:50%!important;background:radial-gradient(circle at 50% 35%,#245c85,#071426 72%)!important;color:#78e8ff!important}
+.nv-ig-digiato-avatar span{font:800 23px Vazirmatn,sans-serif!important;text-shadow:0 0 12px #26cfff!important}
+.nv-ig-post-account{flex:1!important;min-width:0!important;display:flex!important;flex-direction:column!important;gap:3px!important;text-align:right!important}
+.nv-ig-post-account strong{font:700 13px Arial,sans-serif!important;color:#fff!important}
+.nv-ig-post-account small{font:400 10px Vazirmatn,sans-serif!important;color:#a5a5ad!important}
+.nv-ig-post-actions{display:flex!important;align-items:center!important;gap:9px!important}
+.nv-ig-follow{height:30px!important;padding:0 12px!important;border:1px solid #36383e!important;border-radius:8px!important;background:#17181c!important;color:#f5f5f5!important;font:600 10px Vazirmatn,sans-serif!important}
+.nv-ig-more{display:grid!important;place-items:center!important;width:28px!important;height:32px!important;padding:0!important;border:0!important;background:transparent!important;color:#eee!important}
+.nv-ig-more svg{width:22px!important;height:22px!important}
+.nv-ig-post-media{position:relative!important;display:block!important;width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:4/5!important;overflow:hidden!important;background:radial-gradient(ellipse at 50% 46%,#173d68 0,transparent 34%),radial-gradient(ellipse at 83% 20%,#4a1d67 0,transparent 39%),linear-gradient(145deg,#07101f 0%,#0b1426 46%,#100b1c 100%)!important}
+.nv-ig-art-grid{position:absolute!important;inset:0!important;opacity:.28!important;background-image:linear-gradient(#6ceaff18 1px,transparent 1px),linear-gradient(90deg,#6ceaff18 1px,transparent 1px)!important;background-size:28px 28px!important;mask-image:linear-gradient(180deg,#000,transparent 85%)!important}
+.nv-ig-art-orbit{position:absolute!important;left:50%!important;top:42%!important;width:65%!important;aspect-ratio:1!important;border:1px solid #5de6ff88!important;border-radius:50%!important;transform:translate(-50%,-50%) rotate(-25deg) scaleY(.42)!important;box-shadow:0 0 22px #1fcfff33!important}
+.nv-ig-art-orbit.orbit-two{width:83%!important;border-color:#bd79ff88!important;transform:translate(-50%,-50%) rotate(52deg) scaleY(.48)!important}
+.nv-ig-art-core{position:absolute!important;left:50%!important;top:39%!important;width:31%!important;aspect-ratio:1!important;display:grid!important;place-items:center!important;border:1px solid #8deeff!important;border-radius:28% 45% 30% 46%!important;transform:translate(-50%,-50%) rotate(45deg)!important;background:linear-gradient(145deg,#163d62dd,#20153ddd)!important;box-shadow:0 0 28px #1dbfff77,inset 0 0 20px #a56cff55!important}
+.nv-ig-art-core span{transform:rotate(-45deg)!important;color:#e6fbff!important;font:900 clamp(25px,8vw,43px) Arial,sans-serif!important;letter-spacing:-3px!important;text-shadow:0 0 18px #49dfff!important}
+.nv-ig-art-core i,.nv-ig-art-core b,.nv-ig-art-core em{position:absolute!important;width:7px!important;height:7px!important;border-radius:50%!important;background:#a8f5ff!important;box-shadow:0 0 12px #36dcff!important}
+.nv-ig-art-core i{left:-4px!important;top:20%!important}.nv-ig-art-core b{right:4%!important;bottom:2%!important}.nv-ig-art-core em{right:-4px!important;top:45%!important}
+.nv-ig-art-copy{position:absolute!important;right:7%!important;left:7%!important;bottom:14%!important;z-index:2!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:9px!important;text-align:right!important}
+.nv-ig-art-copy>span{color:#8beaff!important;font:700 9px Arial,sans-serif!important;letter-spacing:3px!important}
+.nv-ig-art-copy strong{color:#fff!important;font:900 clamp(23px,6.2vw,34px)/1.6 Vazirmatn,sans-serif!important;text-shadow:0 3px 18px #000!important}
+.nv-ig-art-copy small{max-width:90%!important;color:#c2d2e4!important;font:400 11px/1.9 Vazirmatn,sans-serif!important}
+.nv-ig-art-brand{position:absolute!important;left:7%!important;bottom:5%!important;z-index:3!important;display:flex!important;align-items:center!important;gap:8px!important;color:#d8eaff!important;font:800 9px Arial,sans-serif!important;letter-spacing:2px!important}
+.nv-ig-art-brand i{width:8px!important;height:8px!important;border:1px solid #69e8ff!important;border-radius:2px!important;transform:rotate(45deg)!important;box-shadow:0 0 10px #3adfff!important}
+.nv-ig-post-engagement{height:49px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;padding:0 15px!important;background:#000!important;color:#f7f7f7!important}
+.nv-ig-engage-actions{display:flex!important;align-items:center!important;gap:18px!important}
+.nv-ig-engage-actions svg,.nv-ig-post-engagement>svg{width:23px!important;height:23px!important;stroke-width:1.8!important}
+@media(max-width:600px){.nv-ig-post-media{aspect-ratio:4/5!important}.nv-ig-stories{gap:12px!important}.nv-ig-story{flex-basis:70px!important;width:70px!important;min-width:70px!important}}
