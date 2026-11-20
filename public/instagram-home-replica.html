@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#0F1218">
-<title>Instagram Android Home Replica</title>
+<title>Instagram Android Home — NOVYRA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -13,8 +13,8 @@
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:var(--white)}
 body{font-family:Roboto,Vazirmatn,sans-serif}
-.phone{width:100vw;height:100dvh;max-height:100dvh;aspect-ratio:9/19.5;margin:auto;position:relative;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
-@media (min-aspect-ratio:9/19.5){.phone{width:min(100vw,51.282vh);height:min(100dvh,195vw)}}
+.phone{width:100vw;height:100dvh;max-height:100dvh;aspect-ratio:1080/2340;margin:auto;position:relative;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+@media (min-aspect-ratio:1080/2340){.phone{width:min(100vw,46.1538vh);height:min(100dvh,216.6667vw)}}
 svg{display:block}
 .status{height:4%;flex:0 0 4%;display:flex;align-items:center;justify-content:space-between;padding:0 3.5%;direction:ltr;font:600 2.8vw Roboto,sans-serif}
 .status-left,.status-right{display:flex;align-items:center;gap:1.4vw}
@@ -37,80 +37,97 @@ svg{display:block}
 .add-story{position:absolute;width:6vw;height:6vw;right:-.4vw;bottom:-.3vw;background:white;color:#111;border:.4vw solid var(--bg);border-radius:50%;display:grid;place-items:center;font:400 5vw/1 Arial,sans-serif}
 .post{height:64.2%;flex:0 0 64.2%;background:var(--burgundy);position:relative;overflow:hidden}
 .post-header{height:11%;position:absolute;z-index:3;top:0;left:0;right:0;display:grid;grid-template-columns:12% 1fr 15%;align-items:center;padding:0 3%;direction:ltr}
-.menu-lines{width:6vw;display:flex;flex-direction:column;gap:1.2vw}.menu-lines span{display:block;height:.55vw;background:white;border-radius:1vw}.menu-lines span:first-child{width:5.5vw}.menu-lines span:last-child{width:4.2vw}
-.post-account{text-align:center;direction:rtl;font-family:Roboto,Vazirmatn,sans-serif;min-width:0}.account-name{font-size:3.4vw;font-weight:800;white-space:nowrap}
-.audio-name{margin-top:.7vw;font-size:2.6vw;display:flex;justify-content:center;align-items:center;gap:.8vw;white-space:nowrap}.audio-name svg{width:2.6vw;height:2.6vw}
-.post-avatars{position:relative;width:11vw;height:8vw;justify-self:end}.post-avatars i{position:absolute;top:0;width:7.5vw;height:7.5vw;border-radius:50%;border:.5vw solid var(--burgundy);background:radial-gradient(circle at 35% 35%,#f6d46c 0 12%,#288c9a 13% 35%,#18496a 36% 60%,#e4b34b 61%);}.post-avatars i:first-child{right:0;z-index:2}.post-avatars i:last-child{right:4vw;top:1vw;background:radial-gradient(circle,#e5b63e 0 20%,#d74d38 21% 40%,#286a83 41% 70%)}
-.poster{position:absolute;top:10%;left:4%;width:92%;height:94%;border-radius:3.7vw;overflow:hidden;background:radial-gradient(circle at 100% 100%,rgba(255,221,45,.85),transparent 35%),linear-gradient(160deg,var(--red) 0%,#E72A16 28%,var(--orange) 62%,#F9A51B 83%,var(--yellow) 100%);box-shadow:0 1vw 3vw #0004;direction:rtl}
-.poster:before{content:"";position:absolute;left:-2%;top:-1%;width:40%;height:25%;opacity:.16;background-image:radial-gradient(#5C1010 18%,transparent 20%);background-size:2.2vw 2.2vw;mask-image:linear-gradient(135deg,#000,transparent 90%)}
-.virus{position:absolute;top:2%;right:6%;width:23%;height:14%}.virus.small{width:10%;height:7%;top:11%;right:29%}.virus.tiny{width:7%;height:5%;top:3%;right:34%}
-.school-scene{position:absolute;top:14%;left:5%;width:90%;height:23%;display:flex;align-items:center;justify-content:center}
-.school-building{position:absolute;left:18%;top:9%;width:65%;height:79%;background:linear-gradient(#E6D1A7,#B98C68);border:.8vw solid #F4E3C7;border-radius:1.4vw;box-shadow:0 1vw 1.5vw #0004;overflow:hidden}
-.school-building:before{content:"";position:absolute;top:12%;left:10%;right:10%;height:23%;background:#1F5C9A;border-radius:.5vw}
-.school-sign{position:absolute;top:14%;left:10%;width:80%;text-align:center;color:white;font:900 4vw Vazirmatn,sans-serif;z-index:2}
-.school-windows{position:absolute;left:12%;right:12%;bottom:12%;height:35%;display:flex;justify-content:space-around}.school-windows i{width:16%;height:100%;background:#42749A;border:.5vw solid #F1D8B3}.school-door{position:absolute;bottom:0;left:43%;width:15%;height:32%;background:#75523C}
-.no-symbol{position:absolute;left:0;top:4%;width:43%;height:94%;border:2.4vw solid #D20C19;border-radius:50%;background:#ffffff1a;z-index:3;display:grid;place-items:center}.no-symbol:after{content:"";position:absolute;width:120%;height:2.3vw;background:#D20C19;transform:rotate(-45deg);border:.4vw solid white;border-radius:2vw}
-.school-bag{font-size:10vw;filter:drop-shadow(.6vw .6vw .5vw #0005)}
-.warning{position:absolute;right:0;top:16%;width:20%;height:48%;z-index:4}
-.poster-copy{position:absolute;top:38%;left:4%;width:92%;display:flex;flex-direction:column;align-items:center;gap:1.2vw}
-.banner{width:96%;min-height:10vw;padding:1.3vw 1vw;display:flex;justify-content:center;align-items:center;text-align:center;transform:skewY(-3deg);border-radius:2vw;box-shadow:0 1.3vw 1.2vw #0005,inset 0 .7vw 1vw #ffffff47;line-height:1.2;white-space:nowrap;font-family:Vazirmatn,sans-serif}
+.more{width:6vw;height:6vw}.post-title{font:800 3.5vw/1.25 Roboto,Vazirmatn,sans-serif;text-align:center;white-space:nowrap;direction:rtl}.post-sub{font:400 2.6vw/1.4 Roboto,Vazirmatn,sans-serif;text-align:center;color:#fff;white-space:nowrap;direction:rtl;margin-top:.5vw}
+.post-avatars{display:flex;align-items:center;justify-content:flex-end}.post-avatars span{width:7vw;height:7vw;border:.4vw solid var(--burgundy);border-radius:50%;background:linear-gradient(135deg,#1c9caa,#e7bc54,#e64e60)}.post-avatars span+span{margin-left:-2.5vw;background:linear-gradient(135deg,#4d7fba,#f1c56d,#8c4d9b)}
+.poster{position:absolute;top:10%;left:4%;width:92%;height:105%;border-radius:3.7vw 3.7vw 0 0;overflow:hidden;background:linear-gradient(160deg,var(--red) 0%,var(--orange) 48%,var(--yellow) 100%);box-shadow:0 1.5vw 4vw #21000c88}
+.poster:before{content:"";position:absolute;left:0;top:0;width:42%;height:29%;opacity:.18;background-image:radial-gradient(#7b1010 1px,transparent 1.4px);background-size:1.2vw 1.2vw}
+.poster-content{position:relative;height:100%;padding:4% 5%;display:flex;flex-direction:column;align-items:center;gap:1.1vw}
+.virus-area{height:20%;width:100%;position:relative;display:flex;justify-content:flex-end;align-items:flex-start;padding-right:3%}
+.virus{width:24vw;height:24vw;filter:drop-shadow(0 1vw 1vw #6d1b1766)}.virus.small{width:9vw;height:9vw;position:absolute;right:1%;top:52%}.virus.tiny{width:6vw;height:6vw;position:absolute;right:25%;top:12%}
+.school-scene{width:100%;height:20%;display:flex;align-items:center;justify-content:center;position:relative;margin-top:-3%}
+.school{position:absolute;width:57%;height:77%;right:9%;top:4%;border:.8vw solid #e5c8a2;border-radius:1vw;background:linear-gradient(#d5c1a5 0 23%,#b78d6b 23% 100%);box-shadow:0 1vw 2vw #6c1a0c55;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden}
+.school:before{content:"";position:absolute;inset:32% 0 0;background:repeating-linear-gradient(90deg,transparent 0 8%,#5c6d7c 8% 10%,transparent 10% 18%)}
+.school-sign{z-index:1;background:#125da5;color:#fff;font:800 4vw Vazirmatn,sans-serif;padding:.4vw 4vw;border-radius:.4vw}
+.school-ground{position:absolute;bottom:0;width:100%;height:13%;background:#596b43}
+.no-school{position:absolute;left:4%;top:0;width:35vw;height:35vw;border:2.2vw solid #d71920;border-radius:50%;display:grid;place-items:center;background:#ffffff22;z-index:2}
+.no-school:after{content:"";position:absolute;width:120%;height:2.2vw;background:#d71920;transform:rotate(-45deg);border-radius:2vw}
+.bag{position:relative;width:13vw;height:15vw;background:#1768bd;border-radius:3vw 3vw 2vw 2vw;box-shadow:inset -2vw 0 #0d4389;z-index:1}
+.bag:before{content:"";position:absolute;width:6vw;height:3vw;border:1.4vw solid #174c89;border-bottom:0;border-radius:4vw 4vw 0 0;top:-3vw;left:3vw}
+.bag:after{content:"";position:absolute;left:2vw;right:2vw;bottom:3vw;height:4vw;border-radius:1vw;background:#4e9be6}
+.warning{position:absolute;right:1%;bottom:-5%;width:13vw;height:13vw;z-index:3}
+.banner{position:relative;z-index:4;min-height:9%;width:94%;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:2.5vw;transform:skewY(-3deg);box-shadow:0 1.5vw 2vw #63100077,inset 0 .8vw 0 #ffffff35,inset 0 -1vw 0 #00000018;padding:1.2% 2%;white-space:nowrap}
 .banner span{transform:skewY(3deg);display:block}
-.banner-red{color:white;background:linear-gradient(180deg,#F72B2C,#B90010);font-size:10vw;font-weight:900;min-height:14vw;text-shadow:0 .5vw .3vw #0004}
-.banner-gray{width:82%;color:#171717;background:linear-gradient(180deg,#fff,#D5D5D5);font-size:8vw;font-weight:900;min-height:11vw}
-.banner-white{width:94%;color:var(--red);background:linear-gradient(180deg,#fff,#E8E8E8);font-size:13vw;font-weight:900;min-height:16vw;box-shadow:0 1.3vw 1.3vw #0005,inset 0 .8vw 1vw white}
-.banner-yellow{width:100%;color:#171717;background:linear-gradient(180deg,#FFE85B,#F4B900);font-size:5vw;font-weight:900;min-height:10vw}
-.banner-last{width:92%;min-height:16vw;font-size:11vw}
-.bottom-nav{height:5%;flex:0 0 5%;background:var(--nav);display:flex;align-items:center;justify-content:space-around;direction:ltr;padding:0 2%}
-.nav-item{width:17%;height:100%;display:flex;align-items:center;justify-content:center}.nav-icon{width:7.2vw;height:7.2vw}
-.active-pill{width:12vw;height:9vw;border-radius:4vw;background:#2A2D33;display:grid;place-items:center}.active-pill svg{width:7vw;height:7vw}
-.profile-nav{width:7.5vw;height:7.5vw;border-radius:50%;background:linear-gradient(145deg,#ddd,#333 45%,#111);border:.4vw solid white;overflow:hidden}
-.android-nav{height:6%;flex:0 0 6%;background:#000;display:flex;align-items:center;justify-content:space-around;direction:ltr}.android-nav svg{width:5vw;height:5vw}
+.banner.red{background:linear-gradient(180deg,#fa3b31,var(--red) 52%,#a90d17);color:#fff;font:900 10vw/1.1 Vazirmatn,sans-serif}
+.banner.gray{width:79%;min-height:7%;background:linear-gradient(#fff,#dedede);color:#171717;font:900 8vw/1.1 Vazirmatn,sans-serif}
+.banner.white{width:86%;min-height:9%;background:linear-gradient(#fff,#eee);color:var(--red);font:900 13vw/1.1 Vazirmatn,sans-serif}
+.banner.yellow{width:96%;min-height:7%;background:linear-gradient(#ffe76b,var(--yellow));color:#171717;font:900 5vw/1.2 Vazirmatn,sans-serif}
+.banner.last{min-height:10%;font-size:11vw}
+.bottom{height:5%;flex:0 0 5%;background:var(--nav);display:grid;grid-template-columns:repeat(5,1fr);align-items:center;direction:ltr;padding:0 2%}
+.nav-item{height:100%;display:flex;align-items:center;justify-content:center}.nav-icon{width:7vw;height:7vw}.active-pill{width:13vw;height:9vw;border-radius:3vw;background:#2A2D33;display:grid;place-items:center}.profile{width:7vw;height:7vw;border-radius:50%;background:#555;border:.35vw solid white}
+.android-nav{height:6%;flex:0 0 6%;background:#000;display:flex;align-items:center;justify-content:space-around;color:#CFCFCF}
+.android-nav svg{width:5vw;height:5vw}
+@media (min-width:700px){.phone{width:min(100vw,46.1538vh)}}
 </style>
 </head>
 <body>
-<main class="phone">
-<section class="status">
- <div class="status-left"><div class="battery">23</div><span>4G</span><div class="signal"><i></i><i></i><i></i><i></i></div><span class="vpn">VPN</span></div>
- <div class="status-right"><span style="font-size:4vw;letter-spacing:.2vw">···</span>
-  <svg class="status-glyph" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="18" cy="6" r="1" fill="white"/></svg>
-  <svg class="status-glyph" viewBox="0 0 24 24" fill="white"><path d="M12 2.3 3.3 7.2v9.6l8.7 4.9 8.7-4.9V7.2L12 2.3Zm0 3 5.9 3.3-5.9 3.3-5.9-3.3L12 5.3Zm-6.9 5.7 5.9 3.3v5.8l-5.9-3.3V11Zm13.8 0v5.8L13 20.1v-5.8l5.9-3.3Z"/></svg>
-  <svg class="status-glyph" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="18" cy="6" r="1" fill="white"/></svg><span class="time">۲۱:۴۶</span>
- </div>
-</section>
-<header class="header">
- <div class="header-side left"><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M20.8 8.8c0 5.2-8.8 11-8.8 11s-8.8-5.8-8.8-11A4.8 4.8 0 0 1 12 6.2a4.8 4.8 0 0 1 8.8 2.6Z"/></svg></div>
- <div class="wordmark"><svg class="chevron" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2"><path d="m2 4 4 4 4-4"/></svg><span>Instagram</span></div>
- <div class="header-side right"><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
-</header>
-<section class="stories"><div class="story-track">
- <div class="story"><div class="story-ring"><div class="story-img"></div></div><div class="story-label">r.__.200cc</div></div>
- <div class="story"><div class="story-ring"><div class="story-img"></div></div><div class="story-label">raha._cc250</div></div>
- <div class="story"><div class="story-ring dashed"><div class="story-img"></div></div><div class="story-label">l_the_kami_l</div></div>
- <div class="story"><div class="story-ring"><div class="story-img" style="background:linear-gradient(135deg,#222,#777,#171717)"></div><div class="add-story">+</div></div><div class="story-label fa">داستان شما</div></div>
-</div></section>
-<section class="post">
- <header class="post-header"><div class="menu-lines"><span></span><span></span></div>
-  <div class="post-account"><div class="account-name">akhbarsardasht و digikala_rayegan</div><div class="audio-name"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span>digikala_rayegan · صدای اصلی</span></div></div>
-  <div class="post-avatars"><i></i><i></i></div>
- </header>
- <div class="poster">
-  <svg class="virus" viewBox="0 0 100 100"><g stroke="#174B9B" stroke-width="5" fill="#2878D1"><path d="M50 2v15M50 83v15M2 50h15M83 50h15M16 16l11 11M73 73l11 11M84 16 73 27M27 73 16 84"/><circle cx="50" cy="50" r="31"/><circle cx="39" cy="39" r="5" fill="#8EC8F7" stroke="none"/><circle cx="62" cy="47" r="4" fill="#8EC8F7" stroke="none"/><circle cx="47" cy="65" r="4" fill="#8EC8F7" stroke="none"/></g></svg>
-  <svg class="virus small" viewBox="0 0 100 100"><g stroke="#174B9B" stroke-width="7" fill="#2878D1"><path d="M50 0v20M50 80v20M0 50h20M80 50h20M15 15l15 15M70 70l15 15M85 15 70 30M30 70 15 85"/><circle cx="50" cy="50" r="30"/></g></svg>
-  <svg class="virus tiny" viewBox="0 0 100 100"><g stroke="#174B9B" stroke-width="8" fill="#2878D1"><path d="M50 0v20M50 80v20M0 50h20M80 50h20M15 15l15 15M70 70l15 15M85 15 70 30M30 70 15 85"/><circle cx="50" cy="50" r="30"/></g></svg>
-  <div class="school-scene"><div class="school-building"><div class="school-sign">مدرسه</div><div class="school-windows"><i></i><i></i><i></i><i></i></div><div class="school-door"></div></div><div class="no-symbol"><span class="school-bag">🎒</span></div>
-   <svg class="warning" viewBox="0 0 100 100"><path d="M50 5 96 88H4Z" fill="#fff" stroke="#D5D5D5" stroke-width="4" stroke-linejoin="round"/><path d="M50 30v30" stroke="#171717" stroke-width="10" stroke-linecap="round"/><circle cx="50" cy="74" r="5" fill="#171717"/></svg>
+<main class="phone" aria-label="Instagram Android dark home screen replica">
+  <section class="status">
+    <div class="status-left"><span class="battery">23</span><b>4G</b><span class="signal"><i></i><i></i><i></i><i></i></span><span class="vpn">VPN</span></div>
+    <div class="status-right">
+      <b>···</b>
+      <svg class="status-glyph" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.3"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="18" cy="6" r="1" fill="white"/></svg>
+      <svg class="status-glyph" viewBox="0 0 24 24" fill="white"><path d="M12 2.5c-5.3 0-9.5 3.8-9.5 8.6 0 2.7 1.4 5 3.7 6.6l-.8 3.8 4.1-2.1c.8.2 1.7.3 2.5.3 5.3 0 9.5-3.8 9.5-8.6S17.3 2.5 12 2.5z"/></svg>
+      <svg class="status-glyph" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.3"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="18" cy="6" r="1" fill="white"/></svg>
+      <span class="time">۲۱:۴۶</span>
+    </div>
+  </section>
+  <header class="header">
+    <div class="header-side left"><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M20.8 8.8c0 5.1-8.8 11-8.8 11s-8.8-5.9-8.8-11A4.8 4.8 0 0 1 12 6.2a4.8 4.8 0 0 1 8.8 2.6z"/></svg></div>
+    <div class="wordmark"><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="m5 9 7 7 7-7"/></svg><span>Instagram</span></div>
+    <div class="header-side right"><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7"><path d="M12 5v14M5 12h14"/></svg></div>
+  </header>
+  <section class="stories"><div class="story-track">
+    <div class="story"><div class="story-ring"><div class="story-img"></div></div><div class="story-label">r.__.200cc</div></div>
+    <div class="story"><div class="story-ring"><div class="story-img"></div></div><div class="story-label">raha._cc250</div></div>
+    <div class="story"><div class="story-ring dashed"><div class="story-img"></div></div><div class="story-label">l_the_kami_l</div></div>
+    <div class="story"><div class="story-ring"><div class="story-img"></div><span class="add-story">+</span></div><div class="story-label fa">داستان شما</div></div>
+  </div></section>
+  <section class="post">
+    <div class="post-header">
+      <svg class="more" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M4 8h16M4 15h12"/></svg>
+      <div><div class="post-title">akhbarsardasht و digikala_rayegan</div><div class="post-sub">♫ digikala_rayegan · صدای اصلی</div></div>
+      <div class="post-avatars"><span></span><span></span></div>
+    </div>
+    <div class="poster"><div class="poster-content">
+      <div class="virus-area">
+        <svg class="virus" viewBox="0 0 120 120"><g stroke="#1E5FB4" stroke-width="7" stroke-linecap="round"><path d="M60 2v17M60 101v17M2 60h17M101 60h17M19 19l13 13M88 88l13 13M101 19 88 32M32 88l-13 13M35 5l7 17M78 98l7 17M5 35l17 7M98 78l17 7M85 5l-7 17M42 98l-7 17M115 35l-17 7M22 78l-17 7"/></g><circle cx="60" cy="60" r="39" fill="#2675CE" stroke="#164D9A" stroke-width="5"/><g fill="#76B5F0"><circle cx="45" cy="42" r="7"/><circle cx="73" cy="38" r="5"/><circle cx="78" cy="68" r="8"/><circle cx="48" cy="76" r="5"/></g></svg>
+        <svg class="virus small" viewBox="0 0 120 120"><circle cx="60" cy="60" r="38" fill="#2675CE" stroke="#164D9A" stroke-width="7"/><g stroke="#1E5FB4" stroke-width="9" stroke-linecap="round"><path d="M60 2v18M60 100v18M2 60h18M100 60h18M20 20l14 14M86 86l14 14M100 20 86 34M34 86l-14 14"/></g></svg>
+        <svg class="virus tiny" viewBox="0 0 120 120"><circle cx="60" cy="60" r="38" fill="#2675CE" stroke="#164D9A" stroke-width="7"/><g stroke="#1E5FB4" stroke-width="9" stroke-linecap="round"><path d="M60 2v18M60 100v18M2 60h18M100 60h18"/></g></svg>
+      </div>
+      <div class="school-scene">
+        <div class="school"><span class="school-sign">مدرسه</span><i class="school-ground"></i></div>
+        <div class="no-school"><div class="bag"></div></div>
+        <svg class="warning" viewBox="0 0 100 100"><path d="M50 7 94 87H6Z" fill="#fff" stroke="#ddd" stroke-width="4" stroke-linejoin="round"/><path d="M50 32v27" stroke="#171717" stroke-width="9" stroke-linecap="round"/><circle cx="50" cy="72" r="5" fill="#171717"/></svg>
+      </div>
+      <div class="banner red"><span>تعطیلی مدارس</span></div>
+      <div class="banner gray"><span>مدارس ابتدایی</span></div>
+      <div class="banner white"><span>بوکان فردا</span></div>
+      <div class="banner yellow"><span>به دلیل شیوع ویروس آنفولانزا</span></div>
+      <div class="banner red last"><span>تعطیل شد</span></div>
+    </div></div>
+  </section>
+  <nav class="bottom" aria-label="Instagram navigation">
+    <div class="nav-item"><div class="profile"></div></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.1"><circle cx="10.8" cy="10.8" r="7.2"/><path d="m16.2 16.2 5 5"/></svg></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2.5" y="3" width="19" height="18" rx="5"/><path d="m10 8 6 4-6 4Z" fill="white" stroke="white"/></svg></div>
+    <div class="nav-item"><div class="active-pill"><svg class="nav-icon" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="1.4" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1Z"/></svg></div></div>
+  </nav>
+  <div class="android-nav">
+    <svg viewBox="0 0 24 24" fill="#CFCFCF"><path d="M5 12 19 4v16Z"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="#CFCFCF" stroke-width="2"><circle cx="12" cy="12" r="8"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
   </div>
-  <div class="poster-copy"><div class="banner banner-red"><span>تعطیلی مدارس</span></div><div class="banner banner-gray"><span>مدارس ابتدایی</span></div><div class="banner banner-white"><span>بوکان فردا</span></div><div class="banner banner-yellow"><span>به دلیل شیوع ویروس آنفولانزا</span></div><div class="banner banner-red banner-last"><span>تعطیل شد</span></div></div>
- </div>
-</section>
-<nav class="bottom-nav">
- <div class="nav-item"><div class="profile-nav"></div></div>
- <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.1" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="7.2"/><path d="m16 16 5 5"/></svg></div>
- <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></div>
- <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"><rect x="2.5" y="3.5" width="19" height="17" rx="5"/><path d="m10 8 6 4-6 4Z" fill="white" stroke="none"/></svg></div>
- <div class="nav-item"><div class="active-pill"><svg viewBox="0 0 24 24" fill="white"><path d="m2 10.5 10-8 10 8v10a1.5 1.5 0 0 1-1.5 1.5h-6v-7h-5v7h-6A1.5 1.5 0 0 1 2 20.5Z"/></svg></div></div>
-</nav>
-<footer class="android-nav"><svg viewBox="0 0 24 24" fill="#CFCFCF"><path d="M4 12 20 3v18Z"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="#CFCFCF" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></footer>
 </main>
 </body>
 </html>
