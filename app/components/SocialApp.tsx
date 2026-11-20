@@ -823,7 +823,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               onCommentDraft={(postId,value)=>setCommentDrafts(current=>({...current,[postId]:value}))}
               onSubmitComment={post=>void submitComment(post as Post)}
             />}
-          </section>
+          </section>}
 
           {!aiOpen && active === "profile" && <section className="social-profile-screen">
             {loading ? <p className="social-muted social-center">{t.loading}</p> : <>
