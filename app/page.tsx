@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Onboarding from "./components/Onboarding";
-import SocialApp from "./components/SocialApp";
+import NovyraLuxuryApp from "./components/NovyraLuxuryApp";
 import { apiRequest, clearSession } from "./lib/api";
 
 type Language = "en" | "fa" | "ar" | "ku";
