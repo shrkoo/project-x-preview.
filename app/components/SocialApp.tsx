@@ -26,6 +26,7 @@ type Post = {
   shareCount?: number;
   saveCount?: number;
   savedByMe?: boolean;
+  likedByNames?: string[];
 };
 type Person = {
   id: string;
@@ -187,7 +188,7 @@ function PostCard({
       <button type="button" onClick={() => onShare(post)} aria-label={t.send}><AppIcon icon={Send}/><span>{formatSocialCount(post.shareCount)}</span></button>
       <button type="button" className={saved?"is-saved":""} onClick={() => onSave(post)} aria-label={t.save}><AppIcon icon={Bookmark} fill={saved?"currentColor":"none"}/></button>
     </div>
-    <div className="nv-post-like-summary"><strong>{formatSocialCount(post.likeCount)}</strong> {language==="fa"?"پسندیدند":t.likes}</div>
+    <div className="nv-post-like-summary">{post.likedByNames?.length ? <><span className="nv-post-liker-avatars">{post.likedByNames.slice(0,2).map(name=><Avatar key={name} name={name}/>)}</span><span><strong>{post.likedByNames[0]}</strong>{language==="fa"?" و دیگران پسندیدند":" and others liked this"}</span></> : <span>{language==="fa"?"هنوز کسی این پست را نپسندیده":"No likes yet"}</span>}</div>
     {post.body && post.mediaUrl && <button type="button" className={captionExpanded?"nv-post-copy is-expanded":"nv-post-copy"} onClick={()=>setCaptionExpanded(value=>!value)}><strong><bdi dir="auto">{post.authorName}</bdi></strong> <bdi dir="auto">{post.body}</bdi>{!captionExpanded&&post.body.length>90?<span className="nv-post-more"> … بیشتر</span>:null}</button>}
     <small className="nv-post-age"><bdi dir="auto">{formatPostAge(post.createdAt,language)}</bdi></small>
     {commentsOpen && <div className="social-comments">
