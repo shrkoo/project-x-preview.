@@ -2173,3 +2173,86 @@ html,body{background:#120c0a!important}
   .novyra-bottom-items{grid-template-columns:1fr 1fr 58px 1fr 1fr!important}
   .nv-post-image{min-height:350px;height:62vh}
 }
+
+
+/* Lucide consistency + reference-detail corrections */
+@media(max-width:760px){
+  .nv-top-tabs{
+    border-radius:0 0 18px 18px!important;
+    background:linear-gradient(180deg,rgba(26,17,13,.96),rgba(18,12,10,.92))!important;
+    border:1px solid rgba(255,255,255,.09)!important;
+    border-top:0!important;
+    box-shadow:0 7px 18px rgba(0,0,0,.12)!important;
+  }
+  .nv-top-tabs .nv-round-action{
+    width:38px!important;height:38px!important;min-width:38px!important;
+    display:grid!important;place-items:center!important;padding:0!important;
+    color:#fff!important;background:rgba(255,255,255,.12)!important;
+    border:1px solid rgba(255,255,255,.18)!important;border-radius:50%!important;
+  }
+  .nv-top-tabs .nv-round-action svg{
+    width:24px!important;height:24px!important;min-width:24px!important;
+    stroke:currentColor!important;stroke-width:1.75!important;
+    stroke-linecap:round!important;stroke-linejoin:round!important;
+    fill:none!important;shape-rendering:geometricPrecision;
+  }
+  .nv-top-tabs .nv-bell{position:relative!important}
+  .nv-top-tabs .nv-bell i{position:absolute!important;top:5px!important;right:5px!important;width:7px!important;height:7px!important;border-radius:50%!important;background:#ff3b30!important;border:1px solid #120c0a!important}
+  .nv-profile-topbar{margin-bottom:10px!important}
+  .nv-profile-top-title{font-size:14px;font-weight:700;color:#fff}
+  .nv-profile-name-row{display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;margin:8px 0 3px!important}
+  .nv-profile-name-row h2{margin:0!important}
+  .nv-profile-name-row .nv-edit-pill{margin:0!important;padding:4px 10px!important;font-size:9px!important}
+  .nv-profile-hero>p{margin:3px 0 0!important}
+  .nv-profile-tabs{
+    display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    align-items:center!important;justify-items:center!important;gap:0!important;
+    padding:10px 0 12px!important;border-bottom:1px solid rgba(255,255,255,.12)!important;
+  }
+  .nv-profile-tabs button{
+    position:relative!important;display:grid!important;place-items:center!important;
+    width:100%!important;height:36px!important;padding:0!important;
+    border:0!important;border-radius:0!important;background:transparent!important;
+    color:rgba(255,255,255,.48)!important;box-shadow:none!important;
+  }
+  .nv-profile-tabs button svg{
+    width:24px!important;height:24px!important;stroke:currentColor!important;
+    stroke-width:1.75!important;stroke-linecap:round!important;stroke-linejoin:round!important;
+    fill:none!important;shape-rendering:geometricPrecision;
+  }
+  .nv-profile-tabs button.is-active{color:#fff!important}
+  .nv-profile-tabs button.is-active:after{
+    content:"";position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);
+    width:26px;height:2px;border-radius:2px;background:#fff;
+  }
+  .nv-profile-grid{
+    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-auto-flow:dense!important;grid-auto-rows:92px!important;gap:7px!important;
+  }
+  .nv-profile-tile{height:auto!important;min-height:0!important;grid-row:span 2!important}
+  .nv-profile-tile:nth-child(3n+1){grid-row:span 3!important}
+  .nv-profile-tile:nth-child(4n+2){grid-row:span 2!important}
+  .nv-profile-tile:nth-child(5n){grid-row:span 3!important}
+  .nv-profile-tile img{width:100%!important;height:100%!important;object-fit:cover!important}
+  .novyra-bottom-tab{gap:3px!important}
+  .novyra-bottom-tab>svg,.novyra-bottom-tab .novyra-inbox-icon>svg{
+    width:24px!important;height:24px!important;min-width:24px!important;
+    stroke:currentColor!important;stroke-width:1.75!important;
+    stroke-linecap:round!important;stroke-linejoin:round!important;
+    shape-rendering:geometricPrecision;
+  }
+  .novyra-bottom-tab.is-active{color:#fff!important}
+  .novyra-bottom-tab.is-active>svg,.novyra-bottom-tab.is-active .novyra-inbox-icon>svg{
+    fill:currentColor!important;stroke:#fff!important;
+  }
+  .novyra-bottom-tab:not(.is-active)>svg,.novyra-bottom-tab:not(.is-active) .novyra-inbox-icon>svg{
+    fill:none!important;stroke:rgba(255,255,255,.62)!important;
+  }
+  .novyra-bottom-tab span:last-child{font-size:9px!important;line-height:1!important;font-weight:500!important;letter-spacing:0!important}
+  .novyra-bottom-tab.is-active span:last-child{font-weight:700!important;color:#fff!important}
+  .novyra-inbox-icon{width:24px!important;height:24px!important}
+  .novyra-inbox-icon i{top:0!important;right:-1px!important}
+  .nv-post-more{display:grid!important;place-items:center!important}
+  .nv-post-more svg{width:24px!important;height:24px!important;stroke:currentColor!important;stroke-width:1.75!important;fill:none!important}
+  .nv-reel-actions svg,.nv-record svg{width:24px!important;height:24px!important;stroke:currentColor!important;stroke-width:1.75!important;stroke-linecap:round!important;stroke-linejoin:round!important;fill:none!important}
+}
