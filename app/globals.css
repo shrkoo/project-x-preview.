@@ -3071,3 +3071,159 @@ html,body{background:linear-gradient(145deg,#0D0907 0%,#130d09 52%,#1A120D 100%)
 @media (prefers-reduced-motion:reduce) {
   .novyra-bottom-tab,.nv-explore-tile>img,.nv-explore-tile>video {transition:none!important}
 }
+
+
+/* NOVYRA bottom navigation — isolated replacement */
+@media (max-width: 760px) {
+  .social-mobile-nav-wrap {
+    display: block !important;
+    position: static !important;
+  }
+  .novyra-bottom-nav {
+    position: fixed !important;
+    z-index: 1000 !important;
+    inset-inline: 0 !important;
+    bottom: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: calc(86px + env(safe-area-inset-bottom)) !important;
+    margin: 0 !important;
+    padding: 0 8px env(safe-area-inset-bottom) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #0B0D12 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .novyra-bottom-items {
+    direction: rtl !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    align-items: center !important;
+    justify-items: center !important;
+    gap: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    margin: 0 !important;
+  }
+  .social-app .novyra-bottom-tab {
+    position: relative !important;
+    isolation: isolate !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    justify-self: stretch !important;
+    align-self: center !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 70px !important;
+    height: 70px !important;
+    gap: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #fff !important;
+    -webkit-tap-highlight-color: transparent;
+    transition: color .16s ease, transform .16s ease !important;
+  }
+  .social-app .novyra-bottom-tab::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 5px 3px;
+    border-radius: 999px;
+    background: transparent;
+    opacity: 0;
+    transform: scale(.88);
+    transition: opacity .18s ease, transform .18s ease, background .18s ease;
+  }
+  .social-app .novyra-bottom-tab.is-active::before {
+    background: #25272D;
+    opacity: 1;
+    transform: scale(1);
+  }
+  .social-app .novyra-bottom-tab > svg,
+  .social-app .novyra-bottom-tab .novyra-inbox-icon > svg {
+    display: block !important;
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 1.9 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+    color: #fff !important;
+  }
+  .social-app .novyra-bottom-tab.is-active > svg {
+    stroke-width: 2.35 !important;
+  }
+  .social-app .novyra-bottom-tab > span:not(.novyra-profile-fallback) {
+    display: none !important;
+  }
+  .social-app .novyra-bottom-tab .novyra-unread-dot {
+    position: absolute !important;
+    width: 12px !important;
+    height: 12px !important;
+    left: calc(50% - 16px) !important;
+    bottom: 17px !important;
+    display: block !important;
+    border: 1.5px solid #0B0D12 !important;
+    border-radius: 50% !important;
+    background: #FF3040 !important;
+  }
+  .social-app .novyra-profile-tab img,
+  .social-app .novyra-profile-tab .novyra-profile-fallback {
+    display: grid !important;
+    place-items: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    overflow: hidden !important;
+  }
+  .social-app .novyra-profile-tab .novyra-profile-fallback {
+    background: #242833 !important;
+    color: #fff !important;
+  }
+  .social-app .novyra-profile-tab .novyra-profile-fallback svg {
+    width: 25px !important;
+    height: 25px !important;
+    stroke: currentColor !important;
+    fill: none !important;
+  }
+  .social-app .novyra-profile-tab .novyra-profile-accessible-name {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+  .social-app {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important;
+  }
+  .social-main-column {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important;
+  }
+}
+@media (min-width: 761px) {
+  .social-mobile-nav-wrap { display: none !important; }
+}
