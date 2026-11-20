@@ -774,10 +774,18 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
       <div className="social-layout">
         <aside className="social-sidebar">
           <div className="social-sidebar-kicker">NOVYRA / COMMUNITY</div>
-          {(["home", "search", "reels", "profile"] as NavKey[]).map(item => <button type="button" key={item} className={active === item && !aiOpen ? "social-side-link is-active" : "social-side-link"} onClick={() => navigate(item)}>
-            <span className="social-side-dot" />{t[item]}
-          </button>)}
-          <button type="button" className="social-side-ai" onClick={() => setAiOpen(true)}><AppIcon icon={Sparkles} />{t.ai}</button>
+          <nav className="social-sidebar-nav" aria-label="Main navigation">
+            {([
+              { key: "home", label: t.home, icon: ImageIcon },
+              { key: "reels", label: t.reels, icon: Clapperboard },
+              { key: "create", label: t.create, icon: Plus },
+              { key: "inbox", label: t.inbox, icon: Send },
+              { key: "profile", label: t.profile, icon: UserRound },
+            ] as const).map(item => <button type="button" key={item.key} className={active === item.key && !aiOpen ? "social-side-link is-active" : "social-side-link"} onClick={() => navigate(item.key)} aria-current={active === item.key && !aiOpen ? "page" : undefined}>
+              <AppIcon icon={item.icon}/><span>{item.label}</span>
+            </button>)}
+          </nav>
+          <button type="button" className="social-side-ai" onClick={() => setAiOpen(true)}><AppIcon icon={Sparkles} /><span>{t.ai}</span></button>
           <div className="social-sidebar-account"><Avatar name={profile?.displayName || account.displayName} /><div><strong>{profile?.displayName || account.displayName}</strong><small>{account.email}</small></div></div>
         </aside>
 
