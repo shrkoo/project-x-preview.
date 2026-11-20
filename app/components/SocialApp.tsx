@@ -158,15 +158,6 @@ function formatPostAge(createdAt: string, language: Language) {
 }
 
 
-const DEMO_MEDIA_POSTS: Post[] = [
-  {id:"demo-01",body:"صبحی تازه، نوری تازه؛ لحظه‌ها را زندگی کن. ✨",mediaUrl:"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200&auto=format&fit=crop",mediaType:"image",createdAt:new Date(Date.now()-1000*60*18).toISOString(),authorId:"demo-user-1",authorName:"آرمان",likeCount:248,commentCount:18,likedByMe:false,viewCount:1840,repostCount:12,shareCount:8,saveCount:31},
-  {id:"demo-02",body:"یک گل کوچک، یک حال خوب 🌸",mediaUrl:"https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",mediaType:"video",createdAt:new Date(Date.now()-1000*60*45).toISOString(),authorId:"demo-user-2",authorName:"رها",likeCount:932,commentCount:42,likedByMe:false,viewCount:12600,repostCount:37,shareCount:21,saveCount:84},
-  {id:"demo-03",body:"شهر از زاویه‌ای دیگر؛ زیبایی در جزئیات است.",mediaUrl:"https://images.unsplash.com/photo-1519608487953-e999c86e7455?w=1200&auto=format&fit=crop",mediaType:"image",createdAt:new Date(Date.now()-1000*60*90).toISOString(),authorId:"demo-user-3",authorName:"کیان",likeCount:517,commentCount:26,likedByMe:false,viewCount:7600,repostCount:19,shareCount:14,saveCount:62},
-  {id:"demo-04",body:"چند ثانیه آرامش در دل طبیعت 🌿",mediaUrl:"https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",mediaType:"video",createdAt:new Date(Date.now()-1000*60*60*3).toISOString(),authorId:"demo-user-4",authorName:"سارا",likeCount:1200,commentCount:73,likedByMe:false,viewCount:24100,repostCount:51,shareCount:33,saveCount:106},
-  {id:"demo-05",body:"گاهی بهترین مقصد، خود مسیر است.",mediaUrl:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&auto=format&fit=crop",mediaType:"image",createdAt:new Date(Date.now()-1000*60*60*5).toISOString(),authorId:"demo-user-5",authorName:"نیما",likeCount:386,commentCount:15,likedByMe:false,viewCount:5300,repostCount:9,shareCount:6,saveCount:47},
-  {id:"demo-06",body:"یک قاب کوتاه از طبیعت؛ صدای زندگی.",mediaUrl:"https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",mediaType:"video",createdAt:new Date(Date.now()-1000*60*60*8).toISOString(),authorId:"demo-user-6",authorName:"هلیا",likeCount:764,commentCount:39,likedByMe:false,viewCount:9800,repostCount:24,shareCount:17,saveCount:73}
-];
-
 function Avatar({ name, size = "normal" }: { name: string; size?: "normal" | "large" }) {
   return <span className={`social-avatar ${size === "large" ? "social-avatar-large" : ""}`} aria-hidden="true">{initials(name)}</span>;
 }
@@ -216,7 +207,6 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const t = copy[language];
   const dir = language === "en" ? "ltr" : "rtl";
   const [active, setActive] = useState<NavKey>("home");
-  const [demoMode] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("demo") === "1");
   const [aiOpen, setAiOpen] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [reels, setReels] = useState<Post[]>([]);
@@ -243,6 +233,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileName, setProfileName] = useState(account.displayName);
   const [profileSaving, setProfileSaving] = useState(false);
+  const [demoDeleting, setDemoDeleting] = useState(false);
   const [profileTab, setProfileTab] = useState<"Photos" | "Videos" | "Saved">("Photos");
   const [feedMenuOpen, setFeedMenuOpen] = useState(false);
   const [friends, setFriends] = useState<Person[]>([]);
@@ -292,17 +283,6 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     let alive = true;
     async function loadCurrentPage() {
       setPageError("");
-      if (demoMode) {
-        setPosts(DEMO_MEDIA_POSTS);
-        setReels(DEMO_MEDIA_POSTS.filter(post => post.mediaType === "video"));
-        setExplorePosts(DEMO_MEDIA_POSTS);
-        setProfilePosts(DEMO_MEDIA_POSTS);
-        setSavedPosts(DEMO_MEDIA_POSTS.slice(0, 2));
-        setSavedPostIds(DEMO_MEDIA_POSTS.slice(0, 2).map(post => post.id));
-        setProfile({id:account.id,displayName:account.displayName,email:account.email,postCount:DEMO_MEDIA_POSTS.length,followerCount:1280,followingCount:342,followedByMe:false});
-        setLoading(false);
-        return;
-      }
       if (active === "home" || active === "reels") {
         setLoading(true);
         try {
@@ -355,7 +335,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     }
     void loadCurrentPage();
     return () => { alive = false; };
-  }, [active, friendsOnly, account.displayName, account.email, account.id, t.genericError, demoMode]);
+  }, [active, friendsOnly, account.displayName, account.email, account.id, t.genericError]);
 
   function navigate(next: NavKey) {
     setAiOpen(false);
@@ -657,6 +637,18 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     }
   }
 
+  async function deleteDemoData() {
+    if (!window.confirm("همه کاربران و پست‌های نمونه به‌همراه لایک‌ها، نظرها و ذخیره‌هایشان حذف شوند؟")) return;
+    setDemoDeleting(true);
+    try {
+      const result = await apiRequest<{deletedUsers:number;deletedPosts:number}>("/social/demo-data", {method:"DELETE"});
+      setPosts([]); setReels([]); setExplorePosts([]); setProfilePosts([]); setSavedPosts([]); setSavedPostIds([]);
+      setPageError("داده‌های نمونه حذف شدند: "+result.deletedUsers+" کاربر و "+result.deletedPosts+" پست.");
+    } catch (error) {
+      setPageError(error instanceof Error ? error.message : t.genericError);
+    } finally { setDemoDeleting(false); }
+  }
+
   async function logout() {
     try { await apiRequest("/auth/logout", { method: "POST" }); } catch { /* Local sign-out still removes the token. */ }
     clearSession();
@@ -879,7 +871,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               <div className="nv-profile-tabs" role="tablist" aria-label="Profile content">{(["Photos","Videos","Saved"] as const).map(tab=><button key={tab} type="button" className={profileTab===tab?"is-active":""} onClick={() => {setProfileTab(tab);if(tab==="Saved")void loadSavedPosts();}}>{tab==="Saved" && <AppIcon icon={LockKeyhole}/>}<span>{tab}</span></button>)}</div>
               <div className="nv-profile-grid">{(profileTab==="Saved"?savedPosts:profilePosts.filter(post=>profileTab==="Photos"?post.mediaType==="image":post.mediaType==="video")).map(item=><button type="button" key={item.id} className="nv-profile-tile" onClick={()=>openMediaViewer(item,profileTab==="Saved"?savedPosts:profilePosts.filter(post=>profileTab==="Photos"?post.mediaType==="image":post.mediaType==="video"),"profile")}>{item.mediaType==="video"?<><video src={item.mediaUrl||undefined} muted playsInline preload="metadata"/><AppIcon icon={Play}/></>:item.mediaUrl?<img src={item.mediaUrl} alt="" loading="lazy"/>:<span className="nv-explore-text-tile">{item.body}</span>}</button>)}</div>
               <form className="social-profile-edit" onSubmit={saveProfile}><label>{t.editProfile}<input id="nv-profile-name" value={profileName} onChange={event => setProfileName(event.target.value)} maxLength={32}/></label><button type="submit" disabled={profileSaving || profileName.trim().length<2}>{profileSaving?"…":t.save}</button></form>
-              <div className="social-profile-settings"><label>{t.language}<select value={language} onChange={event => changeLanguage(event.target.value)}><option value="fa">فارسی</option><option value="en">English</option><option value="ar">العربية</option><option value="ku">کوردی</option></select></label><button type="button" className="social-logout-button" onClick={logout}>{t.logout}</button></div>
+              <div className="social-profile-settings"><label>{t.language}<select value={language} onChange={event => changeLanguage(event.target.value)}><option value="fa">فارسی</option><option value="en">English</option><option value="ar">العربية</option><option value="ku">کوردی</option></select></label>{account.role === "admin" && <button type="button" className="social-logout-button" onClick={() => void deleteDemoData()} disabled={demoDeleting}>{demoDeleting ? "در حال حذف…" : "حذف داده‌های نمونه"}</button>}<button type="button" className="social-logout-button" onClick={logout}>{t.logout}</button></div>
             </>}
           </section>}
         </section>
