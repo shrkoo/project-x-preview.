@@ -109,7 +109,7 @@ function EyeMark({ visible }: { visible: boolean }) {
 
 export default function Onboarding({ onComplete, initialNotice }: Props) {
   const [language, setLanguage] = useState<Language>("fa");
-  const [stage, setStage] = useState<Stage>("language");
+  const [stage, setStage] = useState<Stage>("auth");
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -140,10 +140,8 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       window.history.replaceState({}, "", window.location.pathname + window.location.search);
       apiRequest<{user:User}>("/auth/me").then(data => {
         setUser(data.user);
-        setProfileName(data.user.displayName || "");
         setEmail(data.user.email);
-        const savedLanguage=(localStorage.getItem("projectx-language") as Language) || "en";
-        setStage("passwordSetup");
+        onComplete(data.user, language);
       }).catch(() => { localStorage.removeItem("projectx-token"); setNotice("ورود با Google کامل نشد؛ دوباره تلاش کن."); });
     } else if (googleError) {
       window.history.replaceState({}, "", window.location.pathname + window.location.search);
@@ -326,7 +324,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
       <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">NOVYRA</span></header>
       <section className="px-onboarding-stage">
-        {stage === "language" && <div className="px-glass-panel px-language-panel">
+        {false && stage === "language" && <div className="px-glass-panel px-language-panel">
           <div className="px-eyebrow">NOVYRA / YOUR EXPERIENCE</div>
           <div className="px-language-intro">{language === "fa" ? "یک جهان، به زبان تو" : language === "ku" ? "جیهانێک بە زمانی تۆ" : language === "ar" ? "عالمٌ بلغتك" : "A WORLD, IN YOUR LANGUAGE"}</div>
           <h1>{t("choose")}</h1><p className="px-stage-subtitle">{t("chooseSub")}</p>
@@ -345,7 +343,6 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         </div>}
 
         {stage === "auth" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-button" onClick={() => setStage("language")} aria-label={t("back")}>←</button>
           <div className="px-auth-emblem" aria-label="NOVYRA"><NovyraMark /></div>
           <div className="px-eyebrow">NOVYRA / {recoveryMode ? "ACCOUNT RECOVERY" : "YOUR SPACE"}</div>
           <h1>{recoveryMode ? t("resetTitle") : mode === "login" ? t("loginTitle") : t("signupTitle")}</h1>
@@ -366,7 +363,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <p className="px-auth-security">{language === "en" ? "SECURE ACCESS · NOVYRA" : language === "ku" ? "چوونەژوورەوەی پارێزراو · NOVYRA" : language === "ar" ? "دخول آمن · NOVYRA" : "ورود امن · NOVYRA"}</p>
         </div>}
 
-        {stage === "passwordSetup" && <div className="px-glass-panel px-auth-panel">
+        {false && stage === "passwordSetup" && <div className="px-glass-panel px-auth-panel">
           <div className="px-eyebrow">NOVYRA / ACCOUNT SECURITY</div>
           <h1>{language === "en" ? "Create a password" : "تعیین رمز عبور"}</h1>
           <p className="px-stage-subtitle">{language === "en" ? "Your Google account is connected. Add a password so you can also sign in with email." : "حساب Google متصل شد. برای ورود با ایمیل نیز یک رمز عبور تعیین کن."}</p>
@@ -375,7 +372,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <button type="button" className="px-primary-action" disabled={busy} onClick={saveGooglePassword}>{busy ? "..." : (language === "en" ? "Save password" : "ذخیره رمز عبور")} <span>↗</span></button>
           <button type="button" className="px-skip-action" disabled={busy} onClick={skipGooglePassword}>{language === "en" ? "Skip for now" : "فعلاً رد می‌کنم"}</button>
         </div>}
-        {stage === "profile" && <div className="px-glass-panel px-profile-panel">
+        {false && stage === "profile" && <div className="px-glass-panel px-profile-panel">
           <div className="px-eyebrow">NOVYRA / PERSONAL PROFILE</div>
           <div className="px-profile-preview">{photo ? <img src={photo} alt="Profile preview" /> : <span>{avatar || (profileName || user?.displayName || "N").slice(0, 1)}</span>}</div>
           <h1>{t("profileTitle")}</h1><p className="px-stage-subtitle">{t("profileSub")}</p>
