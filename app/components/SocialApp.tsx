@@ -4,7 +4,9 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { apiRequest, clearSession } from "../lib/api";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
 import AppIcon from "./AppIcon";
-import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, Send, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound, Clock, Play, Eye, ArrowRight, ArrowLeft } from "lucide-react";
+import { FeedMedia, MediaViewer, formatSocialCount } from "./MediaExperience";
+import type { SocialMediaPost, SocialMediaPerson } from "./MediaExperience";
+import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, Send, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound, Clock, Play, Eye, ArrowRight, ArrowLeft, Repeat2 } from "lucide-react";
 
 type Language = "en" | "fa" | "ar" | "ku";
 type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string };
@@ -20,6 +22,10 @@ type Post = {
   commentCount: number;
   likedByMe: boolean;
   viewCount?: number;
+  repostCount?: number;
+  shareCount?: number;
+  saveCount?: number;
+  savedByMe?: boolean;
 };
 type Person = {
   id: string;
@@ -152,45 +158,38 @@ function Avatar({ name, size = "normal" }: { name: string; size?: "normal" | "la
   return <span className={`social-avatar ${size === "large" ? "social-avatar-large" : ""}`} aria-hidden="true">{initials(name)}</span>;
 }
 
-function PostMedia({ post }: { post: Post }) {
-  if (!post.mediaUrl || !post.mediaType) return null;
-  if (post.mediaType === "video") {
-    return <video className="social-post-video" src={post.mediaUrl} controls playsInline preload="metadata" />;
-  }
-  return <a className="social-post-image-wrap" href={post.mediaUrl} target="_blank" rel="noreferrer">
-    <img className="social-post-image" src={post.mediaUrl} alt="" loading="lazy" />
-  </a>;
-}
-
 function PostCard({
   post, t, language, onLike, onToggleComments, commentsOpen, comments, commentDraft, onCommentDraft,
-  onSubmitComment, commentsLoading, onSave, saved
+  onSubmitComment, commentsLoading, onSave, saved, onRepost, onShare, onOpenMedia, onView
 }: {
   post: Post; t: Record<string, string>; language: Language; onLike: (post: Post) => void;
   onToggleComments: (post: Post) => void; commentsOpen: boolean; comments: Comment[];
   commentDraft: string; onCommentDraft: (value: string) => void;
-  onSubmitComment: (post: Post) => void; commentsLoading: boolean; onSave: (post: Post) => void; saved: boolean;
+  onSubmitComment: (post: Post) => void; commentsLoading: boolean;
+  onSave: (post: Post) => void; saved: boolean; onRepost: (post: Post) => void;
+  onShare: (post: Post) => void; onOpenMedia: (post: Post) => void; onView: (post: Post) => void;
 }) {
-  const numberLocale = language === "fa" ? "fa-IR" : language === "ar" ? "ar" : language === "ku" ? "ku" : "en";
-  const sharePost = () => {
-    const shareData = { title: post.authorName, text: post.body, url: window.location.href };
-    if (navigator.share) void navigator.share(shareData).catch(() => undefined);
-    else if (navigator.clipboard) void navigator.clipboard.writeText([post.authorName, post.body, window.location.href].filter(Boolean).join("\n"));
-  };
-  return <article className="nv-post-card">
+  const [captionExpanded,setCaptionExpanded]=useState(false);
+  const [menuOpen,setMenuOpen]=useState(false);
+  return <article className="nv-post-card" dir={language==="en"?"ltr":"rtl"}>
     <div className="nv-post-head">
       <Avatar name={post.authorName}/>
-      <div className="nv-post-person"><strong><bdi dir="auto">{post.authorName}</bdi></strong><small><bdi dir="auto">{formatPostAge(post.createdAt, language)}</bdi></small></div>
-      <button className="nv-post-menu" type="button" aria-label={t.save} title={t.save} onClick={() => onSave(post)}><AppIcon icon={Bookmark} fill={saved ? "currentColor" : "none"}/></button>
+      <div className="nv-post-person"><strong><bdi dir="auto">{post.authorName}</bdi></strong><small><bdi dir="auto">{formatPostAge(post.createdAt,language)}</bdi></small></div>
+      <button className="nv-post-menu" type="button" aria-label="گزینه‌های بیشتر" onClick={()=>setMenuOpen(value=>!value)}><AppIcon icon={MoreHorizontal}/></button>
+      {menuOpen&&<div className="nv-post-menu-popover"><button type="button" onClick={()=>{onSave(post);setMenuOpen(false);}}>{saved?"حذف از ذخیره‌شده‌ها":"ذخیره"}</button><button type="button" onClick={()=>{onRepost(post);setMenuOpen(false);}}>بازنشر</button><button type="button" onClick={()=>{onShare(post);setMenuOpen(false);}}>ارسال</button></div>}
     </div>
-    {post.mediaUrl && post.mediaType && <div className="nv-post-photo"><PostMedia post={post}/></div>}
+    {post.mediaUrl && post.mediaType && <div className="nv-post-photo"><FeedMedia post={post} onOpen={()=>onOpenMedia(post)} onLike={()=>onLike(post)} onView={()=>onView(post)}/></div>}
     {!post.mediaUrl && post.body && <div className="nv-post-text-only"><p>{post.body}</p></div>}
-    <div className="nv-post-interactions">
-      <button type="button" className={post.likedByMe ? "liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}><AppIcon icon={Heart} fill={post.likedByMe ? "currentColor" : "none"}/><span>{post.likeCount.toLocaleString(numberLocale)}</span></button>
-      <button type="button" onClick={() => onToggleComments(post)} aria-label={t.comments}><AppIcon icon={MessageCircle}/><span>{post.commentCount.toLocaleString(numberLocale)}</span></button>
-      <button type="button" className="nv-reply-pill" onClick={sharePost} aria-label={t.send}><AppIcon icon={Send}/></button>
+    <div className="nv-post-interactions" dir="rtl">
+      <button type="button" className={post.likedByMe ? "liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}><AppIcon icon={Heart} fill={post.likedByMe ? "currentColor" : "none"}/><span>{formatSocialCount(post.likeCount)}</span></button>
+      <button type="button" onClick={() => onToggleComments(post)} aria-label={t.comments}><AppIcon icon={MessageCircle}/><span>{formatSocialCount(post.commentCount)}</span></button>
+      <button type="button" onClick={() => onRepost(post)} aria-label="بازنشر"><AppIcon icon={Repeat2}/><span>{formatSocialCount(post.repostCount)}</span></button>
+      <button type="button" onClick={() => onShare(post)} aria-label={t.send}><AppIcon icon={Send}/><span>{formatSocialCount(post.shareCount)}</span></button>
+      <button type="button" className={saved?"is-saved":""} onClick={() => onSave(post)} aria-label={t.save}><AppIcon icon={Bookmark} fill={saved?"currentColor":"none"}/></button>
     </div>
-    {post.body && post.mediaUrl && <p className="nv-post-copy"><strong><bdi dir="auto">{post.authorName}</bdi></strong> {post.body}</p>}
+    <div className="nv-post-like-summary"><strong>{formatSocialCount(post.likeCount)}</strong> {language==="fa"?"پسندیدند":t.likes}</div>
+    {post.body && post.mediaUrl && <button type="button" className={captionExpanded?"nv-post-copy is-expanded":"nv-post-copy"} onClick={()=>setCaptionExpanded(value=>!value)}><strong><bdi dir="auto">{post.authorName}</bdi></strong> <bdi dir="auto">{post.body}</bdi>{!captionExpanded&&post.body.length>90?<span className="nv-post-more"> … بیشتر</span>:null}</button>}
+    <small className="nv-post-age"><bdi dir="auto">{formatPostAge(post.createdAt,language)}</bdi></small>
     {commentsOpen && <div className="social-comments">
       {commentsLoading ? <p className="social-muted">{t.loading}</p> : comments.length ? comments.map(comment => <div className="social-comment" key={comment.id}><Avatar name={comment.authorName}/><div><strong><bdi dir="auto">{comment.authorName}</bdi></strong><p>{comment.body}</p></div></div>) : <p className="social-muted">{t.emptyComments}</p>}
       <form className="social-comment-form" onSubmit={event => { event.preventDefault(); onSubmitComment(post); }}>
