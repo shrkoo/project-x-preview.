@@ -135,3 +135,8 @@
   .nv-media-viewer.mode-explore .nv-media-scroll,.nv-media-viewer.mode-profile .nv-media-scroll {width:min(100%,560px);margin-inline:auto}
   .nv-media-viewer.mode-explore .nv-media-slide,.nv-media-viewer.mode-profile .nv-media-slide {max-width:560px;margin-inline:auto}
 }
+
+.nv-post-liker-avatars {display:inline-flex;align-items:center;flex-direction:row-reverse;margin-inline-end:7px;vertical-align:middle}
+.nv-post-liker-avatars .social-avatar {width:22px!important;height:22px!important;min-width:22px!important;font-size:9px!important;border:2px solid #000!important;margin-inline-start:-7px!important}
+.nv-post-like-summary {display:flex;align-items:center;gap:6px;min-height:25px;padding:1px 12px 4px;color:#e8e8e8;font-size:12px;line-height:1.4}
+.nv-post-like-summary strong {color:#fff}
