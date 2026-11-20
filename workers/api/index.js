@@ -393,10 +393,27 @@ export default {
     return json({stories:rows.results||[]});
    }
    if(path==="/social/stories" && request.method==="POST") {
-    const form=await request.formData(),type=form.get("type")==="video"?"video":"image",file=form.get("file");
-    if(!(file instanceof File)) return fail("فایل استوری ارسال نشده است.");
+    let type="image",file=null,legacy=false;
+    if((request.headers.get("Content-Type")||"").toLowerCase().includes("multipart/form-data")) {
+      const form=await request.formData();
+      type=form.get("type")==="video"?"video":"image";
+      const uploaded=form.get("file");
+      if(uploaded instanceof File) file=uploaded;
+    } else {
+      // Temporary compatibility for already-published clients: decode in memory, never persist payload in D1.
+      const body=await readBody(request),dataUrl=String(body?.mediaData||"");
+      type=body?.type==="video"?"video":"image";
+      const match=dataUrl.match(/^data:(image\\/(?:jpeg|png|webp)|video\\/(?:mp4|webm|quicktime));base64,([A-Za-z0-9+/=]+)$/);
+      if(match && ((type==="image"&&match[1].startsWith("image/"))||(type==="video"&&match[1].startsWith("video/")))) {
+        const binary=atob(match[2]),bytes=new Uint8Array(binary.length);
+        for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+        file=new File([bytes],"legacy-upload",{type:match[1]});
+        legacy=true;
+      }
+    }
+    if(!(file instanceof File)) return fail("فایل استوری معتبر نیست.");
     const contentType=String(file.type||"").toLowerCase();
-    const validImage=type==="image" && contentType==="image/webp";
+    const validImage=type==="image" && (contentType==="image/webp" || (legacy && ["image/jpeg","image/png"].includes(contentType)));
     const validVideo=type==="video" && ["video/mp4","video/webm","video/quicktime"].includes(contentType);
     if(!validImage&&!validVideo) return fail(type==="image"?"عکس باید به فرمت WebP تبدیل شود.":"فرمت ویدیو پشتیبانی نمی‌شود.");
     if(file.size<1 || file.size>1500000) return fail("حجم فایل باید حداکثر ۱٫۵ مگابایت باشد.",413);
