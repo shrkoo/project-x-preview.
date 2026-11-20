@@ -71,7 +71,7 @@ export function FeedMedia({ post, onOpen, onLike, onView }: FeedMediaProps) {
 
   useEffect(() => { if (videoRef.current) videoRef.current.muted = muted; }, [muted]);
 
-  function toggleSound(event?: React.MouseEvent) {
+  function toggleSound(event?: { stopPropagation(): void }) {
     event?.stopPropagation();
     const video = videoRef.current;
     const nextMuted = !muted;
@@ -102,7 +102,7 @@ export function FeedMedia({ post, onOpen, onLike, onView }: FeedMediaProps) {
     longPressTimer.current = null;
     if (longPressed.current) void videoRef.current?.play().catch(() => undefined);
   }
-  function retryVideo(event: React.MouseEvent) {
+  function retryVideo(event: { stopPropagation(): void }) {
     event.stopPropagation(); setFailed(false); setLoading(true);
     const video = videoRef.current;
     if (video) { video.load(); void video.play().catch(() => undefined); }
@@ -219,7 +219,7 @@ export function MediaViewer({
   }, [activeIndex, muted]);
 
   const activePost = items[activeIndex];
-  function toggleViewerSound(event?: React.MouseEvent) {
+  function toggleViewerSound(event?: { stopPropagation(): void }) {
     event?.stopPropagation();
     const nextMuted = !muted;
     setMuted(nextMuted);
