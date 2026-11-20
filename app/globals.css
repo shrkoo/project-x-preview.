@@ -2318,3 +2318,26 @@ html,body{background:#120c0a!important}
   height:2px!important;
   border-radius:999px!important;
 }
+
+
+/* Unified outline icon system: active state changes color, never icon fill */
+@media(max-width:760px){
+  .nv-profile-tabs button svg,
+  .novyra-bottom-tab svg,
+  .novyra-bottom-tab .novyra-inbox-icon svg{
+    fill:none!important;
+    stroke:currentColor!important;
+    stroke-width:1.75!important;
+    stroke-linecap:round!important;
+    stroke-linejoin:round!important;
+  }
+  .nv-profile-tabs button.is-active svg,
+  .novyra-bottom-tab.is-active svg{
+    fill:none!important;
+    stroke:currentColor!important;
+  }
+  .nv-profile-tabs button:not(.is-active) svg,
+  .novyra-bottom-tab:not(.is-active) svg{
+    fill:none!important;
+  }
+}
