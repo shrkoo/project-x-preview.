@@ -431,7 +431,6 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   function updatePost(postId: string, changes: Partial<Post>) {
     setPosts(current => current.map(item => item.id === postId ? { ...item, ...changes } : item));
     setReels(current => current.map(item => item.id === postId ? { ...item, ...changes } : item));
-    setSearchPosts(current => current.map(item => item.id === postId ? { ...item, ...changes } : item));
     setProfilePosts(current => current.map(item => item.id === postId ? { ...item, ...changes } : item));
   }
 
@@ -685,7 +684,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             
             {viewedProfile ? <div className="nv-other-profile">
               <div className="nv-other-profile-head"><button type="button" onClick={()=>setViewedProfile(null)} aria-label="Back"><AppIcon icon={language==="fa"?ArrowRight:ArrowLeft}/></button><strong>{viewedProfile.profile.displayName}</strong></div>
-              <div className="nv-profile-hero"><div className="nv-avatar-wrap"><span className="nv-profile-avatar nv-profile-avatar-placeholder"><AppIcon icon={UserRound}/></span></div><h2>{viewedProfile.profile.displayName}</h2><p>@{viewedProfile.profile.displayName.toLowerCase().replace(/[^a-z0-9]/g,"")}</p></div>
+              <div className="nv-profile-hero"><div className="nv-avatar-wrap"><span className="nv-profile-avatar nv-profile-avatar-placeholder"><AppIcon icon={UserRound}/></span></div><h2>{viewedProfile.profile.displayName}</h2><p>@{viewedProfile.profile.username || viewedProfile.profile.displayName.toLowerCase().replace(/\s+/g,"")}</p></div>
               <div className="nv-profile-stats"><div><strong>{viewedProfile.profile.postCount}</strong><small>{t.postCount}</small></div><div><strong>{viewedProfile.profile.followerCount}</strong><small>{t.followers}</small></div><div><strong>{viewedProfile.profile.followingCount}</strong><small>{t.followingCount}</small></div></div>
               <div className="nv-profile-buttons"><button type="button" className="nv-follow-profile" onClick={()=>followPerson(viewedProfile.profile)}>{viewedProfile.profile.followedByMe?t.following:t.follow}</button></div>
               <div className="nv-profile-grid is-other-profile">{viewedProfile.posts.filter(post=>Boolean(post.mediaUrl)&&(post.mediaType==="image"||post.mediaType==="video")).map(post=><button type="button" className="nv-profile-tile" key={post.id} onClick={()=>void openExplorePost(post)}>{post.mediaType==="video"?<video src={post.mediaUrl||undefined} muted playsInline preload="metadata"/>:<img src={post.mediaUrl||undefined} alt="" loading="lazy"/>}</button>)}</div>
