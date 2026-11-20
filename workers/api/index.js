@@ -367,7 +367,7 @@ export default {
         EXISTS(SELECT 1 FROM story_reactions r WHERE r.story_id=s.id AND r.user_id=?) AS reactedByMe
       FROM stories s JOIN users u ON u.id=s.user_id
       WHERE s.expires_at>datetime('now') AND (
-        s.user_id=? OR EXISTS(SELECT 1 FROM social_follows f WHERE f.follower_id=? AND f.followed_id=s.user_id)
+        s.user_id=? OR s.is_demo=1 OR EXISTS(SELECT 1 FROM social_follows f WHERE f.follower_id=? AND f.followed_id=s.user_id)
       )
       ORDER BY CASE WHEN s.user_id=? THEN 0 ELSE 1 END,s.created_at ASC
     `).bind(user.id,user.id,user.id,user.id,user.id).all();
