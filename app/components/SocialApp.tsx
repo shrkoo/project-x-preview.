@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { apiRequest, apiUpload, clearSession } from "../lib/api";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
-import StoriesExperience from "./StoriesExperience";
+import InstagramHomeReplica from "./InstagramHomeReplica";
 import AppIcon from "./AppIcon";
 import PostCreationFlow from "./PostCreationFlow";
 import { FeedMedia, MediaViewer, formatSocialCount } from "./MediaExperience";
@@ -799,9 +799,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           </section>}
 
           {!aiOpen && active === "home" && <section className="social-feed-screen">
-            <div className="nv-feed-header" dir="rtl"><button className="nv-home-create" type="button" onClick={() => navigate("create")} aria-label="ساخت پست"><AppIcon icon={Plus}/></button><div className="nv-feed-switch"><button className="nv-feed-title" onClick={() => setFeedMenuOpen(v => !v)} aria-label="انتخاب فید"><span>NOVYRA</span><AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button onClick={() => {setFeedMenuOpen(false);navigate("friends")}}>دنبال‌شده‌ها</button><button onClick={() => {setFeedMenuOpen(false);setFriendsOnly(true);navigate("reels")}}>مورد علاقه‌ها</button><button onClick={() => {setFeedMenuOpen(false);navigate("home")}}>خانه</button></div>}</div><button type="button" className="nv-home-notifications" onClick={loadNotifications} aria-label="اعلان‌ها"><AppIcon icon={Heart}/>{notificationCount > 0 && <i/>}</button></div>
-            <StoriesExperience userId={account.id} displayName={account.displayName} onError={setPageError}/>
-            {loading ? <p className="social-muted social-center">{t.loading}</p> : posts.length ? <div className="social-post-list">{posts.map(renderPost)}</div> : <div className="nv-feed-empty"><strong>{t.noPosts}</strong><p>{t.noPostsHint}</p><button type="button" onClick={() => navigate("create")}>{t.create}</button></div>}
+            <InstagramHomeReplica onCreate={() => navigate("create")} onNotifications={loadNotifications}/>
+            {loading ? <p className="social-muted social-center">{t.loading}</p> : posts.length ? <div className="social-post-list">{posts.map(renderPost)}</div> : null}
           </section>}
 
           {!aiOpen && active === "search" && <section className="nv-explore-screen">
