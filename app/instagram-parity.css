@@ -337,3 +337,38 @@ button{-webkit-tap-highlight-color:transparent}
  .novyra-bottom-tab{gap:0!important}
  .novyra-bottom-tab>span:not(.novyra-profile-fallback),.novyra-bottom-tab>small{display:none!important}
 }
+
+/* Tighten the mobile feed rhythm: stories sit closer to the first post. */
+@media(max-width:760px){
+ .social-app:has(.social-feed-screen) .social-main-column{padding-top:0!important}
+ .nv-feed-header{margin:0!important}
+ .nv-stories{
+   gap:8px!important;
+   padding:6px 8px 7px!important;
+   margin:0!important;
+   min-height:0!important;
+ }
+ .nv-story{
+   flex:0 0 58px!important;
+   width:58px!important;
+   min-width:58px!important;
+   gap:3px!important;
+ }
+ .nv-story-ring,.nv-story-own-avatar{
+   width:54px!important;
+   height:54px!important;
+ }
+ .nv-story small{
+   width:58px!important;
+   margin-top:0!important;
+   font-size:9px!important;
+   line-height:1.15!important;
+ }
+ .nv-story-skeleton{
+   flex:0 0 54px!important;
+   width:54px!important;
+   height:54px!important;
+ }
+ .social-feed-screen .social-post-list{margin-top:0!important;padding-top:0!important}
+ .nv-post-head{min-height:52px!important;padding-block:5px!important}
+}
