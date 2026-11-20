@@ -3309,7 +3309,7 @@ html,body{background:linear-gradient(145deg,#0D0907 0%,#130d09 52%,#1A120D 100%)
     padding: 0 !important;
   }
   .social-app .novyra-bottom-items > .novyra-profile-tab {
-    grid-column: 1 !important;
+    grid-column: 5 !important;
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
