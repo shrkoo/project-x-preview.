@@ -310,6 +310,12 @@ export default {
     const id=env.ROOM_HUB.idFromName(wsMatch[1]);
     return env.ROOM_HUB.get(id).fetch(new Request(request,{headers:new Headers({...Object.fromEntries(request.headers), "X-PX-USER":record.user_id,"X-PX-NAME":profile.display_name,"X-PX-ROOM":wsMatch[1]})}));
    }
+   const storyMediaMatch=path.match(/^\\/social\\/stories\\/([a-f0-9-]+)\\/media$/i);
+   if(storyMediaMatch && request.method==="GET") {
+    const story=await db.prepare("SELECT media_data,content_type,expires_at FROM stories WHERE id=? AND expires_at>datetime('now')").bind(storyMediaMatch[1]).first();
+    if(!story || !story.media_data) return fail("استوری پیدا نشد یا منقضی شده است.",404);
+    return new Response(story.media_data,{headers:{...corsHeaders,"Content-Type":story.content_type||"application/octet-stream","Cache-Control":"private, max-age=300","X-Content-Type-Options":"nosniff"}});
+   }
    const user = await authenticate(request,db);
    if (path.startsWith("/auth/") && path !== "/auth/register" && path !== "/auth/login") {
     if (!user) return fail("برای ادامه وارد حساب شو.",401);
@@ -350,6 +356,43 @@ export default {
     return json({ticket,expiresIn:60});
    }
    if (!user) return fail("برای استفاده از این بخش وارد حساب شو.",401);
+
+   if(path==="/social/stories" && request.method==="GET") {
+    await db.prepare("DELETE FROM stories WHERE expires_at<=datetime('now')").run();
+    const rows=await db.prepare(`
+      SELECT s.id,s.user_id AS userId,s.media_url AS mediaUrl,s.type,s.created_at AS createdAt,s.expires_at AS expiresAt,
+        u.display_name AS displayName,u.username,u.avatar_url AS avatarUrl,
+        EXISTS(SELECT 1 FROM story_views v WHERE v.story_id=s.id AND v.viewer_id=?) AS viewedByMe
+      FROM stories s JOIN users u ON u.id=s.user_id
+      WHERE s.expires_at>datetime('now') AND (
+        s.user_id=? OR EXISTS(SELECT 1 FROM social_follows f WHERE f.follower_id=? AND f.followed_id=s.user_id)
+      )
+      ORDER BY CASE WHEN s.user_id=? THEN 0 ELSE 1 END,s.created_at ASC
+    `).bind(user.id,user.id,user.id,user.id).all();
+    return json({stories:rows.results||[]});
+   }
+   if(path==="/social/stories" && request.method==="POST") {
+    const body=await readBody(request),type=body?.type==="video"?"video":"image",dataUrl=String(body?.mediaData||"");
+    const match=dataUrl.match(/^data:(image\\/(?:jpeg|png|webp)|video\\/(?:mp4|webm));base64,([A-Za-z0-9+/=]+)$/);
+    if(!match || (type==="image"&&!match[1].startsWith("image/")) || (type==="video"&&!match[1].startsWith("video/"))) return fail("فایل استوری معتبر نیست.");
+    const binary=atob(match[2]);
+    if(binary.length>1500000) return fail("حجم استوری باید کمتر از ۱٫۵ مگابایت باشد.",413);
+    const bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+    const id=crypto.randomUUID();
+    await db.prepare("DELETE FROM stories WHERE expires_at<=datetime('now')").run();
+    await db.prepare("INSERT INTO stories (id,user_id,media_url,type,expires_at,media_data,content_type) VALUES (?,?,?, ?,datetime('now','+24 hours'),?,?)")
+      .bind(id,user.id,"/social/stories/"+id+"/media",type,bytes,match[1]).run();
+    return json({ok:true,story:{id,mediaUrl:"/social/stories/"+id+"/media",type,expiresAt:new Date(Date.now()+86400000).toISOString()}},201);
+   }
+   const storyViewMatch=path.match(/^\\/social\\/stories\\/([a-f0-9-]+)\\/view$/i);
+   if(storyViewMatch && request.method==="POST") {
+    const story=await db.prepare("SELECT id,user_id AS userId FROM stories WHERE id=? AND expires_at>datetime('now')").bind(storyViewMatch[1]).first();
+    if(!story) return fail("استوری پیدا نشد یا منقضی شده است.",404);
+    if(story.userId!==user.id) await db.prepare("INSERT OR IGNORE INTO story_views (story_id,viewer_id) VALUES (?,?)").bind(story.id,user.id).run();
+    return json({ok:true});
+   }
+
 
    if(path==="/social/demo-data" && request.method==="DELETE") {
     if(user.role!=="admin") return fail("فقط مدیر می‌تواند داده‌های نمونه را حذف کند.",403);
