@@ -205,6 +205,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const [selectedReel, setSelectedReel] = useState<Post | null>(null);
   const [profileTab, setProfileTab] = useState<"Photos" | "Videos" | "Saved">("Photos");
   const [feedMenuOpen, setFeedMenuOpen] = useState(false);
+  const [reelsMode, setReelsMode] = useState<"videos" | "explore">("videos");
   const [savedPostIds, setSavedPostIds] = useState<string[]>([]);
   const [savedPosts, setSavedPosts] = useState<Post[]>([]);
   const [explorePosts, setExplorePosts] = useState<Post[]>([]);
@@ -245,7 +246,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     let alive = true;
     async function loadCurrentPage() {
       setPageError("");
-      if (active === "home" || active === "reels") {
+      if (active === "home" || (active === "reels" && reelsMode === "videos")) {
         setLoading(true);
         try {
           if (active === "home") {
@@ -262,7 +263,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           if (alive) setLoading(false);
         }
       }
-      if (active === "search") {
+      if (active === "search" || (active === "reels" && reelsMode === "explore")) {
         void loadExplore(true);
         void loadSearchHistory();
       }
@@ -284,12 +285,21 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     }
     void loadCurrentPage();
     return () => { alive = false; };
-  }, [active, account.displayName, t.genericError]);
+  }, [active, reelsMode, account.displayName, t.genericError]);
 
   function navigate(next: NavKey) {
     setAiOpen(false);
     setNotificationsOpen(false);
-    if (next !== "search") { setSearchOpen(false); setViewedProfile(null); }
+    if (next === "search") {
+      setReelsMode("explore");
+      setSearchOpen(false);
+      setViewedProfile(null);
+      setActive("reels");
+      return;
+    }
+    if (next === "reels") setReelsMode("videos");
+    setSearchOpen(false);
+    setViewedProfile(null);
     setActive(next);
   }
 
@@ -629,7 +639,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             {loading ? <p className="social-muted social-center">{t.loading}</p> : <div className="social-post-list">{(posts.length ? posts : demoPosts).map(renderPost)}</div>}
           </section>}
 
-          {!aiOpen && active === "search" && <section className="nv-explore-screen">
+          {!aiOpen && active === "reels" && reelsMode === "explore" && <section className="nv-explore-screen">
             {viewedProfile ? <div className="nv-other-profile">
               <div className="nv-other-profile-head"><button type="button" onClick={()=>setViewedProfile(null)} aria-label="Back"><AppIcon icon={language==="fa"?ArrowRight:ArrowLeft}/></button><strong>{viewedProfile.profile.displayName}</strong></div>
               <div className="nv-profile-hero"><div className="nv-avatar-wrap"><span className="nv-profile-avatar nv-profile-avatar-placeholder"><AppIcon icon={UserRound}/></span></div><h2>{viewedProfile.profile.displayName}</h2><p>@{viewedProfile.profile.displayName.toLowerCase().replace(/[^a-z0-9]/g,"")}</p></div>
@@ -675,8 +685,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             </div>
           </section>}
 
-          {!aiOpen && active === "reels" && <section className="nv-reels-screen">
-            <div className="nv-top-tabs nv-reels-tabs"><button onClick={() => navigate("home")}>Feed</button><button onClick={() => navigate("friends")}>Following</button><button className="active">Reels<i/></button><span className="nv-top-spacer"/><button className="nv-round-action" onClick={() => navigate("search")} aria-label="Search"><AppIcon icon={Search}/></button><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell}/><i/></button></div>
+          {!aiOpen && active === "reels" && reelsMode === "videos" && <section className="nv-reels-screen">
+            <div className="nv-top-tabs nv-reels-tabs"><div className="nv-reels-mode-switch"><button className="nv-reels-mode-title" type="button" onClick={() => setFeedMenuOpen(value => !value)}>ویدئوها <AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button type="button" onClick={() => {setFeedMenuOpen(false);setReelsMode("videos");}}>ویدئوها</button><button type="button" onClick={() => {setFeedMenuOpen(false);setReelsMode("explore");setSearchOpen(false);void loadExplore(true);void loadSearchHistory();}}>اکسپلور</button></div>}</div><span className="nv-top-spacer"/><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell}/><i/></button></div>
             {loading ? <p className="social-muted social-center">{t.loading}</p> : <div className="nv-reels-stack">{(reels.length ? reels : (posts.length ? posts : demoPosts)).map((post,i)=><button type="button" className="nv-reel-list-card" key={post.id} onClick={() => setSelectedReel(post)} style={{backgroundImage:`linear-gradient(0deg,rgba(0,0,0,.65),transparent 58%),url("${post.mediaUrl || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900`}")`}}><span>{post.authorName}</span><small>Watch reel</small></button>)}</div>}
           </section>}
 
@@ -703,7 +713,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         <div className="nv-full-reel-caption"><div className="nv-full-reel-user"><Avatar name={selectedReel.authorName}/><div><strong><bdi dir="auto">{selectedReel.authorName}</bdi></strong><small><bdi dir="auto">19 hour ago</bdi></small></div><button>{t.follow}</button></div><p>{selectedReel.body.slice(0,110)}... <span>{language === "fa" ? "بیشتر" : "more"}</span></p><small><AppIcon icon={Music2}/> Remix with laddu_jaan...</small></div><div className="nv-reel-home-indicator"/>
       </section>}
       <nav className="social-mobile-nav-wrap" style={selectedReel ? {display:"none"} : undefined}>
-        <MobileBottomNav active={active} labels={{home:t.home,reels:t.reels,message:t.inbox,search:(language === "fa" ? "اکسپلور" : language === "ku" ? "گەڕان" : language === "ar" ? "استكشاف" : "Explore"),profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName}
+        <MobileBottomNav active={active} labels={{home:t.home,reels:t.reels,message:t.inbox,search:"",profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName}
           onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} />
       </nav>
     </div>
