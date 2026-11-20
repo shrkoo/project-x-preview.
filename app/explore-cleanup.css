@@ -22,7 +22,7 @@
   align-items: center !important;
   gap: 12px !important;
   width: 100% !important;
-  height: 80px !important;
+  height: 66px !important;
   margin: 0 !important;
   padding: 0 16px !important;
   direction: rtl !important;
@@ -454,4 +454,38 @@
     margin: 0 -14px !important;
     width: calc(100% + 28px) !important;
   }
+}
+
+/* Instagram-style Explore refinements; deliberately scoped to Explore only. */
+.social-app .nv-explore-search-trigger input {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  font: inherit !important;
+  text-align: right !important;
+}
+.social-app .nv-explore-search-trigger input::placeholder {
+  color: #aeb3bd !important;
+  opacity: 1 !important;
+}
+.social-app .nv-explore-tile > img,
+.social-app .nv-explore-tile > video,
+.social-app .nv-profile-grid.is-other-profile .nv-profile-tile > img,
+.social-app .nv-profile-grid.is-other-profile .nv-profile-tile > video {
+  background: #1c1e24 !important;
+}
+.social-app .nv-profile-grid.is-other-profile {
+  margin-top: 0 !important;
+}
+.social-app .nv-explore-screen,
+.social-app .nv-search-page,
+.social-app .nv-saved-explore-screen,
+.social-app .nv-other-profile {
+  color: #fff !important;
+  background: #0a0c10 !important;
 }

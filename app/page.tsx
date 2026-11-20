@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Onboarding from "./components/Onboarding";
-import SocialApp from "./components/SocialApp";
+import NovyraLuxuryApp from "./components/NovyraLuxuryApp";
 import { apiRequest, clearSession } from "./lib/api";
 
 type Language = "en" | "fa" | "ar" | "ku";
@@ -83,7 +83,15 @@ export default function Home() {
     }
   }
 
+  function changeLanguage(nextLanguage: Language) {
+    setLanguage(nextLanguage);
+    localStorage.setItem("projectx-language", nextLanguage);
+    document.documentElement.lang = nextLanguage;
+    document.documentElement.dir = nextLanguage === "en" ? "ltr" : "rtl";
+  }
+
   function logoutComplete() {
+    clearSession();
     setAccount(null);
     setNotice("");
   }
@@ -92,12 +100,12 @@ export default function Home() {
 
   if (!account) return <Onboarding onComplete={completeOnboarding} initialNotice={notice} />;
 
-  return <SocialApp
+  return <NovyraLuxuryApp
     account={account}
     language={language}
     notice={notice}
     onClearNotice={() => setNotice("")}
-    onLanguageChange={setLanguage}
+    onLanguageChange={changeLanguage}
     onLogout={logoutComplete}
   />;
 }

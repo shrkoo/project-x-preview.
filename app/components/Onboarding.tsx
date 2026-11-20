@@ -140,10 +140,8 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       window.history.replaceState({}, "", window.location.pathname + window.location.search);
       apiRequest<{user:User}>("/auth/me").then(data => {
         setUser(data.user);
-        setProfileName(data.user.displayName || "");
         setEmail(data.user.email);
-        const savedLanguage=(localStorage.getItem("projectx-language") as Language) || "en";
-        setStage("passwordSetup");
+        onComplete(data.user, language);
       }).catch(() => { localStorage.removeItem("projectx-token"); setNotice("ورود با Google کامل نشد؛ دوباره تلاش کن."); });
     } else if (googleError) {
       window.history.replaceState({}, "", window.location.pathname + window.location.search);
@@ -155,8 +153,6 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     const saved = localStorage.getItem("projectx-language") as Language | null;
     if (saved && copy[saved]) {
       setLanguage(saved);
-      // Returning signed-out users go straight to sign-in; language is first-run only.
-      setStage("auth");
     }
     const reset = new URLSearchParams(window.location.search).get("reset");
     if (reset) {
@@ -345,7 +341,6 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         </div>}
 
         {stage === "auth" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-button" onClick={() => setStage("language")} aria-label={t("back")}>←</button>
           <div className="px-auth-emblem" aria-label="NOVYRA"><NovyraMark /></div>
           <div className="px-eyebrow">NOVYRA / {recoveryMode ? "ACCOUNT RECOVERY" : "YOUR SPACE"}</div>
           <h1>{recoveryMode ? t("resetTitle") : mode === "login" ? t("loginTitle") : t("signupTitle")}</h1>
@@ -366,7 +361,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <p className="px-auth-security">{language === "en" ? "SECURE ACCESS · NOVYRA" : language === "ku" ? "چوونەژوورەوەی پارێزراو · NOVYRA" : language === "ar" ? "دخول آمن · NOVYRA" : "ورود امن · NOVYRA"}</p>
         </div>}
 
-        {stage === "passwordSetup" && <div className="px-glass-panel px-auth-panel">
+        {false && stage === "passwordSetup" && <div className="px-glass-panel px-auth-panel">
           <div className="px-eyebrow">NOVYRA / ACCOUNT SECURITY</div>
           <h1>{language === "en" ? "Create a password" : "تعیین رمز عبور"}</h1>
           <p className="px-stage-subtitle">{language === "en" ? "Your Google account is connected. Add a password so you can also sign in with email." : "حساب Google متصل شد. برای ورود با ایمیل نیز یک رمز عبور تعیین کن."}</p>
@@ -375,7 +370,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <button type="button" className="px-primary-action" disabled={busy} onClick={saveGooglePassword}>{busy ? "..." : (language === "en" ? "Save password" : "ذخیره رمز عبور")} <span>↗</span></button>
           <button type="button" className="px-skip-action" disabled={busy} onClick={skipGooglePassword}>{language === "en" ? "Skip for now" : "فعلاً رد می‌کنم"}</button>
         </div>}
-        {stage === "profile" && <div className="px-glass-panel px-profile-panel">
+        {false && stage === "profile" && <div className="px-glass-panel px-profile-panel">
           <div className="px-eyebrow">NOVYRA / PERSONAL PROFILE</div>
           <div className="px-profile-preview">{photo ? <img src={photo} alt="Profile preview" /> : <span>{avatar || (profileName || user?.displayName || "N").slice(0, 1)}</span>}</div>
           <h1>{t("profileTitle")}</h1><p className="px-stage-subtitle">{t("profileSub")}</p>

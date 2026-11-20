@@ -1,6 +1,6 @@
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,OPTIONS",
+  "Access-Control-Allow-Methods": "GET,HEAD,POST,PATCH,DELETE,OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Access-Control-Max-Age": "86400",
   "Vary": "Origin"
@@ -121,6 +121,23 @@ async function issueEmailToken(db,userId,kind,ttlMs) {
  await db.prepare("INSERT INTO email_tokens (id,user_id,token_hash,kind,expires_at) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),userId,tokenHash,kind,expires).run();
  return token;
 }
+async function storeStoryMedia(env,id,file) {
+  if(!env.STORY_MEDIA) throw new Error("ذخیره‌ساز فایل استوری پیکربندی نشده است.");
+  await env.STORY_MEDIA.put("story:"+id,await file.arrayBuffer(),{metadata:{contentType:file.type}});
+}
+async function readStoryMedia(env,id) {
+  if(!env.STORY_MEDIA) throw new Error("ذخیره‌ساز فایل استوری پیکربندی نشده است.");
+  const {value,metadata}=await env.STORY_MEDIA.getWithMetadata("story:"+id,"arrayBuffer");
+  return {value,contentType:metadata?.contentType||"application/octet-stream"};
+}
+async function deleteStoryMedia(env,id) {
+  if(env.STORY_MEDIA) await env.STORY_MEDIA.delete("story:"+id);
+}
+async function cleanupExpiredStories(env,db) {
+  const expired=await db.prepare("SELECT id FROM stories WHERE expires_at<=datetime('now') LIMIT 500").all();
+  for(const row of expired.results||[]) await deleteStoryMedia(env,row.id);
+  await db.prepare("DELETE FROM stories WHERE expires_at<=datetime('now')").run();
+}
 const readBody = async request => { try { return await request.json(); } catch { return null; } };
 async function createSession(db, userId) {
   const token = randomToken();
@@ -133,7 +150,7 @@ async function authenticate(request, db) {
   const token = request.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
   if (!token || token.length < 30) return null;
   const tokenHash = await digest(token);
-  return await db.prepare("SELECT u.id,u.email,u.display_name,u.xp,u.games_played,u.role FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
+  return await db.prepare("SELECT u.id,u.email,u.display_name,u.xp,u.games_played,u.role,u.username,u.avatar_url,u.bio FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
 }
 function cleanName(value) { return String(value || "").trim().replace(/[<>]/g, "").slice(0, 32); }
 function cleanEmail(value) { return String(value ?? "").normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g, "").replace(/\s+/g, "").toLowerCase().slice(0, 254); }
@@ -145,14 +162,19 @@ const isoDate = value => {
 };
 function shapeSocialPost(row) {
   return {
-    id:row.id, body:row.body||"", mediaUrl:row.mediaUrl||null, mediaType:row.mediaType||null,
+    id:row.id, body:row.body||"", mediaUrl:row.mediaUrl||null, mediaType:row.mediaType||null, thumbnailUrl:row.thumbnailUrl||null,
     createdAt:isoDate(row.createdAt), authorId:row.authorId, authorName:row.authorName||"NOVYRA",
     likeCount:Number(row.likeCount||0), commentCount:Number(row.commentCount||0),
-    likedByMe:Boolean(row.likedByMe), viewCount:Number(row.viewCount||0)
+    likedByMe:Boolean(row.likedByMe),
+    likedByNames:(()=>{try{return Array.isArray(row.likedByNames)?row.likedByNames:JSON.parse(row.likedByNames||"[]");}catch{return [];}})(),
+    viewCount:Number(row.viewCount||0),
+    repostCount:Number(row.repostCount||0), shareCount:Number(row.shareCount||0),
+    saveCount:Number(row.saveCount||0), savedByMe:Boolean(row.savedByMe)
   };
 }
 
 export default {
+ async scheduled(controller, env, ctx) { ctx.waitUntil(cleanupExpiredStories(env,env.DB)); },
  async fetch(request, env) {
   const origin = request.headers.get("Origin");
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: { ...corsHeaders, ...(origin === "http://localhost:3000" ? { "Access-Control-Allow-Origin": origin } : {}) } });
@@ -306,7 +328,103 @@ export default {
     const id=env.ROOM_HUB.idFromName(wsMatch[1]);
     return env.ROOM_HUB.get(id).fetch(new Request(request,{headers:new Headers({...Object.fromEntries(request.headers), "X-PX-USER":record.user_id,"X-PX-NAME":profile.display_name,"X-PX-ROOM":wsMatch[1]})}));
    }
-   const user = await authenticate(request,db);
+   const storyMediaMatch=path.match(/^\/social\/stories\/([a-f0-9-]+)\/media$/i);
+   if(storyMediaMatch && (request.method==="GET" || request.method==="HEAD")) {
+    const story=await db.prepare("SELECT id,type FROM stories WHERE id=? AND expires_at>datetime('now')").bind(storyMediaMatch[1]).first();
+    if(!story) return fail("استوری پیدا نشد یا منقضی شده است.",404);
+    const media=await readStoryMedia(env,story.id);
+    if(!media?.value) return fail("فایل استوری پیدا نشد یا منقضی شده است.",404);
+    const bytes=new Uint8Array(media.value),size=bytes.byteLength,contentType=media.contentType||"application/octet-stream";
+    const baseHeaders={...corsHeaders,"Content-Type":contentType,"Accept-Ranges":"bytes","Cache-Control":"public, max-age=300","X-Content-Type-Options":"nosniff","X-Robots-Tag":"noindex, nofollow","Content-Length":String(size)};
+    if(request.method==="HEAD") return new Response(null,{status:200,headers:baseHeaders});
+    const rangeHeader=request.headers.get("Range");
+    if(story.type==="video" && rangeHeader) {
+      const match=rangeHeader.match(/^bytes=(\d*)-(\d*)$/);
+      if(match) {
+        let start,end;
+        if(match[1]==="") { const suffix=Number(match[2]); if(!suffix) return new Response(null,{status:416,headers:{...baseHeaders,"Content-Range":"bytes */"+size,"Content-Length":"0"}}); start=Math.max(0,size-suffix); end=size-1; }
+        else { start=Number(match[1]); end=match[2]===""?size-1:Number(match[2]); }
+        if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<0||end<start||start>=size) return new Response(null,{status:416,headers:{...baseHeaders,"Content-Range":"bytes */"+size,"Content-Length":"0"}});
+        end=Math.min(end,size-1);
+        const chunk=bytes.slice(start,end+1);
+        return new Response(chunk,{status:206,headers:{...baseHeaders,"Content-Length":String(chunk.byteLength),"Content-Range":`bytes ${start}-${end}/${size}`}});
+      }
+    }
+    return new Response(request.method==="HEAD"?null:bytes,{status:200,headers:baseHeaders});
+   }
+      const user = await authenticate(request,db);
+   const publicShareMediaMatch=path.match(/^\/public\/shares\/([A-Za-z0-9_-]{40,60})\/media$/);
+   const publicSharePageMatch=path.match(/^\/public\/shares\/([A-Za-z0-9_-]{40,60})$/);
+   if(publicShareMediaMatch && (request.method==="GET"||request.method==="HEAD")) {
+    const tokenHash=await digest(publicShareMediaMatch[1]);
+    const share=await db.prepare("SELECT id,media_key,content_type FROM public_shares WHERE token_hash=? AND kind='video' AND deleted_at IS NULL").bind(tokenHash).first();
+    if(!share) return fail("این محتوا وجود ندارد",404);
+    const stored=await env.STORY_MEDIA.get(share.media_key,"arrayBuffer");
+    if(!stored) return fail("این محتوا وجود ندارد",404);
+    const bytes=new Uint8Array(stored),size=bytes.byteLength;
+    const baseHeaders={...corsHeaders,"Content-Type":share.content_type||"video/mp4","Accept-Ranges":"bytes","Cache-Control":"public, max-age=300","X-Content-Type-Options":"nosniff","Content-Length":String(size)};
+    if(request.method==="HEAD") return new Response(null,{status:200,headers:baseHeaders});
+    const rangeHeader=request.headers.get("Range");
+    if(rangeHeader) {
+      const match=rangeHeader.match(/^bytes=(\\d*)-(\\d*)$/);
+      if(!match || (!match[1]&&!match[2])) return new Response(null,{status:416,headers:{...baseHeaders,"Content-Range":`bytes */${size}`,"Content-Length":"0"}});
+      let start=match[1]?Number(match[1]):Math.max(0,size-Number(match[2]));
+      let end=match[2]&&match[1]?Number(match[2]):match[2]&&!match[1]?size-1:size-1;
+      if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<0||start>=size||end<start) return new Response(null,{status:416,headers:{...baseHeaders,"Content-Range":`bytes */${size}`,"Content-Length":"0"}});
+      end=Math.min(end,size-1);
+      const chunk=bytes.slice(start,end+1);
+      return new Response(chunk,{status:206,headers:{...baseHeaders,"Content-Length":String(chunk.byteLength),"Content-Range":`bytes ${start}-${end}/${size}`}});
+    }
+    return new Response(bytes,{status:200,headers:baseHeaders});
+   }
+   if(publicSharePageMatch && request.method==="GET") {
+    const tokenHash=await digest(publicSharePageMatch[1]);
+    const share=await db.prepare("SELECT kind,content,content_type,created_at AS createdAt FROM public_shares WHERE token_hash=? AND deleted_at IS NULL").bind(tokenHash).first();
+    if(!share) return fail("این محتوا وجود ندارد",404);
+    return json({kind:share.kind,content:share.content||"",mediaUrl:share.kind==="video"?`/public/shares/${publicSharePageMatch[1]}/media`:null,contentType:share.content_type||null,createdAt:share.createdAt});
+   }
+   if (path === "/public/shares" && request.method==="POST") {
+    if(!user) return fail("برای ساخت لینک وارد حساب شو.",401);
+    let kind="text",content="",file=null;
+    if((request.headers.get("Content-Type")||"").toLowerCase().includes("multipart/form-data")) {
+      const form=await request.formData();
+      const uploaded=form.get("file");
+      if(uploaded instanceof File) file=uploaded;
+      kind="video";
+    } else {
+      const body=await readBody(request);
+      content=String(body?.content||"").trim();
+    }
+    if(file) {
+      const type=String(file.type||"").toLowerCase();
+      if(!["video/mp4","video/webm","video/quicktime"].includes(type)) return fail("فرمت ویدیو پشتیبانی نمی‌شود. MP4، WebM یا MOV انتخاب کن.");
+      if(file.size<1||file.size>20*1024*1024) return fail("حجم ویدیو بیشتر از سقف مجاز ۲۰ مگابایت است. یک ویدیوی کوچک‌تر انتخاب کن.",413);
+    } else if(!content) return fail("متن یا ویدیویی برای ساخت لینک انتخاب کن.");
+    else if(content.length>20000) return fail("متن نباید بیشتر از ۲۰٬۰۰۰ نویسه باشد.",413);
+    const token=randomToken(32),tokenHash=await digest(token),id=crypto.randomUUID();
+    const mediaKey=file?"share:"+tokenHash:null;
+    if(file) await env.STORY_MEDIA.put(mediaKey,await file.arrayBuffer(),{metadata:{contentType:file.type}});
+    try {
+      await db.prepare("INSERT INTO public_shares (id,token_hash,owner_id,kind,content,media_key,content_type) VALUES (?,?,?,?,?,?,?)")
+        .bind(id,tokenHash,user.id,kind,file?null:content,mediaKey,file?.type||null).run();
+    } catch(error) { if(mediaKey) await env.STORY_MEDIA.delete(mediaKey); throw error; }
+    return json({ok:true,id,token,kind,createdAt:new Date().toISOString()},201);
+   }
+   if(path==="/public/shares/mine" && request.method==="GET") {
+    if(!user) return fail("برای مشاهده لینک‌ها وارد حساب شو.",401);
+    const rows=await db.prepare("SELECT id,kind,content,created_at AS createdAt FROM public_shares WHERE owner_id=? AND deleted_at IS NULL ORDER BY created_at DESC LIMIT 100").bind(user.id).all();
+    return json({shares:rows.results||[]});
+   }
+   const deletePublicShareMatch=path.match(/^\/public\/shares\/manage\/([a-f0-9-]+)$/i);
+   if(deletePublicShareMatch && request.method==="DELETE") {
+    if(!user) return fail("برای حذف لینک وارد حساب شو.",401);
+    const share=await db.prepare("SELECT id,owner_id,media_key FROM public_shares WHERE id=? AND deleted_at IS NULL").bind(deletePublicShareMatch[1]).first();
+    if(!share) return fail("این محتوا وجود ندارد",404);
+    if(share.owner_id!==user.id) return fail("اجازه حذف این محتوا را نداری.",403);
+    await db.prepare("DELETE FROM public_shares WHERE id=? AND owner_id=?").bind(share.id,user.id).run();
+    if(share.media_key) await env.STORY_MEDIA.delete(share.media_key);
+    return json({ok:true});
+   }
    if (path.startsWith("/auth/") && path !== "/auth/register" && path !== "/auth/login") {
     if (!user) return fail("برای ادامه وارد حساب شو.",401);
     if (path === "/auth/set-password" && request.method === "POST") {
@@ -347,20 +465,141 @@ export default {
    }
    if (!user) return fail("برای استفاده از این بخش وارد حساب شو.",401);
 
+   if(path==="/social/stories" && request.method==="GET") {
+    await cleanupExpiredStories(env,db);
+    const rows=await db.prepare(`
+      SELECT s.id,s.user_id AS userId,s.media_url AS mediaUrl,s.type,s.created_at AS createdAt,s.expires_at AS expiresAt,
+        u.display_name AS displayName,u.username,u.avatar_url AS avatarUrl,
+        EXISTS(SELECT 1 FROM story_views v WHERE v.story_id=s.id AND v.viewer_id=?) AS viewedByMe,
+        EXISTS(SELECT 1 FROM story_reactions r WHERE r.story_id=s.id AND r.user_id=?) AS reactedByMe
+      FROM stories s JOIN users u ON u.id=s.user_id
+      WHERE s.expires_at>datetime('now') AND (
+        s.user_id=? OR s.is_demo=1 OR EXISTS(SELECT 1 FROM social_follows f WHERE f.follower_id=? AND f.followed_id=s.user_id)
+      )
+      ORDER BY CASE WHEN s.user_id=? THEN 0 ELSE 1 END,s.created_at ASC
+    `).bind(user.id,user.id,user.id,user.id,user.id).all();
+    return json({stories:rows.results||[]});
+   }
+   if(path==="/social/stories" && request.method==="POST") {
+    let type="image",file=null,legacy=false;
+    if((request.headers.get("Content-Type")||"").toLowerCase().includes("multipart/form-data")) {
+      const form=await request.formData();
+      type=form.get("type")==="video"?"video":"image";
+      const uploaded=form.get("file");
+      if(uploaded instanceof File) file=uploaded;
+    } else {
+      // Temporary compatibility for already-published clients: decode in memory, never persist payload in D1.
+      const body=await readBody(request),dataUrl=String(body?.mediaData||"");
+      type=body?.type==="video"?"video":"image";
+      const match=dataUrl.match(/^data:(image\/(?:jpeg|png|webp)|video\/(?:mp4|webm|quicktime));base64,([A-Za-z0-9+/=]+)$/);
+      if(match && ((type==="image"&&match[1].startsWith("image/"))||(type==="video"&&match[1].startsWith("video/")))) {
+        const binary=atob(match[2]),bytes=new Uint8Array(binary.length);
+        for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+        file=new File([bytes],"legacy-upload",{type:match[1]});
+        legacy=true;
+      }
+    }
+    if(!(file instanceof File)) return fail("فایل استوری معتبر نیست.");
+    const contentType=String(file.type||"").toLowerCase();
+    const validImage=type==="image" && (contentType==="image/webp" || (legacy && ["image/jpeg","image/png"].includes(contentType)));
+    const validVideo=type==="video" && ["video/mp4","video/webm","video/quicktime"].includes(contentType);
+    if(!validImage&&!validVideo) return fail(type==="image"?"عکس باید به فرمت WebP تبدیل شود.":"فرمت ویدیو پشتیبانی نمی‌شود.");
+    const maxSize=type==="video"?20*1024*1024:5*1024*1024;
+    if(file.size<1 || file.size>maxSize) return fail(type==="video"?"حجم ویدیو بیشتر از سقف مجاز ۲۰ مگابایت است. یک ویدیوی کوچک‌تر انتخاب کن.":"حجم عکس پس از فشرده‌سازی باید حداکثر ۵ مگابایت باشد.",413);
+    const id=crypto.randomUUID(),mediaUrl="/social/stories/"+id+"/media";
+    await cleanupExpiredStories(env,db);
+    await storeStoryMedia(env,id,file);
+    try {
+      await db.prepare("INSERT INTO stories (id,user_id,media_url,type,expires_at) VALUES (?,?,?, ?,datetime('now','+24 hours'))")
+        .bind(id,user.id,mediaUrl,type).run();
+    } catch(error) {
+      await deleteStoryMedia(env,id);
+      throw error;
+    }
+    return json({ok:true,story:{id,mediaUrl,type,expiresAt:new Date(Date.now()+86400000).toISOString()}},201);
+   }
+   const storyViewMatch=path.match(/^\/social\/stories\/([a-f0-9-]+)\/view$/i);
+   if(storyViewMatch && request.method==="POST") {
+    const story=await db.prepare("SELECT id,user_id AS userId FROM stories WHERE id=? AND expires_at>datetime('now')").bind(storyViewMatch[1]).first();
+    if(!story) return fail("استوری پیدا نشد یا منقضی شده است.",404);
+    if(story.userId!==user.id) await db.prepare("INSERT OR IGNORE INTO story_views (story_id,viewer_id) VALUES (?,?)").bind(story.id,user.id).run();
+    return json({ok:true});
+   }
+   const storyReactionMatch=path.match(/^\/social\/stories\/([a-f0-9-]+)\/reaction$/i);
+   if(storyReactionMatch && request.method==="POST") {
+    const story=await db.prepare("SELECT id,user_id AS userId FROM stories WHERE id=? AND expires_at>CURRENT_TIMESTAMP").bind(storyReactionMatch[1]).first();
+    if(!story) return fail("استوری پیدا نشد یا منقضی شده است.",404);
+    const existing=await db.prepare("SELECT 1 AS yes FROM story_reactions WHERE story_id=? AND user_id=?").bind(story.id,user.id).first();
+    if(existing) await db.prepare("DELETE FROM story_reactions WHERE story_id=? AND user_id=?").bind(story.id,user.id).run();
+    else {
+      await db.prepare("INSERT INTO story_reactions (story_id,user_id) VALUES (?,?)").bind(story.id,user.id).run();
+      if(story.userId!==user.id) await db.prepare("INSERT INTO notifications (id,user_id,kind,title,body) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),story.userId,"story_like","پسندیدن استوری",user.display_name+" استوری تو را پسندید.").run();
+    }
+    return json({liked:!existing});
+   }
+   const storyReplyMatch=path.match(/^\/social\/stories\/([a-f0-9-]+)\/reply$/i);
+   if(storyReplyMatch && request.method==="POST") {
+    const story=await db.prepare("SELECT id,user_id AS userId FROM stories WHERE id=? AND expires_at>CURRENT_TIMESTAMP").bind(storyReplyMatch[1]).first();
+    if(!story) return fail("استوری پیدا نشد یا منقضی شده است.",404);
+    const body=await readBody(request),message=String(body?.body||"").trim().slice(0,1000);
+    if(!message) return fail("پیام خالی است.");
+    if(story.userId===user.id) return fail("نمی‌توانی به استوری خودت پاسخ بدهی.");
+    await db.prepare("INSERT INTO social_direct_messages (id,sender_id,recipient_id,story_id,body) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),user.id,story.userId,story.id,message).run();
+    await db.prepare("INSERT INTO notifications (id,user_id,kind,title,body) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),story.userId,"story_reply","پاسخ به استوری",user.display_name+" به استوری تو پاسخ داد.").run();
+    return json({ok:true});
+   }
+
+
+   if(path==="/social/demo-data" && request.method==="DELETE") {
+    if(user.role!=="admin") return fail("فقط مدیر می‌تواند داده‌های نمونه را حذف کند.",403);
+    const [postCount,userCount]=await Promise.all([
+      db.prepare("SELECT COUNT(*) AS total FROM social_posts WHERE is_demo=1").first(),
+      db.prepare("SELECT COUNT(*) AS total FROM users WHERE is_demo=1").first()
+    ]);
+    await db.batch([
+      db.prepare("DELETE FROM social_posts WHERE is_demo=1"),
+      db.prepare("DELETE FROM users WHERE is_demo=1")
+    ]);
+    return json({ok:true,deletedPosts:Number(postCount?.total||0),deletedUsers:Number(userCount?.total||0)});
+   }
+
    // NOVYRA social core — additive routes; existing account and legacy API routes stay intact.
    if ((path === "/social/feed" || path === "/social/reels") && request.method === "GET") {
     const reelsOnly = path === "/social/reels";
+    const friendsOnly = reelsOnly && url.searchParams.get("friends") === "1";
     const rows = await db.prepare(`
-      SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
+      SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,p.created_at AS createdAt,
         p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,
+        p.repost_count AS repostCount,p.share_count AS shareCount,
         (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
+        COALESCE((SELECT json_group_array(liked.name) FROM (
+          SELECT lu.display_name AS name FROM social_post_likes ll
+          JOIN users lu ON lu.id=ll.user_id
+          WHERE ll.post_id=p.id ORDER BY ll.created_at DESC LIMIT 2
+        ) liked),'[]') AS likedByNames,
         (SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,
-        EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe
+        (SELECT COUNT(*) FROM social_post_saves sv WHERE sv.post_id=p.id) AS saveCount,
+        EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe,
+        EXISTS(SELECT 1 FROM social_post_saves mine WHERE mine.post_id=p.id AND mine.user_id=?) AS savedByMe
       FROM social_posts p JOIN users u ON u.id=p.author_id
-      ${reelsOnly ? "WHERE p.media_type='video'" : ""}
+      ${reelsOnly ? "WHERE p.media_type='video' AND p.media_url IS NOT NULL AND TRIM(p.media_url)<>''" : ""}
+      ${friendsOnly ? "AND EXISTS(SELECT 1 FROM social_follows f WHERE f.follower_id=? AND f.followed_id=p.author_id)" : ""}
       ORDER BY p.created_at DESC LIMIT 50
-    `).bind(user.id).all();
+    `).bind(...(friendsOnly ? [user.id,user.id,user.id] : [user.id,user.id])).all();
     return json({ posts: (rows.results || []).map(shapeSocialPost) });
+   }
+
+   if(path === "/social/friends" && request.method === "GET") {
+    const rows=await db.prepare(`
+      SELECT u.id,u.display_name AS displayName,COALESCE(u.username,LOWER(REPLACE(u.display_name,' ',''))) AS username,
+        (SELECT COUNT(*) FROM social_posts p WHERE p.author_id=u.id) AS postCount,
+        (SELECT COUNT(*) FROM social_follows f WHERE f.followed_id=u.id) AS followerCount,
+        (SELECT COUNT(*) FROM social_follows f WHERE f.follower_id=u.id) AS followingCount,
+        1 AS followedByMe
+      FROM social_follows mine JOIN users u ON u.id=mine.followed_id
+      WHERE mine.follower_id=? ORDER BY u.display_name LIMIT 30
+    `).bind(user.id).all();
+    return json({friends:rows.results||[]});
    }
 
    if (path === "/social/profile" && request.method === "GET") {
@@ -372,17 +611,25 @@ export default {
           (SELECT COUNT(*) FROM social_follows WHERE follower_id=?) AS followingCount
       `).bind(user.id,user.id,user.id).first(),
       db.prepare(`
-        SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
-          p.author_id AS authorId,u.display_name AS authorName,
+        SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,p.created_at AS createdAt,
+          p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,
+          p.repost_count AS repostCount,p.share_count AS shareCount,
           (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
+        COALESCE((SELECT json_group_array(liked.name) FROM (
+          SELECT lu.display_name AS name FROM social_post_likes ll
+          JOIN users lu ON lu.id=ll.user_id
+          WHERE ll.post_id=p.id ORDER BY ll.created_at DESC LIMIT 2
+        ) liked),'[]') AS likedByNames,
           (SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,
-          EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe
+          (SELECT COUNT(*) FROM social_post_saves sv WHERE sv.post_id=p.id) AS saveCount,
+          EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe,
+          EXISTS(SELECT 1 FROM social_post_saves mine WHERE mine.post_id=p.id AND mine.user_id=?) AS savedByMe
         FROM social_posts p JOIN users u ON u.id=p.author_id
         WHERE p.author_id=? ORDER BY p.created_at DESC LIMIT 50
-      `).bind(user.id,user.id).all()
+      `).bind(user.id,user.id,user.id).all()
     ]);
     return json({
-      profile:{id:user.id,email:user.email,displayName:user.display_name,postCount:stats?.postCount||0,followerCount:stats?.followerCount||0,followingCount:stats?.followingCount||0},
+      profile:{id:user.id,email:user.email,displayName:user.display_name,username:user.username||"",avatarUrl:user.avatar_url||null,bio:user.bio||"",postCount:stats?.postCount||0,followerCount:stats?.followerCount||0,followingCount:stats?.followingCount||0},
       posts:(posts.results||[]).map(shapeSocialPost)
     });
    }
@@ -393,11 +640,19 @@ export default {
     const offset=Math.max(0,Number(url.searchParams.get("offset")||0));
     const seed=Math.min(1000000,Math.max(1,Math.floor(Number(url.searchParams.get("seed")||1))));
     const rows=await db.prepare(`
-      SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
+      SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,p.created_at AS createdAt,
         p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,
+        p.repost_count AS repostCount,p.share_count AS shareCount,
         (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
+        COALESCE((SELECT json_group_array(liked.name) FROM (
+          SELECT lu.display_name AS name FROM social_post_likes ll
+          JOIN users lu ON lu.id=ll.user_id
+          WHERE ll.post_id=p.id ORDER BY ll.created_at DESC LIMIT 2
+        ) liked),'[]') AS likedByNames,
         (SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,
-        EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe
+        (SELECT COUNT(*) FROM social_post_saves sv WHERE sv.post_id=p.id) AS saveCount,
+        EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe,
+        EXISTS(SELECT 1 FROM social_post_saves mine WHERE mine.post_id=p.id AND mine.user_id=?) AS savedByMe
       FROM social_posts p JOIN users u ON u.id=p.author_id
       WHERE p.media_type IN ('image','video') AND p.media_url IS NOT NULL AND TRIM(p.media_url)<>''
       ORDER BY (
@@ -408,31 +663,134 @@ export default {
         + (SELECT COUNT(*) FROM social_post_likes popular WHERE popular.post_id=p.id)*50
       ) DESC, p.created_at DESC
       LIMIT ? OFFSET ?
-    `).bind(user.id,seed,(seed*3)%1000003+1,(seed*7)%1000003+1,(seed*11)%1000003+1,(seed*13)%1000003+1,(seed*17)%1000003+1,limit,offset).all();
+    `).bind(user.id,user.id,seed,(seed*3)%1000003+1,(seed*7)%1000003+1,(seed*11)%1000003+1,(seed*13)%1000003+1,(seed*17)%1000003+1,limit,offset).all();
     return json({posts:(rows.results||[]).map(shapeSocialPost),nextOffset:offset+(rows.results||[]).length,hasMore:(rows.results||[]).length===limit});
    }
 
    const otherProfileMatch=path.match(/^\/social\/users\/([a-f0-9-]+)\/profile$/i);
    if(otherProfileMatch && request.method==="GET") {
     const targetId=otherProfileMatch[1];
-    const target=await db.prepare("SELECT id,email,display_name AS displayName FROM users WHERE id=?").bind(targetId).first();
+    const target=await db.prepare("SELECT id,email,display_name AS displayName,COALESCE(username,LOWER(REPLACE(display_name,' ',''))) AS username,avatar_url AS avatarUrl,bio FROM users WHERE id=?").bind(targetId).first();
     if(!target) return fail("کاربر پیدا نشد.",404);
     const [stats,posts]=await Promise.all([
      db.prepare("SELECT (SELECT COUNT(*) FROM social_posts WHERE author_id=?) AS postCount,(SELECT COUNT(*) FROM social_follows WHERE followed_id=?) AS followerCount,(SELECT COUNT(*) FROM social_follows WHERE follower_id=?) AS followingCount,EXISTS(SELECT 1 FROM social_follows WHERE follower_id=? AND followed_id=?) AS followedByMe").bind(targetId,targetId,targetId,user.id,targetId).first(),
-     db.prepare("SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,(SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,(SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe FROM social_posts p JOIN users u ON u.id=p.author_id WHERE p.author_id=? ORDER BY p.created_at DESC LIMIT 100").bind(user.id,targetId).all()
+     db.prepare(`SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,p.created_at AS createdAt,p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,p.repost_count AS repostCount,p.share_count AS shareCount,(SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
+        COALESCE((SELECT json_group_array(liked.name) FROM (
+          SELECT lu.display_name AS name FROM social_post_likes ll
+          JOIN users lu ON lu.id=ll.user_id
+          WHERE ll.post_id=p.id ORDER BY ll.created_at DESC LIMIT 2
+        ) liked),'[]') AS likedByNames,(SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,(SELECT COUNT(*) FROM social_post_saves sv WHERE sv.post_id=p.id) AS saveCount,EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe,EXISTS(SELECT 1 FROM social_post_saves mine WHERE mine.post_id=p.id AND mine.user_id=?) AS savedByMe FROM social_posts p JOIN users u ON u.id=p.author_id WHERE p.author_id=? ORDER BY p.created_at DESC LIMIT 100`).bind(user.id,user.id,targetId).all()
     ]);
     return json({profile:{...target,...stats},posts:(posts.results||[]).map(shapeSocialPost)});
    }
 
    const viewPostMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/view$/i);
    if(viewPostMatch && request.method==="POST") {
-    const result=await db.prepare("UPDATE social_posts SET view_count=COALESCE(view_count,0)+1 WHERE id=? RETURNING view_count AS viewCount").bind(viewPostMatch[1]).first();
-    if(!result) return fail("پست پیدا نشد.",404);
-    return json({viewCount:result.viewCount||0});
+    const postId=viewPostMatch[1];
+    const post=await db.prepare("SELECT id FROM social_posts WHERE id=?").bind(postId).first();
+    if(!post) return fail("پست پیدا نشد.",404);
+    const inserted=await db.prepare("INSERT OR IGNORE INTO social_post_views (post_id,user_id) VALUES (?,?)").bind(postId,user.id).run();
+    const counted=Number(inserted?.meta?.changes||0)>0;
+    if(counted) await db.prepare("UPDATE social_posts SET view_count=COALESCE(view_count,0)+1 WHERE id=?").bind(postId).run();
+    const current=await db.prepare("SELECT COALESCE(view_count,0) AS viewCount FROM social_posts WHERE id=?").bind(postId).first();
+    return json({viewCount:current?.viewCount||0,counted});
+   }
+
+   if(path==="/social/saved" && request.method==="GET") {
+    const rows=await db.prepare(`
+      SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,p.created_at AS createdAt,
+        p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,
+        p.repost_count AS repostCount,p.share_count AS shareCount,
+        (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
+        COALESCE((SELECT json_group_array(liked.name) FROM (
+          SELECT lu.display_name AS name FROM social_post_likes ll
+          JOIN users lu ON lu.id=ll.user_id
+          WHERE ll.post_id=p.id ORDER BY ll.created_at DESC LIMIT 2
+        ) liked),'[]') AS likedByNames,
+        (SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,
+        (SELECT COUNT(*) FROM social_post_saves sv WHERE sv.post_id=p.id) AS saveCount,
+        EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe,
+        1 AS savedByMe
+      FROM social_post_saves own JOIN social_posts p ON p.id=own.post_id
+      JOIN users u ON u.id=p.author_id
+      WHERE own.user_id=? ORDER BY own.created_at DESC LIMIT 100
+    `).bind(user.id,user.id).all();
+    return json({posts:(rows.results||[]).map(shapeSocialPost)});
+   }
+
+   const savePostMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/save$/i);
+   if(savePostMatch && request.method==="POST") {
+    const postId=savePostMatch[1];
+    if(!await db.prepare("SELECT id FROM social_posts WHERE id=?").bind(postId).first()) return fail("پست پیدا نشد.",404);
+    const existing=await db.prepare("SELECT 1 AS yes FROM social_post_saves WHERE post_id=? AND user_id=?").bind(postId,user.id).first();
+    if(existing) await db.prepare("DELETE FROM social_post_saves WHERE post_id=? AND user_id=?").bind(postId,user.id).run();
+    else await db.prepare("INSERT INTO social_post_saves (post_id,user_id) VALUES (?,?)").bind(postId,user.id).run();
+    const total=await db.prepare("SELECT COUNT(*) AS total FROM social_post_saves WHERE post_id=?").bind(postId).first();
+    return json({saved:!existing,saveCount:total?.total||0});
+   }
+
+   const repostPostMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/repost$/i);
+   if(repostPostMatch && request.method==="POST") {
+    const postId=repostPostMatch[1];
+    const post=await db.prepare("SELECT author_id FROM social_posts WHERE id=?").bind(postId).first();
+    if(!post) return fail("پست پیدا نشد.",404);
+    const existing=await db.prepare("SELECT 1 AS yes FROM social_post_reposts WHERE post_id=? AND user_id=?").bind(postId,user.id).first();
+    if(existing) await db.prepare("DELETE FROM social_post_reposts WHERE post_id=? AND user_id=?").bind(postId,user.id).run();
+    else {
+      await db.prepare("INSERT INTO social_post_reposts (post_id,user_id) VALUES (?,?)").bind(postId,user.id).run();
+      if(post.author_id!==user.id) await db.prepare("INSERT INTO notifications (id,user_id,kind,title,body) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),post.author_id,"post_repost","بازنشر پست",user.display_name+" پستت را بازنشر کرد.").run();
+    }
+    const total=await db.prepare("SELECT COUNT(*) AS total FROM social_post_reposts WHERE post_id=?").bind(postId).first();
+    await db.prepare("UPDATE social_posts SET repost_count=? WHERE id=?").bind(total?.total||0,postId).run();
+    return json({reposted:!existing,repostCount:total?.total||0});
+   }
+
+   const shareTargetsMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/share-targets$/i);
+   if(shareTargetsMatch && request.method==="GET") {
+    const rows=await db.prepare("SELECT u.id,u.display_name AS displayName,COALESCE(u.username,LOWER(REPLACE(u.display_name,' ',''))) AS username FROM users u WHERE u.id<>? ORDER BY u.created_at DESC LIMIT 50").bind(user.id).all();
+    return json({users:rows.results||[]});
+   }
+
+   if(path==="/social/messages" && request.method==="GET") {
+    const rows=await db.prepare(`
+      SELECT m.id,m.body,m.created_at AS createdAt,
+        m.sender_id AS senderId,sender.display_name AS senderName,
+        m.recipient_id AS recipientId,recipient.display_name AS recipientName,
+        m.shared_post_id AS sharedPostId,
+        p.body AS postBody,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,
+        p.author_id AS postAuthorId,postAuthor.display_name AS postAuthorName
+      FROM social_direct_messages m
+      JOIN users sender ON sender.id=m.sender_id
+      JOIN users recipient ON recipient.id=m.recipient_id
+      LEFT JOIN social_posts p ON p.id=m.shared_post_id
+      LEFT JOIN users postAuthor ON postAuthor.id=p.author_id
+      WHERE m.sender_id=? OR m.recipient_id=?
+      ORDER BY m.created_at DESC LIMIT 100
+    `).bind(user.id,user.id).all();
+    return json({messages:(rows.results||[]).map(row=>({...row,createdAt:isoDate(row.createdAt),received:row.recipientId===user.id}))});
+   }
+
+   const sharePostMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/share$/i);
+   if(sharePostMatch && request.method==="POST") {
+    const postId=sharePostMatch[1], body=await readBody(request);
+    const post=await db.prepare("SELECT author_id FROM social_posts WHERE id=?").bind(postId).first();
+    if(!post) return fail("پست پیدا نشد.",404);
+    const targetUserId=String(body?.targetUserId||"");
+    if(targetUserId) {
+      if(targetUserId===user.id) return fail("نمی‌توانی محتوا را برای خودت بفرستی.");
+      const target=await db.prepare("SELECT id FROM users WHERE id=?").bind(targetUserId).first();
+      if(!target) return fail("کاربر مقصد پیدا نشد.",404);
+      await db.prepare("INSERT INTO social_direct_messages (id,sender_id,recipient_id,shared_post_id,body) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),user.id,targetUserId,postId,"یک پست را برایت فرستاد.").run();
+      await db.prepare("INSERT INTO notifications (id,user_id,kind,title,body) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),targetUserId,"shared_post","پست ارسال‌شده",user.display_name+" یک پست برایت فرستاد.").run();
+    }
+    await db.prepare("INSERT INTO social_post_shares (id,post_id,user_id,target_user_id) VALUES (?,?,?,?)").bind(crypto.randomUUID(),postId,user.id,targetUserId||null).run();
+    await db.prepare("UPDATE social_posts SET share_count=share_count+1 WHERE id=?").bind(postId).run();
+    const total=await db.prepare("SELECT share_count AS total FROM social_posts WHERE id=?").bind(postId).first();
+    return json({shared:true,shareCount:total?.total||0});
    }
 
    if(path==="/social/search-history" && request.method==="GET") {
-    const rows=await db.prepare("SELECT h.id,h.search_type AS type,h.query_text AS query,h.target_user_id AS userId,h.created_at AS createdAt,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username FROM social_search_history h LEFT JOIN users u ON u.id=h.target_user_id WHERE h.owner_id=? ORDER BY h.created_at DESC,h.id DESC").bind(user.id).all();
+    const rows=await db.prepare("SELECT h.id,h.search_type AS type,h.query_text AS query,h.target_user_id AS userId,h.created_at AS createdAt,u.display_name AS displayName,COALESCE(u.username,LOWER(REPLACE(u.display_name,' ',''))) AS username FROM social_search_history h LEFT JOIN users u ON u.id=h.target_user_id WHERE h.owner_id=? ORDER BY h.created_at DESC,h.id DESC").bind(user.id).all();
     return json({items:rows.results||[]});
    }
    if(path==="/social/search-history" && request.method==="POST") {
@@ -464,16 +822,16 @@ export default {
     const likeQuery=`%${q}%`;
     const usersResult= q
       ? await db.prepare(`
-          SELECT u.id,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username,
+          SELECT u.id,u.display_name AS displayName,COALESCE(u.username,LOWER(REPLACE(u.display_name,' ',''))) AS username,
             (SELECT COUNT(*) FROM social_posts p WHERE p.author_id=u.id) AS postCount,
             (SELECT COUNT(*) FROM social_follows f WHERE f.followed_id=u.id) AS followerCount,
             (SELECT COUNT(*) FROM social_follows f WHERE f.follower_id=u.id) AS followingCount,
             EXISTS(SELECT 1 FROM social_follows mine WHERE mine.follower_id=? AND mine.followed_id=u.id) AS followedByMe
-          FROM users u WHERE u.id<>? AND (u.display_name LIKE ? OR LOWER(REPLACE(u.display_name,' ','')) LIKE ?)
+          FROM users u WHERE u.id<>? AND (u.display_name LIKE ? OR LOWER(COALESCE(u.username,'')) LIKE ? OR LOWER(REPLACE(u.display_name,' ','')) LIKE ?)
           ORDER BY followerCount DESC,u.created_at DESC LIMIT 40
-        `).bind(user.id,user.id,likeQuery,likeQuery).all()
+        `).bind(user.id,user.id,likeQuery,likeQuery,likeQuery).all()
       : await db.prepare(`
-          SELECT u.id,u.display_name AS displayName,LOWER(REPLACE(u.display_name,char(32),'')) AS username,
+          SELECT u.id,u.display_name AS displayName,COALESCE(u.username,LOWER(REPLACE(u.display_name,char(32),''))) AS username,
             (SELECT COUNT(*) FROM social_posts p WHERE p.author_id=u.id) AS postCount,
             (SELECT COUNT(*) FROM social_follows f WHERE f.followed_id=u.id) AS followerCount,
             (SELECT COUNT(*) FROM social_follows f WHERE f.follower_id=u.id) AS followingCount,
@@ -484,9 +842,14 @@ export default {
     let postsResult={results:[]};
     if(q) {
       postsResult=await db.prepare(`
-        SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
+        SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,p.created_at AS createdAt,
           p.author_id AS authorId,u.display_name AS authorName,
           (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
+        COALESCE((SELECT json_group_array(liked.name) FROM (
+          SELECT lu.display_name AS name FROM social_post_likes ll
+          JOIN users lu ON lu.id=ll.user_id
+          WHERE ll.post_id=p.id ORDER BY ll.created_at DESC LIMIT 2
+        ) liked),'[]') AS likedByNames,
           (SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,
           EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe
         FROM social_posts p JOIN users u ON u.id=p.author_id

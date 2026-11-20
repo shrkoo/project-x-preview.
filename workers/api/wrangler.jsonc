@@ -4,6 +4,7 @@
   "main": "index.js",
   "compatibility_date": "2026-11-17",
   "workers_dev": true,
+  "previews": {},
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,
@@ -18,6 +19,12 @@
       "head_sampling_rate": 0.1
     }
   },
+  "kv_namespaces": [
+    {
+      "binding": "STORY_MEDIA",
+      "id": "b011d86c602d478588ce1085ce0b48c8"
+    }
+  ],
   "d1_databases": [
     {
       "binding": "DB",
@@ -47,5 +54,10 @@
   },
   "vars": {
     "EMAIL_BRIDGE_URL": "https://script.google.com/macros/s/AKfycbzUnfnVEde_XAkXZAvogC49hl-k-yTqBCWFWE8uJjAQjj-BVK_PnBrXIF-Ji4e_37vM/exec"
+  },
+  "triggers": {
+    "crons": [
+      "0 * * * *"
+    ]
   }
 }
