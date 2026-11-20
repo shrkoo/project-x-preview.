@@ -487,3 +487,37 @@ button{-webkit-tap-highlight-color:transparent}
 .nv-ig-banner{position:relative;z-index:4;min-height:9%;width:94%;margin:1.1vw auto 0;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:2.5vw;transform:skewY(-3deg);box-shadow:0 1.5vw 2vw #63100077,inset 0 .8vw 0 #ffffff35,inset 0 -1vw 0 #00000018;padding:1.2% 2%;white-space:nowrap}.nv-ig-banner span{transform:skewY(3deg);display:block}.nv-ig-banner-red{background:linear-gradient(180deg,#fa3b31,#D7131B 52%,#a90d17);color:#fff;font:900 10vw/1.1 Vazirmatn,sans-serif}.nv-ig-banner-gray{width:79%;min-height:7%;background:linear-gradient(#fff,#dedede);color:#171717;font:900 8vw/1.1 Vazirmatn,sans-serif}.nv-ig-banner-white{width:86%;min-height:9%;background:linear-gradient(#fff,#eee);color:#D7131B;font:900 13vw/1.1 Vazirmatn,sans-serif}.nv-ig-banner-yellow{width:96%;min-height:7%;background:linear-gradient(#ffe76b,#FDC51B);color:#171717;font:900 5vw/1.2 Vazirmatn,sans-serif}.nv-ig-banner-last{min-height:10%;font-size:11vw}
 @media(min-width:761px){.nv-instagram-home{max-width:540px}.nv-ig-story{min-width:108px}.nv-ig-story-ring{width:108px;height:108px}.nv-ig-story small{font-size:16px}.nv-ig-banner-red{font-size:54px}.nv-ig-banner-gray{font-size:43px}.nv-ig-banner-white{font-size:70px}.nv-ig-banner-yellow{font-size:27px}.nv-ig-banner-last{font-size:59px}}
 @media(max-width:760px){.social-app:has(.social-feed-screen) .social-topbar,.social-app:has(.social-feed-screen) .social-page-heading{display:none!important}.social-app:has(.social-feed-screen) .social-main-column{padding:0!important}.social-app:has(.social-feed-screen) .social-layout{display:block!important}.social-app:has(.social-feed-screen) .social-feed-screen{padding:0!important;margin:0!important}.social-app:has(.social-feed-screen) .social-app-frame{padding:0!important}.nv-instagram-home{max-width:none}.nv-ig-feature-post{height:64.2dvh}.nv-ig-stories{padding-left:0}.nv-ig-story{max-width:none}.nv-ig-story-ring{max-width:none;max-height:none}.nv-ig-banner-red{font-size:10vw}.nv-ig-banner-gray{font-size:8vw}.nv-ig-banner-white{font-size:13vw}.nv-ig-banner-yellow{font-size:5vw}.nv-ig-banner-last{font-size:11vw}}
+
+
+/* Revised NOVYRA Home: simple full-width post image placeholder */
+.nv-ig-feature-post{height:64.2dvh;min-height:360px;background:#0F1218;position:relative;overflow:hidden}
+.nv-ig-post-head{height:11%;position:absolute;z-index:3;inset:0 0 auto;display:grid;grid-template-columns:12% 1fr 15%;align-items:center;padding:0 3%;direction:ltr;background:#0F1218}
+.nv-ig-more{display:flex;flex-direction:column;gap:5px;width:24px}
+.nv-ig-more i{display:block;width:17px;height:2px;background:#fff;border-radius:2px}
+.nv-ig-more i:first-child{width:24px}
+.nv-ig-post-media{position:absolute;inset:11% 0 0;width:100%;height:89%;background:#333}
+.nv-ig-stories{gap:2.3vw}
+.nv-ig-story-first{margin-left:-8vw}
+.nv-ig-story-ring{border:.45vw solid #2B2F36}
+.nv-ig-story-ring.dashed{border:.55vw dashed #777}
+.nv-ig-story-ring.own{border-color:#2B2F36}
+.nv-story-photo-one{background:linear-gradient(145deg,#293b2e 0 28%,#8e3027 29% 62%,#4a3c2c 63%)}
+.nv-story-photo-two{background:linear-gradient(155deg,#b5a17d 0 34%,#e2d9c9 35% 52%,#66543e 53% 72%,#30382d 73%)}
+.nv-story-photo-three{background:linear-gradient(180deg,#477f9e 0 38%,#7b9eac 39% 48%,#465f50 49% 67%,#827d60 68%)}
+.nv-story-photo-own{background:linear-gradient(145deg,#777,#171717);filter:grayscale(1)}
+.nv-ig-story small{font:400 2.8vw/1.3 Roboto,Vazirmatn,sans-serif;color:#A8A8A8}
+.nv-ig-story:last-child small{font-family:Vazirmatn,sans-serif}
+@media(max-width:760px){
+ .social-app:has(.social-feed-screen) .social-mobile-nav-wrap{position:fixed!important;right:0!important;bottom:24px!important;left:0!important;z-index:100!important}
+ .social-app:has(.social-feed-screen) .novyra-bottom-nav{position:relative!important;bottom:auto!important;height:58px!important;background:#12161C!important;border-top:0!important;padding:3px 8px!important}
+ .social-app:has(.social-feed-screen) .novyra-bottom-tab{height:48px!important}
+ .social-app:has(.social-feed-screen) .novyra-bottom-tab.is-active{position:relative!important}
+ .social-app:has(.social-feed-screen) .novyra-bottom-tab.is-active:before{content:"";position:absolute;z-index:-1;width:46px;height:38px;border-radius:20px;background:#2A2D33}
+ .social-app:has(.social-feed-screen) .novyra-bottom-tab.is-active svg{fill:none!important}
+ .social-app:has(.social-feed-screen) .novyra-bottom-tab.is-active svg.lucide-house{fill:#fff!important}
+ .social-app:has(.social-feed-screen) .nv-android-navigation{position:fixed;z-index:101;right:0;bottom:0;left:0;height:24px;background:#000;display:flex;align-items:center;justify-content:space-around}
+ .nv-android-back{width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:9px solid #CFCFCF}
+ .nv-android-home{width:12px;height:12px;border:1.5px solid #CFCFCF;border-radius:50%}
+ .nv-android-recents{width:11px;height:11px;border:1.5px solid #8A8A8A;border-radius:2px}
+ .nv-ig-feature-post{height:64.2dvh;min-height:0}
+}
