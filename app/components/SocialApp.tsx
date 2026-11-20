@@ -119,7 +119,7 @@ function initials(name: string) {
 }
 
 function Avatar({ name, size = "normal" }: { name: string; size?: "normal" | "large" }) {
-  return <span className={`social-avatar ${size === "large" ? "social-avatar-large" : ""}`} aria-hidden="true">{initials(name)}</span>;
+  return <span className={`social-avatar ${size === "large" ? "social-avatar-large" : ""}`} aria-hidden="true"><img src={`https://i.pravatar.cc/96?u=${encodeURIComponent(name)}`} alt="" loading="lazy" /></span>;
 }
 
 function PostMedia({ post }: { post: Post }) {
@@ -155,7 +155,7 @@ function PostCard({
         <button type="button" aria-label="Share" onClick={() => { const url = window.location.href; if (navigator.share) void navigator.share({ title: "NOVYRA", text: post.body, url }).catch(() => undefined); else void navigator.clipboard?.writeText(url); }}><svg viewBox="0 0 24 24"><path d="m21 3-7.2 18-3.6-7.2L3 10.2 21 3Z M10.2 13.8 21 3"/></svg><small>Share</small></button>
         <button type="button" aria-label="Save" onClick={() => { const key = "novyra-saved-posts"; const saved = JSON.parse(localStorage.getItem(key) || "[]") as string[]; localStorage.setItem(key, JSON.stringify(saved.includes(post.id) ? saved.filter(id => id !== post.id) : [...saved, post.id])); }}><svg viewBox="0 0 24 24"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg><small>Save</small></button>
       </div>
-      <div className="nv-post-caption"><div className="nv-progress"><i /></div><p><strong>{post.authorName}</strong> {post.body}</p></div>
+      <div className="nv-post-caption"><div className="nv-progress"><i /></div><p><strong>{post.authorName}</strong> {post.body}<small className="nv-post-hashtags"> #NOVYRA #community</small></p></div>
     </div>
     {commentsOpen && <div className="social-comments">
       {commentsLoading ? <p className="social-muted">{t.loading}</p> : comments.length ? comments.map(comment => <div className="social-comment" key={comment.id}><Avatar name={comment.authorName} /><div><strong>{comment.authorName}</strong><p>{comment.body}</p></div></div>) : <p className="social-muted">{t.emptyComments}</p>}
