@@ -157,6 +157,16 @@ function formatPostAge(createdAt: string, language: Language) {
   catch { return new Intl.RelativeTimeFormat("en", { numeric: "auto" }).format(value, unit); }
 }
 
+
+const DEMO_MEDIA_POSTS: Post[] = [
+  {id:"demo-01",body:"صبحی تازه، نوری تازه؛ لحظه‌ها را زندگی کن. ✨",mediaUrl:"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200&auto=format&fit=crop",mediaType:"image",createdAt:new Date(Date.now()-1000*60*18).toISOString(),authorId:"demo-user-1",authorName:"آرمان",likeCount:248,commentCount:18,likedByMe:false,viewCount:1840,repostCount:12,shareCount:8,saveCount:31},
+  {id:"demo-02",body:"یک گل کوچک، یک حال خوب 🌸",mediaUrl:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",mediaType:"video",createdAt:new Date(Date.now()-1000*60*45).toISOString(),authorId:"demo-user-2",authorName:"رها",likeCount:932,commentCount:42,likedByMe:false,viewCount:12600,repostCount:37,shareCount:21,saveCount:84},
+  {id:"demo-03",body:"شهر از زاویه‌ای دیگر؛ زیبایی در جزئیات است.",mediaUrl:"https://images.unsplash.com/photo-1519608487953-e999c86e7455?w=1200&auto=format&fit=crop",mediaType:"image",createdAt:new Date(Date.now()-1000*60*90).toISOString(),authorId:"demo-user-3",authorName:"کیان",likeCount:517,commentCount:26,likedByMe:false,viewCount:7600,repostCount:19,shareCount:14,saveCount:62},
+  {id:"demo-04",body:"چند ثانیه آرامش در دل طبیعت 🌿",mediaUrl:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",mediaType:"video",createdAt:new Date(Date.now()-1000*60*60*3).toISOString(),authorId:"demo-user-4",authorName:"سارا",likeCount:1200,commentCount:73,likedByMe:false,viewCount:24100,repostCount:51,shareCount:33,saveCount:106},
+  {id:"demo-05",body:"گاهی بهترین مقصد، خود مسیر است.",mediaUrl:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&auto=format&fit=crop",mediaType:"image",createdAt:new Date(Date.now()-1000*60*60*5).toISOString(),authorId:"demo-user-5",authorName:"نیما",likeCount:386,commentCount:15,likedByMe:false,viewCount:5300,repostCount:9,shareCount:6,saveCount:47},
+  {id:"demo-06",body:"یک قاب کوتاه از طبیعت؛ صدای زندگی.",mediaUrl:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",mediaType:"video",createdAt:new Date(Date.now()-1000*60*60*8).toISOString(),authorId:"demo-user-6",authorName:"هلیا",likeCount:764,commentCount:39,likedByMe:false,viewCount:9800,repostCount:24,shareCount:17,saveCount:73}
+];
+
 function Avatar({ name, size = "normal" }: { name: string; size?: "normal" | "large" }) {
   return <span className={`social-avatar ${size === "large" ? "social-avatar-large" : ""}`} aria-hidden="true">{initials(name)}</span>;
 }
@@ -206,6 +216,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const t = copy[language];
   const dir = language === "en" ? "ltr" : "rtl";
   const [active, setActive] = useState<NavKey>("home");
+  const [demoMode] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("demo") === "1");
   const [aiOpen, setAiOpen] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [reels, setReels] = useState<Post[]>([]);
@@ -281,6 +292,17 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     let alive = true;
     async function loadCurrentPage() {
       setPageError("");
+      if (demoMode) {
+        setPosts(DEMO_MEDIA_POSTS);
+        setReels(DEMO_MEDIA_POSTS.filter(post => post.mediaType === "video"));
+        setExplorePosts(DEMO_MEDIA_POSTS);
+        setProfilePosts(DEMO_MEDIA_POSTS);
+        setSavedPosts(DEMO_MEDIA_POSTS.slice(0, 2));
+        setSavedPostIds(DEMO_MEDIA_POSTS.slice(0, 2).map(post => post.id));
+        setProfile({id:account.id,displayName:account.displayName,email:account.email,postCount:DEMO_MEDIA_POSTS.length,followerCount:1280,followingCount:342,followedByMe:false});
+        setLoading(false);
+        return;
+      }
       if (active === "home" || active === "reels") {
         setLoading(true);
         try {
@@ -333,7 +355,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     }
     void loadCurrentPage();
     return () => { alive = false; };
-  }, [active, friendsOnly, account.displayName, t.genericError]);
+  }, [active, friendsOnly, account.displayName, account.email, account.id, t.genericError, demoMode]);
 
   function navigate(next: NavKey) {
     setAiOpen(false);
@@ -718,6 +740,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         {notifications.length ? notifications.map(item => <div className="social-notification-row" key={item.id}><strong>{item.title}</strong><p>{item.body}</p></div>) : <p className="social-muted">{t.noNotifications}</p>}
       </section>}
 
+      {demoMode && <div role="status" style={{background:"#fff3cd",color:"#664d03",padding:"9px 14px",textAlign:"center",fontSize:13,fontWeight:700}}>حالت پیش‌نمایش — محتوای نمونه است و در حساب یا دیتابیس ذخیره نمی‌شود.</div>}
       <div className="social-layout">
         <aside className="social-sidebar">
           <div className="social-sidebar-kicker">NOVYRA / COMMUNITY</div>
