@@ -328,7 +328,7 @@ export default {
     const id=env.ROOM_HUB.idFromName(wsMatch[1]);
     return env.ROOM_HUB.get(id).fetch(new Request(request,{headers:new Headers({...Object.fromEntries(request.headers), "X-PX-USER":record.user_id,"X-PX-NAME":profile.display_name,"X-PX-ROOM":wsMatch[1]})}));
    }
-   const storyMediaMatch=path.match(/^\\/social\\/stories\\/([a-f0-9-]+)\\/media$/i);
+   const storyMediaMatch=path.match(/^\/social\/stories\/([a-f0-9-]+)\/media$/i);
    if(storyMediaMatch && (request.method==="GET" || request.method==="HEAD")) {
     const story=await db.prepare("SELECT id,type FROM stories WHERE id=? AND expires_at>datetime('now')").bind(storyMediaMatch[1]).first();
     if(!story) return fail("استوری پیدا نشد یا منقضی شده است.",404);
@@ -339,7 +339,7 @@ export default {
     if(request.method==="HEAD") return new Response(null,{status:200,headers:baseHeaders});
     const rangeHeader=request.headers.get("Range");
     if(story.type==="video" && rangeHeader) {
-      const match=rangeHeader.match(/^bytes=(\\d*)-(\\d*)$/);
+      const match=rangeHeader.match(/^bytes=(\d*)-(\d*)$/);
       if(match) {
         let start,end;
         if(match[1]==="") { const suffix=Number(match[2]); if(!suffix) return new Response(null,{status:416,headers:{...baseHeaders,"Content-Range":"bytes */"+size,"Content-Length":"0"}}); start=Math.max(0,size-suffix); end=size-1; }
