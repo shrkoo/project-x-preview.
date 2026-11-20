@@ -328,7 +328,6 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
       await apiRequest("/social/search-history", {method:"POST",body:JSON.stringify({type:"user",userId:person.id})});
       setViewedProfile({profile:data.profile,posts:data.posts||[]});
       setProfileTab("Photos");
-      setSearchOpen(false);
       await loadSearchHistory();
     } catch (error) { setPageError(error instanceof Error ? error.message : t.genericError); }
   }
