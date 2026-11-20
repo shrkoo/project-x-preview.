@@ -2816,3 +2816,10 @@ html,body{background:linear-gradient(145deg,#0D0907 0%,#130d09 52%,#1A120D 100%)
   .nv-reel-list-card { min-height:calc(100dvh - 58px)!important; border-radius:0!important; }
   .social-profile-screen { background:#000!important; color:#fff!important; }
 }
+
+
+@media (max-width:760px) {
+  .novyra-bottom-tab span:last-child { display:none!important; }
+  .novyra-bottom-tab svg { width:26px!important;height:26px!important; }
+  .nv-full-reel-actions { left:12px!important; right:auto!important; }
+}
