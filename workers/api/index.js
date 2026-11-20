@@ -353,6 +353,78 @@ export default {
     return new Response(request.method==="HEAD"?null:bytes,{status:200,headers:baseHeaders});
    }
       const user = await authenticate(request,db);
+   const publicShareMediaMatch=path.match(/^\/public\/shares\/([A-Za-z0-9_-]{40,60})\/media$/);
+   const publicSharePageMatch=path.match(/^\/public\/shares\/([A-Za-z0-9_-]{40,60})$/);
+   if(publicShareMediaMatch && (request.method==="GET"||request.method==="HEAD")) {
+    const tokenHash=await digest(publicShareMediaMatch[1]);
+    const share=await db.prepare("SELECT id,media_key,content_type FROM public_shares WHERE token_hash=? AND kind='video' AND deleted_at IS NULL").bind(tokenHash).first();
+    if(!share) return fail("این محتوا وجود ندارد",404);
+    const stored=await env.STORY_MEDIA.get(share.media_key,"arrayBuffer");
+    if(!stored) return fail("این محتوا وجود ندارد",404);
+    const bytes=new Uint8Array(stored),size=bytes.byteLength;
+    const baseHeaders={...corsHeaders,"Content-Type":share.content_type||"video/mp4","Accept-Ranges":"bytes","Cache-Control":"public, max-age=300","X-Content-Type-Options":"nosniff","Content-Length":String(size)};
+    if(request.method==="HEAD") return new Response(null,{status:200,headers:baseHeaders});
+    const rangeHeader=request.headers.get("Range");
+    if(rangeHeader) {
+      const match=rangeHeader.match(/^bytes=(\\d*)-(\\d*)$/);
+      if(!match || (!match[1]&&!match[2])) return new Response(null,{status:416,headers:{...baseHeaders,"Content-Range":`bytes */${size}`,"Content-Length":"0"}});
+      let start=match[1]?Number(match[1]):Math.max(0,size-Number(match[2]));
+      let end=match[2]&&match[1]?Number(match[2]):match[2]&&!match[1]?size-1:size-1;
+      if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<0||start>=size||end<start) return new Response(null,{status:416,headers:{...baseHeaders,"Content-Range":`bytes */${size}`,"Content-Length":"0"}});
+      end=Math.min(end,size-1);
+      const chunk=bytes.slice(start,end+1);
+      return new Response(chunk,{status:206,headers:{...baseHeaders,"Content-Length":String(chunk.byteLength),"Content-Range":`bytes ${start}-${end}/${size}`}});
+    }
+    return new Response(bytes,{status:200,headers:baseHeaders});
+   }
+   if(publicSharePageMatch && request.method==="GET") {
+    const tokenHash=await digest(publicSharePageMatch[1]);
+    const share=await db.prepare("SELECT kind,content,content_type,created_at AS createdAt FROM public_shares WHERE token_hash=? AND deleted_at IS NULL").bind(tokenHash).first();
+    if(!share) return fail("این محتوا وجود ندارد",404);
+    return json({kind:share.kind,content:share.content||"",mediaUrl:share.kind==="video"?`/public/shares/${publicSharePageMatch[1]}/media`:null,contentType:share.content_type||null,createdAt:share.createdAt});
+   }
+   if (path === "/public/shares" && request.method==="POST") {
+    if(!user) return fail("برای ساخت لینک وارد حساب شو.",401);
+    let kind="text",content="",file=null;
+    if((request.headers.get("Content-Type")||"").toLowerCase().includes("multipart/form-data")) {
+      const form=await request.formData();
+      const uploaded=form.get("file");
+      if(uploaded instanceof File) file=uploaded;
+      kind="video";
+    } else {
+      const body=await readBody(request);
+      content=String(body?.content||"").trim();
+    }
+    if(file) {
+      const type=String(file.type||"").toLowerCase();
+      if(!["video/mp4","video/webm","video/quicktime"].includes(type)) return fail("فرمت ویدیو پشتیبانی نمی‌شود. MP4، WebM یا MOV انتخاب کن.");
+      if(file.size<1||file.size>20*1024*1024) return fail("حجم ویدیو بیشتر از سقف مجاز ۲۰ مگابایت است. یک ویدیوی کوچک‌تر انتخاب کن.",413);
+    } else if(!content) return fail("متن یا ویدیویی برای ساخت لینک انتخاب کن.");
+    else if(content.length>20000) return fail("متن نباید بیشتر از ۲۰٬۰۰۰ نویسه باشد.",413);
+    const token=randomToken(32),tokenHash=await digest(token),id=crypto.randomUUID();
+    const mediaKey=file?"share:"+tokenHash:null;
+    if(file) await env.STORY_MEDIA.put(mediaKey,await file.arrayBuffer(),{metadata:{contentType:file.type}});
+    try {
+      await db.prepare("INSERT INTO public_shares (id,token_hash,owner_id,kind,content,media_key,content_type) VALUES (?,?,?,?,?,?,?)")
+        .bind(id,tokenHash,user.id,kind,file?null:content,mediaKey,file?.type||null).run();
+    } catch(error) { if(mediaKey) await env.STORY_MEDIA.delete(mediaKey); throw error; }
+    return json({ok:true,id,token,kind,createdAt:new Date().toISOString()},201);
+   }
+   if(path==="/public/shares/mine" && request.method==="GET") {
+    if(!user) return fail("برای مشاهده لینک‌ها وارد حساب شو.",401);
+    const rows=await db.prepare("SELECT id,kind,content,created_at AS createdAt FROM public_shares WHERE owner_id=? AND deleted_at IS NULL ORDER BY created_at DESC LIMIT 100").bind(user.id).all();
+    return json({shares:rows.results||[]});
+   }
+   const deletePublicShareMatch=path.match(/^\/public\/shares\/manage\/([a-f0-9-]+)$/i);
+   if(deletePublicShareMatch && request.method==="DELETE") {
+    if(!user) return fail("برای حذف لینک وارد حساب شو.",401);
+    const share=await db.prepare("SELECT id,owner_id,media_key FROM public_shares WHERE id=? AND deleted_at IS NULL").bind(deletePublicShareMatch[1]).first();
+    if(!share) return fail("این محتوا وجود ندارد",404);
+    if(share.owner_id!==user.id) return fail("اجازه حذف این محتوا را نداری.",403);
+    await db.prepare("DELETE FROM public_shares WHERE id=? AND owner_id=?").bind(share.id,user.id).run();
+    if(share.media_key) await env.STORY_MEDIA.delete(share.media_key);
+    return json({ok:true});
+   }
    if (path.startsWith("/auth/") && path !== "/auth/register" && path !== "/auth/login") {
     if (!user) return fail("برای ادامه وارد حساب شو.",401);
     if (path === "/auth/set-password" && request.method === "POST") {
