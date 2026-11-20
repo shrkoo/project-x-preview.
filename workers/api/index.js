@@ -328,13 +328,29 @@ export default {
     const id=env.ROOM_HUB.idFromName(wsMatch[1]);
     return env.ROOM_HUB.get(id).fetch(new Request(request,{headers:new Headers({...Object.fromEntries(request.headers), "X-PX-USER":record.user_id,"X-PX-NAME":profile.display_name,"X-PX-ROOM":wsMatch[1]})}));
    }
-   const storyMediaMatch=path.match(/^\/social\/stories\/([a-f0-9-]+)\/media$/i);
-   if(storyMediaMatch && request.method==="GET") {
-    const story=await db.prepare("SELECT id FROM stories WHERE id=? AND expires_at>datetime('now')").bind(storyMediaMatch[1]).first();
+   const storyMediaMatch=path.match(/^\\/social\\/stories\\/([a-f0-9-]+)\\/media$/i);
+   if(storyMediaMatch && (request.method==="GET" || request.method==="HEAD")) {
+    const story=await db.prepare("SELECT id,type FROM stories WHERE id=? AND expires_at>datetime('now')").bind(storyMediaMatch[1]).first();
     if(!story) return fail("استوری پیدا نشد یا منقضی شده است.",404);
     const media=await readStoryMedia(env,story.id);
     if(!media?.value) return fail("فایل استوری پیدا نشد یا منقضی شده است.",404);
-    return new Response(media.value,{headers:{...corsHeaders,"Content-Type":media.contentType||"application/octet-stream","Cache-Control":"public, max-age=300","X-Content-Type-Options":"nosniff"}});
+    const bytes=new Uint8Array(media.value),size=bytes.byteLength,contentType=media.contentType||"application/octet-stream";
+    const baseHeaders={...corsHeaders,"Content-Type":contentType,"Accept-Ranges":"bytes","Cache-Control":"public, max-age=300","X-Content-Type-Options":"nosniff","Content-Length":String(size)};
+    if(request.method==="HEAD") return new Response(null,{status:200,headers:baseHeaders});
+    const rangeHeader=request.headers.get("Range");
+    if(story.type==="video" && rangeHeader) {
+      const match=rangeHeader.match(/^bytes=(\\d*)-(\\d*)$/);
+      if(match) {
+        let start,end;
+        if(match[1]==="") { const suffix=Number(match[2]); if(!suffix) return new Response(null,{status:416,headers:{...baseHeaders,"Content-Range":"bytes */"+size,"Content-Length":"0"}}); start=Math.max(0,size-suffix); end=size-1; }
+        else { start=Number(match[1]); end=match[2]===""?size-1:Number(match[2]); }
+        if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<0||end<start||start>=size) return new Response(null,{status:416,headers:{...baseHeaders,"Content-Range":"bytes */"+size,"Content-Length":"0"}});
+        end=Math.min(end,size-1);
+        const chunk=bytes.slice(start,end+1);
+        return new Response(chunk,{status:206,headers:{...baseHeaders,"Content-Length":String(chunk.byteLength),"Content-Range":`bytes ${start}-${end}/${size}`}});
+      }
+    }
+    return new Response(request.method==="HEAD"?null:bytes,{status:200,headers:baseHeaders});
    }
       const user = await authenticate(request,db);
    if (path.startsWith("/auth/") && path !== "/auth/register" && path !== "/auth/login") {
@@ -416,7 +432,8 @@ export default {
     const validImage=type==="image" && (contentType==="image/webp" || (legacy && ["image/jpeg","image/png"].includes(contentType)));
     const validVideo=type==="video" && ["video/mp4","video/webm","video/quicktime"].includes(contentType);
     if(!validImage&&!validVideo) return fail(type==="image"?"عکس باید به فرمت WebP تبدیل شود.":"فرمت ویدیو پشتیبانی نمی‌شود.");
-    if(file.size<1 || file.size>1500000) return fail("حجم فایل باید حداکثر ۱٫۵ مگابایت باشد.",413);
+    const maxSize=type==="video"?20*1024*1024:5*1024*1024;
+    if(file.size<1 || file.size>maxSize) return fail(type==="video"?"حجم ویدیو بیشتر از سقف مجاز ۲۰ مگابایت است. یک ویدیوی کوچک‌تر انتخاب کن.":"حجم عکس پس از فشرده‌سازی باید حداکثر ۵ مگابایت باشد.",413);
     const id=crypto.randomUUID(),mediaUrl="/social/stories/"+id+"/media";
     await cleanupExpiredStories(env,db);
     await storeStoryMedia(env,id,file);
