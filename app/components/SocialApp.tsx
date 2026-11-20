@@ -3,7 +3,8 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { apiRequest, clearSession } from "../lib/api";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
-import { Search, Bell, Image as ImageIcon, Video, Lock, Heart, Bookmark, MoreHorizontal, MessageCircle, Share2, Music2, Users, MessageSquare, Sparkles, Film, BadgeCheck } from "lucide-react";
+import AppIcon from "./AppIcon";
+import { Search, Bell, Image as ImageIcon, Video, Lock, Heart, Bookmark, MoreHorizontal, MessageCircle, Share2, Music2, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck } from "lucide-react";
 
 type Language = "en" | "fa" | "ar" | "ku";
 type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string };
@@ -147,8 +148,8 @@ function PostCard({
     <div className="nv-post-image" style={{ backgroundImage: post.mediaType === "image" && post.mediaUrl ? `url("${post.mediaUrl}")` : `url("${fallback}")` }}>
       {post.mediaType === "video" && post.mediaUrl && <video src={post.mediaUrl} controls playsInline preload="metadata" />}
       <div className="nv-post-shade" />
-      <div className="nv-post-author"><Avatar name={post.authorName} /><div><strong>{post.authorName} <span className="nv-verified"><BadgeCheck size={14} strokeWidth={1.75} /></span></strong><small>@{post.authorName.toLowerCase().replace(/[^a-z0-9]/g,"")} · {Number.isNaN(date.getTime()) ? "NOVYRA" : date.toLocaleDateString()}</small></div></div>
-      <button className="nv-post-more" type="button" aria-label="Share post" title="Share post" onClick={() => { const url = window.location.href; if (navigator.share) void navigator.share({ title: "NOVYRA", text: post.body, url }).catch(() => undefined); else void navigator.clipboard?.writeText(url); }}><MoreHorizontal size={24} strokeWidth={1.75} /></button>
+      <div className="nv-post-author"><Avatar name={post.authorName} /><div><strong>{post.authorName} <span className="nv-verified"><AppIcon icon={BadgeCheck} /></span></strong><small>@{post.authorName.toLowerCase().replace(/[^a-z0-9]/g,"")} · {Number.isNaN(date.getTime()) ? "NOVYRA" : date.toLocaleDateString()}</small></div></div>
+      <button className="nv-post-more" type="button" aria-label="Share post" title="Share post" onClick={() => { const url = window.location.href; if (navigator.share) void navigator.share({ title: "NOVYRA", text: post.body, url }).catch(() => undefined); else void navigator.clipboard?.writeText(url); }}><AppIcon icon={MoreHorizontal} /></button>
       <div className="nv-post-actions">
         <button type="button" className={post.likedByMe ? "liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}><svg viewBox="0 0 24 24"><path d="M20.8 8.7c0 4.7-8.8 10.1-8.8 10.1S3.2 13.4 3.2 8.7A4.2 4.2 0 0 1 11 6.3a4.2 4.2 0 0 1 9.8 2.4Z"/></svg><small>{post.likeCount.toLocaleString()}</small></button>
         <button type="button" onClick={() => onToggleComments(post)} aria-label={t.comments}><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 20l1-4.1a8.5 8.5 0 1 1 16.5-4.4Z"/></svg><small>{post.commentCount.toLocaleString()}</small></button>
@@ -168,7 +169,7 @@ function PostCard({
 
 export default function SocialApp({ account, language, notice, onClearNotice, onLanguageChange, onLogout }: Props) {
   const t = copy[language];
-  const dir = language === "en" ? "ltr" : "rtl";
+  const dir = language === "fa" ? "rtl" : "ltr";
   const [active, setActive] = useState<NavKey>("home");
   const [aiOpen, setAiOpen] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -420,7 +421,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     const next = value as Language;
     localStorage.setItem("projectx-language", next);
     document.documentElement.lang = next;
-    document.documentElement.dir = next === "en" ? "ltr" : "rtl";
+    document.documentElement.dir = next === "fa" ? "rtl" : "ltr";
     onLanguageChange(next);
     setPageError(copy[next].languageSaved);
   }
@@ -462,20 +463,20 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           {(["home", "search", "reels", "profile"] as NavKey[]).map(item => <button type="button" key={item} className={active === item && !aiOpen ? "social-side-link is-active" : "social-side-link"} onClick={() => navigate(item)}>
             <span className="social-side-dot" />{t[item]}
           </button>)}
-          <button type="button" className="social-side-ai" onClick={() => setAiOpen(true)}><Sparkles size={22} strokeWidth={1.75} />{t.ai}</button>
+          <button type="button" className="social-side-ai" onClick={() => setAiOpen(true)}><AppIcon icon={Sparkles} />{t.ai}</button>
           <div className="social-sidebar-account"><Avatar name={profile?.displayName || account.displayName} /><div><strong>{profile?.displayName || account.displayName}</strong><small>{account.email}</small></div></div>
         </aside>
 
         <section className="social-main-column">
           <div className="social-page-heading">
             <div><span className="social-eyebrow">{aiOpen ? "NOVYRA / AI" : "NOVYRA / COMMUNITY"}</span><h1>{pageTitle}</h1></div>
-            <span className="social-page-glyph">{aiOpen ? <Sparkles size={24} strokeWidth={1.75} /> : active === "reels" ? <Film size={24} strokeWidth={1.75} /> : active === "search" ? <Search size={24} strokeWidth={1.75} /> : active === "profile" ? <ImageIcon size={24} strokeWidth={1.75} /> : active === "create" ? "+" : "N"}</span>
+            <span className="social-page-glyph">{aiOpen ? <AppIcon icon={Sparkles} /> : active === "reels" ? <AppIcon icon={Film} /> : active === "search" ? <AppIcon icon={Search} /> : active === "profile" ? <AppIcon icon={ImageIcon} /> : active === "create" ? "+" : "N"}</span>
           </div>
 
           {pageError && <div className="social-alert" role="status"><span>{pageError}</span><button type="button" onClick={() => { setPageError(""); onClearNotice(); }}>×</button></div>}
 
           {aiOpen && <section className="social-ai-screen">
-            <div className="social-ai-intro"><div className="social-ai-orb"><Sparkles size={28} strokeWidth={1.75} /></div><h2>{t.aiWelcome}</h2><p>{t.aiHint}</p></div>
+            <div className="social-ai-intro"><div className="social-ai-orb"><AppIcon icon={Sparkles} /></div><h2>{t.aiWelcome}</h2><p>{t.aiHint}</p></div>
             <div className="social-ai-chat" aria-live="polite">
               {aiMessages.map((message, index) => <div className={`social-ai-message ${message.role === "user" ? "from-user" : "from-ai"}`} key={index}><div className="social-ai-message-label">{message.role === "user" ? account.displayName : "NOVYRA AI"}</div><p>{message.content}</p></div>)}
               {aiBusy && <div className="social-ai-message from-ai"><div className="social-ai-message-label">NOVYRA AI</div><p className="social-ai-thinking">{t.aiBusy}</p></div>}
@@ -488,14 +489,14 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           </section>}
 
           {!aiOpen && active === "home" && <section className="social-feed-screen">
-            <div className="nv-top-tabs"><button className="active" onClick={() => navigate("home")}>Feed<i /></button><button onClick={() => navigate("home")}>Following</button><button onClick={() => navigate("reels")}>Reels</button><span className="nv-top-spacer" /><button className="nv-round-action" onClick={() => navigate("search")} aria-label="Search"><Search size={24} strokeWidth={1.75} /></button><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><Bell size={24} strokeWidth={1.75} /><i /></button></div>
+            <div className="nv-top-tabs"><button className="active" onClick={() => navigate("home")}>Feed<i /></button><button onClick={() => navigate("home")}>Following</button><button onClick={() => navigate("reels")}>Reels</button><span className="nv-top-spacer" /><button className="nv-round-action" onClick={() => navigate("search")} aria-label="Search"><AppIcon icon={Search} /></button><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell} /><i /></button></div>
             <div className="nv-stories"><button className="nv-story add" onClick={() => navigate("create")}><span><b>＋</b></span><small>Add Story</small></button>{["Lizaa","Jacks","Luiz","Julien","Nina"].map((name,i)=><button className="nv-story" key={name}><span><img src={`https://i.pravatar.cc/120?img=${i+12}`} alt="" /></span><small>{name}</small></button>)}</div>
             <div className="social-feed-intro"><div><h2>{t.feed}</h2><p>{t.feedHint}</p></div><button type="button" onClick={() => navigate("create")}>＋</button></div>
             {loading ? <p className="social-muted social-center">{t.loading}</p> : posts.length ? <div className="social-post-list">{posts.map(renderPost)}</div> : <div className="social-empty-state"><span className="social-empty-mark">N</span><h2>{t.noPosts}</h2><p>{t.noPostsHint}</p><button type="button" onClick={() => navigate("create")}>{t.create} <span>↗</span></button></div>}
           </section>}
 
           {!aiOpen && active === "search" && <section className="social-search-screen">
-            <form className="social-search-form" onSubmit={runSearch}><Search size={22} strokeWidth={1.75} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder={t.searchPlaceholder} /><button type="submit">{t.search}</button></form>
+            <form className="social-search-form" onSubmit={runSearch}><AppIcon icon={Search} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder={t.searchPlaceholder} /><button type="submit">{t.search}</button></form>
             {searchLoading ? <p className="social-muted social-center">{t.loading}</p> : <>
               <div className="social-section-heading"><h2>{t.people}</h2></div>
               {people.length ? <div className="social-people-list">{people.map(person => <article className="social-person-card" key={person.id}>
@@ -507,7 +508,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             </>}
           </section>}
 
-          {!aiOpen && (active === "friends" || active === "inbox") && <section className="nv-placeholder"><div className="nv-placeholder-icon">{active === "friends" ? <Users size={28} strokeWidth={1.75} /> : <MessageSquare size={28} strokeWidth={1.75} />}</div><h2>{active === "friends" ? t.friends : t.inbox}</h2><p>{active === "friends" ? "Find and connect with people on NOVYRA." : "Your conversations will appear here."}</p></section>}
+          {!aiOpen && (active === "friends" || active === "inbox") && <section className="nv-placeholder"><div className="nv-placeholder-icon">{active === "friends" ? <AppIcon icon={UsersRound} /> : <AppIcon icon={MessageSquare} />}</div><h2>{active === "friends" ? t.friends : t.inbox}</h2><p>{active === "friends" ? "Find and connect with people on NOVYRA." : "Your conversations will appear here."}</p></section>}
 
           {!aiOpen && active === "create" && <section className="social-create-screen">
             <div className="social-create-card">
@@ -523,17 +524,17 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           </section>}
 
           {!aiOpen && active === "reels" && <section className="nv-reels-screen">
-            <div className="nv-top-tabs nv-reels-tabs"><button onClick={() => navigate("home")}>Feed</button><button onClick={() => navigate("friends")}>Following</button><button className="active">Reels<i /></button><span className="nv-top-spacer" /><button className="nv-round-action" onClick={() => navigate("search")} aria-label="Search"><Search size={24} strokeWidth={1.75} /></button><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><Bell size={24} strokeWidth={1.75} /><i /></button></div>
+            <div className="nv-top-tabs nv-reels-tabs"><button onClick={() => navigate("home")}>Feed</button><button onClick={() => navigate("friends")}>Following</button><button className="active">Reels<i /></button><span className="nv-top-spacer" /><button className="nv-round-action" onClick={() => navigate("search")} aria-label="Search"><AppIcon icon={Search} /></button><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell} /><i /></button></div>
             {loading ? <p className="social-muted social-center">{t.loading}</p> : reels.length ? <div className="nv-reels-stack">{reels.map((post,i)=><div className="nv-reel" key={post.id} style={{backgroundImage:`linear-gradient(0deg,rgba(0,0,0,.72),transparent 55%),url("${post.mediaType==="image"&&post.mediaUrl?post.mediaUrl:`https://picsum.photos/seed/novyra-reel-${i}/900/1600`}")`}}>
               {post.mediaType==="video"&&post.mediaUrl&&<video src={post.mediaUrl} autoPlay muted loop playsInline />}
-              <div className="nv-reel-actions"><button onClick={()=>toggleLike(post)} className={post.likedByMe?"liked":""}><Heart size={24} strokeWidth={1.75} /><small>{post.likeCount.toLocaleString()}</small></button><button onClick={()=>toggleComments(post)}><MessageCircle size={24} strokeWidth={1.75} /><small>{post.commentCount.toLocaleString()}</small></button><button aria-label="Share reel" onClick={() => { const url = window.location.href; if (navigator.share) void navigator.share({ title: "NOVYRA", text: post.body, url }).catch(() => undefined); else void navigator.clipboard?.writeText(url); }}><Share2 size={24} strokeWidth={1.75} /><small>Share</small></button><button aria-label="Save reel" onClick={() => { const key = "novyra-saved-posts"; const saved = JSON.parse(localStorage.getItem(key) || "[]") as string[]; localStorage.setItem(key, JSON.stringify(saved.includes(post.id) ? saved.filter(id => id !== post.id) : [...saved, post.id])); }}><Bookmark size={24} strokeWidth={1.75} /><small>Save</small></button></div>
-              <div className="nv-reel-meta"><strong>{post.authorName} <span className="nv-verified"><BadgeCheck size={14} strokeWidth={1.75} /></span></strong><p>{post.body||"#foryou #NOVYRA #social"}</p><small><Music2 size={13} strokeWidth={1.75} /> Original audio</small></div><div className="nv-record"><Music2 size={24} strokeWidth={1.75} /></div>
-            </div>)}</div> : <div className="social-empty-state social-reels-empty"><span className="social-empty-mark"><Film size={28} strokeWidth={1.75} /></span><h2>{t.noVideos}</h2><p>{t.noVideosHint}</p><button type="button" onClick={() => navigate("create")}>{t.create} <span>↗</span></button></div>}
+              <div className="nv-reel-actions"><button onClick={()=>toggleLike(post)} className={post.likedByMe?"liked":""}><AppIcon icon={Heart} /><small>{post.likeCount.toLocaleString()}</small></button><button onClick={()=>toggleComments(post)}><AppIcon icon={MessageCircle} /><small>{post.commentCount.toLocaleString()}</small></button><button aria-label="Share reel" onClick={() => { const url = window.location.href; if (navigator.share) void navigator.share({ title: "NOVYRA", text: post.body, url }).catch(() => undefined); else void navigator.clipboard?.writeText(url); }}><Share2 size={24} strokeWidth={1.75} /><small>Share</small></button><button aria-label="Save reel" onClick={() => { const key = "novyra-saved-posts"; const saved = JSON.parse(localStorage.getItem(key) || "[]") as string[]; localStorage.setItem(key, JSON.stringify(saved.includes(post.id) ? saved.filter(id => id !== post.id) : [...saved, post.id])); }}><AppIcon icon={Bookmark} /><small>Save</small></button></div>
+              <div className="nv-reel-meta"><strong>{post.authorName} <span className="nv-verified"><AppIcon icon={BadgeCheck} /></span></strong><p>{post.body||"#foryou #NOVYRA #social"}</p><small><AppIcon icon={Music2} /> Original audio</small></div><div className="nv-record"><AppIcon icon={Music2} /></div>
+            </div>)}</div> : <div className="social-empty-state social-reels-empty"><span className="social-empty-mark"><AppIcon icon={Film} /></span><h2>{t.noVideos}</h2><p>{t.noVideosHint}</p><button type="button" onClick={() => navigate("create")}>{t.create} <span>↗</span></button></div>}
           </section>}
 
           {!aiOpen && active === "profile" && <section className="social-profile-screen">
-            <div className="nv-top-tabs nv-profile-topbar"><span className="nv-profile-top-title">Profile</span><span className="nv-top-spacer" /><button className="nv-round-action" onClick={() => navigate("search")} aria-label="Search"><Search size={24} strokeWidth={1.75} /></button><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><Bell size={24} strokeWidth={1.75} /><i /></button></div>
-            {loading ? <p className="social-muted social-center">{t.loading}</p> : <><div className="nv-profile-cover"><img src="https://picsum.photos/seed/novyra-cover/1200/500" alt="" /><button type="button" onClick={loadNotifications} aria-label="Notifications"><Bell size={22} strokeWidth={1.75} /></button></div><div className="nv-profile-hero"><img className="nv-profile-avatar" src={`https://i.pravatar.cc/240?u=${encodeURIComponent(account.id)}`} alt="" /><div className="nv-profile-name-row"><h2>{profile?.displayName || account.displayName}</h2><button className="nv-edit-pill" type="button" onClick={() => document.getElementById("nv-profile-name")?.focus()}>Edit</button></div><p>Creator · Sharing moments on NOVYRA</p></div><div className="nv-profile-stats"><div><strong>{profile?.followerCount ?? 0}</strong><small>Followers</small></div><div><strong>{profile?.followingCount ?? 0}</strong><small>Following</small></div><div><strong>{profile?.postCount ?? profilePosts.length}</strong><small>Post</small></div><div><strong>—</strong><small>Likes</small></div></div><div className="nv-profile-tabs" role="tablist" aria-label="Profile content"><button className="is-active" type="button" aria-label="Posts"><ImageIcon size={24} strokeWidth={1.75} /></button><button type="button" aria-label="Videos"><Video size={24} strokeWidth={1.75} /></button><button type="button" aria-label="Private"><Lock size={24} strokeWidth={1.75} /></button><button type="button" aria-label="Likes"><Heart size={24} strokeWidth={1.75} /></button><button type="button" aria-label="Saved"><Bookmark size={24} strokeWidth={1.75} /></button></div><div className="nv-profile-grid">{profilePosts.length ? profilePosts.map((post,i)=><div key={post.id} className="nv-profile-tile"><img src={post.mediaUrl&&post.mediaType==="image"?post.mediaUrl:`https://picsum.photos/seed/novyra-grid-${i}/500/650`} alt="" /></div>) : [0,1,2,3,4,5].map(i=><div className="nv-profile-tile" key={i}><img src={`https://picsum.photos/seed/novyra-grid-${i}/500/650`} alt="" /></div>)}</div>
+            <div className="nv-top-tabs nv-profile-topbar"><span className="nv-profile-top-title">Profile</span><span className="nv-top-spacer" /><button className="nv-round-action" onClick={() => navigate("search")} aria-label="Search"><AppIcon icon={Search} /></button><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell} /><i /></button></div>
+            {loading ? <p className="social-muted social-center">{t.loading}</p> : <><div className="nv-profile-cover"><img src="https://picsum.photos/seed/novyra-cover/1200/500" alt="" /><button type="button" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell} /></button></div><div className="nv-profile-hero"><img className="nv-profile-avatar" src={`https://i.pravatar.cc/240?u=${encodeURIComponent(account.id)}`} alt="" /><div className="nv-profile-name-row"><h2>{profile?.displayName || account.displayName}</h2><button className="nv-edit-pill" type="button" onClick={() => document.getElementById("nv-profile-name")?.focus()}>Edit</button></div><p>Creator · Sharing moments on NOVYRA</p></div><div className="nv-profile-stats"><div><strong>{profile?.followerCount ?? 0}</strong><small>Followers</small></div><div><strong>{profile?.followingCount ?? 0}</strong><small>Following</small></div><div><strong>{profile?.postCount ?? profilePosts.length}</strong><small>Post</small></div><div><strong>—</strong><small>Likes</small></div></div><div className="nv-profile-tabs" role="tablist" aria-label="Profile content"><button className="is-active" type="button" aria-label="Posts"><AppIcon icon={ImageIcon} /></button><button type="button" aria-label="Videos"><AppIcon icon={Video} /></button><button type="button" aria-label="Private"><AppIcon icon={Lock} /></button><button type="button" aria-label="Likes"><AppIcon icon={Heart} /></button><button type="button" aria-label="Saved"><AppIcon icon={Bookmark} /></button></div><div className="nv-profile-grid">{profilePosts.length ? profilePosts.map((post,i)=><div key={post.id} className="nv-profile-tile"><img src={post.mediaUrl&&post.mediaType==="image"?post.mediaUrl:`https://picsum.photos/seed/novyra-grid-${i}/500/650`} alt="" /></div>) : [0,1,2,3,4,5].map(i=><div className="nv-profile-tile" key={i}><img src={`https://picsum.photos/seed/novyra-grid-${i}/500/650`} alt="" /></div>)}</div>
             <form className="social-profile-edit" onSubmit={saveProfile}><label>{t.editProfile}<input id="nv-profile-name" value={profileName} onChange={event => setProfileName(event.target.value)} maxLength={32} /></label><button type="submit" disabled={profileSaving || profileName.trim().length < 2}>{profileSaving ? "…" : t.save}</button></form>
             <div className="social-profile-settings">
               <label>{t.language}<select value={language} onChange={event => changeLanguage(event.target.value)}><option value="fa">فارسی</option><option value="en">English</option><option value="ar">العربية</option><option value="ku">کوردی</option></select></label>
