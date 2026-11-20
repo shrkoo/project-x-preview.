@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { apiRequest, clearSession } from "../lib/api";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
 import AppIcon from "./AppIcon";
-import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound, Clock, Play, Eye, ArrowRight, ArrowLeft } from "lucide-react";
+import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, Send, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound, Clock, Play, Eye, ArrowRight, ArrowLeft } from "lucide-react";
 
 type Language = "en" | "fa" | "ar" | "ku";
 type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string };
@@ -32,12 +32,6 @@ type Person = {
 };
 type Comment = { id: string; body: string; createdAt: string; authorId: string; authorName: string };
 type Profile = Person & { email: string; createdAt?: string };
-
-const demoPosts: Post[] = [
-  {id:"demo-1",body:"Golden hour, good people, and a moment worth keeping. What made you smile today?",mediaUrl:"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1000&auto=format&fit=crop",mediaType:"image",createdAt:"2026-11-20T10:00:00.000Z",authorId:"demo",authorName:"Alex Morgan",likeCount:212,commentCount:20,likedByMe:false},
-  {id:"demo-2",body:"A little reminder to slow down and enjoy the small things around you.",mediaUrl:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=1000&auto=format&fit=crop",mediaType:"image",createdAt:"2026-11-20T09:48:00.000Z",authorId:"demo",authorName:"Alana Rose",likeCount:184,commentCount:16,likedByMe:false},
-  {id:"demo-3",body:"New places, familiar faces, and stories still waiting to happen.",mediaUrl:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=1000&auto=format&fit=crop",mediaType:"image",createdAt:"2026-11-20T09:36:00.000Z",authorId:"demo",authorName:"Marco Lee",likeCount:96,commentCount:8,likedByMe:false}
-];
 
 type Props = {
   account: Account;
@@ -138,8 +132,24 @@ function formatExploreViews(value: number | undefined) {
   return `${format(Math.round((count / 1000000) * 10) / 10)} میلیون`;
 }
 
+function formatPostAge(createdAt: string, language: Language) {
+  const date = new Date(createdAt);
+  if (Number.isNaN(date.getTime())) return "";
+  const seconds = Math.round((date.getTime() - Date.now()) / 1000);
+  const absolute = Math.abs(seconds);
+  const locale = language === "fa" ? "fa-IR" : language === "ar" ? "ar" : language === "ku" ? "fa-IR" : "en";
+  let value = seconds;
+  let unit: Intl.RelativeTimeFormatUnit = "second";
+  if (absolute >= 60 * 60 * 24 * 30) { value = Math.round(seconds / (60 * 60 * 24 * 30)); unit = "month"; }
+  else if (absolute >= 60 * 60 * 24) { value = Math.round(seconds / (60 * 60 * 24)); unit = "day"; }
+  else if (absolute >= 60 * 60) { value = Math.round(seconds / (60 * 60)); unit = "hour"; }
+  else if (absolute >= 60) { value = Math.round(seconds / 60); unit = "minute"; }
+  try { return new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(value, unit); }
+  catch { return new Intl.RelativeTimeFormat("en", { numeric: "auto" }).format(value, unit); }
+}
+
 function Avatar({ name, size = "normal" }: { name: string; size?: "normal" | "large" }) {
-  return <span className={`social-avatar ${size === "large" ? "social-avatar-large" : ""}`} aria-hidden="true"><img src={`https://i.pravatar.cc/96?u=${encodeURIComponent(name)}`} alt="" loading="lazy" /></span>;
+  return <span className={`social-avatar ${size === "large" ? "social-avatar-large" : ""}`} aria-hidden="true">{initials(name)}</span>;
 }
 
 function PostMedia({ post }: { post: Post }) {
@@ -153,26 +163,34 @@ function PostMedia({ post }: { post: Post }) {
 }
 
 function PostCard({
-  post, t, onLike, onToggleComments, commentsOpen, comments, commentDraft, onCommentDraft,
-  onSubmitComment, commentsLoading, onSave
+  post, t, language, onLike, onToggleComments, commentsOpen, comments, commentDraft, onCommentDraft,
+  onSubmitComment, commentsLoading, onSave, saved
 }: {
-  post: Post; t: Record<string, string>; onLike: (post: Post) => void;
+  post: Post; t: Record<string, string>; language: Language; onLike: (post: Post) => void;
   onToggleComments: (post: Post) => void; commentsOpen: boolean; comments: Comment[];
   commentDraft: string; onCommentDraft: (value: string) => void;
-  onSubmitComment: (post: Post) => void; commentsLoading: boolean; onSave: (post: Post) => void;
+  onSubmitComment: (post: Post) => void; commentsLoading: boolean; onSave: (post: Post) => void; saved: boolean;
 }) {
-  const date = new Date(post.createdAt);
-  const photo = post.mediaUrl && post.mediaType === "image" ? post.mediaUrl : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1000&auto=format&fit=crop";
-  const ago = Number.isNaN(date.getTime()) ? "12 min ago" : "12 min ago";
+  const numberLocale = language === "fa" ? "fa-IR" : language === "ar" ? "ar" : language === "ku" ? "ku" : "en";
+  const sharePost = () => {
+    const shareData = { title: post.authorName, text: post.body, url: window.location.href };
+    if (navigator.share) void navigator.share(shareData).catch(() => undefined);
+    else if (navigator.clipboard) void navigator.clipboard.writeText([post.authorName, post.body, window.location.href].filter(Boolean).join("\n"));
+  };
   return <article className="nv-post-card">
-    <div className="nv-post-head"><Avatar name={post.authorName}/><div className="nv-post-person"><strong><bdi dir="auto">{post.authorName}</bdi></strong><small><bdi dir="auto">{ago}</bdi></small></div><button className="nv-post-menu" type="button" aria-label="Save post" onClick={() => onSave(post)}><AppIcon icon={EllipsisVertical}/></button></div>
-    <div className="nv-post-photo"><img src={photo} alt="" loading="lazy"/>{post.mediaType === "video" && post.mediaUrl && <video src={post.mediaUrl} controls playsInline preload="metadata"/>}</div>
-    <div className="nv-post-interactions">
-      <button type="button" className={post.likedByMe ? "liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}><AppIcon icon={Heart} fill="currentColor"/><span>{post.likeCount || 212}</span></button>
-      <button type="button" onClick={() => onToggleComments(post)} aria-label={t.comments}><AppIcon icon={MessageCircle}/><span>{post.commentCount || 20}</span></button>
-      <button type="button" className="nv-reply-pill" onClick={() => onToggleComments(post)}><AppIcon icon={Share2}/><span>Reply</span></button>
+    <div className="nv-post-head">
+      <Avatar name={post.authorName}/>
+      <div className="nv-post-person"><strong><bdi dir="auto">{post.authorName}</bdi></strong><small><bdi dir="auto">{formatPostAge(post.createdAt, language)}</bdi></small></div>
+      <button className="nv-post-menu" type="button" aria-label={t.save} title={t.save} onClick={() => onSave(post)}><AppIcon icon={Bookmark} fill={saved ? "currentColor" : "none"}/></button>
     </div>
-    <p className="nv-post-copy"><strong><bdi dir="auto">{post.authorName}</bdi></strong> {post.body || "A little moment worth remembering. Sharing the good energy with everyone today."}</p>
+    {post.mediaUrl && post.mediaType && <div className="nv-post-photo"><PostMedia post={post}/></div>}
+    {!post.mediaUrl && post.body && <div className="nv-post-text-only"><p>{post.body}</p></div>}
+    <div className="nv-post-interactions">
+      <button type="button" className={post.likedByMe ? "liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}><AppIcon icon={Heart} fill={post.likedByMe ? "currentColor" : "none"}/><span>{post.likeCount.toLocaleString(numberLocale)}</span></button>
+      <button type="button" onClick={() => onToggleComments(post)} aria-label={t.comments}><AppIcon icon={MessageCircle}/><span>{post.commentCount.toLocaleString(numberLocale)}</span></button>
+      <button type="button" className="nv-reply-pill" onClick={sharePost} aria-label={t.send}><AppIcon icon={Send}/></button>
+    </div>
+    {post.body && post.mediaUrl && <p className="nv-post-copy"><strong><bdi dir="auto">{post.authorName}</bdi></strong> {post.body}</p>}
     {commentsOpen && <div className="social-comments">
       {commentsLoading ? <p className="social-muted">{t.loading}</p> : comments.length ? comments.map(comment => <div className="social-comment" key={comment.id}><Avatar name={comment.authorName}/><div><strong><bdi dir="auto">{comment.authorName}</bdi></strong><p>{comment.body}</p></div></div>) : <p className="social-muted">{t.emptyComments}</p>}
       <form className="social-comment-form" onSubmit={event => { event.preventDefault(); onSubmitComment(post); }}>
@@ -267,11 +285,14 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             if (alive) setPosts(Array.isArray(data.posts) ? data.posts : []);
           } else {
             const data = await apiRequest<{ posts: Post[] }>("/social/reels");
-            if (alive) setReels(Array.isArray(data.posts) ? data.posts : []);
+            if (alive) setReels((Array.isArray(data.posts) ? data.posts : []).filter(post => Boolean(post.mediaUrl) && post.mediaType === "video"));
           }
         } catch (error) {
-          if (alive && active === "home") setPosts(demoPosts);
-          if (alive && active === "reels") setReels(demoPosts);
+          if (alive) {
+            setPageError(error instanceof Error ? error.message : t.genericError);
+            if (active === "home") setPosts([]);
+            if (active === "reels") setReels([]);
+          }
         } finally {
           if (alive) setLoading(false);
         }
@@ -599,7 +620,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     return <PostCard key={post.id} post={post} t={t} onLike={toggleLike} onToggleComments={toggleComments}
       commentsOpen={commentingPost === post.id} comments={commentsByPost[post.id] || []}
       commentDraft={commentDrafts[post.id] || ""} onCommentDraft={value => setCommentDrafts(current => ({ ...current, [post.id]: value }))}
-      onSubmitComment={submitComment} commentsLoading={Boolean(commentsLoading[post.id])} onSave={toggleSavedPost} />;
+      onSubmitComment={submitComment} commentsLoading={Boolean(commentsLoading[post.id])} onSave={toggleSavedPost} saved={savedPostIds.includes(post.id)} language={language} />;
   }
 
   return <main className="social-app" dir={dir}>
@@ -656,8 +677,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
 
           {!aiOpen && active === "home" && <section className="social-feed-screen">
             <div className="nv-feed-header"><div className="nv-feed-switch"><button className="nv-feed-title" onClick={() => setFeedMenuOpen(v => !v)}>{t.home} <AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button onClick={() => {setFeedMenuOpen(false);navigate("home")}}>Feed</button><button onClick={() => {setFeedMenuOpen(false);navigate("friends")}}>Following</button><button onClick={() => {setFeedMenuOpen(false);navigate("reels")}}>Reels</button></div>}</div><div className="nv-feed-tools"><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell}/><i/></button></div></div>
-            <div className="nv-stories"><button className="nv-story add" onClick={() => navigate("create")}><span><img src={`https://i.pravatar.cc/120?u=${encodeURIComponent(account.id)}`} alt=""/><b>+</b></span><small>You</small></button>{["alex","alana","marco","john","jim"].map((name,i)=><button className="nv-story" key={name}><span><img src={`https://i.pravatar.cc/120?img=${i+12}`} alt=""/></span><small>@{name}</small></button>)}</div>
-            {loading ? <p className="social-muted social-center">{t.loading}</p> : <div className="social-post-list">{(posts.length ? posts : demoPosts).map(renderPost)}</div>}
+            <div className="nv-stories"><button className="nv-story add" onClick={() => navigate("create")} aria-label={t.create}><span className="nv-story-own-avatar"><Avatar name={account.displayName}/><b>+</b></span><small>{language === "fa" ? "پست جدید" : "New post"}</small></button></div>
+            {loading ? <p className="social-muted social-center">{t.loading}</p> : posts.length ? <div className="social-post-list">{posts.map(renderPost)}</div> : <div className="nv-feed-empty"><strong>{t.noPosts}</strong><p>{t.noPostsHint}</p><button type="button" onClick={() => navigate("create")}>{t.create}</button></div>}
           </section>}
 
           {!aiOpen && active === "search" && <section className="nv-explore-screen">
@@ -678,7 +699,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               </div>
               {!savedPosts.some(post=>Boolean(post.mediaUrl)&&(post.mediaType==="image"||post.mediaType==="video"))&&<p className="social-muted social-center">هنوز محتوایی ذخیره نکرده‌ای.</p>}
             </div> : !searchOpen ? <>
-              <div className="nv-explore-toolbar" dir="rtl"><form className="nv-explore-search-trigger" onSubmit={runSearch}><AppIcon icon={Search}/><input aria-label="جستجوی محتوا و مکان" value={query} onFocus={()=>{setSearchOpen(true);setShowSavedPosts(false);}} onChange={event=>setQuery(event.target.value)} placeholder="جستجوی عکس، ویدئو یا مکان" /></form><button type="button" className="nv-explore-bookmark" aria-label="ذخیره‌شده‌ها" title="ذخیره‌شده‌ها" onClick={()=>{setShowSavedPosts(true);setSearchOpen(false);setViewedProfile(null);}}><AppIcon icon={Bookmark}/></button></div>
+              <div className="nv-explore-toolbar" dir="rtl"><form className="nv-explore-search-trigger" onSubmit={runSearch}><AppIcon icon={Search}/><input aria-label="جستجوی محتوا و مکان" value={query} onFocus={()=>{setSearchOpen(true);setShowSavedPosts(false);}} onChange={event=>setQuery(event.target.value)} placeholder="جستجو" /></form><button type="button" className="nv-explore-bookmark" aria-label="ذخیره‌شده‌ها" title="ذخیره‌شده‌ها" onClick={()=>{setShowSavedPosts(true);setSearchOpen(false);setViewedProfile(null);}}><AppIcon icon={Bookmark}/></button></div>
               <div className="nv-explore-grid" dir="rtl" onTouchStart={event=>setTouchStartY(event.touches[0]?.clientY??null)} onTouchEnd={event=>{const end=event.changedTouches[0]?.clientY??0;if(window.scrollY<=2&&touchStartY!==null&&end-touchStartY>70)void loadExplore(true,true);setTouchStartY(null);}}>
                 {explorePosts.map(post=><button type="button" className="nv-explore-tile" key={post.id} onClick={()=>void openExplorePost(post)} aria-label={`${post.authorName}، ${formatExploreViews(post.viewCount)} بازدید`}>
                   {post.mediaType==="video"&&post.mediaUrl?<><video src={post.mediaUrl} muted playsInline preload="metadata" onLoadedData={event=>{event.currentTarget.dataset.loaded="true";}}/><span className="nv-tile-play"><AppIcon icon={Play}/></span></>:<img src={post.mediaUrl||""} alt="" loading="lazy" onLoad={event=>{event.currentTarget.dataset.loaded="true";}}/>}
@@ -716,14 +737,19 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           </section>}
 
           {!aiOpen && active === "reels" && <section className="nv-reels-screen">
-            <div className="nv-top-tabs nv-reels-tabs"><div className="nv-reels-mode-switch"><button className="nv-reels-mode-title" type="button" onClick={() => setFeedMenuOpen(value => !value)}>ویدئوها <AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button type="button" onClick={() => {setFeedMenuOpen(false);setReelsMode("videos");}}>ویدئوها</button></div>}</div><span className="nv-top-spacer"/><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell}/><i/></button></div>
-            {loading ? <p className="social-muted social-center">{t.loading}</p> : <div className="nv-reels-stack">{(reels.length ? reels : (posts.length ? posts : demoPosts)).map((post,i)=><button type="button" className="nv-reel-list-card" key={post.id} onClick={() => setSelectedReel(post)} style={{backgroundImage:`linear-gradient(0deg,rgba(0,0,0,.65),transparent 58%),url("${post.mediaUrl || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900`}")`}}><span>{post.authorName}</span><small>Watch reel</small></button>)}</div>}
+            <div className="nv-top-tabs nv-reels-tabs"><div className="nv-reels-mode-switch"><button className="nv-reels-mode-title" type="button" onClick={() => setFeedMenuOpen(value => !value)}>{reelsMode === "videos" ? "ویدئوها" : "اکسپلور"} <AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button type="button" onClick={() => {setFeedMenuOpen(false);setReelsMode("videos");}}>ویدئوها</button><button type="button" onClick={() => {setFeedMenuOpen(false);setReelsMode("explore");void loadExplore(true,true);}}>اکسپلور</button></div>}</div><span className="nv-top-spacer"/><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label={t.notifications}><AppIcon icon={Bell}/>{notificationCount > 0 && <i/>}</button></div>
+            {reelsMode === "videos" ? (loading ? <p className="social-muted social-center">{t.loading}</p> : reels.length ? <div className="nv-reels-stack">{reels.map(post=><button type="button" className="nv-reel-list-card" key={post.id} onClick={() => setSelectedReel(post)}><video src={post.mediaUrl || undefined} muted playsInline preload="metadata"/><span>{post.authorName}</span></button>)}</div> : <div className="nv-feed-empty"><strong>{t.noVideos}</strong><p>{t.noVideosHint}</p></div>) : <>
+              <div className="nv-explore-toolbar" dir="rtl"><button type="button" className="nv-explore-search-trigger" onClick={() => navigate("search")}><AppIcon icon={Search}/><span>جستجو</span></button></div>
+              <div className="nv-explore-grid" dir="rtl">{explorePosts.map(post=><button type="button" className="nv-explore-tile" key={post.id} onClick={() => void openExplorePost(post)} aria-label={`${post.authorName}، ${formatExploreViews(post.viewCount)} بازدید`}>{post.mediaType === "video" ? <><video src={post.mediaUrl || undefined} muted playsInline preload="metadata"/><span className="nv-tile-play"><AppIcon icon={Play}/></span></> : <img src={post.mediaUrl || ""} alt="" loading="lazy"/>}<span className="nv-explore-views"><AppIcon icon={Eye}/>{formatExploreViews(post.viewCount)}</span></button>)}</div>
+              <div className="nv-explore-sentinel"/>
+              {!exploreLoading && !explorePosts.length && <p className="social-muted social-center">هنوز محتوایی برای نمایش وجود ندارد.</p>}
+            </>}
           </section>}
 
           {!aiOpen && active === "profile" && <section className="social-profile-screen">
             {loading ? <p className="social-muted social-center">{t.loading}</p> : <>
-              <div className="nv-profile-cover"><img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1400&auto=format&fit=crop" alt=""/><span className="nv-cover-status"/></div>
-              <div className="nv-profile-hero"><div className="nv-avatar-wrap"><img className="nv-profile-avatar" src={`https://i.pravatar.cc/240?u=${encodeURIComponent(account.id)}`} alt=""/><button type="button" className="nv-camera-badge" aria-label="Change profile photo"><AppIcon icon={Camera}/></button></div><h2>{profile?.displayName || account.displayName}</h2><p>@{(profile?.displayName || account.displayName).toLowerCase().replace(/[^a-z0-9]/g,"") || "username"}</p><button type="button" className="nv-edit-pill" onClick={() => document.getElementById("nv-profile-name")?.focus()}>{t.editProfile}</button></div>
+              <div className="nv-profile-cover"><span className="nv-cover-status"/></div>
+              <div className="nv-profile-hero"><div className="nv-avatar-wrap"><span className="nv-profile-avatar nv-profile-avatar-placeholder">{initials(profile?.displayName || account.displayName)}</span><button type="button" className="nv-camera-badge" aria-label="Change profile photo"><AppIcon icon={Camera}/></button></div><h2>{profile?.displayName || account.displayName}</h2><p>@{(profile?.displayName || account.displayName).toLowerCase().replace(/[^a-z0-9]/g,"") || "username"}</p><button type="button" className="nv-edit-pill" onClick={() => document.getElementById("nv-profile-name")?.focus()}>{t.editProfile}</button></div>
               <div className="nv-profile-stats"><div><strong>{profile?.postCount ?? profilePosts.length}</strong><small>{t.postCount}</small></div><div><strong>{(profile?.followerCount ?? 0).toLocaleString(language==="fa"?"fa-IR":undefined)}</strong><small>{t.followers}</small></div><div><strong>{(profile?.followingCount ?? 0).toLocaleString(language==="fa"?"fa-IR":undefined)}</strong><small>{t.followingCount}</small></div><div><strong>{profilePosts.reduce((sum,post)=>sum+(post.likeCount||0),0).toLocaleString(language==="fa"?"fa-IR":undefined)}</strong><small>{language==="fa"?"پسندها":"Likes"}</small></div></div>
               <div className="nv-profile-tabs" role="tablist" aria-label="Profile content">{(["Photos","Videos","Saved"] as const).map(tab=><button key={tab} type="button" className={profileTab===tab?"is-active":""} onClick={() => setProfileTab(tab)}>{tab==="Saved" && <AppIcon icon={LockKeyhole}/>}<span>{tab}</span></button>)}</div>
               <div className="nv-profile-grid">{(profileTab==="Saved"?savedPosts:profilePosts.filter(post=>profileTab==="Photos"?post.mediaType==="image":post.mediaType==="video")).map(item=><button type="button" key={item.id} className="nv-profile-tile" onClick={()=>void openExplorePost(item)}>{item.mediaType==="video"?<><video src={item.mediaUrl||undefined} muted playsInline preload="metadata"/><AppIcon icon={Play}/></>:item.mediaUrl?<img src={item.mediaUrl} alt="" loading="lazy"/>:<span className="nv-explore-text-tile">{item.body}</span>}</button>)}</div>
@@ -736,10 +762,10 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
 
       {selectedGridPost && <section className="nv-grid-post-viewer" role="dialog" aria-modal="true" onClick={()=>setSelectedGridPost(null)}><button type="button" className="nv-grid-viewer-close" onClick={()=>setSelectedGridPost(null)} aria-label="Close">×</button><div className="nv-grid-viewer-media" onClick={event=>event.stopPropagation()}>{selectedGridPost.mediaType==="video"&&selectedGridPost.mediaUrl?<video src={selectedGridPost.mediaUrl} autoPlay controls playsInline/>:selectedGridPost.mediaUrl?<img src={selectedGridPost.mediaUrl} alt=""/>:<p>{selectedGridPost.body}</p>}</div></section>}
       {selectedReel && <section className="nv-full-reel" role="dialog" aria-modal="true">
-        <div className="nv-full-reel-media">{selectedReel.mediaType==="video"&&selectedReel.mediaUrl?<video src={selectedReel.mediaUrl} autoPlay loop playsInline controls/>:<img src={selectedReel.mediaUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1200"} alt="Reel"/>}</div>
+        <div className="nv-full-reel-media">{selectedReel.mediaType === "video" && selectedReel.mediaUrl ? <video src={selectedReel.mediaUrl} autoPlay loop playsInline controls/> : null}</div>
         <div className="nv-full-reel-top"><button onClick={()=>setSelectedReel(null)} aria-label="Back"><AppIcon icon={ChevronDown}/></button><button onClick={()=>{setSelectedReel(null);navigate("search")}} aria-label="Search"><AppIcon icon={Search}/></button></div>
-        <div className="nv-full-reel-actions"><button onClick={()=>toggleLike(selectedReel)}><AppIcon icon={Heart} fill={selectedReel.likedByMe?"#ef4444":"none"}/><small>4.2k</small></button><button onClick={()=>toggleComments(selectedReel)}><AppIcon icon={MessageCircle}/><small>4.2k</small></button><button onClick={()=>{const url=window.location.href;if(navigator.share)void navigator.share({title:"NOVYRA",text:selectedReel.body,url}).catch(()=>undefined);else void navigator.clipboard?.writeText(url)}}><AppIcon icon={Share2}/></button><button><AppIcon icon={MoreHorizontal}/></button></div>
-        <div className="nv-full-reel-caption"><div className="nv-full-reel-user"><Avatar name={selectedReel.authorName}/><div><strong><bdi dir="auto">{selectedReel.authorName}</bdi></strong><small><bdi dir="auto">19 hour ago</bdi></small></div><button>{t.follow}</button></div><p>{selectedReel.body.slice(0,110)}... <span>{language === "fa" ? "بیشتر" : "more"}</span></p><small><AppIcon icon={Music2}/> Remix with laddu_jaan...</small></div><div className="nv-reel-home-indicator"/>
+        <div className="nv-full-reel-actions"><button onClick={()=>toggleLike(selectedReel)} aria-label={t.likes}><AppIcon icon={Heart} fill={selectedReel.likedByMe?"#ef4444":"none"}/><small>{selectedReel.likeCount.toLocaleString(language==="fa"?"fa-IR":undefined)}</small></button><button onClick={()=>toggleComments(selectedReel)} aria-label={t.comments}><AppIcon icon={MessageCircle}/><small>{selectedReel.commentCount.toLocaleString(language==="fa"?"fa-IR":undefined)}</small></button><button onClick={()=>{const url=window.location.href;if(navigator.share)void navigator.share({title:"NOVYRA",text:selectedReel.body,url}).catch(()=>undefined);else void navigator.clipboard?.writeText(url)}} aria-label={t.send}><AppIcon icon={Send}/></button><button onClick={()=>toggleSavedPost(selectedReel)} aria-label={t.save}><AppIcon icon={Bookmark} fill={savedPostIds.includes(selectedReel.id)?"currentColor":"none"}/></button></div>
+        <div className="nv-full-reel-caption"><div className="nv-full-reel-user"><Avatar name={selectedReel.authorName}/><div><strong><bdi dir="auto">{selectedReel.authorName}</bdi></strong><small><bdi dir="auto">{formatPostAge(selectedReel.createdAt,language)}</bdi></small></div></div>{selectedReel.body && <p>{selectedReel.body}</p>}</div><div className="nv-reel-home-indicator"/>
       </section>}
       <nav className="social-mobile-nav-wrap" style={selectedReel ? {display:"none"} : undefined}>
         <MobileBottomNav active={active} labels={{home:t.home,reels:t.reels,message:t.inbox,search:t.search,profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName}
