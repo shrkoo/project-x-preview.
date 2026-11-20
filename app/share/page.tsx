@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
 import { API_BASE } from "../lib/api";
 import { Play, Pause, Volume2, VolumeX, Maximize, ExternalLink } from "lucide-react";
 
@@ -10,7 +9,8 @@ export default function SharedLinkPage(){
  const pathname=usePathname(),token=String(pathname.split("/").filter(Boolean)[1]||"");
  const [data,setData]=useState<SharedContent|null>(null),[loading,setLoading]=useState(true),[missing,setMissing]=useState(false),[playing,setPlaying]=useState(false),[muted,setMuted]=useState(false),[time,setTime]=useState(0),[duration,setDuration]=useState(0),[volume,setVolume]=useState(1),[copied,setCopied]=useState(false);
  const videoRef=useRef<HTMLVideoElement|null>(null),playerRef=useRef<HTMLDivElement|null>(null);
- useEffect(()=>{let alive=true;fetch(API_BASE+"/public/shares/"+encodeURIComponent(token),{cache:"no-store"}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d?.error||"missing");return d as SharedContent;}).then(d=>{if(alive)setData(d);}).catch(()=>{if(alive)setMissing(true);}).finally(()=>{if(alive)setLoading(false);});return()=>{alive=false;};},[token]);
+ useEffect(()=>{const slug=String(window.location.pathname.split("/").filter(Boolean)[1]||"");if(!slug){setMissing(true);setLoading(false);return;}setToken(slug);},[]);
+ useEffect(()=>{if(!token)return;let alive=true;fetch(API_BASE+"/public/shares/"+encodeURIComponent(token),{cache:"no-store"}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d?.error||"missing");return d as SharedContent;}).then(d=>{if(alive)setData(d);}).catch(()=>{if(alive)setMissing(true);}).finally(()=>{if(alive)setLoading(false);});return()=>{alive=false;};},[token]);
  const mediaSrc=data?.mediaUrl?API_BASE+data.mediaUrl:"";
  async function togglePlay(){const v=videoRef.current;if(!v)return;if(v.paused){try{await v.play();setPlaying(true);}catch{setPlaying(false);}}else{v.pause();setPlaying(false);}}
  function toggleMute(){const v=videoRef.current;if(!v)return;v.muted=!v.muted;setMuted(v.muted);}
