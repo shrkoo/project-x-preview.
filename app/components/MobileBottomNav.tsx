@@ -1,6 +1,7 @@
 "use client";
 
-import { House, SquarePlay, Send, UserRound, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { House, SquarePlay, Send, Search } from "lucide-react";
 import AppIcon from "./AppIcon";
 
 export type NavKey = "home" | "search" | "create" | "reels" | "profile" | "friends" | "inbox";
@@ -25,11 +26,23 @@ export default function MobileBottomNav({
   avatarUrl,
   hasUnreadMessages = false,
 }: Props) {
+  const [avatarFailed, setAvatarFailed] = useState(false);
+
+  useEffect(() => {
+    setAvatarFailed(false);
+  }, [avatarUrl]);
+
+  const initial = displayName.trim().charAt(0).toLocaleUpperCase() || "N";
+  const showAvatar = Boolean(avatarUrl) && !avatarFailed;
+
+  // Keep all five destinations in one ordered list so the profile item always
+  // occupies the fifth (leftmost in RTL) navigation cell.
   const tabs = [
     { key: "home" as const, label: labels.home, icon: House },
     { key: "reels" as const, label: labels.reels, icon: SquarePlay },
     { key: "inbox" as const, label: labels.message, icon: Send },
     { key: "search" as const, label: labels.search, icon: Search },
+    { key: "profile" as const, label: labels.profile, icon: null },
   ];
 
   return (
@@ -39,29 +52,24 @@ export default function MobileBottomNav({
           <button
             key={key}
             type="button"
-            className={`novyra-bottom-tab ${active === key ? "is-active" : ""} ${key === "inbox" ? "novyra-inbox-tab" : ""}`}
+            className={`novyra-bottom-tab ${key === "profile" ? "novyra-profile-tab" : ""} ${key === "inbox" ? "novyra-inbox-tab" : ""} ${active === key ? "is-active" : ""}`}
             onClick={() => onNavigate(key)}
             aria-label={label}
             aria-current={active === key ? "page" : undefined}
           >
-            <AppIcon icon={icon} />
+            {key === "profile" ? (
+              showAvatar ? (
+                <img src={avatarUrl} alt="" onError={() => setAvatarFailed(true)} />
+              ) : (
+                <span className="novyra-profile-fallback" aria-hidden="true">{initial}</span>
+              )
+            ) : icon ? (
+              <AppIcon icon={icon} />
+            ) : null}
             {key === "inbox" && hasUnreadMessages && <i className="novyra-unread-dot" aria-label="Unread messages" />}
+            {key === "profile" && <span className="novyra-profile-accessible-name">{label}</span>}
           </button>
         ))}
-        <button
-          type="button"
-          className={`novyra-bottom-tab novyra-profile-tab ${active === "profile" ? "is-active" : ""}`}
-          onClick={() => onNavigate("profile")}
-          aria-label={labels.profile}
-          aria-current={active === "profile" ? "page" : undefined}
-        >
-          {avatarUrl ? (
-            <img src={avatarUrl} alt="" />
-          ) : (
-            <span className="novyra-profile-fallback"><AppIcon icon={UserRound} /></span>
-          )}
-          <span className="novyra-profile-accessible-name">{displayName}</span>
-        </button>
       </div>
     </nav>
   );
