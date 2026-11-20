@@ -799,7 +799,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           </section>}
 
           {!aiOpen && active === "home" && <section className="social-feed-screen">
-            <InstagramHomeReplica onCreate={() => navigate("create")} onNotifications={loadNotifications}/>
+            <InstagramHomeReplica onCreate={() => navigate("create")} onNotifications={loadNotifications} users={Array.from(new Map(posts.filter(post => post.authorId !== account.id).map(post => [post.authorId, { id: post.authorId, name: post.authorName }])).values()).slice(0, 6)}/>
             {loading ? <p className="social-muted social-center">{t.loading}</p> : posts.length ? <div className="social-post-list">{posts.map(renderPost)}</div> : null}
           </section>}
 
