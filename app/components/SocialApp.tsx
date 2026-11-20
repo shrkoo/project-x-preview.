@@ -244,6 +244,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const [feedMenuOpen, setFeedMenuOpen] = useState(false);
   const [friends, setFriends] = useState<Person[]>([]);
   const [friendsOnly, setFriendsOnly] = useState(false);
+  const [videoMenuOpen, setVideoMenuOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerPosts, setViewerPosts] = useState<Post[]>([]);
   const [viewerIndex, setViewerIndex] = useState(0);
@@ -885,6 +886,20 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           </section>}
 
           {!aiOpen && active === "reels" && <section className="nv-reels-screen">
+            <div className="nv-video-switcher" dir={dir}>
+              <button type="button" className="nv-video-switcher-trigger" aria-expanded={videoMenuOpen}
+                onClick={() => setVideoMenuOpen(value => !value)}>
+                <span>{t.reels}</span><ChevronDown size={17}/>
+              </button>
+              {videoMenuOpen && <div className="nv-video-switcher-menu" role="menu">
+                <button type="button" role="menuitem" className="is-selected" onClick={() => setVideoMenuOpen(false)}>
+                  <Clapperboard size={18}/><span>{t.reels}</span><i>✓</i>
+                </button>
+                <button type="button" role="menuitem" onClick={() => { setVideoMenuOpen(false); navigate("search"); }}>
+                  <Search size={18}/><span>{t.search}</span>
+                </button>
+              </div>}
+            </div>
             {loading ? <p className="social-muted social-center">{t.loading}</p> : <MediaViewer
               items={reels as SocialMediaPost[]}
               mode="reels"

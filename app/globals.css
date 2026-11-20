@@ -3370,3 +3370,57 @@ html,body{background:linear-gradient(145deg,#0D0907 0%,#130d09 52%,#1A120D 100%)
 .nv-create-card .social-create-footer{margin-top:14px}
 .nv-create-card .social-create-footer button{min-width:112px}
 @media(max-width:760px){.nv-create-flow{padding:0 0 22px!important}.nv-create-topline{margin:0 -2px 12px}.nv-gallery-picker{min-height:42vh}.nv-selected-media{min-height:38vh}.nv-selected-media img,.nv-selected-media video{max-height:52vh}}
+
+
+/* NOVYRA Instagram-reference pass — 20 Nov 2026 */
+:root{--nv-instagram-bg:#000;--nv-instagram-panel:#121212;--nv-instagram-line:#262626;--nv-instagram-text:#f5f5f5;--nv-instagram-muted:#a8a8a8;--nv-instagram-blue:#0095f6;--nv-instagram-pink:#ff3040}
+html,body{background:var(--nv-instagram-bg)}
+.social-app{background:#000!important;color:var(--nv-instagram-text)!important}
+.social-topbar{border-bottom-color:var(--nv-instagram-line)!important}
+.social-main-column{background:transparent!important}
+.nv-feed-header{padding-top:10px!important}
+.nv-feed-title{font-size:20px!important;font-weight:750!important;letter-spacing:-.35px}
+.nv-round-action{background:transparent!important;border-color:transparent!important}
+.nv-stories{gap:14px!important;padding-bottom:16px!important}
+.nv-story>span{background:linear-gradient(45deg,#feda75 0%,#fa7e1e 25%,#d62976 55%,#962fbf 78%,#4f5bd5 100%)!important}
+.nv-story>span img{border-color:#000!important}
+.nv-story small{color:#f5f5f5!important;font-size:11px!important}
+.nv-post-card{background:#000!important;border:0!important;border-bottom:1px solid var(--nv-instagram-line)!important;border-radius:0!important;box-shadow:none!important}
+.nv-post-author{background:rgba(0,0,0,.38)!important;border:1px solid rgba(255,255,255,.15)!important}
+.nv-post-actions{color:#f5f5f5!important}
+.nv-post-actions button{color:inherit!important}
+.nv-post-actions button.liked{color:var(--nv-instagram-pink)!important}
+.nv-post-actions button.liked svg{fill:var(--nv-instagram-pink)!important;stroke:var(--nv-instagram-pink)!important}
+.nv-explore-search-trigger{background:#262626!important;color:#f5f5f5!important;border-radius:12px!important}
+.nv-explore-bookmark{background:transparent!important}
+.nv-explore-grid{gap:2px!important}
+.nv-profile-cover{border-radius:0!important}
+.nv-profile-avatar{border-color:#000!important}
+.nv-profile-tabs{border-bottom-color:var(--nv-instagram-line)!important}
+.novyra-bottom-nav{background:rgba(0,0,0,.94)!important;border-top:1px solid var(--nv-instagram-line)!important;border-radius:0!important;backdrop-filter:blur(18px)}
+.novyra-bottom-items{max-width:560px!important}
+.novyra-bottom-tab{color:#f5f5f5!important;gap:3px!important;font-size:10px!important}
+.novyra-bottom-tab svg{width:24px!important;height:24px!important;stroke-width:1.8!important}
+.novyra-bottom-tab.is-active{color:#fff!important}
+.novyra-create-button{background:#fff!important;color:#000!important;border:0!important;box-shadow:none!important}
+.novyra-create-button>span:first-child{color:#000!important}
+.novyra-profile-tab img,.novyra-profile-fallback{width:27px;height:27px;border:1.5px solid #f5f5f5;border-radius:50%;object-fit:cover}
+.novyra-profile-fallback{display:grid;place-items:center;background:#363636;color:#fff;font-size:12px}
+.nv-video-switcher{position:absolute;z-index:12;top:12px;left:16px;display:flex;align-items:center}
+.nv-video-switcher-trigger{display:flex;align-items:center;gap:6px;padding:8px 11px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(0,0,0,.55);backdrop-filter:blur(16px);color:#fff;font-size:14px;font-weight:750}
+.nv-video-switcher-menu{position:absolute;top:43px;left:0;min-width:170px;padding:6px;border:1px solid rgba(255,255,255,.13);border-radius:14px;background:#1c1c1e;box-shadow:0 12px 36px #0009}
+.nv-video-switcher-menu button{width:100%;display:flex;align-items:center;gap:10px;padding:11px 10px;border:0;border-radius:9px;background:transparent;color:#f5f5f5;text-align:start;font-size:13px}
+.nv-video-switcher-menu button:active{background:#333}
+.nv-video-switcher-menu button i{margin-inline-start:auto;color:#0095f6;font-style:normal}
+.nv-video-switcher-menu button.is-selected{font-weight:700}
+@media(max-width:760px){
+ .social-app{padding-bottom:calc(74px + env(safe-area-inset-bottom))!important}
+ .nv-reels-screen{margin:0 -15px!important}
+ .nv-video-switcher{top:12px}
+ .nv-video-switcher-trigger{font-size:14px;padding:8px 10px}
+ .nv-feed-header{padding-inline:0!important}
+}
+@media(prefers-reduced-motion:no-preference){
+ .novyra-bottom-tab,.nv-round-action,.nv-video-switcher-trigger{transition:transform .16s ease,background-color .16s ease,color .16s ease}
+ .novyra-bottom-tab:active,.nv-round-action:active{transform:scale(.94)}
+}
