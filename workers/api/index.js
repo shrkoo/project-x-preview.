@@ -395,7 +395,7 @@ export default {
     return json({posts:(rows.results||[]).map(shapeSocialPost),nextOffset:offset+(rows.results||[]).length,hasMore:(rows.results||[]).length===limit});
    }
 
-   const otherProfileMatch=path.match(/^\\/social\\/users\\/([a-f0-9-]+)\\/profile$/i);
+   const otherProfileMatch=path.match(/^\/social\/users\/([a-f0-9-]+)\/profile$/i);
    if(otherProfileMatch && request.method==="GET") {
     const targetId=otherProfileMatch[1];
     const target=await db.prepare("SELECT id,email,display_name AS displayName FROM users WHERE id=?").bind(targetId).first();
@@ -407,7 +407,7 @@ export default {
     return json({profile:{...target,...stats},posts:(posts.results||[]).map(shapeSocialPost)});
    }
 
-   const viewPostMatch=path.match(/^\\/social\\/posts\\/([a-f0-9-]+)\\/view$/i);
+   const viewPostMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/view$/i);
    if(viewPostMatch && request.method==="POST") {
     const result=await db.prepare("UPDATE social_posts SET view_count=COALESCE(view_count,0)+1 WHERE id=? RETURNING view_count AS viewCount").bind(viewPostMatch[1]).first();
     if(!result) return fail("پست پیدا نشد.",404);
@@ -432,7 +432,7 @@ export default {
     await db.prepare("INSERT INTO social_search_history (id,owner_id,search_type,target_user_id,query_text,created_at) VALUES (?,?,?,?,?,CURRENT_TIMESTAMP) ON CONFLICT(id) DO UPDATE SET created_at=CURRENT_TIMESTAMP,query_text=excluded.query_text").bind(id,user.id,type,type==="user"?targetId:null,type==="query"?queryText:null).run();
     return json({ok:true,id});
    }
-   const historyItemMatch=path.match(/^\\/social\\/search-history\\/([a-f0-9-]+)$/i);
+   const historyItemMatch=path.match(/^\/social\/search-history\/([a-f0-9-]+)$/i);
    if(historyItemMatch && request.method==="DELETE") {
     await db.prepare("DELETE FROM social_search_history WHERE id=? AND owner_id=?").bind(historyItemMatch[1],user.id).run();
     return json({ok:true});
