@@ -426,9 +426,14 @@ export default {
 
    const viewPostMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/view$/i);
    if(viewPostMatch && request.method==="POST") {
-    const result=await db.prepare("UPDATE social_posts SET view_count=COALESCE(view_count,0)+1 WHERE id=? RETURNING view_count AS viewCount").bind(viewPostMatch[1]).first();
-    if(!result) return fail("پست پیدا نشد.",404);
-    return json({viewCount:result.viewCount||0});
+    const postId=viewPostMatch[1];
+    const post=await db.prepare("SELECT id FROM social_posts WHERE id=?").bind(postId).first();
+    if(!post) return fail("پست پیدا نشد.",404);
+    const inserted=await db.prepare("INSERT OR IGNORE INTO social_post_views (post_id,user_id) VALUES (?,?)").bind(postId,user.id).run();
+    const counted=Number(inserted?.meta?.changes||0)>0;
+    if(counted) await db.prepare("UPDATE social_posts SET view_count=COALESCE(view_count,0)+1 WHERE id=?").bind(postId).run();
+    const current=await db.prepare("SELECT COALESCE(view_count,0) AS viewCount FROM social_posts WHERE id=?").bind(postId).first();
+    return json({viewCount:current?.viewCount||0,counted});
    }
 
    if(path==="/social/search-history" && request.method==="GET") {
