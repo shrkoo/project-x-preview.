@@ -56,7 +56,7 @@ type Props = {
 
 const copy: Record<Language, Record<string, string>> = {
   fa: {
-    home: "خانه", search: "اکسپلور", create: "ساخت پست", reels: "ویدئوها", profile: "پروفایل", friends: "دوستان", inbox: "پیام‌ها", ai: "هوش مصنوعی",
+    home: "خانه", search: "اکسپلور", create: "ساخت پست", reels: "ویدئوها", profile: "پروفایل", friends: "دوستان", inbox: "پیام‌ها", ai: "هوش مصنوعی", games: "بازی‌ها",
     hello: "فضای تو، صدای تو", feed: "تازه‌های NOVYRA", feedHint: "چیزهایی که افراد منتشر کرده‌اند",
     shareThought: "چه چیزی در ذهنت می‌گذرد؟", writePost: "چیزی بنویس…", publish: "انتشار", publishing: "در حال انتشار…",
     mediaLink: "لینک مستقیم تصویر یا ویدئو (اختیاری)", mediaHint: "فقط نشانی HTTPS فایل رسانه؛ بارگذاری مستقیم فایل هنوز فعال نیست.",
@@ -74,7 +74,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "نمایش همه", backHome: "بازگشت به خانه", profileUpdated: "نام نمایشی به‌روزرسانی شد."
   },
   en: {
-    home: "Home", search: "Explore", create: "Create post", reels: "Videos", profile: "Profile", friends: "Friends", inbox: "Inbox", ai: "AI assistant",
+    home: "Home", search: "Explore", create: "Create post", reels: "Videos", profile: "Profile", friends: "Friends", inbox: "Inbox", ai: "AI assistant", games: "Games",
     hello: "Your space. Your voice.", feed: "What’s happening", feedHint: "Recent posts from the NOVYRA community",
     shareThought: "What’s on your mind?", writePost: "Write something…", publish: "Publish", publishing: "Publishing…",
     mediaLink: "Direct image or video link (optional)", mediaHint: "HTTPS media file URL only. Direct file uploads are not enabled yet.",
@@ -92,7 +92,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "View all", backHome: "Back home", profileUpdated: "Your display name has been updated."
   },
   ar: {
-    home: "الرئيسية", search: "استكشاف", create: "إنشاء منشور", reels: "فيديوهات", profile: "الملف الشخصي", friends: "الأصدقاء", inbox: "الرسائل", ai: "مساعد الذكاء الاصطناعي",
+    home: "الرئيسية", search: "استكشاف", create: "إنشاء منشور", reels: "فيديوهات", profile: "الملف الشخصي", friends: "الأصدقاء", inbox: "الرسائل", ai: "مساعد الذكاء الاصطناعي", games: "الألعاب",
     hello: "مساحتك. صوتك.", feed: "أحدث المنشورات", feedHint: "ما يشاركه مجتمع NOVYRA",
     shareThought: "بماذا تفكر؟", writePost: "اكتب شيئاً…", publish: "نشر", publishing: "جارٍ النشر…",
     mediaLink: "رابط صورة أو فيديو مباشر (اختياري)", mediaHint: "رابط HTTPS لملف الوسائط فقط. رفع الملفات غير متاح بعد.",
@@ -110,7 +110,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "عرض الكل", backHome: "العودة للرئيسية", profileUpdated: "تم تحديث اسم العرض."
   },
   ku: {
-    home: "سەرەکی", search: "گەڕان", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک",
+    home: "سەرەکی", search: "گەڕان", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک", games: "یارییەکان",
     hello: "شوێنی تۆ. دەنگی تۆ.", feed: "نوێترین بڵاوکراوەکان", feedHint: "ئەوەی ئەندامانی NOVYRA بڵاوی دەکەنەوە",
     shareThought: "لە مێشکتدا چییە؟", writePost: "شتێک بنووسە…", publish: "بڵاوکردنەوە", publishing: "لە بڵاوکردنەوەدایە…",
     mediaLink: "بەستەری ڕاستەوخۆی وێنە یان ڤیدیۆ (ئارەزوومەندانە)", mediaHint: "تەنها بەستەری HTTPS ـی فایل. بارکردنی ڕاستەوخۆی فایل هێشتا چالاک نییە.",
@@ -211,6 +211,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const dir = language === "en" ? "ltr" : "rtl";
   const [active, setActive] = useState<NavKey>("home");
   const [aiOpen, setAiOpen] = useState(false);
+  const [gamesOpen, setGamesOpen] = useState(false);
+  const [gameResult, setGameResult] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
   const [reels, setReels] = useState<Post[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
@@ -354,6 +356,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
 
   function navigate(next: NavKey) {
     setAiOpen(false);
+    setGamesOpen(false);
     setNotificationsOpen(false);
     if (next === "search") {
       setSearchOpen(false);
@@ -711,7 +714,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     return ()=>observer.disconnect();
   },[active,searchOpen,showSavedPosts,viewedProfile,exploreHasMore,exploreLoading,exploreOffset]);
 
-  const pageTitle = aiOpen ? t.ai : t[active];
+  const pageTitle = aiOpen ? t.ai : gamesOpen ? t.games : t[active];
   const visiblePosts = active === "reels" ? reels : posts;
 
   async function toggleSavedPost(post: Post) {
@@ -774,11 +777,13 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
 
         <section className="social-main-column">
           <div className="social-page-heading">
-            <div><span className="social-eyebrow">{aiOpen ? "NOVYRA / AI" : "NOVYRA / COMMUNITY"}</span><h1>{pageTitle}</h1></div>
-            <span className="social-page-glyph">{aiOpen ? <AppIcon icon={Sparkles} /> : active === "reels" ? <AppIcon icon={Film} /> : active === "search" ? <AppIcon icon={Search} /> : active === "profile" ? <AppIcon icon={ImageIcon} /> : active === "create" ? "+" : "N"}</span>
+            <div><span className="social-eyebrow">{aiOpen ? "NOVYRA / AI" : gamesOpen ? "NOVYRA / GAMES" : "NOVYRA / COMMUNITY"}</span><h1>{pageTitle}</h1></div>
+            <span className="social-page-glyph">{aiOpen ? <AppIcon icon={Sparkles} /> : gamesOpen ? <AppIcon icon={Gamepad2} /> : active === "reels" ? <AppIcon icon={Film} /> : active === "search" ? <AppIcon icon={Search} /> : active === "profile" ? <AppIcon icon={ImageIcon} /> : active === "create" ? "+" : "N"}</span>
           </div>
 
           {pageError && <div className="social-alert" role="status"><span>{pageError}</span><button type="button" onClick={() => { setPageError(""); onClearNotice(); }}>×</button></div>}
+
+          {gamesOpen && <section className="nv-placeholder" dir={dir}><div className="nv-placeholder-icon"><AppIcon icon={Gamepad2}/></div><h2>{t.games}</h2><p>{language==="fa" ? "یک بازی کوتاه انتخاب کن و سرگرم شو." : "Choose a quick game and have fun."}</p><div className="nv-game-card"><strong>{language==="fa" ? "سنگ، کاغذ، قیچی" : "Rock, Paper, Scissors"}</strong><div className="nv-game-choices">{(language==="fa" ? ["سنگ","کاغذ","قیچی"] : ["Rock","Paper","Scissors"]).map((choice,index)=><button type="button" key={choice} onClick={()=>{const choices=language==="fa"?["سنگ","کاغذ","قیچی"]:["Rock","Paper","Scissors"];const ai= Math.floor(Math.random()*3);const win=(index-ai+3)%3===1;setGameResult(`${language==="fa"?"انتخاب تو":"You"}: ${choice} · ${language==="fa"?"انتخاب NOVYRA":"NOVYRA"}: ${choices[ai]} · ${index===ai?(language==="fa"?"مساوی!":"Draw!") : win?(language==="fa"?"بردی!":"You win!"):(language==="fa"?"این بار باختی!":"You lose!")}`);}}>{choice}</button>)}</div>{gameResult&&<p className="nv-game-result" role="status">{gameResult}</p>}</div></section>}
 
           {aiOpen && <section className="social-ai-screen">
             <div className="social-ai-intro"><div className="social-ai-orb"><AppIcon icon={Sparkles} /></div><h2>{t.aiWelcome}</h2><p>{t.aiHint}</p></div>
@@ -940,8 +945,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         </div>
       </section>}
       <nav className="social-mobile-nav-wrap">
-        <MobileBottomNav active={active} labels={{home:t.home,reels:t.reels,message:t.inbox,search:t.search,profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName} avatarUrl={profile?.avatarUrl || profile?.avatar_url || profile?.photoUrl || profile?.imageUrl}
-          onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} />
+        <MobileBottomNav active={active} labels={{home:t.home,reels:t.reels,message:t.inbox,search:t.search,profile:t.profile,ai:t.ai,games:t.games}} userId={account.id} displayName={profile?.displayName || account.displayName} avatarUrl={profile?.avatarUrl || profile?.avatar_url || profile?.photoUrl || profile?.imageUrl}
+          onNavigate={navigate} onOpenAI={() => { setGamesOpen(false); setAiOpen(true); setNotificationsOpen(false); }} onOpenGame={() => { setAiOpen(false); setGamesOpen(true); setNotificationsOpen(false); setGameResult(""); }} />
       </nav>
     </div>
   </main>;
