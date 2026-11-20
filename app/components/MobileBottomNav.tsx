@@ -8,7 +8,6 @@ export type NavKey = "home" | "search" | "create" | "reels" | "profile" | "frien
 
 type Props = {
   active: NavKey;
-  labels?: { home: string; reels: string; message: string; search: string; profile: string };
   userId?: string;
   displayName?: string;
   avatarUrl?: string;
