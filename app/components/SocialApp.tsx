@@ -732,7 +732,6 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         {notifications.length ? notifications.map(item => <div className="social-notification-row" key={item.id}><strong>{item.title}</strong><p>{item.body}</p></div>) : <p className="social-muted">{t.noNotifications}</p>}
       </section>}
 
-      {demoMode && <div role="status" style={{background:"#fff3cd",color:"#664d03",padding:"9px 14px",textAlign:"center",fontSize:13,fontWeight:700}}>حالت پیش‌نمایش — محتوای نمونه است و در حساب یا دیتابیس ذخیره نمی‌شود.</div>}
       <div className="social-layout">
         <aside className="social-sidebar">
           <div className="social-sidebar-kicker">NOVYRA / COMMUNITY</div>
