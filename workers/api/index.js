@@ -454,7 +454,7 @@ export default {
             EXISTS(SELECT 1 FROM social_follows mine WHERE mine.follower_id=? AND mine.followed_id=u.id) AS followedByMe
           FROM users u WHERE u.id<>? AND (u.display_name LIKE ? OR LOWER(REPLACE(u.display_name,' ','')) LIKE ?)
           ORDER BY followerCount DESC,u.created_at DESC LIMIT 40
-        `).bind(user.id,user.id,likeQuery).all()
+        `).bind(user.id,user.id,likeQuery,likeQuery).all()
       : await db.prepare(`
           SELECT u.id,u.display_name AS displayName,
             (SELECT COUNT(*) FROM social_posts p WHERE p.author_id=u.id) AS postCount,
