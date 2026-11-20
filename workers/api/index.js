@@ -479,7 +479,7 @@ export default {
     return json({posts:(rows.results||[]).map(shapeSocialPost)});
    }
 
-   const savePostMatch=path.match(/^\\/social\\/posts\\/([a-f0-9-]+)\\/save$/i);
+   const savePostMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/save$/i);
    if(savePostMatch && request.method==="POST") {
     const postId=savePostMatch[1];
     if(!await db.prepare("SELECT id FROM social_posts WHERE id=?").bind(postId).first()) return fail("پست پیدا نشد.",404);
@@ -490,7 +490,7 @@ export default {
     return json({saved:!existing,saveCount:total?.total||0});
    }
 
-   const repostPostMatch=path.match(/^\\/social\\/posts\\/([a-f0-9-]+)\\/repost$/i);
+   const repostPostMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/repost$/i);
    if(repostPostMatch && request.method==="POST") {
     const postId=repostPostMatch[1];
     const post=await db.prepare("SELECT author_id FROM social_posts WHERE id=?").bind(postId).first();
@@ -506,13 +506,13 @@ export default {
     return json({reposted:!existing,repostCount:total?.total||0});
    }
 
-   const shareTargetsMatch=path.match(/^\\/social\\/posts\\/([a-f0-9-]+)\\/share-targets$/i);
+   const shareTargetsMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/share-targets$/i);
    if(shareTargetsMatch && request.method==="GET") {
     const rows=await db.prepare("SELECT u.id,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username FROM social_follows f JOIN users u ON u.id=f.followed_id WHERE f.follower_id=? AND u.id<>? ORDER BY u.display_name LIMIT 50").bind(user.id,user.id).all();
     return json({users:rows.results||[]});
    }
 
-   const sharePostMatch=path.match(/^\\/social\\/posts\\/([a-f0-9-]+)\\/share$/i);
+   const sharePostMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/share$/i);
    if(sharePostMatch && request.method==="POST") {
     const postId=sharePostMatch[1], body=await readBody(request);
     const post=await db.prepare("SELECT author_id FROM social_posts WHERE id=?").bind(postId).first();
