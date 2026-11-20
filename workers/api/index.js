@@ -148,7 +148,7 @@ function shapeSocialPost(row) {
     id:row.id, body:row.body||"", mediaUrl:row.mediaUrl||null, mediaType:row.mediaType||null,
     createdAt:isoDate(row.createdAt), authorId:row.authorId, authorName:row.authorName||"NOVYRA",
     likeCount:Number(row.likeCount||0), commentCount:Number(row.commentCount||0),
-    likedByMe:Boolean(row.likedByMe)
+    likedByMe:Boolean(row.likedByMe), viewCount:Number(row.viewCount||0)
   };
 }
 
@@ -391,7 +391,7 @@ export default {
    if (path === "/social/explore" && request.method === "GET") {
     const limit=Math.min(40,Math.max(1,Number(url.searchParams.get("limit")||30)));
     const offset=Math.max(0,Number(url.searchParams.get("offset")||0));
-    const rows=await db.prepare("SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,(SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,(SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe FROM social_posts p JOIN users u ON u.id=p.author_id WHERE p.media_type IN ('image','video') ORDER BY p.created_at DESC LIMIT ? OFFSET ?").bind(user.id,limit,offset).all();
+    const rows=await db.prepare("SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,(SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,(SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe FROM social_posts p JOIN users u ON u.id=p.author_id ORDER BY p.created_at DESC LIMIT ? OFFSET ?").bind(user.id,limit,offset).all();
     return json({posts:(rows.results||[]).map(shapeSocialPost),nextOffset:offset+(rows.results||[]).length,hasMore:(rows.results||[]).length===limit});
    }
 
