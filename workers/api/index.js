@@ -310,7 +310,7 @@ export default {
     const id=env.ROOM_HUB.idFromName(wsMatch[1]);
     return env.ROOM_HUB.get(id).fetch(new Request(request,{headers:new Headers({...Object.fromEntries(request.headers), "X-PX-USER":record.user_id,"X-PX-NAME":profile.display_name,"X-PX-ROOM":wsMatch[1]})}));
    }
-   const storyMediaMatch=path.match(/^\\/social\\/stories\\/([a-f0-9-]+)\\/media$/i);
+   const storyMediaMatch=path.match(/^\/social\/stories\/([a-f0-9-]+)\/media$/i);
    if(storyMediaMatch && request.method==="GET") {
     const story=await db.prepare("SELECT media_data,content_type,expires_at FROM stories WHERE id=? AND expires_at>datetime('now')").bind(storyMediaMatch[1]).first();
     if(!story || !story.media_data) return fail("استوری پیدا نشد یا منقضی شده است.",404);
@@ -373,7 +373,7 @@ export default {
    }
    if(path==="/social/stories" && request.method==="POST") {
     const body=await readBody(request),type=body?.type==="video"?"video":"image",dataUrl=String(body?.mediaData||"");
-    const match=dataUrl.match(/^data:(image\\/(?:jpeg|png|webp)|video\\/(?:mp4|webm));base64,([A-Za-z0-9+/=]+)$/);
+    const match=dataUrl.match(/^data:(image\/(?:jpeg|png|webp)|video\/(?:mp4|webm));base64,([A-Za-z0-9+/=]+)$/);
     if(!match || (type==="image"&&!match[1].startsWith("image/")) || (type==="video"&&!match[1].startsWith("video/"))) return fail("فایل استوری معتبر نیست.");
     const binary=atob(match[2]);
     if(binary.length>1500000) return fail("حجم استوری باید کمتر از ۱٫۵ مگابایت باشد.",413);
@@ -385,7 +385,7 @@ export default {
       .bind(id,user.id,"/social/stories/"+id+"/media",type,bytes,match[1]).run();
     return json({ok:true,story:{id,mediaUrl:"/social/stories/"+id+"/media",type,expiresAt:new Date(Date.now()+86400000).toISOString()}},201);
    }
-   const storyViewMatch=path.match(/^\\/social\\/stories\\/([a-f0-9-]+)\\/view$/i);
+   const storyViewMatch=path.match(/^\/social\/stories\/([a-f0-9-]+)\/view$/i);
    if(storyViewMatch && request.method==="POST") {
     const story=await db.prepare("SELECT id,user_id AS userId FROM stories WHERE id=? AND expires_at>datetime('now')").bind(storyViewMatch[1]).first();
     if(!story) return fail("استوری پیدا نشد یا منقضی شده است.",404);
