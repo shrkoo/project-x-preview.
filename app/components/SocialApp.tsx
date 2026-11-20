@@ -3,11 +3,12 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { apiRequest, apiUpload, clearSession } from "../lib/api";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
-import StoriesExperience from "./StoriesExperience";
+import InstagramHomeReplica from "./InstagramHomeReplica";
 import AppIcon from "./AppIcon";
+import PostCreationFlow from "./PostCreationFlow";
 import { FeedMedia, MediaViewer, formatSocialCount } from "./MediaExperience";
 import type { SocialMediaPost, SocialMediaPerson } from "./MediaExperience";
-import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, Send, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound, Clock, Play, Eye, ArrowRight, ArrowLeft, Repeat2, Plus } from "lucide-react";
+import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, Send, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound, Clock, Play, Eye, ArrowRight, ArrowLeft, Repeat2, Plus, Gamepad2 } from "lucide-react";
 
 type Language = "en" | "fa" | "ar" | "ku";
 type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string };
@@ -55,7 +56,7 @@ type Props = {
 
 const copy: Record<Language, Record<string, string>> = {
   fa: {
-    home: "خانه", search: "اکسپلور", create: "ساخت پست", reels: "ویدئوها", profile: "پروفایل", friends: "دوستان", inbox: "پیام‌ها", ai: "هوش مصنوعی",
+    home: "خانه", search: "اکسپلور", create: "ساخت پست", reels: "ویدئوها", profile: "پروفایل", friends: "دوستان", inbox: "پیام‌ها", ai: "هوش مصنوعی", games: "بازی‌ها",
     hello: "فضای تو، صدای تو", feed: "تازه‌های NOVYRA", feedHint: "چیزهایی که افراد منتشر کرده‌اند",
     shareThought: "چه چیزی در ذهنت می‌گذرد؟", writePost: "چیزی بنویس…", publish: "انتشار", publishing: "در حال انتشار…",
     mediaLink: "لینک مستقیم تصویر یا ویدئو (اختیاری)", mediaHint: "فقط نشانی HTTPS فایل رسانه؛ بارگذاری مستقیم فایل هنوز فعال نیست.",
@@ -73,7 +74,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "نمایش همه", backHome: "بازگشت به خانه", profileUpdated: "نام نمایشی به‌روزرسانی شد."
   },
   en: {
-    home: "Home", search: "Explore", create: "Create post", reels: "Videos", profile: "Profile", friends: "Friends", inbox: "Inbox", ai: "AI assistant",
+    home: "Home", search: "Explore", create: "Create post", reels: "Videos", profile: "Profile", friends: "Friends", inbox: "Inbox", ai: "AI assistant", games: "Games",
     hello: "Your space. Your voice.", feed: "What’s happening", feedHint: "Recent posts from the NOVYRA community",
     shareThought: "What’s on your mind?", writePost: "Write something…", publish: "Publish", publishing: "Publishing…",
     mediaLink: "Direct image or video link (optional)", mediaHint: "HTTPS media file URL only. Direct file uploads are not enabled yet.",
@@ -91,7 +92,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "View all", backHome: "Back home", profileUpdated: "Your display name has been updated."
   },
   ar: {
-    home: "الرئيسية", search: "استكشاف", create: "إنشاء منشور", reels: "فيديوهات", profile: "الملف الشخصي", friends: "الأصدقاء", inbox: "الرسائل", ai: "مساعد الذكاء الاصطناعي",
+    home: "الرئيسية", search: "استكشاف", create: "إنشاء منشور", reels: "فيديوهات", profile: "الملف الشخصي", friends: "الأصدقاء", inbox: "الرسائل", ai: "مساعد الذكاء الاصطناعي", games: "الألعاب",
     hello: "مساحتك. صوتك.", feed: "أحدث المنشورات", feedHint: "ما يشاركه مجتمع NOVYRA",
     shareThought: "بماذا تفكر؟", writePost: "اكتب شيئاً…", publish: "نشر", publishing: "جارٍ النشر…",
     mediaLink: "رابط صورة أو فيديو مباشر (اختياري)", mediaHint: "رابط HTTPS لملف الوسائط فقط. رفع الملفات غير متاح بعد.",
@@ -109,7 +110,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "عرض الكل", backHome: "العودة للرئيسية", profileUpdated: "تم تحديث اسم العرض."
   },
   ku: {
-    home: "سەرەکی", search: "گەڕان", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک",
+    home: "سەرەکی", search: "گەڕان", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک", games: "یارییەکان",
     hello: "شوێنی تۆ. دەنگی تۆ.", feed: "نوێترین بڵاوکراوەکان", feedHint: "ئەوەی ئەندامانی NOVYRA بڵاوی دەکەنەوە",
     shareThought: "لە مێشکتدا چییە؟", writePost: "شتێک بنووسە…", publish: "بڵاوکردنەوە", publishing: "لە بڵاوکردنەوەدایە…",
     mediaLink: "بەستەری ڕاستەوخۆی وێنە یان ڤیدیۆ (ئارەزوومەندانە)", mediaHint: "تەنها بەستەری HTTPS ـی فایل. بارکردنی ڕاستەوخۆی فایل هێشتا چالاک نییە.",
@@ -210,6 +211,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const dir = language === "en" ? "ltr" : "rtl";
   const [active, setActive] = useState<NavKey>("home");
   const [aiOpen, setAiOpen] = useState(false);
+  const [gamesOpen, setGamesOpen] = useState(false);
+  const [gameResult, setGameResult] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
   const [reels, setReels] = useState<Post[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
@@ -244,6 +247,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const [feedMenuOpen, setFeedMenuOpen] = useState(false);
   const [friends, setFriends] = useState<Person[]>([]);
   const [friendsOnly, setFriendsOnly] = useState(false);
+  const [videoMenuOpen, setVideoMenuOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerPosts, setViewerPosts] = useState<Post[]>([]);
   const [viewerIndex, setViewerIndex] = useState(0);
@@ -352,6 +356,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
 
   function navigate(next: NavKey) {
     setAiOpen(false);
+    setGamesOpen(false);
     setNotificationsOpen(false);
     if (next === "search") {
       setSearchOpen(false);
@@ -569,38 +574,20 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     }
   }
 
-  async function publishPost(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const body = postBody.trim();
-    if (!body && !selectedMedia) return;
-    setPublishing(true);
-    setUploadProgress(0);
-    setPageError("");
+  async function publishComposer(file: File | null, caption: string) {
+    const body = caption.trim();
+    if (!body && !file) return;
+    setPublishing(true); setUploadProgress(0); setPageError("");
     try {
-      const form = new FormData();
-      form.append("body", body);
-      if (selectedMedia) {
-        form.append("file", selectedMedia, selectedMedia.name);
-        form.append("mediaType", mediaType || (selectedMedia.type.startsWith("video/") ? "video" : "image"));
-      }
+      const form = new FormData(); form.append("body", body);
+      if (file) { form.append("file", file, file.name); form.append("mediaType", file.type.startsWith("video/") ? "video" : "image"); }
       const created = await apiUpload<{ id: string; message: string }>("/social/posts", form, setUploadProgress);
       const data = await apiRequest<{ posts: Post[] }>("/social/feed");
-      const refreshed = data.posts || [];
-      const newlyPublished = refreshed.find(post => post.id === created.id);
+      const refreshed = data.posts || [], newlyPublished = refreshed.find(post => post.id === created.id);
       setPosts(newlyPublished ? [newlyPublished, ...refreshed.filter(post => post.id !== created.id)] : refreshed);
-      setPostBody("");
-      setSelectedMedia(null);
-      setMediaType("");
-      setComposerStep("media");
-      setUploadProgress(0);
-      setActive("home");
-      setAiOpen(false);
-      setPageError(t.postCreated);
-    } catch (error) {
-      setPageError(error instanceof Error ? error.message : t.genericError);
-    } finally {
-      setPublishing(false);
-    }
+      setPostBody(""); setSelectedMedia(null); setMediaType(""); setComposerStep("media"); setUploadProgress(0); setActive("home"); setAiOpen(false); setPageError(t.postCreated);
+    } catch (error) { setPageError(error instanceof Error ? error.message : t.genericError); }
+    finally { setPublishing(false); }
   }
 
   function chooseMedia(file?: File) {
@@ -727,7 +714,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     return ()=>observer.disconnect();
   },[active,searchOpen,showSavedPosts,viewedProfile,exploreHasMore,exploreLoading,exploreOffset]);
 
-  const pageTitle = aiOpen ? t.ai : t[active];
+  const pageTitle = aiOpen ? t.ai : gamesOpen ? t.games : t[active];
   const visiblePosts = active === "reels" ? reels : posts;
 
   async function toggleSavedPost(post: Post) {
@@ -773,20 +760,30 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
       <div className="social-layout">
         <aside className="social-sidebar">
           <div className="social-sidebar-kicker">NOVYRA / COMMUNITY</div>
-          {(["home", "search", "reels", "profile"] as NavKey[]).map(item => <button type="button" key={item} className={active === item && !aiOpen ? "social-side-link is-active" : "social-side-link"} onClick={() => navigate(item)}>
-            <span className="social-side-dot" />{t[item]}
-          </button>)}
-          <button type="button" className="social-side-ai" onClick={() => setAiOpen(true)}><AppIcon icon={Sparkles} />{t.ai}</button>
+          <nav className="social-sidebar-nav" aria-label="Main navigation">
+            {([
+              { key: "home", label: t.home, icon: ImageIcon },
+              { key: "reels", label: t.reels, icon: Clapperboard },
+              { key: "create", label: t.create, icon: Plus },
+              { key: "inbox", label: t.inbox, icon: Send },
+              { key: "profile", label: t.profile, icon: UserRound },
+            ] as const).map(item => <button type="button" key={item.key} className={active === item.key && !aiOpen ? "social-side-link is-active" : "social-side-link"} onClick={() => navigate(item.key)} aria-current={active === item.key && !aiOpen ? "page" : undefined}>
+              <AppIcon icon={item.icon}/><span>{item.label}</span>
+            </button>)}
+          </nav>
+          <button type="button" className="social-side-ai" onClick={() => setAiOpen(true)}><AppIcon icon={Sparkles} /><span>{t.ai}</span></button>
           <div className="social-sidebar-account"><Avatar name={profile?.displayName || account.displayName} /><div><strong>{profile?.displayName || account.displayName}</strong><small>{account.email}</small></div></div>
         </aside>
 
         <section className="social-main-column">
           <div className="social-page-heading">
-            <div><span className="social-eyebrow">{aiOpen ? "NOVYRA / AI" : "NOVYRA / COMMUNITY"}</span><h1>{pageTitle}</h1></div>
-            <span className="social-page-glyph">{aiOpen ? <AppIcon icon={Sparkles} /> : active === "reels" ? <AppIcon icon={Film} /> : active === "search" ? <AppIcon icon={Search} /> : active === "profile" ? <AppIcon icon={ImageIcon} /> : active === "create" ? "+" : "N"}</span>
+            <div><span className="social-eyebrow">{aiOpen ? "NOVYRA / AI" : gamesOpen ? "NOVYRA / GAMES" : "NOVYRA / COMMUNITY"}</span><h1>{pageTitle}</h1></div>
+            <span className="social-page-glyph">{aiOpen ? <AppIcon icon={Sparkles} /> : gamesOpen ? <AppIcon icon={Gamepad2} /> : active === "reels" ? <AppIcon icon={Film} /> : active === "search" ? <AppIcon icon={Search} /> : active === "profile" ? <AppIcon icon={ImageIcon} /> : active === "create" ? "+" : "N"}</span>
           </div>
 
           {pageError && <div className="social-alert" role="status"><span>{pageError}</span><button type="button" onClick={() => { setPageError(""); onClearNotice(); }}>×</button></div>}
+
+          {gamesOpen && <section className="nv-placeholder" dir={dir}><div className="nv-placeholder-icon"><AppIcon icon={Gamepad2}/></div><h2>{t.games}</h2><p>{language==="fa" ? "یک بازی کوتاه انتخاب کن و سرگرم شو." : "Choose a quick game and have fun."}</p><div className="nv-game-card"><strong>{language==="fa" ? "سنگ، کاغذ، قیچی" : "Rock, Paper, Scissors"}</strong><div className="nv-game-choices">{(language==="fa" ? ["سنگ","کاغذ","قیچی"] : ["Rock","Paper","Scissors"]).map((choice,index)=><button type="button" key={choice} onClick={()=>{const choices=language==="fa"?["سنگ","کاغذ","قیچی"]:["Rock","Paper","Scissors"];const ai= Math.floor(Math.random()*3);const win=(index-ai+3)%3===1;setGameResult(`${language==="fa"?"انتخاب تو":"You"}: ${choice} · ${language==="fa"?"انتخاب NOVYRA":"NOVYRA"}: ${choices[ai]} · ${index===ai?(language==="fa"?"مساوی!":"Draw!") : win?(language==="fa"?"بردی!":"You win!"):(language==="fa"?"این بار باختی!":"You lose!")}`);}}>{choice}</button>)}</div>{gameResult&&<p className="nv-game-result" role="status">{gameResult}</p>}</div></section>}
 
           {aiOpen && <section className="social-ai-screen">
             <div className="social-ai-intro"><div className="social-ai-orb"><AppIcon icon={Sparkles} /></div><h2>{t.aiWelcome}</h2><p>{t.aiHint}</p></div>
@@ -802,9 +799,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           </section>}
 
           {!aiOpen && active === "home" && <section className="social-feed-screen">
-            <div className="nv-feed-header" dir="rtl"><button className="nv-home-create" type="button" onClick={() => navigate("create")} aria-label="ساخت پست"><AppIcon icon={Plus}/></button><div className="nv-feed-switch"><button className="nv-feed-title" onClick={() => setFeedMenuOpen(v => !v)} aria-label="انتخاب فید"><span>NOVYRA</span><AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button onClick={() => {setFeedMenuOpen(false);navigate("friends")}}>دنبال‌شده‌ها</button><button onClick={() => {setFeedMenuOpen(false);setFriendsOnly(true);navigate("reels")}}>مورد علاقه‌ها</button><button onClick={() => {setFeedMenuOpen(false);navigate("home")}}>خانه</button></div>}</div><button type="button" className="nv-home-notifications" onClick={loadNotifications} aria-label="اعلان‌ها"><AppIcon icon={Heart}/>{notificationCount > 0 && <i/>}</button></div>
-            <StoriesExperience userId={account.id} displayName={account.displayName} onError={setPageError}/>
-            {loading ? <p className="social-muted social-center">{t.loading}</p> : posts.length ? <div className="social-post-list">{posts.map(renderPost)}</div> : <div className="nv-feed-empty"><strong>{t.noPosts}</strong><p>{t.noPostsHint}</p><button type="button" onClick={() => navigate("create")}>{t.create}</button></div>}
+            <InstagramHomeReplica onCreate={() => navigate("create")} onNotifications={loadNotifications}/>
+            {loading ? <p className="social-muted social-center">{t.loading}</p> : posts.length ? <div className="social-post-list">{posts.map(renderPost)}</div> : null}
           </section>}
 
           {!aiOpen && active === "search" && <section className="nv-explore-screen">
@@ -860,31 +856,23 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             </article>):<div className="nv-placeholder"><div className="nv-placeholder-icon"><AppIcon icon={MessageSquare}/></div><h2>{t.inbox}</h2><p>هنوز پستی برایت ارسال نشده است.</p></div>}
           </section>}
 
-          {!aiOpen && active === "create" && <section className="social-create-screen nv-create-flow" dir="rtl">
-            <div className="nv-create-topline"><button type="button" onClick={() => navigate("home")} aria-label="بستن"><AppIcon icon={X}/></button><strong>پست جدید</strong><span>{composerStep === "media" ? "۱ از ۲" : "۲ از ۲"}</span></div>
-            <div className="social-create-card nv-create-card">
-              <div className="social-create-heading"><Avatar name={account.displayName} size="large" /><div><strong>{account.displayName}</strong><small>{composerStep === "media" ? "یک عکس یا ویدئو انتخاب کن" : "پیش‌نمایش و توضیحات پست"}</small></div></div>
-              <form onSubmit={publishPost}>
-                <input ref={mediaInputRef} className="nv-hidden-media-input" type="file" accept="image/*,video/mp4,video/webm,video/quicktime" onChange={event => chooseMedia(event.target.files?.[0] || undefined)} />
-                {selectedMedia && mediaPreview ? <div className="nv-selected-media">
-                  {mediaType === "video" ? <video src={mediaPreview} controls playsInline preload="metadata"/> : <img src={mediaPreview} alt="پیش‌نمایش پست"/>}
-                  <button type="button" className="nv-remove-media" onClick={() => {setSelectedMedia(null);setMediaType("");setComposerStep("media");if(mediaInputRef.current)mediaInputRef.current.value="";}} aria-label="حذف فایل"><AppIcon icon={X}/></button>
-                </div> : <button type="button" className="nv-gallery-picker" onClick={() => mediaInputRef.current?.click()}><span><AppIcon icon={Plus}/></span><strong>انتخاب از گالری</strong><small>عکس یا ویدئو از گوشی</small></button>}
-                {composerStep === "details" && <textarea value={postBody} onChange={event => setPostBody(event.target.value)} placeholder="برای این پست توضیحی بنویس…" maxLength={2000} rows={4}/>}
-                {composerStep === "media" && <textarea value={postBody} onChange={event => setPostBody(event.target.value)} placeholder="متن پست (اختیاری)…" maxLength={2000} rows={3}/>}
-                {publishing && <div className="nv-upload-status"><div><span>در حال بارگذاری و انتشار…</span><b>{uploadProgress}٪</b></div><progress max="100" value={uploadProgress}/></div>}
-                <div className="social-create-footer">
-                  <span>{selectedMedia ? (mediaType === "video" ? "ویدئو" : "تصویر") + " · " + (selectedMedia.size/1024/1024).toFixed(1) + " MB" : postBody.length + "/2000"}</span>
-                  {composerStep === "media" && !selectedMedia && !postBody.trim() ? <button type="button" onClick={() => mediaInputRef.current?.click()}>انتخاب رسانه <span>＋</span></button> :
-                    composerStep === "media" && !selectedMedia && postBody.trim() ? <button type="submit" disabled={publishing}>انتشار متن <span>↗</span></button> :
-                    composerStep === "media" && selectedMedia ? <button type="button" onClick={() => setComposerStep("details")}>بعدی <span>→</span></button> :
-                    <button type="submit" disabled={publishing || (!postBody.trim() && !selectedMedia)}>{publishing ? "در حال انتشار…" : "انتشار"} <span>↗</span></button>}
-                </div>
-              </form>
-            </div>
-          </section>}
+          {!aiOpen && active === "create" && <PostCreationFlow onClose={() => navigate("home")} onPublish={publishComposer} publishing={publishing} uploadProgress={uploadProgress} error={pageError && pageError !== t.postCreated ? pageError : ""} />}
 
           {!aiOpen && active === "reels" && <section className="nv-reels-screen">
+            <div className="nv-video-switcher" dir={dir}>
+              <button type="button" className="nv-video-switcher-trigger" aria-expanded={videoMenuOpen}
+                onClick={() => setVideoMenuOpen(value => !value)}>
+                <span>{t.reels}</span><ChevronDown size={17}/>
+              </button>
+              {videoMenuOpen && <div className="nv-video-switcher-menu" role="menu">
+                <button type="button" role="menuitem" className="is-selected" onClick={() => setVideoMenuOpen(false)}>
+                  <Clapperboard size={18}/><span>{t.reels}</span><i>✓</i>
+                </button>
+                <button type="button" role="menuitem" onClick={() => { setVideoMenuOpen(false); navigate("search"); }}>
+                  <Search size={18}/><span>{t.search}</span>
+                </button>
+              </div>}
+            </div>
             {loading ? <p className="social-muted social-center">{t.loading}</p> : <MediaViewer
               items={reels as SocialMediaPost[]}
               mode="reels"
@@ -956,8 +944,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         </div>
       </section>}
       <nav className="social-mobile-nav-wrap">
-        <MobileBottomNav active={active} labels={{home:t.home,reels:t.reels,message:t.inbox,search:t.search,profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName} avatarUrl={profile?.avatarUrl || profile?.avatar_url || profile?.photoUrl || profile?.imageUrl}
-          onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} />
+        <MobileBottomNav active={active} labels={{home:t.home,reels:t.reels,message:t.inbox,search:t.search,profile:t.profile,ai:t.ai,games:t.games}} userId={account.id} displayName={profile?.displayName || account.displayName} avatarUrl={profile?.avatarUrl || profile?.avatar_url || profile?.photoUrl || profile?.imageUrl}
+          onNavigate={navigate} onOpenAI={() => { setGamesOpen(false); setAiOpen(true); setNotificationsOpen(false); }} onOpenGame={() => { setAiOpen(false); setGamesOpen(true); setNotificationsOpen(false); setGameResult(""); }} />
       </nav>
     </div>
   </main>;

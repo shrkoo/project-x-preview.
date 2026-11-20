@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./explore-cleanup.css";
 import "./media-experience.css";
+import "./instagram-parity.css";
+import "./novyra-luxury.css";
 
 export const metadata: Metadata = {
   title: "NOVYRA — شبکه اجتماعی و دستیار هوشمند",
@@ -12,7 +14,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0D0907",
+  themeColor: "#f7f6f1",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
