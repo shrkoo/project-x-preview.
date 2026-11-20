@@ -363,13 +363,14 @@ export default {
     const rows=await db.prepare(`
       SELECT s.id,s.user_id AS userId,s.media_url AS mediaUrl,s.type,s.created_at AS createdAt,s.expires_at AS expiresAt,
         u.display_name AS displayName,u.username,u.avatar_url AS avatarUrl,
-        EXISTS(SELECT 1 FROM story_views v WHERE v.story_id=s.id AND v.viewer_id=?) AS viewedByMe
+        EXISTS(SELECT 1 FROM story_views v WHERE v.story_id=s.id AND v.viewer_id=?) AS viewedByMe,
+        EXISTS(SELECT 1 FROM story_reactions r WHERE r.story_id=s.id AND r.user_id=?) AS reactedByMe
       FROM stories s JOIN users u ON u.id=s.user_id
       WHERE s.expires_at>datetime('now') AND (
         s.user_id=? OR EXISTS(SELECT 1 FROM social_follows f WHERE f.follower_id=? AND f.followed_id=s.user_id)
       )
       ORDER BY CASE WHEN s.user_id=? THEN 0 ELSE 1 END,s.created_at ASC
-    `).bind(user.id,user.id,user.id,user.id).all();
+    `).bind(user.id,user.id,user.id,user.id,user.id).all();
     return json({stories:rows.results||[]});
    }
    if(path==="/social/stories" && request.method==="POST") {
@@ -391,6 +392,29 @@ export default {
     const story=await db.prepare("SELECT id,user_id AS userId FROM stories WHERE id=? AND expires_at>datetime('now')").bind(storyViewMatch[1]).first();
     if(!story) return fail("استوری پیدا نشد یا منقضی شده است.",404);
     if(story.userId!==user.id) await db.prepare("INSERT OR IGNORE INTO story_views (story_id,viewer_id) VALUES (?,?)").bind(story.id,user.id).run();
+    return json({ok:true});
+   }
+   const storyReactionMatch=path.match(/^\/social\/stories\/([a-f0-9-]+)\/reaction$/i);
+   if(storyReactionMatch && request.method==="POST") {
+    const story=await db.prepare("SELECT id,user_id AS userId FROM stories WHERE id=? AND expires_at>CURRENT_TIMESTAMP").bind(storyReactionMatch[1]).first();
+    if(!story) return fail("استوری پیدا نشد یا منقضی شده است.",404);
+    const existing=await db.prepare("SELECT 1 AS yes FROM story_reactions WHERE story_id=? AND user_id=?").bind(story.id,user.id).first();
+    if(existing) await db.prepare("DELETE FROM story_reactions WHERE story_id=? AND user_id=?").bind(story.id,user.id).run();
+    else {
+      await db.prepare("INSERT INTO story_reactions (story_id,user_id) VALUES (?,?)").bind(story.id,user.id).run();
+      if(story.userId!==user.id) await db.prepare("INSERT INTO notifications (id,user_id,kind,title,body) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),story.userId,"story_like","پسندیدن استوری",user.display_name+" استوری تو را پسندید.").run();
+    }
+    return json({liked:!existing});
+   }
+   const storyReplyMatch=path.match(/^\/social\/stories\/([a-f0-9-]+)\/reply$/i);
+   if(storyReplyMatch && request.method==="POST") {
+    const story=await db.prepare("SELECT id,user_id AS userId FROM stories WHERE id=? AND expires_at>CURRENT_TIMESTAMP").bind(storyReplyMatch[1]).first();
+    if(!story) return fail("استوری پیدا نشد یا منقضی شده است.",404);
+    const body=await readBody(request),message=String(body?.body||"").trim().slice(0,1000);
+    if(!message) return fail("پیام خالی است.");
+    if(story.userId===user.id) return fail("نمی‌توانی به استوری خودت پاسخ بدهی.");
+    await db.prepare("INSERT INTO social_direct_messages (id,sender_id,recipient_id,story_id,body) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),user.id,story.userId,story.id,message).run();
+    await db.prepare("INSERT INTO notifications (id,user_id,kind,title,body) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),story.userId,"story_reply","پاسخ به استوری",user.display_name+" به استوری تو پاسخ داد.").run();
     return json({ok:true});
    }
 
