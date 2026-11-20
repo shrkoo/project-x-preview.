@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./explore-cleanup.css";
 
 export const metadata: Metadata = {
   title: "NOVYRA — شبکه اجتماعی و دستیار هوشمند",
