@@ -258,8 +258,8 @@ export function MediaViewer({
 
         {mode === "reels" && index === activeIndex && <div className="nv-media-reels-top" dir="rtl">
           <button type="button" className="nv-media-add" onClick={onCreate} aria-label="ساخت ویدئو"><Plus/></button>
-          <button type="button" className={friendsOnly ? "is-active" : ""} onClick={onFriendsToggle}>دوستان <span className="nv-friend-avatars">{friends.slice(0,3).map(friend => <Avatar key={friend.id} name={friend.displayName} small/>)}</span></button>
           <strong>Reels</strong>
+          <button type="button" className={friendsOnly ? "is-active" : ""} onClick={onFriendsToggle}>دوستان <span className="nv-friend-avatars">{friends.slice(0,3).map(friend => <Avatar key={friend.id} name={friend.displayName} small/>)}</span></button>
         </div>}
         {mode !== "reels" && index === activeIndex && <button type="button" className="nv-media-back" onClick={onClose} aria-label="بازگشت"><ArrowRight/></button>}
 
