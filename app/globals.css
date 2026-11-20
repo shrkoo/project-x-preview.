@@ -2263,7 +2263,6 @@ html,body{background:#120c0a!important}
   .social-avatar img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;border-radius:50%!important}
   .nv-post-hashtags{color:#ffc15a!important;font-size:10px!important;white-space:normal}
   .nv-verified{display:inline-flex!important;vertical-align:middle!important;color:#60a5fa!important}
-  .nv-verified svg{display:block!important;width:14px!important;height:14px!important;stroke:currentColor!important;fill:none!important}
   .social-search-form>svg{flex:none!important;color:rgba(255,255,255,.72)!important;stroke-width:1.75!important}
   .social-side-ai>svg{flex:none!important}
 }
@@ -2277,6 +2276,9 @@ html,body{background:#120c0a!important}
 .social-app[dir="rtl"] .novyra-bottom-items{direction:rtl}
 .nv-profile-tabs button{position:relative}
 .nv-profile-tabs button.is-active:after{bottom:0!important;width:28px!important;height:2px!important;border-radius:2px!important}
+.nv-profile-tabs button.is-active svg{fill:currentColor!important}
+.nv-profile-tabs button:not(.is-active) svg{fill:none!important}
+.nv-post-actions button.liked svg{fill:currentColor!important}
 .nv-profile-tabs button svg,
 .nv-top-tabs .nv-round-action svg,
 .nv-post-actions svg,.nv-post-more svg,.nv-reel-actions svg,
