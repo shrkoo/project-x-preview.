@@ -1,10 +1,10 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { apiRequest, clearSession } from "../lib/api";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
 import AppIcon from "./AppIcon";
-import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound } from "lucide-react";
+import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound, Clock, Play, Eye, ArrowRight, ArrowLeft } from "lucide-react";
 
 type Language = "en" | "fa" | "ar" | "ku";
 type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string };
@@ -19,6 +19,7 @@ type Post = {
   likeCount: number;
   commentCount: number;
   likedByMe: boolean;
+  viewCount?: number;
 };
 type Person = {
   id: string;
@@ -27,6 +28,7 @@ type Person = {
   followerCount: number;
   followingCount: number;
   followedByMe: boolean;
+  username?: string;
 };
 type Comment = { id: string; body: string; createdAt: string; authorId: string; authorName: string };
 type Profile = Person & { email: string; createdAt?: string };
@@ -204,6 +206,18 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const [profileTab, setProfileTab] = useState<"Photos" | "Videos" | "Saved">("Photos");
   const [feedMenuOpen, setFeedMenuOpen] = useState(false);
   const [savedPostIds, setSavedPostIds] = useState<string[]>([]);
+  const [explorePosts, setExplorePosts] = useState<Post[]>([]);
+  const [exploreOffset, setExploreOffset] = useState(0);
+  const [exploreHasMore, setExploreHasMore] = useState(true);
+  const [exploreLoading, setExploreLoading] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<Array<{id:string;type:"user"|"query";query?:string;userId?:string;displayName?:string;username?:string}>>([]);
+  const [searchResults, setSearchResults] = useState<Person[]>([]);
+  const [historyExpanded, setHistoryExpanded] = useState(false);
+  const [viewedProfile, setViewedProfile] = useState<{profile:Profile;posts:Post[]}|null>(null);
+  const [selectedGridPost, setSelectedGridPost] = useState<Post|null>(null);
+  const [touchStartY, setTouchStartY] = useState<number|null>(null);
+  const exploreSentinelRef = useRef<HTMLDivElement|null>(null);
 
   const notificationCount = useMemo(() => notifications.filter(item => !item.readAt).length, [notifications]);
 
@@ -239,15 +253,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         }
       }
       if (active === "search") {
-        setSearchLoading(true);
-        try {
-          const data = await apiRequest<{ users: Person[]; posts: Post[] }>("/social/search");
-          if (alive) { setPeople(data.users || []); setSearchPosts(data.posts || []); }
-        } catch (error) {
-          if (alive) setPageError(error instanceof Error ? error.message : t.genericError);
-        } finally {
-          if (alive) setSearchLoading(false);
-        }
+        void loadExplore(true);
+        void loadSearchHistory();
       }
       if (active === "profile") {
         setLoading(true);
@@ -272,7 +279,76 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   function navigate(next: NavKey) {
     setAiOpen(false);
     setNotificationsOpen(false);
+    if (next !== "search") { setSearchOpen(false); setViewedProfile(null); }
     setActive(next);
+  }
+
+
+  async function loadExplore(reset = false, shuffle = false) {
+    if (exploreLoading) return;
+    setExploreLoading(true);
+    try {
+      const offset = reset ? 0 : exploreOffset;
+      const data = await apiRequest<{posts:Post[];nextOffset:number;hasMore:boolean}>(`/social/explore?limit=30&offset=${offset}`);
+      let incoming = data.posts || [];
+      if (shuffle) incoming = [...incoming].sort(() => Math.random() - 0.5);
+      setExplorePosts(current => reset ? incoming : [...current, ...incoming]);
+      setExploreOffset(data.nextOffset ?? offset + incoming.length);
+      setExploreHasMore(Boolean(data.hasMore));
+    } catch (error) { setPageError(error instanceof Error ? error.message : t.genericError); }
+    finally { setExploreLoading(false); }
+  }
+
+  async function loadSearchHistory() {
+    try {
+      const data = await apiRequest<{items:typeof recentSearches}>("/social/search-history");
+      setRecentSearches(data.items || []);
+    } catch { setRecentSearches([]); }
+  }
+
+  async function deleteSearchHistory(id: string) {
+    try {
+      await apiRequest(`/social/search-history/${id}`, {method:"DELETE"});
+      setRecentSearches(current => current.filter(item => item.id !== id));
+    } catch (error) { setPageError(error instanceof Error ? error.message : t.genericError); }
+  }
+
+  async function clearSearchHistory() {
+    try {
+      await apiRequest("/social/search-history/clear", {method:"DELETE"});
+      setRecentSearches([]);
+      setHistoryExpanded(false);
+    } catch (error) { setPageError(error instanceof Error ? error.message : t.genericError); }
+  }
+
+  async function openPersonProfile(person: Person) {
+    if (!person.id) return;
+    try {
+      const data = await apiRequest<{profile:Profile;posts:Post[]}>(`/social/users/${person.id}/profile`);
+      await apiRequest("/social/search-history", {method:"POST",body:JSON.stringify({type:"user",userId:person.id})});
+      setViewedProfile({profile:data.profile,posts:data.posts||[]});
+      setProfileTab("Photos");
+      setSearchOpen(false);
+      await loadSearchHistory();
+    } catch (error) { setPageError(error instanceof Error ? error.message : t.genericError); }
+  }
+
+  async function recordQuerySearch(value: string) {
+    const clean=value.trim();
+    if (!clean) return;
+    try {
+      await apiRequest("/social/search-history", {method:"POST",body:JSON.stringify({type:"query",query:clean})});
+      await loadSearchHistory();
+    } catch { /* Keep search usable when history storage is unavailable. */ }
+  }
+
+  async function openExplorePost(post: Post) {
+    setSelectedGridPost(post);
+    try {
+      const data=await apiRequest<{viewCount:number}>(`/social/posts/${post.id}/view`,{method:"POST"});
+      setExplorePosts(current=>current.map(item=>item.id===post.id?{...item,viewCount:data.viewCount}:item));
+      setSelectedGridPost(current=>current?.id===post.id?{...current,viewCount:data.viewCount}:current);
+    } catch { /* Keep the media viewer open even if the counter cannot update. */ }
   }
 
   async function runSearch(event: FormEvent<HTMLFormElement>) {
@@ -283,6 +359,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
       const data = await apiRequest<{ users: Person[]; posts: Post[] }>(`/social/search?q=${encodeURIComponent(query.trim())}`);
       setPeople(data.users || []);
       setSearchPosts(data.posts || []);
+      await recordQuerySearch(query);
     } catch (error) {
       setPageError(error instanceof Error ? error.message : t.genericError);
     } finally {
@@ -439,6 +516,31 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     setPageError(copy[next].languageSaved);
   }
 
+
+  useEffect(() => {
+    if (active !== "search" || !searchOpen) return;
+    const term=query.trim();
+    if (!term) { setSearchResults([]); setSearchLoading(false); return; }
+    const timer=window.setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        const data=await apiRequest<{users:Person[];posts:Post[]}>(`/social/search?q=${encodeURIComponent(term)}`);
+        setSearchResults(data.users||[]);
+      } catch { setSearchResults([]); }
+      finally { setSearchLoading(false); }
+    },220);
+    return () => window.clearTimeout(timer);
+  },[active,searchOpen,query]);
+
+  useEffect(() => {
+    if (active!=="search" || searchOpen || viewedProfile || !exploreHasMore) return;
+    const node=exploreSentinelRef.current;
+    if (!node || typeof IntersectionObserver==="undefined") return;
+    const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting)&&!exploreLoading)void loadExplore(false);},{rootMargin:"240px"});
+    observer.observe(node);
+    return ()=>observer.disconnect();
+  },[active,searchOpen,viewedProfile,exploreHasMore,exploreLoading,exploreOffset]);
+
   const pageTitle = aiOpen ? t.ai : t[active];
   const visiblePosts = active === "reels" ? reels : posts;
 
@@ -515,19 +617,37 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             {loading ? <p className="social-muted social-center">{t.loading}</p> : <div className="social-post-list">{(posts.length ? posts : demoPosts).map(renderPost)}</div>}
           </section>}
 
-          {!aiOpen && active === "search" && <section className="social-search-screen">
-            <form className="social-search-form" onSubmit={runSearch}><AppIcon icon={Search} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder={t.searchPlaceholder} /><button type="submit">{t.search}</button></form>
-            {searchLoading ? <p className="social-muted social-center">{t.loading}</p> : <>
-              <div className="social-section-heading"><h2>{t.people}</h2></div>
-              {people.length ? <div className="social-people-list">{people.map(person => <article className="social-person-card" key={person.id}>
-                <Avatar name={person.displayName} size="large" />
-                <div className="social-person-info"><strong>{person.displayName}</strong><small>{person.followerCount.toLocaleString()} · {t.followers}</small></div>
-                <button type="button" className={person.followedByMe ? "is-following" : ""} onClick={() => followPerson(person)}>{person.followedByMe ? t.following : t.follow}</button>
-              </article>)}</div> : <p className="social-muted">{t.noPeople}</p>}
-              {searchPosts.length > 0 && <><div className="social-section-heading"><h2>{t.posts}</h2></div><div className="social-post-list">{searchPosts.map(renderPost)}</div></>}
-            </>}
+          {!aiOpen && active === "search" && <section className="nv-explore-screen">
+            {viewedProfile ? <div className="nv-other-profile">
+              <div className="nv-other-profile-head"><button type="button" onClick={()=>setViewedProfile(null)} aria-label="Back"><AppIcon icon={language==="fa"?ArrowRight:ArrowLeft}/></button><strong>{viewedProfile.profile.displayName}</strong></div>
+              <div className="nv-profile-hero"><div className="nv-avatar-wrap"><span className="nv-profile-avatar nv-profile-avatar-placeholder"><AppIcon icon={UserRound}/></span></div><h2>{viewedProfile.profile.displayName}</h2><p>@{viewedProfile.profile.displayName.toLowerCase().replace(/[^a-z0-9]/g,"")}</p></div>
+              <div className="nv-profile-stats"><div><strong>{viewedProfile.profile.postCount}</strong><small>{t.postCount}</small></div><div><strong>{viewedProfile.profile.followerCount}</strong><small>{t.followers}</small></div><div><strong>{viewedProfile.profile.followingCount}</strong><small>{t.followingCount}</small></div></div>
+              <div className="nv-profile-buttons"><button type="button" className="nv-follow-profile" onClick={()=>followPerson(viewedProfile.profile)}>{viewedProfile.profile.followedByMe?t.following:t.follow}</button></div>
+              <div className="nv-profile-grid is-other-profile">{viewedProfile.posts.filter(post=>post.mediaType==="image"||post.mediaType==="video").map(post=><button type="button" className="nv-profile-tile" key={post.id} onClick={()=>void openExplorePost(post)}>{post.mediaType==="video"?<><video src={post.mediaUrl||undefined} muted playsInline preload="metadata"/><span className="nv-tile-play"><AppIcon icon={Play}/></span></>:<img src={post.mediaUrl||undefined} alt="" loading="lazy"/>}</button>)}</div>
+            </div> : !searchOpen ? <>
+              <div className="nv-explore-toolbar" dir="rtl"><button type="button" className="nv-explore-search-trigger" onClick={()=>setSearchOpen(true)}><AppIcon icon={Search}/><span>جستجو</span></button><button type="button" className="nv-explore-bookmark" aria-label="Saved posts" onClick={()=>{setProfileTab("Saved");navigate("profile");}}><AppIcon icon={Bookmark}/></button></div>
+              <div className="nv-explore-grid" dir="rtl" onTouchStart={event=>setTouchStartY(event.touches[0]?.clientY??null)} onTouchEnd={event=>{const end=event.changedTouches[0]?.clientY??0;if(touchStartY!==null&&end-touchStartY>70)void loadExplore(true,true);setTouchStartY(null);}}>
+                {explorePosts.map(post=><button type="button" className="nv-explore-tile" key={post.id} onClick={()=>void openExplorePost(post)}>
+                  {post.mediaType==="video"&&post.mediaUrl?<video src={post.mediaUrl} muted playsInline preload="metadata"/>:post.mediaType==="image"&&post.mediaUrl?<img src={post.mediaUrl} alt="" loading="lazy"/>:<span className="nv-explore-text-tile">{post.body}</span>}
+                  {post.mediaType==="video"&&<span className="nv-tile-play"><AppIcon icon={Play}/></span>}
+                  <span className="nv-explore-views"><AppIcon icon={Eye}/>{new Intl.NumberFormat("fa-IR",{notation:"compact",compactDisplay:"long",maximumFractionDigits:1}).format(post.viewCount||0)}</span>
+                </button>)}
+              </div>
+              <div ref={exploreSentinelRef} className="nv-explore-sentinel">{exploreLoading?"در حال بارگذاری…":""}</div>
+              {!exploreLoading&&!explorePosts.length&&<p className="social-muted social-center">هنوز محتوایی برای نمایش وجود ندارد.</p>}
+            </> : <div className="nv-search-page" dir="rtl">
+              <div className="nv-search-page-head"><button type="button" onClick={()=>{setSearchOpen(false);setQuery("");}} aria-label="Back"><AppIcon icon={ArrowRight}/></button><form onSubmit={runSearch}><AppIcon icon={Search}/><input autoFocus value={query} onChange={event=>setQuery(event.target.value)} placeholder="جستجو" /></form></div>
+              {!query.trim() ? <>
+                <div className="nv-recent-heading"><strong>جدید</strong><button type="button" onClick={()=>setHistoryExpanded(value=>!value)}>دیدن همه</button></div>
+                <div className="nv-recent-list">{(historyExpanded?recentSearches:recentSearches.slice(0,8)).map(item=><div className="nv-recent-row" key={item.id}>
+                  <button type="button" className="nv-recent-main" onClick={()=>item.type==="user"&&item.userId?void openPersonProfile({id:item.userId,displayName:item.displayName||"",username:item.username,postCount:0,followerCount:0,followingCount:0,followedByMe:false}):setQuery(item.query||"")}>
+                    <span className="nv-recent-avatar">{item.type==="user"?<AppIcon icon={UserRound}/>:<AppIcon icon={Clock}/>}</span><span className="nv-recent-copy">{item.type==="user"?<><strong>{item.username||item.displayName}</strong><small>{item.displayName}</small></>:<strong>{item.query}</strong>}</span>
+                  </button><button type="button" className="nv-recent-remove" onClick={()=>void deleteSearchHistory(item.id)} aria-label="Remove">×</button>
+                </div>)}</div>
+                {recentSearches.length>0&&<button type="button" className="nv-clear-history" onClick={()=>void clearSearchHistory()}>پاک کردن تاریخچه</button>}
+              </> : <div className="nv-live-results">{searchLoading?<p className="social-muted">در حال جستجو…</p>:searchResults.map(person=><button type="button" className="nv-recent-row" key={person.id} onClick={()=>void openPersonProfile(person)}><span className="nv-recent-avatar"><AppIcon icon={UserRound}/></span><span className="nv-recent-copy"><strong>{person.username||person.displayName}</strong><small>{person.displayName}</small></span></button>)}</div>}
+            </div>}
           </section>}
-
           {!aiOpen && (active === "friends" || active === "inbox") && <section className="nv-placeholder"><div className="nv-placeholder-icon">{active === "friends" ? <AppIcon icon={UsersRound} /> : <AppIcon icon={MessageSquare} />}</div><h2>{active === "friends" ? t.friends : t.inbox}</h2><p>{active === "friends" ? "Find and connect with people on NOVYRA." : "Your conversations will appear here."}</p></section>}
 
           {!aiOpen && active === "create" && <section className="social-create-screen">
@@ -554,8 +674,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               <div className="nv-profile-hero"><div className="nv-avatar-wrap"><img className="nv-profile-avatar" src={`https://i.pravatar.cc/240?u=${encodeURIComponent(account.id)}`} alt=""/><button type="button" className="nv-camera-badge" aria-label="Change profile photo"><AppIcon icon={Camera}/></button></div><h2>{profile?.displayName || account.displayName}</h2><p>@{(profile?.displayName || account.displayName).toLowerCase().replace(/[^a-z0-9]/g,"") || "username"}</p></div>
               <div className="nv-profile-stats"><div><strong>{(profile?.postCount ?? profilePosts.length) || 240}</strong><small>{t.postCount}</small></div><div><strong>{profile?.followerCount ? profile.followerCount.toLocaleString() : "47.36K"}</strong><small>{t.followers}</small></div><div><strong>{profile?.followingCount ? profile.followingCount.toLocaleString() : "32K"}</strong><small>{t.followingCount}</small></div></div>
               <div className="nv-profile-buttons own-profile"><button type="button" className="nv-message-profile" onClick={() => document.getElementById("nv-profile-name")?.focus()}>{t.editProfile}</button></div>
-              <div className="nv-profile-tabs" role="tablist" aria-label="Profile content">{(["Photos","Videos","Saved"] as const).map(tab=><button key={tab} type="button" className={profileTab===tab?"is-active":""} onClick={() => setProfileTab(tab)}>{tab}</button>)}</div>
-              <div className="nv-profile-grid">{(profilePosts.length ? profilePosts.filter(post => profileTab === "Photos" ? post.mediaType !== "video" : profileTab === "Videos" ? post.mediaType === "video" : savedPostIds.includes(post.id)) : [0,1,2]).map((item:any,i:number)=><div key={typeof item==="number"?item:item.id} className={`nv-profile-tile nv-profile-masonry-${i%3}`}><img src={typeof item==="number"?[`https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=700`,`https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=700`,`https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=700`][i%3]:(item.mediaUrl || `https://i.pravatar.cc/500?img=${i+20}`)} alt="" /></div>)}</div>
+              <div className="nv-profile-tabs" role="tablist" aria-label="Profile content">{(["Photos","Videos","Saved"] as const).map(tab=><button key={tab} type="button" className={profileTab===tab?"is-active":""} onClick={() => setProfileTab(tab)}>{tab==="Saved" && <AppIcon icon={LockKeyhole}/>}<span>{tab}</span></button>)}</div>
+              <div className="nv-profile-grid">{profilePosts.filter(post => profileTab === "Photos" ? post.mediaType === "image" : profileTab === "Videos" ? post.mediaType === "video" : savedPostIds.includes(post.id)).map(item=><button type="button" key={item.id} className="nv-profile-tile" onClick={()=>setSelectedGridPost(item)}>{item.mediaType==="video"?<><video src={item.mediaUrl||undefined} muted playsInline preload="metadata"/><AppIcon icon={Play}/></>:<img src={item.mediaUrl||undefined} alt="" loading="lazy"/>}</button>)}</div>
               <form className="social-profile-edit" onSubmit={saveProfile}><label>{t.editProfile}<input id="nv-profile-name" value={profileName} onChange={event => setProfileName(event.target.value)} maxLength={32}/></label><button type="submit" disabled={profileSaving || profileName.trim().length<2}>{profileSaving?"…":t.save}</button></form>
               <div className="social-profile-settings"><label>{t.language}<select value={language} onChange={event => changeLanguage(event.target.value)}><option value="fa">فارسی</option><option value="en">English</option><option value="ar">العربية</option><option value="ku">کوردی</option></select></label><button type="button" className="social-logout-button" onClick={logout}>{t.logout}</button></div>
             </>}
@@ -563,6 +683,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         </section>
       </div>
 
+      {selectedGridPost && <section className="nv-grid-post-viewer" role="dialog" aria-modal="true" onClick={()=>setSelectedGridPost(null)}><button type="button" className="nv-grid-viewer-close" onClick={()=>setSelectedGridPost(null)} aria-label="Close">×</button><div className="nv-grid-viewer-media" onClick={event=>event.stopPropagation()}>{selectedGridPost.mediaType==="video"&&selectedGridPost.mediaUrl?<video src={selectedGridPost.mediaUrl} autoPlay controls playsInline/>:selectedGridPost.mediaUrl?<img src={selectedGridPost.mediaUrl} alt=""/>:<p>{selectedGridPost.body}</p>}</div></section>}
       {selectedReel && <section className="nv-full-reel" role="dialog" aria-modal="true">
         <div className="nv-full-reel-media">{selectedReel.mediaType==="video"&&selectedReel.mediaUrl?<video src={selectedReel.mediaUrl} autoPlay loop playsInline controls/>:<img src={selectedReel.mediaUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1200"} alt="Reel"/>}</div>
         <div className="nv-full-reel-top"><button onClick={()=>setSelectedReel(null)} aria-label="Back"><AppIcon icon={ChevronDown}/></button><button onClick={()=>{setSelectedReel(null);navigate("search")}} aria-label="Search"><AppIcon icon={Search}/></button></div>
