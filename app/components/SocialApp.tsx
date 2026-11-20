@@ -4,7 +4,6 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { apiRequest, apiUpload, clearSession } from "../lib/api";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
 import StoriesExperience from "./StoriesExperience";
-import PublicShareCreator from "./PublicShareCreator";
 import AppIcon from "./AppIcon";
 import { FeedMedia, MediaViewer, formatSocialCount } from "./MediaExperience";
 import type { SocialMediaPost, SocialMediaPerson } from "./MediaExperience";
@@ -876,7 +875,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
                 {publishing && <div className="nv-upload-status"><div><span>در حال بارگذاری و انتشار…</span><b>{uploadProgress}٪</b></div><progress max="100" value={uploadProgress}/></div>}
                 <div className="social-create-footer">
                   <span>{selectedMedia ? (mediaType === "video" ? "ویدئو" : "تصویر") + " · " + (selectedMedia.size/1024/1024).toFixed(1) + " MB" : postBody.length + "/2000"}</span>
-                  {composerStep === "media" && !selectedMedia ? <button type="button" onClick={() => mediaInputRef.current?.click()}>انتخاب رسانه <span>＋</span></button> :
+                  {composerStep === "media" && !selectedMedia && !postBody.trim() ? <button type="button" onClick={() => mediaInputRef.current?.click()}>انتخاب رسانه <span>＋</span></button> :
+                    composerStep === "media" && !selectedMedia && postBody.trim() ? <button type="submit" disabled={publishing}>انتشار متن <span>↗</span></button> :
                     composerStep === "media" && selectedMedia ? <button type="button" onClick={() => setComposerStep("details")}>بعدی <span>→</span></button> :
                     <button type="submit" disabled={publishing || (!postBody.trim() && !selectedMedia)}>{publishing ? "در حال انتشار…" : "انتشار"} <span>↗</span></button>}
                 </div>
