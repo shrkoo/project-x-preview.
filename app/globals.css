@@ -3229,29 +3229,37 @@ html,body{background:linear-gradient(145deg,#0D0907 0%,#130d09 52%,#1A120D 100%)
 }
 
 
-/* Align the profile avatar to the exact vertical center of the nav icons */
+/* Keep the entire profile navigation button on the same center line as every icon */
 @media (max-width: 760px) {
-  .social-app .novyra-profile-tab {
+  .social-app .novyra-bottom-items {
+    align-items: center !important;
+  }
+  .social-app .novyra-bottom-tab.novyra-profile-tab {
     position: relative !important;
+    display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
     align-self: center !important;
+    justify-self: stretch !important;
     height: 70px !important;
     min-height: 70px !important;
     padding: 0 !important;
     margin: 0 !important;
+    transform: none !important;
     line-height: 1 !important;
   }
   .social-app .novyra-profile-tab > img,
   .social-app .novyra-profile-tab > .novyra-profile-fallback {
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    right: auto !important;
-    bottom: auto !important;
+    position: relative !important;
+    inset: auto !important;
+    display: grid !important;
+    place-items: center !important;
+    flex: 0 0 44px !important;
+    width: 44px !important;
+    height: 44px !important;
     margin: 0 !important;
-    transform: translate(-50%, -50%) !important;
-    flex: none !important;
+    transform: none !important;
     vertical-align: middle !important;
   }
 }
