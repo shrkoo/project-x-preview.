@@ -50,7 +50,7 @@ type Props = {
 
 const copy: Record<Language, Record<string, string>> = {
   fa: {
-    home: "خانه", search: "اکسپلورر", create: "ساخت پست", reels: "اکسپلورر", profile: "پروفایل", friends: "دوستان", inbox: "پیام‌ها", ai: "هوش مصنوعی",
+    home: "خانه", search: "اکسپلور", create: "ساخت پست", reels: "ویدئوها", profile: "پروفایل", friends: "دوستان", inbox: "پیام‌ها", ai: "هوش مصنوعی",
     hello: "فضای تو، صدای تو", feed: "تازه‌های NOVYRA", feedHint: "چیزهایی که افراد منتشر کرده‌اند",
     shareThought: "چه چیزی در ذهنت می‌گذرد؟", writePost: "چیزی بنویس…", publish: "انتشار", publishing: "در حال انتشار…",
     mediaLink: "لینک مستقیم تصویر یا ویدئو (اختیاری)", mediaHint: "فقط نشانی HTTPS فایل رسانه؛ بارگذاری مستقیم فایل هنوز فعال نیست.",
@@ -68,7 +68,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "نمایش همه", backHome: "بازگشت به خانه", profileUpdated: "نام نمایشی به‌روزرسانی شد."
   },
   en: {
-    home: "Home", search: "Explorer", create: "Create post", reels: "Explorer", profile: "Profile", friends: "Friends", inbox: "Inbox", ai: "AI assistant",
+    home: "Home", search: "Explore", create: "Create post", reels: "Videos", profile: "Profile", friends: "Friends", inbox: "Inbox", ai: "AI assistant",
     hello: "Your space. Your voice.", feed: "What’s happening", feedHint: "Recent posts from the NOVYRA community",
     shareThought: "What’s on your mind?", writePost: "Write something…", publish: "Publish", publishing: "Publishing…",
     mediaLink: "Direct image or video link (optional)", mediaHint: "HTTPS media file URL only. Direct file uploads are not enabled yet.",
@@ -104,7 +104,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "عرض الكل", backHome: "العودة للرئيسية", profileUpdated: "تم تحديث اسم العرض."
   },
   ku: {
-    home: "سەرەکی", search: "گەڕانەوە", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک",
+    home: "سەرەکی", search: "گەڕان", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک",
     hello: "شوێنی تۆ. دەنگی تۆ.", feed: "نوێترین بڵاوکراوەکان", feedHint: "ئەوەی ئەندامانی NOVYRA بڵاوی دەکەنەوە",
     shareThought: "لە مێشکتدا چییە؟", writePost: "شتێک بنووسە…", publish: "بڵاوکردنەوە", publishing: "لە بڵاوکردنەوەدایە…",
     mediaLink: "بەستەری ڕاستەوخۆی وێنە یان ڤیدیۆ (ئارەزوومەندانە)", mediaHint: "تەنها بەستەری HTTPS ـی فایل. بارکردنی ڕاستەوخۆی فایل هێشتا چالاک نییە.",
@@ -276,7 +276,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           if (alive) setLoading(false);
         }
       }
-      if (active === "reels" && reelsMode === "explore") {
+      if (active === "search") {
         void loadExplore(true, true);
         void loadSearchHistory();
       }
@@ -304,10 +304,10 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     setAiOpen(false);
     setNotificationsOpen(false);
     if (next === "search") {
-      setReelsMode("explore");
       setSearchOpen(false);
+      setShowSavedPosts(false);
       setViewedProfile(null);
-      setActive("reels");
+      setActive("search");
       return;
     }
     if (next === "reels") setReelsMode("videos");
@@ -559,7 +559,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
 
 
   useEffect(() => {
-    if (active !== "reels" || reelsMode !== "explore" || !searchOpen) return;
+    if (active !== "search" || !searchOpen) return;
     const term=query.trim();
     if (!term) { setSearchResults([]); setSearchLoading(false); return; }
     const timer=window.setTimeout(async () => {
@@ -574,13 +574,13 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   },[active,reelsMode,searchOpen,query]);
 
   useEffect(() => {
-    if (active !== "reels" || reelsMode !== "explore" || searchOpen || showSavedPosts || viewedProfile || !exploreHasMore) return;
+    if (active !== "search" || searchOpen || showSavedPosts || viewedProfile || !exploreHasMore) return;
     const node=exploreSentinelRef.current;
     if (!node || typeof IntersectionObserver==="undefined") return;
     const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting)&&!exploreLoading)void loadExplore(false);},{rootMargin:"240px"});
     observer.observe(node);
     return ()=>observer.disconnect();
-  },[active,reelsMode,searchOpen,showSavedPosts,viewedProfile,exploreHasMore,exploreLoading,exploreOffset]);
+  },[active,searchOpen,showSavedPosts,viewedProfile,exploreHasMore,exploreLoading,exploreOffset]);
 
   const pageTitle = aiOpen ? t.ai : t[active];
   const visiblePosts = active === "reels" ? reels : posts;
@@ -655,13 +655,13 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           </section>}
 
           {!aiOpen && active === "home" && <section className="social-feed-screen">
-            <div className="nv-feed-header"><div className="nv-feed-switch"><button className="nv-feed-title" onClick={() => setFeedMenuOpen(v => !v)}>{t.reels} <AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button onClick={() => {setFeedMenuOpen(false);navigate("home")}}>Feed</button><button onClick={() => {setFeedMenuOpen(false);navigate("friends")}}>Following</button><button onClick={() => {setFeedMenuOpen(false);navigate("reels")}}>Reels</button></div>}</div><div className="nv-feed-tools"><button className="nv-round-action" onClick={() => navigate("search")} aria-label="Search"><AppIcon icon={Search}/></button><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell}/><i/></button></div></div>
+            <div className="nv-feed-header"><div className="nv-feed-switch"><button className="nv-feed-title" onClick={() => setFeedMenuOpen(v => !v)}>{t.home} <AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button onClick={() => {setFeedMenuOpen(false);navigate("home")}}>Feed</button><button onClick={() => {setFeedMenuOpen(false);navigate("friends")}}>Following</button><button onClick={() => {setFeedMenuOpen(false);navigate("reels")}}>Reels</button></div>}</div><div className="nv-feed-tools"><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell}/><i/></button></div></div>
             <div className="nv-stories"><button className="nv-story add" onClick={() => navigate("create")}><span><img src={`https://i.pravatar.cc/120?u=${encodeURIComponent(account.id)}`} alt=""/><b>+</b></span><small>You</small></button>{["alex","alana","marco","john","jim"].map((name,i)=><button className="nv-story" key={name}><span><img src={`https://i.pravatar.cc/120?img=${i+12}`} alt=""/></span><small>@{name}</small></button>)}</div>
             {loading ? <p className="social-muted social-center">{t.loading}</p> : <div className="social-post-list">{(posts.length ? posts : demoPosts).map(renderPost)}</div>}
           </section>}
 
-          {!aiOpen && active === "reels" && reelsMode === "explore" && <section className="nv-explore-screen">
-            <div className="nv-top-tabs nv-reels-tabs"><div className="nv-reels-mode-switch"><button className="nv-reels-mode-title" type="button" onClick={() => setFeedMenuOpen(value => !value)}>اکسپلورر <AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button type="button" onClick={() => {setFeedMenuOpen(false);setReelsMode("videos");}}>ویدئوها</button><button type="button" onClick={() => {setFeedMenuOpen(false);setReelsMode("explore");}}>اکسپلورر</button></div>}</div><span className="nv-top-spacer"/><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell}/><i/></button></div>
+          {!aiOpen && active === "search" && <section className="nv-explore-screen">
+            
             {viewedProfile ? <div className="nv-other-profile">
               <div className="nv-other-profile-head"><button type="button" onClick={()=>setViewedProfile(null)} aria-label="Back"><AppIcon icon={language==="fa"?ArrowRight:ArrowLeft}/></button><strong>{viewedProfile.profile.displayName}</strong></div>
               <div className="nv-profile-hero"><div className="nv-avatar-wrap"><span className="nv-profile-avatar nv-profile-avatar-placeholder"><AppIcon icon={UserRound}/></span></div><h2>{viewedProfile.profile.displayName}</h2><p>@{viewedProfile.profile.displayName.toLowerCase().replace(/[^a-z0-9]/g,"")}</p></div>
@@ -715,8 +715,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             </div>
           </section>}
 
-          {!aiOpen && active === "reels" && reelsMode === "videos" && <section className="nv-reels-screen">
-            <div className="nv-top-tabs nv-reels-tabs"><div className="nv-reels-mode-switch"><button className="nv-reels-mode-title" type="button" onClick={() => setFeedMenuOpen(value => !value)}>ویدئوها <AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button type="button" onClick={() => {setFeedMenuOpen(false);setReelsMode("videos");}}>ویدئوها</button><button type="button" onClick={() => {setFeedMenuOpen(false);setReelsMode("explore");setSearchOpen(false);}}>اکسپلورر</button></div>}</div><span className="nv-top-spacer"/><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell}/><i/></button></div>
+          {!aiOpen && active === "reels" && <section className="nv-reels-screen">
+            <div className="nv-top-tabs nv-reels-tabs"><div className="nv-reels-mode-switch"><button className="nv-reels-mode-title" type="button" onClick={() => setFeedMenuOpen(value => !value)}>ویدئوها <AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button type="button" onClick={() => {setFeedMenuOpen(false);setReelsMode("videos");}}>ویدئوها</button></div>}</div><span className="nv-top-spacer"/><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell}/><i/></button></div>
             {loading ? <p className="social-muted social-center">{t.loading}</p> : <div className="nv-reels-stack">{(reels.length ? reels : (posts.length ? posts : demoPosts)).map((post,i)=><button type="button" className="nv-reel-list-card" key={post.id} onClick={() => setSelectedReel(post)} style={{backgroundImage:`linear-gradient(0deg,rgba(0,0,0,.65),transparent 58%),url("${post.mediaUrl || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900`}")`}}><span>{post.authorName}</span><small>Watch reel</small></button>)}</div>}
           </section>}
 
@@ -743,7 +743,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         <div className="nv-full-reel-caption"><div className="nv-full-reel-user"><Avatar name={selectedReel.authorName}/><div><strong><bdi dir="auto">{selectedReel.authorName}</bdi></strong><small><bdi dir="auto">19 hour ago</bdi></small></div><button>{t.follow}</button></div><p>{selectedReel.body.slice(0,110)}... <span>{language === "fa" ? "بیشتر" : "more"}</span></p><small><AppIcon icon={Music2}/> Remix with laddu_jaan...</small></div><div className="nv-reel-home-indicator"/>
       </section>}
       <nav className="social-mobile-nav-wrap" style={selectedReel ? {display:"none"} : undefined}>
-        <MobileBottomNav active={active} labels={{home:t.home,reels:language==="fa"?"ویدئوها":language==="en"?"Videos":language==="ar"?"فيديوهات":"ڤیدیۆ",message:t.inbox,search:"",profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName}
+        <MobileBottomNav active={active} labels={{home:t.home,reels:language==="fa"?"ویدئوها":language==="en"?"Videos":language==="ar"?"فيديوهات":"ڤیدیۆ",message:t.inbox,search:t.search,profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName}
           onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} />
       </nav>
     </div>
