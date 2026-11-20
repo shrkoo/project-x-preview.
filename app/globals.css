@@ -1922,3 +1922,96 @@ button{cursor:pointer}
 }
 .nv-post-actions button,.nv-reel-actions button{transition:transform .16s ease,color .16s ease}
 .nv-post-actions button:active,.nv-reel-actions button:active{transform:scale(.9)}
+
+
+/* NOVYRA — close match to the supplied chocolate/glass mobile reference */
+:root{
+  --nv-chocolate:#120c0a;
+  --nv-coffee:#6b4a35;
+  --nv-deep:#1a110d;
+  --nv-glass:rgba(255,255,255,.15);
+  --nv-glass-line:rgba(255,255,255,.18);
+  --nv-gold:#ffc15a;
+  --nv-amber:#ff9b3e;
+  --nv-orange:#ff7a2f;
+}
+html,body{background:#120c0a!important}
+.social-app{
+  background:
+    radial-gradient(ellipse at 50% -8%,rgba(107,74,53,.42),transparent 42%),
+    linear-gradient(180deg,#1b120e 0%,#120c0a 34%,#0d0908 100%)!important;
+  color:#fff!important;
+}
+.social-topbar{
+  background:linear-gradient(115deg,rgba(107,74,53,.96),rgba(57,37,27,.96) 52%,rgba(26,17,13,.98))!important;
+  border-bottom:1px solid rgba(255,255,255,.09)!important;
+}
+.social-app button{
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .17s ease,background .17s ease,box-shadow .17s ease,border-color .17s ease;
+}
+.social-app button:focus-visible{
+  outline:2px solid var(--nv-gold)!important;outline-offset:3px!important;
+}
+/* Default tactile glass treatment for secondary controls */
+.social-app button:not(.novyra-bottom-tab):not(.novyra-create-button):not(.nv-story):not(.nv-post-actions button):not(.nv-reel-actions button):not(.nv-top-tabs>button):not(.nv-profile-tabs span):not(.social-create-footer button):not(.social-search-form button):not(.social-person-card>button):not(.social-comment-form button):not(.social-profile-edit button):not(.social-logout-button):not(.social-empty-state button){
+  border-color:var(--nv-glass-line);
+  border-radius:14px;
+}
+.nv-round-action,.nv-post-more,.social-notification-button,.nv-profile-cover button{
+  background:rgba(255,255,255,.15)!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+  color:#fff!important;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 7px 18px rgba(0,0,0,.28)!important;
+}
+.social-create-footer button,.social-search-form button,.social-person-card>button,
+.social-comment-form button,.social-profile-edit button,.social-logout-button,
+.social-empty-state button,.social-side-ai{
+  background:linear-gradient(145deg,#ffc15a 0%,#ff9b3e 48%,#ff7a2f 100%)!important;
+  color:#2a180e!important;
+  border:1px solid rgba(255,255,255,.28)!important;
+  border-radius:16px!important;
+  font-weight:750!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.48),0 5px 0 rgba(117,54,22,.55),0 11px 24px rgba(255,122,47,.25)!important;
+}
+.social-create-footer button:active,.social-search-form button:active,
+.social-person-card>button:active,.social-comment-form button:active,
+.social-profile-edit button:active,.social-logout-button:active,
+.social-empty-state button:active{
+  transform:translateY(3px) scale(.98)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.32),0 2px 0 rgba(117,54,22,.5),0 5px 12px rgba(255,122,47,.18)!important;
+}
+.nv-post-card{border:1px solid rgba(255,255,255,.12)!important;border-radius:26px!important}
+.nv-post-author,.nv-post-more,.nv-reel-actions button{
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+.nv-post-actions button,.nv-reel-actions button{
+  color:#fff!important;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.48));
+}
+.nv-post-actions button.liked,.nv-reel-actions button.liked{color:#ff3b30!important}
+.nv-profile-cover{border-radius:0 0 24px 24px!important;overflow:hidden}
+.nv-profile-avatar{box-shadow:0 5px 18px rgba(0,0,0,.45)!important}
+.nv-profile-stats{border-bottom:1px solid rgba(255,255,255,.1)}
+.nv-profile-tile{border-radius:17px!important;overflow:hidden}
+.novyra-bottom-nav{
+  background:rgba(13,9,8,.97)!important;
+  border-top:1px solid rgba(255,255,255,.12)!important;
+  box-shadow:0 -10px 30px rgba(0,0,0,.3)!important;
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+}
+.novyra-bottom-tab{color:rgba(255,255,255,.68)!important}
+.novyra-bottom-tab.is-active{color:#fff!important}
+.novyra-create-button{
+  background:linear-gradient(145deg,#ffc15a 0%,#ff9b3e 48%,#ff7a2f 100%)!important;
+  border:6px solid #0d0908!important;
+  color:#fff!important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.22),inset 0 1px 0 rgba(255,255,255,.55),0 8px 25px rgba(255,122,47,.48)!important;
+}
+.novyra-create-button:active{transform:translateY(1px) scale(.92)!important}
+@media(max-width:760px){
+  .social-app{background:
+    radial-gradient(ellipse at 50% 0%,rgba(107,74,53,.35),transparent 38%),
+    linear-gradient(180deg,#1a110d 0%,#120c0a 36%,#0d0908 100%)!important}
+}
