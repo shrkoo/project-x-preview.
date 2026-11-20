@@ -415,7 +415,7 @@ export default {
    }
 
    if(path==="/social/search-history" && request.method==="GET") {
-    const rows=await db.prepare("SELECT h.id,h.search_type AS type,h.query_text AS query,h.target_user_id AS userId,h.created_at AS createdAt,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username FROM social_search_history h LEFT JOIN users u ON u.id=h.target_user_id WHERE h.owner_id=? ORDER BY h.created_at DESC LIMIT 100").bind(user.id).all();
+    const rows=await db.prepare("SELECT h.id,h.search_type AS type,h.query_text AS query,h.target_user_id AS userId,h.created_at AS createdAt,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username FROM social_search_history h LEFT JOIN users u ON u.id=h.target_user_id WHERE h.owner_id=? ORDER BY h.created_at DESC,h.id DESC LIMIT 100").bind(user.id).all();
     return json({items:rows.results||[]});
    }
    if(path==="/social/search-history" && request.method==="POST") {
@@ -427,9 +427,9 @@ export default {
     if(type==="user" && !await db.prepare("SELECT id FROM users WHERE id=?").bind(targetId).first()) return fail("کاربر پیدا نشد.",404);
     const existing=type==="user"
      ? await db.prepare("SELECT id FROM social_search_history WHERE owner_id=? AND target_user_id=?").bind(user.id,targetId).first()
-     : await db.prepare("SELECT id FROM social_search_history WHERE owner_id=? AND search_type='query' AND query_text=?").bind(user.id,queryText).first();
+     : await db.prepare("SELECT id FROM social_search_history WHERE owner_id=? AND search_type='query' AND LOWER(query_text)=LOWER(?)").bind(user.id,queryText).first();
     const id=existing?.id||crypto.randomUUID();
-    await db.prepare("INSERT INTO social_search_history (id,owner_id,search_type,target_user_id,query_text,created_at) VALUES (?,?,?,?,?,CURRENT_TIMESTAMP) ON CONFLICT(id) DO UPDATE SET created_at=CURRENT_TIMESTAMP,query_text=excluded.query_text").bind(id,user.id,type,type==="user"?targetId:null,type==="query"?queryText:null).run();
+    await db.prepare("INSERT INTO social_search_history (id,owner_id,search_type,target_user_id,query_text,created_at) VALUES (?,?,?,?,?,strftime('%Y-%m-%dT%H:%M:%fZ','now')) ON CONFLICT(id) DO UPDATE SET created_at=excluded.created_at,query_text=excluded.query_text").bind(id,user.id,type,type==="user"?targetId:null,type==="query"?queryText:null).run();
     return json({ok:true,id});
    }
    const historyItemMatch=path.match(/^\/social\/search-history\/([a-f0-9-]+)$/i);
