@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Plus, Menu, MessageCircle, Send, Bookmark, Repeat2 } from "lucide-react";
+import { Heart, Plus, MessageCircle, Send, Bookmark, Repeat2 } from "lucide-react";
 
 const stories = [
   { name: "داستان شما", kind: "own" },
@@ -33,11 +33,11 @@ export default function InstagramHomeReplica({ onCreate, onNotifications }: { on
 
     <article className="nv-ig-feature-post" dir="rtl" aria-label="پست پیشنهادی digiato.ai">
       <header className="nv-ig-post-head">
-        <span className="nv-ig-digiato-avatar" aria-hidden="true"><span className="nv-digiato-symbol">d</span></span>
+        <span className="nv-ig-digiato-avatar" aria-hidden="true"><span className="nv-digiato-symbol" aria-hidden="true"><i/><i/><i/></span></span>
         <div className="nv-ig-post-account"><strong dir="ltr">digiato.ai</strong><small>پیشنهادشده برای شما</small></div>
         <div className="nv-ig-post-actions">
           <button type="button" className="nv-ig-follow">دنبال کردن</button>
-          <button type="button" className="nv-ig-more" aria-label="گزینه‌های بیشتر"><Menu/></button>
+          <button type="button" className="nv-ig-more" aria-label="گزینه‌های بیشتر"><span/><span/></button>
         </div>
       </header>
 
