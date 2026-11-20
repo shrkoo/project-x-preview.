@@ -396,3 +396,13 @@ button{-webkit-tap-highlight-color:transparent}
 .nv-game-choices button{padding:11px 17px;border:1px solid #555;border-radius:12px;background:#222;color:#fff;font:inherit;cursor:pointer}
 .nv-game-choices button:active{background:#833ab4}
 .nv-game-result{margin:18px 0 0;color:#ddd}
+
+
+/* Keep all seven mobile navigation actions visible on narrow screens. */
+@media(max-width:760px){
+  .novyra-bottom-nav{width:100%!important;overflow:visible!important}
+  .novyra-bottom-items{width:100%!important;max-width:none!important;gap:0!important;padding-inline:6px!important;box-sizing:border-box!important}
+  .novyra-bottom-tab{flex:1 1 0!important;width:0!important;min-width:0!important;padding:0!important}
+  .novyra-bottom-tab>svg,.novyra-bottom-tab svg{width:22px!important;height:22px!important}
+  .novyra-bottom-tab.novyra-profile-tab img,.novyra-bottom-tab .novyra-profile-fallback{width:24px!important;height:24px!important}
+}
