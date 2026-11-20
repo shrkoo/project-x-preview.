@@ -566,7 +566,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
       setSearchLoading(true);
       try {
         const data=await apiRequest<{users:Person[];posts:Post[]}>(`/social/search?q=${encodeURIComponent(term)}`);
-        setSearchResults(data.users||[]);
+        setSearchResults(data.users||[]); setSearchPosts(data.posts||[]);
       } catch { setSearchResults([]); }
       finally { setSearchLoading(false); }
     },220);
@@ -678,7 +678,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               </div>
               {!savedPosts.some(post=>Boolean(post.mediaUrl)&&(post.mediaType==="image"||post.mediaType==="video"))&&<p className="social-muted social-center">هنوز محتوایی ذخیره نکرده‌ای.</p>}
             </div> : !searchOpen ? <>
-              <div className="nv-explore-toolbar" dir="rtl"><button type="button" className="nv-explore-search-trigger" onClick={()=>{setSearchOpen(true);setShowSavedPosts(false);}} aria-label="جستجو"><AppIcon icon={Search}/><span>جستجو</span></button><button type="button" className="nv-explore-bookmark" aria-label="ذخیره‌شده‌ها" title="ذخیره‌شده‌ها" onClick={()=>{setShowSavedPosts(true);setSearchOpen(false);setViewedProfile(null);}}><AppIcon icon={Bookmark}/></button></div>
+              <div className="nv-explore-toolbar" dir="rtl"><form className="nv-explore-search-trigger" onSubmit={runSearch}><AppIcon icon={Search}/><input aria-label="جستجوی محتوا و مکان" value={query} onFocus={()=>{setSearchOpen(true);setShowSavedPosts(false);}} onChange={event=>setQuery(event.target.value)} placeholder="جستجوی عکس، ویدئو یا مکان" /></form><button type="button" className="nv-explore-bookmark" aria-label="ذخیره‌شده‌ها" title="ذخیره‌شده‌ها" onClick={()=>{setShowSavedPosts(true);setSearchOpen(false);setViewedProfile(null);}}><AppIcon icon={Bookmark}/></button></div>
               <div className="nv-explore-grid" dir="rtl" onTouchStart={event=>setTouchStartY(event.touches[0]?.clientY??null)} onTouchEnd={event=>{const end=event.changedTouches[0]?.clientY??0;if(window.scrollY<=2&&touchStartY!==null&&end-touchStartY>70)void loadExplore(true,true);setTouchStartY(null);}}>
                 {explorePosts.map(post=><button type="button" className="nv-explore-tile" key={post.id} onClick={()=>void openExplorePost(post)} aria-label={`${post.authorName}، ${formatExploreViews(post.viewCount)} بازدید`}>
                   {post.mediaType==="video"&&post.mediaUrl?<video src={post.mediaUrl} muted playsInline preload="metadata" onLoadedData={event=>{event.currentTarget.dataset.loaded="true";}}/>:<img src={post.mediaUrl||""} alt="" loading="lazy" onLoad={event=>{event.currentTarget.dataset.loaded="true";}}/>}
@@ -688,7 +688,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               <div ref={exploreSentinelRef} className="nv-explore-sentinel">{exploreLoading?"در حال بارگذاری…":""}</div>
               {!exploreLoading&&!explorePosts.length&&<p className="social-muted social-center">هنوز محتوایی برای نمایش وجود ندارد.</p>}
             </> : <div className="nv-search-page" dir="rtl">
-              <div className="nv-search-page-head"><button type="button" onClick={()=>{setSearchOpen(false);setQuery("");setHistoryExpanded(false);}} aria-label="بازگشت"><AppIcon icon={ArrowRight}/></button><form onSubmit={runSearch}><AppIcon icon={Search}/><input autoFocus value={query} onChange={event=>setQuery(event.target.value)} placeholder="جستجوی کاربران" /></form></div>
+              <div className="nv-search-page-head"><button type="button" onClick={()=>{setSearchOpen(false);setQuery("");setHistoryExpanded(false);}} aria-label="بازگشت"><AppIcon icon={ArrowRight}/></button><form onSubmit={runSearch}><AppIcon icon={Search}/><input autoFocus value={query} onChange={event=>setQuery(event.target.value)} placeholder="جستجوی عکس، ویدئو یا مکان" /></form></div>
               {!query.trim() ? <>
                 <div className="nv-recent-heading"><strong>جدید</strong><button type="button" onClick={()=>setHistoryExpanded(value=>!value)}>دیدن همه</button></div>
                 <div className="nv-recent-list">{(historyExpanded?recentSearches:recentSearches.slice(0,8)).map(item=><div className="nv-recent-row" key={item.id}>
@@ -697,7 +697,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
                   </button><button type="button" className="nv-recent-remove" onClick={()=>void deleteSearchHistory(item.id)} aria-label="Remove">×</button>
                 </div>)}</div>
                 {recentSearches.length>0&&<button type="button" className="nv-clear-history" onClick={()=>void clearSearchHistory()}>پاک کردن تاریخچه</button>}
-              </> : <div className="nv-live-results">{searchLoading?<p className="social-muted">در حال جستجو…</p>:searchResults.map(person=><button type="button" className="nv-recent-row" key={person.id} onClick={()=>void openPersonProfile(person)}><span className="nv-recent-avatar"><AppIcon icon={UserRound}/></span><span className="nv-recent-copy"><strong>{person.username||person.displayName}</strong><small>{person.displayName}</small></span></button>)}</div>}
+              </> : <div className="nv-live-results">{searchLoading?<p className="social-muted">در حال جستجو…</p>:<>{searchResults.map(person=><button type="button" className="nv-recent-row" key={person.id} onClick={()=>void openPersonProfile(person)}><span className="nv-recent-avatar"><AppIcon icon={UserRound}/></span><span className="nv-recent-copy"><strong>{person.username||person.displayName}</strong><small>{person.displayName}</small></span></button>)}{searchPosts.filter(post=>Boolean(post.mediaUrl)&&(post.mediaType==="image"||post.mediaType==="video")).length>0&&<div className="nv-explore-grid">{searchPosts.filter(post=>Boolean(post.mediaUrl)&&(post.mediaType==="image"||post.mediaType==="video")).map(post=><button type="button" className="nv-explore-tile" key={post.id} onClick={()=>void openExplorePost(post)} aria-label={`${post.authorName}، ${formatExploreViews(post.viewCount)} بازدید`}>{post.mediaType==="video"?<video src={post.mediaUrl||undefined} muted playsInline preload="metadata"/>:<img src={post.mediaUrl||""} alt="" loading="lazy"/>}<span className="nv-explore-views"><AppIcon icon={Eye}/>{formatExploreViews(post.viewCount)}</span></button>)}</div>}</>}</div>}
             </div>}
           </section>}
           {!aiOpen && (active === "friends" || active === "inbox") && <section className="nv-placeholder"><div className="nv-placeholder-icon">{active === "friends" ? <AppIcon icon={UsersRound} /> : <AppIcon icon={MessageSquare} />}</div><h2>{active === "friends" ? t.friends : t.inbox}</h2><p>{active === "friends" ? "Find and connect with people on NOVYRA." : "Your conversations will appear here."}</p></section>}
