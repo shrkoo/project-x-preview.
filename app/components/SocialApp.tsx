@@ -749,11 +749,11 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               <div className="nv-profile-hero"><div className="nv-avatar-wrap"><span className="nv-profile-avatar nv-profile-avatar-placeholder"><AppIcon icon={UserRound}/></span></div><h2>{viewedProfile.profile.displayName}</h2><p>@{viewedProfile.profile.username || viewedProfile.profile.displayName.toLowerCase().replace(/\s+/g,"")}</p></div>
               <div className="nv-profile-stats"><div><strong>{viewedProfile.profile.postCount}</strong><small>{t.postCount}</small></div><div><strong>{viewedProfile.profile.followerCount}</strong><small>{t.followers}</small></div><div><strong>{viewedProfile.profile.followingCount}</strong><small>{t.followingCount}</small></div></div>
               <div className="nv-profile-buttons"><button type="button" className="nv-follow-profile" onClick={()=>followPerson(viewedProfile.profile)}>{viewedProfile.profile.followedByMe?t.following:t.follow}</button></div>
-              <div className="nv-profile-grid is-other-profile">{viewedProfile.posts.filter(post=>Boolean(post.mediaUrl)&&(post.mediaType==="image"||post.mediaType==="video")).map(post=><button type="button" className="nv-profile-tile" key={post.id} onClick={()=>void openExplorePost(post)}>{post.mediaType==="video"?<video src={post.mediaUrl||undefined} muted playsInline preload="metadata"/>:<img src={post.mediaUrl||undefined} alt="" loading="lazy"/>}</button>)}</div>
+              <div className="nv-profile-grid is-other-profile">{viewedProfile.posts.filter(post=>Boolean(post.mediaUrl)&&(post.mediaType==="image"||post.mediaType==="video")).map(post=><button type="button" className="nv-profile-tile" key={post.id} onClick={()=>openMediaViewer(post,viewedProfile.posts,"profile")}>{post.mediaType==="video"?<video src={post.mediaUrl||undefined} muted playsInline preload="metadata"/>:<img src={post.mediaUrl||undefined} alt="" loading="lazy"/>}</button>)}</div>
             </div> : showSavedPosts ? <div className="nv-saved-explore-screen" dir="rtl">
               <div className="nv-explore-subpage-head"><button type="button" onClick={()=>setShowSavedPosts(false)} aria-label="بازگشت"><AppIcon icon={ArrowRight}/></button><strong>ذخیره‌شده‌ها</strong></div>
               <div className="nv-explore-grid">
-                {savedPosts.filter(post=>Boolean(post.mediaUrl)&&(post.mediaType==="image"||post.mediaType==="video")).map(post=><button type="button" className="nv-explore-tile" key={post.id} onClick={()=>void openExplorePost(post)} aria-label={`${post.authorName}، ${formatExploreViews(post.viewCount)} بازدید`}>
+                {savedPosts.filter(post=>Boolean(post.mediaUrl)&&(post.mediaType==="image"||post.mediaType==="video")).map(post=><button type="button" className="nv-explore-tile" key={post.id} onClick={()=>openMediaViewer(post,savedPosts,"explore")} aria-label={`${post.authorName}، ${formatExploreViews(post.viewCount)} بازدید`}>
                   {post.mediaType==="video"?<video src={post.mediaUrl||undefined} muted playsInline preload="metadata" onLoadedData={event=>{event.currentTarget.dataset.loaded="true";}}/>:<img src={post.mediaUrl||""} alt="" loading="lazy" onLoad={event=>{event.currentTarget.dataset.loaded="true";}}/>}
                   <span className="nv-explore-views"><AppIcon icon={Eye}/>{formatExploreViews(post.viewCount)}</span>
                 </button>)}
@@ -762,7 +762,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             </div> : !searchOpen ? <>
               <div className="nv-explore-toolbar" dir="rtl"><form className="nv-explore-search-trigger" onSubmit={runSearch}><AppIcon icon={Search}/><input aria-label="جستجوی محتوا و مکان" value={query} onFocus={()=>{setSearchOpen(true);setShowSavedPosts(false);}} onChange={event=>setQuery(event.target.value)} placeholder="جستجو" /></form><button type="button" className="nv-explore-bookmark" aria-label="ذخیره‌شده‌ها" title="ذخیره‌شده‌ها" onClick={()=>{setShowSavedPosts(true);setSearchOpen(false);setViewedProfile(null);}}><AppIcon icon={Bookmark}/></button></div>
               <div className="nv-explore-grid" dir="rtl" onTouchStart={event=>setTouchStartY(event.touches[0]?.clientY??null)} onTouchEnd={event=>{const end=event.changedTouches[0]?.clientY??0;if(window.scrollY<=2&&touchStartY!==null&&end-touchStartY>70)void loadExplore(true,true);setTouchStartY(null);}}>
-                {explorePosts.map(post=><button type="button" className="nv-explore-tile" key={post.id} onClick={()=>void openExplorePost(post)} aria-label={`${post.authorName}، ${formatExploreViews(post.viewCount)} بازدید`}>
+                {explorePosts.map(post=><button type="button" className="nv-explore-tile" key={post.id} onClick={()=>openMediaViewer(post,explorePosts,"explore")} aria-label={`${post.authorName}، ${formatExploreViews(post.viewCount)} بازدید`}>
                   {post.mediaType==="video"&&post.mediaUrl?<><video src={post.mediaUrl} muted playsInline preload="metadata" onLoadedData={event=>{event.currentTarget.dataset.loaded="true";}}/><span className="nv-tile-play"><AppIcon icon={Play}/></span></>:<img src={post.mediaUrl||""} alt="" loading="lazy" onLoad={event=>{event.currentTarget.dataset.loaded="true";}}/>}
                   <span className="nv-explore-views"><AppIcon icon={Eye}/>{formatExploreViews(post.viewCount)}</span>
                 </button>)}
@@ -798,14 +798,31 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           </section>}
 
           {!aiOpen && active === "reels" && <section className="nv-reels-screen">
-            <div className="nv-top-tabs nv-reels-tabs"><div className="nv-reels-mode-switch"><button className="nv-reels-mode-title" type="button" onClick={() => setFeedMenuOpen(value => !value)}>{reelsMode === "videos" ? "ویدئوها" : "اکسپلور"} <AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button type="button" onClick={() => {setFeedMenuOpen(false);setReelsMode("videos");}}>ویدئوها</button><button type="button" onClick={() => {setFeedMenuOpen(false);setReelsMode("explore");void loadExplore(true,true);}}>اکسپلور</button></div>}</div><span className="nv-top-spacer"/><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label={t.notifications}><AppIcon icon={Bell}/>{notificationCount > 0 && <i/>}</button></div>
-            {reelsMode === "videos" ? (loading ? <p className="social-muted social-center">{t.loading}</p> : reels.length ? <div className="nv-reels-stack">{reels.map(post=><button type="button" className="nv-reel-list-card" key={post.id} onClick={() => setSelectedReel(post)}><video src={post.mediaUrl || undefined} muted playsInline preload="metadata"/><span>{post.authorName}</span></button>)}</div> : <div className="nv-feed-empty"><strong>{t.noVideos}</strong><p>{t.noVideosHint}</p></div>) : <>
-              <div className="nv-explore-toolbar" dir="rtl"><button type="button" className="nv-explore-search-trigger" onClick={() => navigate("search")}><AppIcon icon={Search}/><span>جستجو</span></button></div>
-              <div className="nv-explore-grid" dir="rtl">{explorePosts.map(post=><button type="button" className="nv-explore-tile" key={post.id} onClick={() => void openExplorePost(post)} aria-label={`${post.authorName}، ${formatExploreViews(post.viewCount)} بازدید`}>{post.mediaType === "video" ? <><video src={post.mediaUrl || undefined} muted playsInline preload="metadata"/><span className="nv-tile-play"><AppIcon icon={Play}/></span></> : <img src={post.mediaUrl || ""} alt="" loading="lazy"/>}<span className="nv-explore-views"><AppIcon icon={Eye}/>{formatExploreViews(post.viewCount)}</span></button>)}</div>
-              <div className="nv-explore-sentinel"/>
-              {!exploreLoading && !explorePosts.length && <p className="social-muted social-center">هنوز محتوایی برای نمایش وجود ندارد.</p>}
-            </>}
-          </section>}
+            {loading ? <p className="social-muted social-center">{t.loading}</p> : <MediaViewer
+              items={reels as SocialMediaPost[]}
+              mode="reels"
+              userId={account.id}
+              friends={friends as SocialMediaPerson[]}
+              friendsOnly={friendsOnly}
+              onFriendsToggle={()=>setFriendsOnly(value=>!value)}
+              onCreate={()=>{setMediaType("video");navigate("create");}}
+              onLike={post=>void toggleLike(post as Post)}
+              onComments={post=>void toggleComments(post as Post)}
+              onRepost={post=>void toggleRepost(post as Post)}
+              onShare={post=>void openShareSheet(post as Post)}
+              onSave={post=>void toggleSavedPost(post as Post)}
+              onView={post=>void recordPostView(post as Post)}
+              onFollow={person=>void followPerson(person as Person)}
+              followingIds={friends.map(person=>person.id)}
+              savedPostIds={savedPostIds}
+              commentsByPost={commentsByPost}
+              commentsLoading={commentsLoading}
+              commentDrafts={commentDrafts}
+              commentsOpenFor={commentingPost}
+              onCommentDraft={(postId,value)=>setCommentDrafts(current=>({...current,[postId]:value}))}
+              onSubmitComment={post=>void submitComment(post as Post)}
+            />}
+          </section>
 
           {!aiOpen && active === "profile" && <section className="social-profile-screen">
             {loading ? <p className="social-muted social-center">{t.loading}</p> : <>
@@ -813,7 +830,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               <div className="nv-profile-hero"><div className="nv-avatar-wrap"><span className="nv-profile-avatar nv-profile-avatar-placeholder">{initials(profile?.displayName || account.displayName)}</span><button type="button" className="nv-camera-badge" aria-label="Change profile photo"><AppIcon icon={Camera}/></button></div><h2>{profile?.displayName || account.displayName}</h2><p>@{(profile?.displayName || account.displayName).toLowerCase().replace(/[^a-z0-9]/g,"") || "username"}</p><button type="button" className="nv-edit-pill" onClick={() => document.getElementById("nv-profile-name")?.focus()}>{t.editProfile}</button></div>
               <div className="nv-profile-stats"><div><strong>{profile?.postCount ?? profilePosts.length}</strong><small>{t.postCount}</small></div><div><strong>{(profile?.followerCount ?? 0).toLocaleString(language==="fa"?"fa-IR":undefined)}</strong><small>{t.followers}</small></div><div><strong>{(profile?.followingCount ?? 0).toLocaleString(language==="fa"?"fa-IR":undefined)}</strong><small>{t.followingCount}</small></div><div><strong>{profilePosts.reduce((sum,post)=>sum+(post.likeCount||0),0).toLocaleString(language==="fa"?"fa-IR":undefined)}</strong><small>{language==="fa"?"پسندها":"Likes"}</small></div></div>
               <div className="nv-profile-tabs" role="tablist" aria-label="Profile content">{(["Photos","Videos","Saved"] as const).map(tab=><button key={tab} type="button" className={profileTab===tab?"is-active":""} onClick={() => setProfileTab(tab)}>{tab==="Saved" && <AppIcon icon={LockKeyhole}/>}<span>{tab}</span></button>)}</div>
-              <div className="nv-profile-grid">{(profileTab==="Saved"?savedPosts:profilePosts.filter(post=>profileTab==="Photos"?post.mediaType==="image":post.mediaType==="video")).map(item=><button type="button" key={item.id} className="nv-profile-tile" onClick={()=>void openExplorePost(item)}>{item.mediaType==="video"?<><video src={item.mediaUrl||undefined} muted playsInline preload="metadata"/><AppIcon icon={Play}/></>:item.mediaUrl?<img src={item.mediaUrl} alt="" loading="lazy"/>:<span className="nv-explore-text-tile">{item.body}</span>}</button>)}</div>
+              <div className="nv-profile-grid">{(profileTab==="Saved"?savedPosts:profilePosts.filter(post=>profileTab==="Photos"?post.mediaType==="image":post.mediaType==="video")).map(item=><button type="button" key={item.id} className="nv-profile-tile" onClick={()=>openMediaViewer(item,profileTab==="Saved"?savedPosts:profilePosts.filter(post=>profileTab==="Photos"?post.mediaType==="image":post.mediaType==="video"),"profile")}>{item.mediaType==="video"?<><video src={item.mediaUrl||undefined} muted playsInline preload="metadata"/><AppIcon icon={Play}/></>:item.mediaUrl?<img src={item.mediaUrl} alt="" loading="lazy"/>:<span className="nv-explore-text-tile">{item.body}</span>}</button>)}</div>
               <form className="social-profile-edit" onSubmit={saveProfile}><label>{t.editProfile}<input id="nv-profile-name" value={profileName} onChange={event => setProfileName(event.target.value)} maxLength={32}/></label><button type="submit" disabled={profileSaving || profileName.trim().length<2}>{profileSaving?"…":t.save}</button></form>
               <div className="social-profile-settings"><label>{t.language}<select value={language} onChange={event => changeLanguage(event.target.value)}><option value="fa">فارسی</option><option value="en">English</option><option value="ar">العربية</option><option value="ku">کوردی</option></select></label><button type="button" className="social-logout-button" onClick={logout}>{t.logout}</button></div>
             </>}
@@ -821,14 +838,37 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         </section>
       </div>
 
-      {selectedGridPost && <section className="nv-grid-post-viewer" role="dialog" aria-modal="true" onClick={()=>setSelectedGridPost(null)}><button type="button" className="nv-grid-viewer-close" onClick={()=>setSelectedGridPost(null)} aria-label="Close">×</button><div className="nv-grid-viewer-media" onClick={event=>event.stopPropagation()}>{selectedGridPost.mediaType==="video"&&selectedGridPost.mediaUrl?<video src={selectedGridPost.mediaUrl} autoPlay controls playsInline/>:selectedGridPost.mediaUrl?<img src={selectedGridPost.mediaUrl} alt=""/>:<p>{selectedGridPost.body}</p>}</div></section>}
-      {selectedReel && <section className="nv-full-reel" role="dialog" aria-modal="true">
-        <div className="nv-full-reel-media">{selectedReel.mediaType === "video" && selectedReel.mediaUrl ? <video src={selectedReel.mediaUrl} autoPlay loop playsInline controls/> : null}</div>
-        <div className="nv-full-reel-top"><button onClick={()=>setSelectedReel(null)} aria-label="Back"><AppIcon icon={ChevronDown}/></button><button onClick={()=>{setSelectedReel(null);navigate("search")}} aria-label="Search"><AppIcon icon={Search}/></button></div>
-        <div className="nv-full-reel-actions"><button onClick={()=>toggleLike(selectedReel)} aria-label={t.likes}><AppIcon icon={Heart} fill={selectedReel.likedByMe?"#ef4444":"none"}/><small>{selectedReel.likeCount.toLocaleString(language==="fa"?"fa-IR":undefined)}</small></button><button onClick={()=>toggleComments(selectedReel)} aria-label={t.comments}><AppIcon icon={MessageCircle}/><small>{selectedReel.commentCount.toLocaleString(language==="fa"?"fa-IR":undefined)}</small></button><button onClick={()=>{const url=window.location.href;if(navigator.share)void navigator.share({title:"NOVYRA",text:selectedReel.body,url}).catch(()=>undefined);else void navigator.clipboard?.writeText(url)}} aria-label={t.send}><AppIcon icon={Send}/></button><button onClick={()=>toggleSavedPost(selectedReel)} aria-label={t.save}><AppIcon icon={Bookmark} fill={savedPostIds.includes(selectedReel.id)?"currentColor":"none"}/></button></div>
-        <div className="nv-full-reel-caption"><div className="nv-full-reel-user"><Avatar name={selectedReel.authorName}/><div><strong><bdi dir="auto">{selectedReel.authorName}</bdi></strong><small><bdi dir="auto">{formatPostAge(selectedReel.createdAt,language)}</bdi></small></div></div>{selectedReel.body && <p>{selectedReel.body}</p>}</div><div className="nv-reel-home-indicator"/>
+      {viewerOpen && <MediaViewer
+        key={viewerMode}
+        items={viewerPosts as SocialMediaPost[]}
+        initialIndex={viewerIndex}
+        mode={viewerMode}
+        userId={account.id}
+        friends={friends as SocialMediaPerson[]}
+        onClose={closeMediaViewer}
+        onLike={post=>void toggleLike(post as Post)}
+        onComments={post=>void toggleComments(post as Post)}
+        onRepost={post=>void toggleRepost(post as Post)}
+        onShare={post=>void openShareSheet(post as Post)}
+        onSave={post=>void toggleSavedPost(post as Post)}
+        onView={post=>void recordPostView(post as Post)}
+        onFollow={person=>void followPerson(person as Person)}
+        followingIds={friends.map(person=>person.id)}
+        savedPostIds={savedPostIds}
+        commentsByPost={commentsByPost}
+        commentsLoading={commentsLoading}
+        commentDrafts={commentDrafts}
+        commentsOpenFor={commentingPost}
+        onCommentDraft={(postId,value)=>setCommentDrafts(current=>({...current,[postId]:value}))}
+        onSubmitComment={post=>void submitComment(post as Post)}
+      />}
+      {sharingPost && <section className="nv-share-sheet-backdrop" role="dialog" aria-modal="true" onClick={()=>setSharingPost(null)}>
+        <div className="nv-share-sheet" dir="rtl" onClick={event=>event.stopPropagation()}>
+          <div className="nv-share-sheet-head"><strong>ارسال برای دوستان</strong><button type="button" onClick={()=>setSharingPost(null)} aria-label="بستن"><AppIcon icon={X}/></button></div>
+          {shareTargets.length ? shareTargets.map(person=><button type="button" className="nv-share-target" key={person.id} onClick={()=>void sendPostToUser(person)} disabled={Boolean(shareSending)}><Avatar name={person.displayName}/><span><strong>{person.displayName}</strong><small>@{person.username||person.displayName.toLowerCase().replace(/\s+/g,"")}</small></span><span className="nv-share-send">{shareSending===person.id?"…":"ارسال"}</span></button>) : <p className="social-muted social-center">هنوز کاربری را دنبال نمی‌کنی. برای ارسال پست، ابتدا یک نفر را دنبال کن.</p>}
+        </div>
       </section>}
-      <nav className="social-mobile-nav-wrap" style={selectedReel ? {display:"none"} : undefined}>
+      <nav className="social-mobile-nav-wrap">
         <MobileBottomNav active={active} labels={{home:t.home,reels:t.reels,message:t.inbox,search:t.search,profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName} avatarUrl={profile?.avatarUrl || profile?.avatar_url || profile?.photoUrl || profile?.imageUrl}
           onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} />
       </nav>
