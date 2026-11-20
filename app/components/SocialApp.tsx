@@ -566,7 +566,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
       setSearchLoading(true);
       try {
         const data=await apiRequest<{users:Person[];posts:Post[]}>(`/social/search?q=${encodeURIComponent(term)}`);
-        setSearchResults(data.users||[]);
+        setSearchResults(data.users||[]); setSearchPosts(data.posts||[]);
       } catch { setSearchResults([]); }
       finally { setSearchLoading(false); }
     },220);
@@ -688,7 +688,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               <div ref={exploreSentinelRef} className="nv-explore-sentinel">{exploreLoading?"در حال بارگذاری…":""}</div>
               {!exploreLoading&&!explorePosts.length&&<p className="social-muted social-center">هنوز محتوایی برای نمایش وجود ندارد.</p>}
             </> : <div className="nv-search-page" dir="rtl">
-              <div className="nv-search-page-head"><button type="button" onClick={()=>{setSearchOpen(false);setQuery("");setHistoryExpanded(false);}} aria-label="بازگشت"><AppIcon icon={ArrowRight}/></button><form onSubmit={runSearch}><AppIcon icon={Search}/><input autoFocus value={query} onChange={event=>setQuery(event.target.value)} placeholder="جستجوی کاربران" /></form></div>
+              <div className="nv-search-page-head"><button type="button" onClick={()=>{setSearchOpen(false);setQuery("");setHistoryExpanded(false);}} aria-label="بازگشت"><AppIcon icon={ArrowRight}/></button><form onSubmit={runSearch}><AppIcon icon={Search}/><input autoFocus value={query} onChange={event=>setQuery(event.target.value)} placeholder="جستجوی عکس، ویدئو یا مکان" /></form></div>
               {!query.trim() ? <>
                 <div className="nv-recent-heading"><strong>جدید</strong><button type="button" onClick={()=>setHistoryExpanded(value=>!value)}>دیدن همه</button></div>
                 <div className="nv-recent-list">{(historyExpanded?recentSearches:recentSearches.slice(0,8)).map(item=><div className="nv-recent-row" key={item.id}>
