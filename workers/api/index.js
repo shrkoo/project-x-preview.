@@ -121,6 +121,23 @@ async function issueEmailToken(db,userId,kind,ttlMs) {
  await db.prepare("INSERT INTO email_tokens (id,user_id,token_hash,kind,expires_at) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),userId,tokenHash,kind,expires).run();
  return token;
 }
+async function storeStoryMedia(env,id,file) {
+  if(!env.STORY_MEDIA) throw new Error("ذخیره‌ساز فایل استوری پیکربندی نشده است.");
+  await env.STORY_MEDIA.put("story:"+id,await file.arrayBuffer(),{metadata:{contentType:file.type}});
+}
+async function readStoryMedia(env,id) {
+  if(!env.STORY_MEDIA) throw new Error("ذخیره‌ساز فایل استوری پیکربندی نشده است.");
+  const {value,metadata}=await env.STORY_MEDIA.getWithMetadata("story:"+id,"arrayBuffer");
+  return {value,contentType:metadata?.contentType||"application/octet-stream"};
+}
+async function deleteStoryMedia(env,id) {
+  if(env.STORY_MEDIA) await env.STORY_MEDIA.delete("story:"+id);
+}
+async function cleanupExpiredStories(env,db) {
+  const expired=await db.prepare("SELECT id FROM stories WHERE expires_at<=datetime('now') LIMIT 500").all();
+  for(const row of expired.results||[]) await deleteStoryMedia(env,row.id);
+  await db.prepare("DELETE FROM stories WHERE expires_at<=datetime('now')").run();
+}
 const readBody = async request => { try { return await request.json(); } catch { return null; } };
 async function createSession(db, userId) {
   const token = randomToken();
@@ -157,7 +174,7 @@ function shapeSocialPost(row) {
 }
 
 export default {
- async scheduled(controller, env, ctx) { ctx.waitUntil(env.DB.prepare("DELETE FROM stories WHERE expires_at<=CURRENT_TIMESTAMP").run()); },
+ async scheduled(controller, env, ctx) { ctx.waitUntil(cleanupExpiredStories(env,env.DB)); },
  async fetch(request, env) {
   const origin = request.headers.get("Origin");
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: { ...corsHeaders, ...(origin === "http://localhost:3000" ? { "Access-Control-Allow-Origin": origin } : {}) } });
@@ -313,11 +330,13 @@ export default {
    }
    const storyMediaMatch=path.match(/^\/social\/stories\/([a-f0-9-]+)\/media$/i);
    if(storyMediaMatch && request.method==="GET") {
-    const story=await db.prepare("SELECT media_data,content_type,expires_at FROM stories WHERE id=? AND expires_at>datetime('now')").bind(storyMediaMatch[1]).first();
-    if(!story || !story.media_data) return fail("استوری پیدا نشد یا منقضی شده است.",404);
-    return new Response(story.media_data,{headers:{...corsHeaders,"Content-Type":story.content_type||"application/octet-stream","Cache-Control":"private, max-age=300","X-Content-Type-Options":"nosniff"}});
+    const story=await db.prepare("SELECT id FROM stories WHERE id=? AND expires_at>datetime('now')").bind(storyMediaMatch[1]).first();
+    if(!story) return fail("استوری پیدا نشد یا منقضی شده است.",404);
+    const media=await readStoryMedia(env,story.id);
+    if(!media?.value) return fail("فایل استوری پیدا نشد یا منقضی شده است.",404);
+    return new Response(media.value,{headers:{...corsHeaders,"Content-Type":media.contentType||"application/octet-stream","Cache-Control":"public, max-age=300","X-Content-Type-Options":"nosniff"}});
    }
-   const user = await authenticate(request,db);
+      const user = await authenticate(request,db);
    if (path.startsWith("/auth/") && path !== "/auth/register" && path !== "/auth/login") {
     if (!user) return fail("برای ادامه وارد حساب شو.",401);
     if (path === "/auth/set-password" && request.method === "POST") {
@@ -359,7 +378,7 @@ export default {
    if (!user) return fail("برای استفاده از این بخش وارد حساب شو.",401);
 
    if(path==="/social/stories" && request.method==="GET") {
-    await db.prepare("DELETE FROM stories WHERE expires_at<=datetime('now')").run();
+    await cleanupExpiredStories(env,db);
     const rows=await db.prepare(`
       SELECT s.id,s.user_id AS userId,s.media_url AS mediaUrl,s.type,s.created_at AS createdAt,s.expires_at AS expiresAt,
         u.display_name AS displayName,u.username,u.avatar_url AS avatarUrl,
@@ -374,18 +393,24 @@ export default {
     return json({stories:rows.results||[]});
    }
    if(path==="/social/stories" && request.method==="POST") {
-    const body=await readBody(request),type=body?.type==="video"?"video":"image",dataUrl=String(body?.mediaData||"");
-    const match=dataUrl.match(/^data:(image\/(?:jpeg|png|webp)|video\/(?:mp4|webm|quicktime));base64,([A-Za-z0-9+/=]+)$/);
-    if(!match || (type==="image"&&!match[1].startsWith("image/")) || (type==="video"&&!match[1].startsWith("video/"))) return fail("فایل استوری معتبر نیست.");
-    const binary=atob(match[2]);
-    if(binary.length>1500000) return fail("حجم استوری باید کمتر از ۱٫۵ مگابایت باشد.",413);
-    const bytes=new Uint8Array(binary.length);
-    for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
-    const id=crypto.randomUUID();
-    await db.prepare("DELETE FROM stories WHERE expires_at<=datetime('now')").run();
-    await db.prepare("INSERT INTO stories (id,user_id,media_url,type,expires_at,media_data,content_type) VALUES (?,?,?, ?,datetime('now','+24 hours'),?,?)")
-      .bind(id,user.id,"/social/stories/"+id+"/media",type,bytes,match[1]).run();
-    return json({ok:true,story:{id,mediaUrl:"/social/stories/"+id+"/media",type,expiresAt:new Date(Date.now()+86400000).toISOString()}},201);
+    const form=await request.formData(),type=form.get("type")==="video"?"video":"image",file=form.get("file");
+    if(!(file instanceof File)) return fail("فایل استوری ارسال نشده است.");
+    const contentType=String(file.type||"").toLowerCase();
+    const validImage=type==="image" && contentType==="image/webp";
+    const validVideo=type==="video" && ["video/mp4","video/webm","video/quicktime"].includes(contentType);
+    if(!validImage&&!validVideo) return fail(type==="image"?"عکس باید به فرمت WebP تبدیل شود.":"فرمت ویدیو پشتیبانی نمی‌شود.");
+    if(file.size<1 || file.size>1500000) return fail("حجم فایل باید حداکثر ۱٫۵ مگابایت باشد.",413);
+    const id=crypto.randomUUID(),mediaUrl="/social/stories/"+id+"/media";
+    await cleanupExpiredStories(env,db);
+    await storeStoryMedia(env,id,file);
+    try {
+      await db.prepare("INSERT INTO stories (id,user_id,media_url,type,expires_at) VALUES (?,?,?, ?,datetime('now','+24 hours'))")
+        .bind(id,user.id,mediaUrl,type).run();
+    } catch(error) {
+      await deleteStoryMedia(env,id);
+      throw error;
+    }
+    return json({ok:true,story:{id,mediaUrl,type,expiresAt:new Date(Date.now()+86400000).toISOString()}},201);
    }
    const storyViewMatch=path.match(/^\/social\/stories\/([a-f0-9-]+)\/view$/i);
    if(storyViewMatch && request.method==="POST") {
