@@ -31,6 +31,12 @@ type Person = {
 type Comment = { id: string; body: string; createdAt: string; authorId: string; authorName: string };
 type Profile = Person & { email: string; createdAt?: string };
 
+const demoPosts: Post[] = [
+  {id:"demo-1",body:"Golden hour, good people, and a moment worth keeping. What made you smile today?",mediaUrl:"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1000&auto=format&fit=crop",mediaType:"image",createdAt:"2026-11-20T10:00:00.000Z",authorId:"demo",authorName:"Alex Morgan",likeCount:212,commentCount:20,likedByMe:false},
+  {id:"demo-2",body:"A little reminder to slow down and enjoy the small things around you.",mediaUrl:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=1000&auto=format&fit=crop",mediaType:"image",createdAt:"2026-11-20T09:48:00.000Z",authorId:"demo",authorName:"Alana Rose",likeCount:184,commentCount:16,likedByMe:false},
+  {id:"demo-3",body:"New places, familiar faces, and stories still waiting to happen.",mediaUrl:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=1000&auto=format&fit=crop",mediaType:"image",createdAt:"2026-11-20T09:36:00.000Z",authorId:"demo",authorName:"Marco Lee",likeCount:96,commentCount:8,likedByMe:false}
+];
+
 type Props = {
   account: Account;
   language: Language;
@@ -135,18 +141,18 @@ function PostMedia({ post }: { post: Post }) {
 
 function PostCard({
   post, t, onLike, onToggleComments, commentsOpen, comments, commentDraft, onCommentDraft,
-  onSubmitComment, commentsLoading
+  onSubmitComment, commentsLoading, onSave
 }: {
   post: Post; t: Record<string, string>; onLike: (post: Post) => void;
   onToggleComments: (post: Post) => void; commentsOpen: boolean; comments: Comment[];
   commentDraft: string; onCommentDraft: (value: string) => void;
-  onSubmitComment: (post: Post) => void; commentsLoading: boolean;
+  onSubmitComment: (post: Post) => void; commentsLoading: boolean; onSave: (post: Post) => void;
 }) {
   const date = new Date(post.createdAt);
   const photo = post.mediaUrl && post.mediaType === "image" ? post.mediaUrl : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1000&auto=format&fit=crop";
   const ago = Number.isNaN(date.getTime()) ? "12 min ago" : "12 min ago";
   return <article className="nv-post-card">
-    <div className="nv-post-head"><Avatar name={post.authorName}/><div className="nv-post-person"><strong>{post.authorName}</strong><small>{ago}</small></div><button className="nv-post-menu" type="button" aria-label="More options"><AppIcon icon={EllipsisVertical}/></button></div>
+    <div className="nv-post-head"><Avatar name={post.authorName}/><div className="nv-post-person"><strong>{post.authorName}</strong><small>{ago}</small></div><button className="nv-post-menu" type="button" aria-label="Save post" onClick={() => onSave(post)}><AppIcon icon={EllipsisVertical}/></button></div>
     <div className="nv-post-photo"><img src={photo} alt="" loading="lazy"/>{post.mediaType === "video" && post.mediaUrl && <video src={post.mediaUrl} controls playsInline preload="metadata"/>}</div>
     <div className="nv-post-interactions">
       <button type="button" className={post.likedByMe ? "liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}><AppIcon icon={Heart} fill="currentColor"/><span>{post.likeCount || 212}</span></button>
@@ -197,6 +203,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const [selectedReel, setSelectedReel] = useState<Post | null>(null);
   const [profileTab, setProfileTab] = useState<"Photos" | "Videos" | "Saved">("Photos");
   const [feedMenuOpen, setFeedMenuOpen] = useState(false);
+  const [savedPostIds, setSavedPostIds] = useState<string[]>([]);
 
   const notificationCount = useMemo(() => notifications.filter(item => !item.readAt).length, [notifications]);
 
@@ -428,11 +435,19 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const pageTitle = aiOpen ? t.ai : t[active];
   const visiblePosts = active === "reels" ? reels : posts;
 
+  function toggleSavedPost(post: Post) {
+    setSavedPostIds(current => {
+      const next = current.includes(post.id) ? current.filter(id => id !== post.id) : [...current, post.id];
+      localStorage.setItem("novyra-saved-posts", JSON.stringify(next));
+      return next;
+    });
+  }
+
   function renderPost(post: Post) {
     return <PostCard key={post.id} post={post} t={t} onLike={toggleLike} onToggleComments={toggleComments}
       commentsOpen={commentingPost === post.id} comments={commentsByPost[post.id] || []}
       commentDraft={commentDrafts[post.id] || ""} onCommentDraft={value => setCommentDrafts(current => ({ ...current, [post.id]: value }))}
-      onSubmitComment={submitComment} commentsLoading={Boolean(commentsLoading[post.id])} />;
+      onSubmitComment={submitComment} commentsLoading={Boolean(commentsLoading[post.id])} onSave={toggleSavedPost} />;
   }
 
   return <main className="social-app" dir={dir}>
@@ -490,11 +505,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           {!aiOpen && active === "home" && <section className="social-feed-screen">
             <div className="nv-feed-header"><div className="nv-feed-switch"><button className="nv-feed-title" onClick={() => setFeedMenuOpen(v => !v)}>{t.reels} <AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button onClick={() => {setFeedMenuOpen(false);navigate("home")}}>Feed</button><button onClick={() => {setFeedMenuOpen(false);navigate("friends")}}>Following</button><button onClick={() => {setFeedMenuOpen(false);navigate("reels")}}>Reels</button></div>}</div><div className="nv-feed-tools"><button className="nv-round-action" onClick={() => navigate("search")} aria-label="Search"><AppIcon icon={Search}/></button><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell}/><i/></button></div></div>
             <div className="nv-stories"><button className="nv-story add" onClick={() => navigate("create")}><span><img src={`https://i.pravatar.cc/120?u=${encodeURIComponent(account.id)}`} alt=""/><b>+</b></span><small>You</small></button>{["alex","alana","marco","john","jim"].map((name,i)=><button className="nv-story" key={name}><span><img src={`https://i.pravatar.cc/120?img=${i+12}`} alt=""/></span><small>@{name}</small></button>)}</div>
-            {loading ? <p className="social-muted social-center">{t.loading}</p> : <div className="social-post-list">{(posts.length ? posts : [
-              {id:"demo-1",body:"Golden hour, good people, and a moment worth keeping. What made you smile today?",mediaUrl:"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1000&auto=format&fit=crop",mediaType:"image",createdAt:new Date().toISOString(),authorId:"demo",authorName:"Alex Morgan",likeCount:212,commentCount:20,likedByMe:false},
-              {id:"demo-2",body:"A little reminder to slow down and enjoy the small things around you.",mediaUrl:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=1000&auto=format&fit=crop",mediaType:"image",createdAt:new Date().toISOString(),authorId:"demo",authorName:"Alana Rose",likeCount:184,commentCount:16,likedByMe:false},
-              {id:"demo-3",body:"New places, familiar faces, and stories still waiting to happen.",mediaUrl:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=1000&auto=format&fit=crop",mediaType:"image",createdAt:new Date().toISOString(),authorId:"demo",authorName:"Marco Lee",likeCount:96,commentCount:8,likedByMe:false}
-            ] as Post[]).map(renderPost)}</div>}
+            {loading ? <p className="social-muted social-center">{t.loading}</p> : <div className="social-post-list">{(posts.length ? posts : demoPosts).map(renderPost)}</div>}
           </section>}
 
           {!aiOpen && active === "search" && <section className="social-search-screen">
@@ -527,7 +538,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
 
           {!aiOpen && active === "reels" && <section className="nv-reels-screen">
             <div className="nv-top-tabs nv-reels-tabs"><button onClick={() => navigate("home")}>Feed</button><button onClick={() => navigate("friends")}>Following</button><button className="active">Reels<i/></button><span className="nv-top-spacer"/><button className="nv-round-action" onClick={() => navigate("search")} aria-label="Search"><AppIcon icon={Search}/></button><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell}/><i/></button></div>
-            {loading ? <p className="social-muted social-center">{t.loading}</p> : <div className="nv-reels-stack">{(reels.length ? reels : posts.slice(0,3)).map((post,i)=><button type="button" className="nv-reel-list-card" key={post.id} onClick={() => setSelectedReel(post)} style={{backgroundImage:`linear-gradient(0deg,rgba(0,0,0,.65),transparent 58%),url("${post.mediaUrl || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900`}")`}}><span>{post.authorName}</span><small>Watch reel</small></button>)}</div>}
+            {loading ? <p className="social-muted social-center">{t.loading}</p> : <div className="nv-reels-stack">{(reels.length ? reels : (posts.length ? posts : demoPosts)).map((post,i)=><button type="button" className="nv-reel-list-card" key={post.id} onClick={() => setSelectedReel(post)} style={{backgroundImage:`linear-gradient(0deg,rgba(0,0,0,.65),transparent 58%),url("${post.mediaUrl || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900`}")`}}><span>{post.authorName}</span><small>Watch reel</small></button>)}</div>}
           </section>}
 
           {!aiOpen && active === "profile" && <section className="social-profile-screen">
@@ -537,7 +548,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               <div className="nv-profile-stats"><div><strong>{(profile?.postCount ?? profilePosts.length) || 240}</strong><small>{t.postCount}</small></div><div><strong>{profile?.followerCount ? profile.followerCount.toLocaleString() : "47.36K"}</strong><small>{t.followers}</small></div><div><strong>{profile?.followingCount ? profile.followingCount.toLocaleString() : "32K"}</strong><small>{t.followingCount}</small></div></div>
               <div className="nv-profile-buttons own-profile"><button type="button" className="nv-message-profile" onClick={() => document.getElementById("nv-profile-name")?.focus()}>{t.editProfile}</button></div>
               <div className="nv-profile-tabs" role="tablist" aria-label="Profile content">{(["Photos","Videos","Saved"] as const).map(tab=><button key={tab} type="button" className={profileTab===tab?"is-active":""} onClick={() => setProfileTab(tab)}>{tab}</button>)}</div>
-              <div className="nv-profile-grid">{(profilePosts.length ? profilePosts.filter(post => profileTab === "Photos" ? post.mediaType !== "video" : profileTab === "Videos" ? post.mediaType === "video" : true) : [0,1,2]).map((item:any,i:number)=><div key={typeof item==="number"?item:item.id} className={`nv-profile-tile nv-profile-masonry-${i%3}`}><img src={typeof item==="number"?[`https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=700`,`https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=700`,`https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=700`][i%3]:(item.mediaUrl || `https://i.pravatar.cc/500?img=${i+20}`)} alt="" /></div>)}</div>
+              <div className="nv-profile-grid">{(profilePosts.length ? profilePosts.filter(post => profileTab === "Photos" ? post.mediaType !== "video" : profileTab === "Videos" ? post.mediaType === "video" : savedPostIds.includes(post.id)) : [0,1,2]).map((item:any,i:number)=><div key={typeof item==="number"?item:item.id} className={`nv-profile-tile nv-profile-masonry-${i%3}`}><img src={typeof item==="number"?[`https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=700`,`https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=700`,`https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=700`][i%3]:(item.mediaUrl || `https://i.pravatar.cc/500?img=${i+20}`)} alt="" /></div>)}</div>
               <form className="social-profile-edit" onSubmit={saveProfile}><label>{t.editProfile}<input id="nv-profile-name" value={profileName} onChange={event => setProfileName(event.target.value)} maxLength={32}/></label><button type="submit" disabled={profileSaving || profileName.trim().length<2}>{profileSaving?"…":t.save}</button></form>
               <div className="social-profile-settings"><label>{t.language}<select value={language} onChange={event => changeLanguage(event.target.value)}><option value="fa">فارسی</option><option value="en">English</option><option value="ar">العربية</option><option value="ku">کوردی</option></select></label><button type="button" className="social-logout-button" onClick={logout}>{t.logout}</button></div>
             </>}
