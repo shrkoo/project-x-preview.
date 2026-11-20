@@ -136,7 +136,7 @@ button{-webkit-tap-highlight-color:transparent}
 .nv-placeholder-icon{background:#2a1826!important;color:#e3a0c9!important}
 .social-mobile-nav-wrap{display:none!important}
 .novyra-bottom-nav{height:calc(68px + env(safe-area-inset-bottom))!important;padding:7px 17px calc(6px + env(safe-area-inset-bottom))!important;border-top:1px solid #26272d!important;background:rgba(5,5,5,.96)!important;backdrop-filter:blur(24px)!important;-webkit-backdrop-filter:blur(24px)!important}
-.novyra-bottom-items{max-width:540px!important;height:50px!important;gap:clamp(12px,5vw,30px)!important}
+.novyra-bottom-items{max-width:620px!important;height:50px!important;gap:clamp(5px,2.4vw,18px)!important}
 .novyra-bottom-tab{position:relative!important;display:grid!important;place-items:center!important;flex:1 1 0!important;min-width:0!important;height:48px!important;border:0!important;background:transparent!important;color:#a3a4ac!important}
 .novyra-bottom-tab>svg{width:25px!important;height:25px!important;stroke-width:1.9!important}
 .novyra-bottom-tab.is-active{color:#fff!important}
@@ -388,3 +388,11 @@ button{-webkit-tap-highlight-color:transparent}
 .nv-flow-inline-tool{display:flex;flex-direction:column;gap:7px;padding:10px 13px;margin:0 0 9px;border-radius:10px;background:#171a21;color:#fff}.nv-flow-inline-tool label,.nv-flow-inline-tool p{margin:0;font-size:11px;font-weight:700}.nv-flow-inline-tool input{width:100%;height:38px;padding:0 10px;border:1px solid #343945;border-radius:8px;background:#0d1015;color:#fff;font:inherit;font-size:12px}.nv-flow-inline-tool small{color:#9ca2ae;font-size:10px;line-height:1.7}
 .nv-flow-bottom-actions{position:sticky;bottom:0;z-index:14;display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:12px 15px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #262a32;background:#0b0d10f5;backdrop-filter:blur(20px)}.nv-flow-bottom-actions button{min-height:47px;border-radius:12px;font-size:13px;font-weight:800}.nv-flow-save-draft{border:0;background:#262a32;color:#fff}.nv-flow-upload{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:12px;color:#cbd0dc;font-size:11px}.nv-flow-upload progress{grid-column:1/-1;width:100%;height:5px;accent-color:#5865f2}.nv-flow-error{color:#ff9ca8;font-size:11px}.nv-flow-toast{position:fixed;z-index:80;bottom:95px;left:50%;transform:translateX(-50%);max-width:calc(100vw - 32px);padding:11px 16px;border:1px solid #444b65;border-radius:12px;background:#202532;color:#fff;font-size:11px;box-shadow:0 12px 35px #0009;white-space:nowrap}
 @media(max-width:760px){.nv-post-flow{min-height:calc(100dvh - 68px);max-width:none}.nv-flow-preview{height:43dvh;min-height:220px}.nv-flow-gallery-grid{padding-bottom:92px}.nv-flow-details-header{top:0}.nv-flow-details-scroll{max-height:calc(100dvh - 175px)}.nv-flow-mode-dock{bottom:calc(12px + env(safe-area-inset-bottom))}.nv-reel-info-sheet{padding-inline:21px}.nv-reel-info-sheet h2{font-size:18px}.nv-flow-bottom-actions{padding-bottom:calc(10px + env(safe-area-inset-bottom))}}
+
+/* AI and games shortcuts in the mobile navigation */
+.novyra-bottom-tab.novyra-ai-tab,.novyra-bottom-tab.novyra-game-tab{flex:1 1 0!important;min-width:0!important}
+.nv-game-card{width:min(100% - 32px,420px);margin:24px auto 0;padding:22px;border:1px solid #34343a;border-radius:18px;background:#111;color:#fff}
+.nv-game-choices{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.nv-game-choices button{padding:11px 17px;border:1px solid #555;border-radius:12px;background:#222;color:#fff;font:inherit;cursor:pointer}
+.nv-game-choices button:active{background:#833ab4}
+.nv-game-result{margin:18px 0 0;color:#ddd}
