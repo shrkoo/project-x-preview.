@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { House, SquarePlay, Send, Search } from "lucide-react";
+import { House, SquarePlay, Search, Plus } from "lucide-react";
 import AppIcon from "./AppIcon";
 
 export type NavKey = "home" | "search" | "create" | "reels" | "profile" | "friends" | "inbox";
@@ -40,7 +40,7 @@ export default function MobileBottomNav({
   const tabs = [
     { key: "home" as const, label: labels.home, icon: House },
     { key: "reels" as const, label: labels.reels, icon: SquarePlay },
-    { key: "inbox" as const, label: labels.message, icon: Send },
+    { key: "create" as const, label: "ساخت پست", icon: Plus },
     { key: "search" as const, label: labels.search, icon: Search },
     { key: "profile" as const, label: labels.profile, icon: null },
   ];
@@ -52,12 +52,12 @@ export default function MobileBottomNav({
           <button
             key={key}
             type="button"
-            className={`novyra-bottom-tab ${key === "profile" ? "novyra-profile-tab" : ""} ${key === "inbox" ? "novyra-inbox-tab" : ""} ${active === key ? "is-active" : ""}`}
+            className={`novyra-bottom-tab ${key === "profile" ? "novyra-profile-tab" : ""} ${key === "create" ? "novyra-create-button" : ""} ${active === key ? "is-active" : ""}` }
             onClick={() => onNavigate(key)}
             aria-label={label}
             aria-current={active === key ? "page" : undefined}
           >
-            {key === "profile" ? (
+            {key === "create" ? <AppIcon icon={Plus} /> : key === "profile" ? (
               showAvatar ? (
                 <img src={avatarUrl} alt="" onError={() => setAvatarFailed(true)} />
               ) : (
@@ -66,7 +66,6 @@ export default function MobileBottomNav({
             ) : icon ? (
               <AppIcon icon={icon} />
             ) : null}
-            {key === "inbox" && hasUnreadMessages && <i className="novyra-unread-dot" aria-label="Unread messages" />}
             {key === "profile" && <span className="novyra-profile-accessible-name">{label}</span>}
           </button>
         ))}
