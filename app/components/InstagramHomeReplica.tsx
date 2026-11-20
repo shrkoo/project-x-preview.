@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Plus, ChevronDown, Search, Send, SquarePlay, House } from "lucide-react";
+import { Heart, Plus, ChevronDown } from "lucide-react";
 
 function Virus({ small = false }: { small?: boolean }) {
   return <svg className={small ? "nv-virus nv-virus-small" : "nv-virus"} viewBox="0 0 120 120" aria-hidden="true">
