@@ -499,10 +499,10 @@ export default {
     if(existing) await db.prepare("DELETE FROM social_post_reposts WHERE post_id=? AND user_id=?").bind(postId,user.id).run();
     else {
       await db.prepare("INSERT INTO social_post_reposts (post_id,user_id) VALUES (?,?)").bind(postId,user.id).run();
-      await db.prepare("UPDATE social_posts SET repost_count=(SELECT COUNT(*) FROM social_post_reposts WHERE post_id=?) WHERE id=?").bind(postId,postId).run();
       if(post.author_id!==user.id) await db.prepare("INSERT INTO notifications (id,user_id,kind,title,body) VALUES (?,?,?,?,?)").bind(crypto.randomUUID(),post.author_id,"post_repost","بازنشر پست",user.display_name+" پستت را بازنشر کرد.").run();
     }
     const total=await db.prepare("SELECT COUNT(*) AS total FROM social_post_reposts WHERE post_id=?").bind(postId).first();
+    await db.prepare("UPDATE social_posts SET repost_count=? WHERE id=?").bind(total?.total||0,postId).run();
     return json({reposted:!existing,repostCount:total?.total||0});
    }
 
