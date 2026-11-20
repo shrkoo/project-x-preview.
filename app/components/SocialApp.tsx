@@ -50,7 +50,7 @@ type Props = {
 
 const copy: Record<Language, Record<string, string>> = {
   fa: {
-    home: "خانه", search: "اکسپلورر", create: "ساخت پست", reels: "ویدئوها", profile: "پروفایل", friends: "دوستان", inbox: "پیام‌ها", ai: "هوش مصنوعی",
+    home: "خانه", search: "اکسپلورر", create: "ساخت پست", reels: "اکسپلورر", profile: "پروفایل", friends: "دوستان", inbox: "پیام‌ها", ai: "هوش مصنوعی",
     hello: "فضای تو، صدای تو", feed: "تازه‌های NOVYRA", feedHint: "چیزهایی که افراد منتشر کرده‌اند",
     shareThought: "چه چیزی در ذهنت می‌گذرد؟", writePost: "چیزی بنویس…", publish: "انتشار", publishing: "در حال انتشار…",
     mediaLink: "لینک مستقیم تصویر یا ویدئو (اختیاری)", mediaHint: "فقط نشانی HTTPS فایل رسانه؛ بارگذاری مستقیم فایل هنوز فعال نیست.",
@@ -68,7 +68,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "نمایش همه", backHome: "بازگشت به خانه", profileUpdated: "نام نمایشی به‌روزرسانی شد."
   },
   en: {
-    home: "Home", search: "Explorer", create: "Create post", reels: "Videos", profile: "Profile", friends: "Friends", inbox: "Inbox", ai: "AI assistant",
+    home: "Home", search: "Explorer", create: "Create post", reels: "Explorer", profile: "Profile", friends: "Friends", inbox: "Inbox", ai: "AI assistant",
     hello: "Your space. Your voice.", feed: "What’s happening", feedHint: "Recent posts from the NOVYRA community",
     shareThought: "What’s on your mind?", writePost: "Write something…", publish: "Publish", publishing: "Publishing…",
     mediaLink: "Direct image or video link (optional)", mediaHint: "HTTPS media file URL only. Direct file uploads are not enabled yet.",
@@ -104,7 +104,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "عرض الكل", backHome: "العودة للرئيسية", profileUpdated: "تم تحديث اسم العرض."
   },
   ku: {
-    home: "سەرەکی", search: "گەڕان", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک",
+    home: "سەرەکی", search: "گەڕانەوە", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک",
     hello: "شوێنی تۆ. دەنگی تۆ.", feed: "نوێترین بڵاوکراوەکان", feedHint: "ئەوەی ئەندامانی NOVYRA بڵاوی دەکەنەوە",
     shareThought: "لە مێشکتدا چییە؟", writePost: "شتێک بنووسە…", publish: "بڵاوکردنەوە", publishing: "لە بڵاوکردنەوەدایە…",
     mediaLink: "بەستەری ڕاستەوخۆی وێنە یان ڤیدیۆ (ئارەزوومەندانە)", mediaHint: "تەنها بەستەری HTTPS ـی فایل. بارکردنی ڕاستەوخۆی فایل هێشتا چالاک نییە.",
@@ -743,7 +743,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         <div className="nv-full-reel-caption"><div className="nv-full-reel-user"><Avatar name={selectedReel.authorName}/><div><strong><bdi dir="auto">{selectedReel.authorName}</bdi></strong><small><bdi dir="auto">19 hour ago</bdi></small></div><button>{t.follow}</button></div><p>{selectedReel.body.slice(0,110)}... <span>{language === "fa" ? "بیشتر" : "more"}</span></p><small><AppIcon icon={Music2}/> Remix with laddu_jaan...</small></div><div className="nv-reel-home-indicator"/>
       </section>}
       <nav className="social-mobile-nav-wrap" style={selectedReel ? {display:"none"} : undefined}>
-        <MobileBottomNav active={active} labels={{home:t.home,reels:t.reels,message:t.inbox,search:"",profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName}
+        <MobileBottomNav active={active} labels={{home:t.home,reels:language==="fa"?"ویدئوها":language==="en"?"Videos":language==="ar"?"فيديوهات":"ڤیدیۆ",message:t.inbox,search:"",profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName}
           onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} />
       </nav>
     </div>
