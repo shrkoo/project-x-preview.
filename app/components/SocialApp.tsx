@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { apiRequest, clearSession } from "../lib/api";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
+import StoriesExperience from "./StoriesExperience";
 import AppIcon from "./AppIcon";
 import { FeedMedia, MediaViewer, formatSocialCount } from "./MediaExperience";
 import type { SocialMediaPost, SocialMediaPerson } from "./MediaExperience";
@@ -766,7 +767,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
 
           {!aiOpen && active === "home" && <section className="social-feed-screen">
             <div className="nv-feed-header" dir="rtl"><button className="nv-home-create" type="button" onClick={() => navigate("create")} aria-label="ساخت پست"><AppIcon icon={Plus}/></button><div className="nv-feed-switch"><button className="nv-feed-title" onClick={() => setFeedMenuOpen(v => !v)} aria-label="انتخاب فید"><span>NOVYRA</span><AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button onClick={() => {setFeedMenuOpen(false);navigate("friends")}}>دنبال‌شده‌ها</button><button onClick={() => {setFeedMenuOpen(false);setFriendsOnly(true);navigate("reels")}}>مورد علاقه‌ها</button><button onClick={() => {setFeedMenuOpen(false);navigate("home")}}>خانه</button></div>}</div><button type="button" className="nv-home-notifications" onClick={loadNotifications} aria-label="اعلان‌ها"><AppIcon icon={Heart}/>{notificationCount > 0 && <i/>}</button></div>
-            <div className="nv-stories" dir="rtl"><button className="nv-story add" onClick={() => navigate("create")} aria-label="داستان شما"><span className="nv-story-own-avatar"><Avatar name={account.displayName}/><b>+</b></span><small>داستان شما</small></button>{friends.map(person=><button className="nv-story nv-story-following" key={person.id} type="button" onClick={()=>void openPersonProfile(person)} aria-label={person.username||person.displayName}><span className="nv-story-ring"><Avatar name={person.displayName}/></span><small dir="ltr">{person.username||person.displayName}</small></button>)}</div>
+            <StoriesExperience userId={account.id} displayName={account.displayName} onError={setPageError}/>
             {loading ? <p className="social-muted social-center">{t.loading}</p> : posts.length ? <div className="social-post-list">{posts.map(renderPost)}</div> : <div className="nv-feed-empty"><strong>{t.noPosts}</strong><p>{t.noPostsHint}</p><button type="button" onClick={() => navigate("create")}>{t.create}</button></div>}
           </section>}
 
