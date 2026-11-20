@@ -385,10 +385,12 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     setShowSavedPosts(false);
     try {
       const data = await apiRequest<{profile:Profile;posts:Post[]}>(`/social/users/${person.id}/profile`);
-      await apiRequest("/social/search-history", {method:"POST",body:JSON.stringify({type:"user",userId:person.id})});
       setViewedProfile({profile:data.profile,posts:data.posts||[]});
       setProfileTab("Photos");
-      await loadSearchHistory();
+      try {
+        await apiRequest("/social/search-history", {method:"POST",body:JSON.stringify({type:"user",userId:person.id})});
+        await loadSearchHistory();
+      } catch { /* Profile navigation remains available if history storage fails. */ }
     } catch (error) { setPageError(error instanceof Error ? error.message : t.genericError); }
   }
 
@@ -718,7 +720,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
                   </button><button type="button" className="nv-recent-remove" onClick={()=>void deleteSearchHistory(item.id)} aria-label="Remove">×</button>
                 </div>)}</div>
                 {recentSearches.length>0&&<button type="button" className="nv-clear-history" onClick={()=>void clearSearchHistory()}>پاک کردن تاریخچه</button>}
-              </> : <div className="nv-live-results">{searchLoading?<p className="social-muted">در حال جستجو…</p>:<>{searchResults.map(person=><button type="button" className="nv-recent-row" key={person.id} onClick={()=>void openPersonProfile(person)}><span className="nv-recent-avatar"><AppIcon icon={UserRound}/></span><span className="nv-recent-copy"><strong>{person.username||person.displayName}</strong><small>{person.displayName}</small></span></button>)}{searchPosts.filter(post=>Boolean(post.mediaUrl)&&(post.mediaType==="image"||post.mediaType==="video")).length>0&&<div className="nv-explore-grid">{searchPosts.filter(post=>Boolean(post.mediaUrl)&&(post.mediaType==="image"||post.mediaType==="video")).map(post=><button type="button" className="nv-explore-tile" key={post.id} onClick={()=>void openExplorePost(post)} aria-label={`${post.authorName}، ${formatExploreViews(post.viewCount)} بازدید`}>{post.mediaType==="video"?<video src={post.mediaUrl||undefined} muted playsInline preload="metadata"/>:<img src={post.mediaUrl||""} alt="" loading="lazy"/>}<span className="nv-explore-views"><AppIcon icon={Eye}/>{formatExploreViews(post.viewCount)}</span></button>)}</div>}</>}</div>}
+              </> : <div className="nv-live-results">{searchLoading?<p className="social-muted">در حال جستجو…</p>:searchResults.length?searchResults.map(person=><button type="button" className="nv-recent-row" key={person.id} onClick={()=>void openPersonProfile(person)}><span className="nv-recent-avatar"><AppIcon icon={UserRound}/></span><span className="nv-recent-copy"><strong>{person.username||person.displayName}</strong><small>{person.displayName}</small></span></button>):<p className="social-muted social-center">کاربری پیدا نشد.</p>}}</>}</div>}
             </div>}
           </section>}
           {!aiOpen && (active === "friends" || active === "inbox") && <section className="nv-placeholder"><div className="nv-placeholder-icon">{active === "friends" ? <AppIcon icon={UsersRound} /> : <AppIcon icon={MessageSquare} />}</div><h2>{active === "friends" ? t.friends : t.inbox}</h2><p>{active === "friends" ? "Find and connect with people on NOVYRA." : "Your conversations will appear here."}</p></section>}
