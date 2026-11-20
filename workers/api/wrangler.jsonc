@@ -19,6 +19,12 @@
       "head_sampling_rate": 0.1
     }
   },
+  "kv_namespaces": [
+    {
+      "binding": "STORY_MEDIA",
+      "id": "b011d86c602d478588ce1085ce0b48c8"
+    }
+  ],
   "d1_databases": [
     {
       "binding": "DB",
