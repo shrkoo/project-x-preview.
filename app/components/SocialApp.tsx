@@ -229,10 +229,17 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileName, setProfileName] = useState(account.displayName);
   const [profileSaving, setProfileSaving] = useState(false);
-  const [selectedReel, setSelectedReel] = useState<Post | null>(null);
   const [profileTab, setProfileTab] = useState<"Photos" | "Videos" | "Saved">("Photos");
   const [feedMenuOpen, setFeedMenuOpen] = useState(false);
-  const [reelsMode, setReelsMode] = useState<"videos" | "explore">("videos");
+  const [friends, setFriends] = useState<Person[]>([]);
+  const [friendsOnly, setFriendsOnly] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerPosts, setViewerPosts] = useState<Post[]>([]);
+  const [viewerIndex, setViewerIndex] = useState(0);
+  const [viewerMode, setViewerMode] = useState<"explore" | "profile">("explore");
+  const [sharingPost, setSharingPost] = useState<Post | null>(null);
+  const [shareTargets, setShareTargets] = useState<Person[]>([]);
+  const [shareSending, setShareSending] = useState<string | null>(null);
   const [savedPostIds, setSavedPostIds] = useState<string[]>([]);
   const [savedPosts, setSavedPosts] = useState<Post[]>([]);
   const [explorePosts, setExplorePosts] = useState<Post[]>([]);
@@ -246,19 +253,14 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const [searchResults, setSearchResults] = useState<Person[]>([]);
   const [historyExpanded, setHistoryExpanded] = useState(false);
   const [viewedProfile, setViewedProfile] = useState<{profile:Profile;posts:Post[]}|null>(null);
-  const [selectedGridPost, setSelectedGridPost] = useState<Post|null>(null);
   const [touchStartY, setTouchStartY] = useState<number|null>(null);
   const exploreSentinelRef = useRef<HTMLDivElement|null>(null);
 
   const notificationCount = useMemo(() => notifications.filter(item => !item.readAt).length, [notifications]);
 
   useEffect(() => {
-    try {
-      const ids = JSON.parse(localStorage.getItem("novyra-saved-posts") || "[]");
-      const cached = JSON.parse(localStorage.getItem("novyra-saved-post-data") || "[]");
-      if (Array.isArray(ids)) setSavedPostIds(ids.filter((id): id is string => typeof id === "string"));
-      if (Array.isArray(cached)) setSavedPosts(cached.filter((post): post is Post => Boolean(post && typeof post.id === "string")));
-    } catch { /* Ignore invalid local saved-post cache. */ }
+    void loadSavedPosts();
+    void loadFriends();
   }, []);
 
   useEffect(() => {
@@ -275,15 +277,16 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     let alive = true;
     async function loadCurrentPage() {
       setPageError("");
-      if (active === "home" || (active === "reels" && reelsMode === "videos")) {
+      if (active === "home" || active === "reels") {
         setLoading(true);
         try {
           if (active === "home") {
             const data = await apiRequest<{ posts: Post[] }>("/social/feed");
             if (alive) setPosts(Array.isArray(data.posts) ? data.posts : []);
           } else {
-            const data = await apiRequest<{ posts: Post[] }>("/social/reels");
+            const data = await apiRequest<{ posts: Post[] }>(`/social/reels${friendsOnly ? "?friends=1" : ""}`);
             if (alive) setReels((Array.isArray(data.posts) ? data.posts : []).filter(post => Boolean(post.mediaUrl) && post.mediaType === "video"));
+            if (alive && !friends.length) void loadFriends();
           }
         } catch (error) {
           if (alive) {
@@ -317,7 +320,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     }
     void loadCurrentPage();
     return () => { alive = false; };
-  }, [active, reelsMode, account.displayName, t.genericError]);
+  }, [active, friendsOnly, account.displayName, t.genericError]);
 
   function navigate(next: NavKey) {
     setAiOpen(false);
@@ -329,7 +332,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
       setActive("search");
       return;
     }
-    if (next === "reels") setReelsMode("videos");
+    if (next === "reels") setFriendsOnly(false);
+    setViewerOpen(false);
     setShowSavedPosts(false);
     setSearchOpen(false);
     setViewedProfile(null);
@@ -401,15 +405,60 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     } catch { /* Keep search usable when history storage is unavailable. */ }
   }
 
-  async function openExplorePost(post: Post) {
-    setSelectedGridPost(post);
+  function openMediaViewer(post: Post, list: Post[], mode: "explore" | "profile" = "explore") {
+    const items=list.filter(item=>Boolean(item.mediaUrl)&&(item.mediaType==="image"||item.mediaType==="video"));
+    const index=Math.max(0,items.findIndex(item=>item.id===post.id));
+    setViewerPosts(items);
+    setViewerIndex(index);
+    setViewerMode(mode);
+    setViewerOpen(true);
+  }
+
+  function closeMediaViewer() { setViewerOpen(false); }
+
+  async function loadSavedPosts() {
+    try {
+      const data=await apiRequest<{posts:Post[]}>("/social/saved");
+      const next=data.posts||[];
+      setSavedPosts(next);
+      setSavedPostIds(next.map(post=>post.id));
+    } catch { setSavedPosts([]); setSavedPostIds([]); }
+  }
+
+  async function loadFriends() {
+    try {
+      const data=await apiRequest<{friends:Person[]}>("/social/friends");
+      setFriends(data.friends||[]);
+    } catch { setFriends([]); }
+  }
+
+  async function recordPostView(post: Post) {
     try {
       const data=await apiRequest<{viewCount:number}>(`/social/posts/${post.id}/view`,{method:"POST"});
-      setExplorePosts(current=>current.map(item=>item.id===post.id?{...item,viewCount:data.viewCount}:item));
-      setSavedPosts(current=>current.map(item=>item.id===post.id?{...item,viewCount:data.viewCount}:item));
-      setViewedProfile(current=>current?{...current,posts:current.posts.map(item=>item.id===post.id?{...item,viewCount:data.viewCount}:item)}:current);
-      setSelectedGridPost(current=>current?.id===post.id?{...current,viewCount:data.viewCount}:current);
-    } catch { /* Keep the media viewer open even if the counter cannot update. */ }
+      updatePost(post.id,{viewCount:data.viewCount});
+    } catch { /* View playback remains available if view tracking is not ready on the API yet. */ }
+  }
+
+  async function openShareSheet(post: Post) {
+    setSharingPost(post);
+    try {
+      const data=await apiRequest<{users:Person[]}>(`/social/posts/${post.id}/share-targets`);
+      setShareTargets(data.users||[]);
+    } catch (error) {
+      setShareTargets([]);
+      setPageError(error instanceof Error?error.message:t.genericError);
+    }
+  }
+
+  async function sendPostToUser(target: Person) {
+    if(!sharingPost || shareSending) return;
+    setShareSending(target.id);
+    try {
+      const data=await apiRequest<{shareCount:number}>(`/social/posts/${sharingPost.id}/share`,{method:"POST",body:JSON.stringify({targetUserId:target.id})});
+      updatePost(sharingPost.id,{shareCount:data.shareCount});
+      setSharingPost(null);
+    } catch (error) { setPageError(error instanceof Error?error.message:t.genericError); }
+    finally { setShareSending(null); }
   }
 
   async function runSearch(event: FormEvent<HTMLFormElement>) {
@@ -428,9 +477,14 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   }
 
   function updatePost(postId: string, changes: Partial<Post>) {
-    setPosts(current => current.map(item => item.id === postId ? { ...item, ...changes } : item));
-    setReels(current => current.map(item => item.id === postId ? { ...item, ...changes } : item));
-    setProfilePosts(current => current.map(item => item.id === postId ? { ...item, ...changes } : item));
+    const update=(items:Post[])=>items.map(item=>item.id===postId?{...item,...changes}:item);
+    setPosts(update);
+    setReels(update);
+    setProfilePosts(update);
+    setExplorePosts(update);
+    setSavedPosts(update);
+    setViewerPosts(update);
+    setViewedProfile(current=>current?{...current,posts:update(current.posts)}:current);
   }
 
   async function toggleLike(post: Post) {
@@ -440,6 +494,13 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     } catch (error) {
       setPageError(error instanceof Error ? error.message : t.genericError);
     }
+  }
+
+  async function toggleRepost(post: Post) {
+    try {
+      const data=await apiRequest<{reposted:boolean;repostCount:number}>(`/social/posts/${post.id}/repost`,{method:"POST"});
+      updatePost(post.id,{repostCount:data.repostCount});
+    } catch(error) { setPageError(error instanceof Error?error.message:t.genericError); }
   }
 
   async function toggleComments(post: Post) {
@@ -474,6 +535,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
       const data = await apiRequest<{ following: boolean }>(`/social/users/${person.id}/follow`, { method: "POST" });
       setPeople(current => current.map(item => item.id === person.id ? { ...item, followedByMe: data.following, followerCount: Math.max(0, item.followerCount + (data.following ? 1 : -1)) } : item));
       setViewedProfile(current => current?.profile.id === person.id ? { ...current, profile: { ...current.profile, followedByMe: data.following, followerCount: Math.max(0, current.profile.followerCount + (data.following ? 1 : -1)) } } : current);
+      setFriends(current=>data.following?(current.some(item=>item.id===person.id)?current:[...current,{...person,followedByMe:true}]):current.filter(item=>item.id!==person.id));
     } catch (error) {
       setPageError(error instanceof Error ? error.message : t.genericError);
     }
@@ -604,21 +666,22 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const pageTitle = aiOpen ? t.ai : t[active];
   const visiblePosts = active === "reels" ? reels : posts;
 
-  function toggleSavedPost(post: Post) {
-    const removing = savedPostIds.includes(post.id);
-    const nextIds = removing ? savedPostIds.filter(id => id !== post.id) : [...savedPostIds, post.id];
-    const nextPosts = removing ? savedPosts.filter(item => item.id !== post.id) : [post, ...savedPosts.filter(item => item.id !== post.id)];
-    setSavedPostIds(nextIds);
-    setSavedPosts(nextPosts);
-    localStorage.setItem("novyra-saved-posts", JSON.stringify(nextIds));
-    localStorage.setItem("novyra-saved-post-data", JSON.stringify(nextPosts));
+  async function toggleSavedPost(post: Post) {
+    try {
+      const data=await apiRequest<{saved:boolean;saveCount:number}>(`/social/posts/${post.id}/save`,{method:"POST"});
+      updatePost(post.id,{savedByMe:data.saved,saveCount:data.saveCount});
+      setSavedPostIds(current=>data.saved?[...new Set([...current,post.id])]:current.filter(id=>id!==post.id));
+      setSavedPosts(current=>data.saved?[{...post,savedByMe:true,saveCount:data.saveCount},...current.filter(item=>item.id!==post.id)]:current.filter(item=>item.id!==post.id));
+    } catch(error) { setPageError(error instanceof Error?error.message:t.genericError); }
   }
 
   function renderPost(post: Post) {
     return <PostCard key={post.id} post={post} t={t} onLike={toggleLike} onToggleComments={toggleComments}
       commentsOpen={commentingPost === post.id} comments={commentsByPost[post.id] || []}
       commentDraft={commentDrafts[post.id] || ""} onCommentDraft={value => setCommentDrafts(current => ({ ...current, [post.id]: value }))}
-      onSubmitComment={submitComment} commentsLoading={Boolean(commentsLoading[post.id])} onSave={toggleSavedPost} saved={savedPostIds.includes(post.id)} language={language} />;
+      onSubmitComment={submitComment} commentsLoading={Boolean(commentsLoading[post.id])}
+      onSave={toggleSavedPost} saved={savedPostIds.includes(post.id)||Boolean(post.savedByMe)}
+      onRepost={toggleRepost} onShare={openShareSheet} onOpenMedia={item=>openMediaViewer(item,posts,"profile")} onView={item=>void recordPostView(item as Post)} language={language} />;
   }
 
   return <main className="social-app" dir={dir}>
