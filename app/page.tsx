@@ -100,7 +100,7 @@ export default function Home() {
 
   if (!account) return <Onboarding onComplete={completeOnboarding} initialNotice={notice} />;
 
-  return <SocialApp
+  return <NovyraLuxuryApp
     account={account}
     language={language}
     notice={notice}
