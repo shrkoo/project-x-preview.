@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { apiRequest, clearSession } from "../lib/api";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
 import StoriesExperience from "./StoriesExperience";
+import PublicShareCreator from "./PublicShareCreator";
 import AppIcon from "./AppIcon";
 import { FeedMedia, MediaViewer, formatSocialCount } from "./MediaExperience";
 import type { SocialMediaPost, SocialMediaPerson } from "./MediaExperience";
@@ -835,6 +836,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
                 <div className="social-create-footer"><span>{postBody.length}/2000</span><button type="submit" disabled={publishing || (!postBody.trim() && !mediaUrl.trim())}>{publishing ? t.publishing : t.publish} <span>↗</span></button></div>
               </form>
             </div>
+            <PublicShareCreator />
           </section>}
 
           {!aiOpen && active === "reels" && <section className="nv-reels-screen">
