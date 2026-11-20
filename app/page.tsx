@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Onboarding from "./components/Onboarding";
+import SocialApp from "./components/SocialApp";
 import { apiRequest, clearSession } from "./lib/api";
 
 type Language = "en" | "fa" | "ar" | "ku";
@@ -82,7 +83,15 @@ export default function Home() {
     }
   }
 
+  function changeLanguage(nextLanguage: Language) {
+    setLanguage(nextLanguage);
+    localStorage.setItem("projectx-language", nextLanguage);
+    document.documentElement.lang = nextLanguage;
+    document.documentElement.dir = nextLanguage === "en" ? "ltr" : "rtl";
+  }
+
   function logoutComplete() {
+    clearSession();
     setAccount(null);
     setNotice("");
   }
@@ -91,5 +100,12 @@ export default function Home() {
 
   if (!account) return <Onboarding onComplete={completeOnboarding} initialNotice={notice} />;
 
-  return <main className="min-h-screen bg-[#0F1218]" aria-label="NOVYRA" />;
+  return <SocialApp
+    account={account}
+    language={language}
+    notice={notice}
+    onClearNotice={() => setNotice("")}
+    onLanguageChange={changeLanguage}
+    onLogout={logoutComplete}
+  />;
 }
