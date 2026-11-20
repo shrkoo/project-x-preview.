@@ -39,10 +39,13 @@ jobs:
           db.execute("PRAGMA foreign_keys = ON")
           db.execute("CREATE TABLE users (id TEXT PRIMARY KEY)")
           db.executescript(Path("workers/api/migrations/0001_social_core.sql").read_text())
-          expected = {"social_posts", "social_post_likes", "social_post_comments", "social_follows", "ai_daily_usage"}
+          db.executescript(Path("workers/api/migrations/0002_explore_profiles.sql").read_text())
+          expected = {"social_posts", "social_post_likes", "social_post_comments", "social_follows", "ai_daily_usage", "social_search_history"}
           actual = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
           assert expected.issubset(actual), f"Missing tables: {expected - actual}"
-          print("D1 social migration syntax and table set: OK")
+          columns = {row[1] for row in db.execute("PRAGMA table_info(social_posts)")}
+          assert "view_count" in columns, "Missing social_posts.view_count"
+          print("D1 social + Explore migrations syntax and schema: OK")
           PY
       - name: Build static site
         run: npm run build
