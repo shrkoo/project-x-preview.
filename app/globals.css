@@ -2267,3 +2267,21 @@ html,body{background:#120c0a!important}
   .social-search-form>svg{flex:none!important;color:rgba(255,255,255,.72)!important;stroke-width:1.75!important}
   .social-side-ai>svg{flex:none!important}
 }
+
+
+/* Precision fixes: language direction and consistent Lucide geometry */
+.social-app{direction:inherit}
+.social-app[dir="ltr"] .nv-top-tabs{direction:ltr}
+.social-app[dir="rtl"] .nv-top-tabs{direction:rtl}
+.social-app[dir="ltr"] .novyra-bottom-items{direction:ltr}
+.social-app[dir="rtl"] .novyra-bottom-items{direction:rtl}
+.nv-profile-tabs button{position:relative}
+.nv-profile-tabs button.is-active:after{bottom:0!important;width:28px!important;height:2px!important;border-radius:2px!important}
+.nv-profile-tabs button svg,
+.nv-top-tabs .nv-round-action svg,
+.nv-post-actions svg,.nv-post-more svg,.nv-reel-actions svg,
+.nv-profile-cover button svg,.social-app .social-icon svg{
+  width:24px!important;height:24px!important;stroke-width:1.75!important;
+  stroke-linecap:round!important;stroke-linejoin:round!important;
+}
+.novyra-bottom-tab>svg,.novyra-bottom-tab .novyra-inbox-icon>svg{width:24px!important;height:24px!important;stroke-width:1.75!important}
