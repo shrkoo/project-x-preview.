@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Onboarding from "./components/Onboarding";
-import SocialApp from "./components/SocialApp";
 import { apiRequest, clearSession } from "./lib/api";
 
 type Language = "en" | "fa" | "ar" | "ku";
@@ -92,12 +91,5 @@ export default function Home() {
 
   if (!account) return <Onboarding onComplete={completeOnboarding} initialNotice={notice} />;
 
-  return <SocialApp
-    account={account}
-    language={language}
-    notice={notice}
-    onClearNotice={() => setNotice("")}
-    onLanguageChange={setLanguage}
-    onLogout={logoutComplete}
-  />;
+  return <main className="min-h-screen bg-[#0F1218]" aria-label="NOVYRA" />;
 }
