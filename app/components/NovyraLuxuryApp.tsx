@@ -29,8 +29,8 @@ export default function NovyraLuxuryApp({account,language,notice,onClearNotice,o
  const [notifications,setNotifications]=useState<{id:string;title:string;body:string;readAt:string|null}[]>([]),[notificationsOpen,setNotificationsOpen]=useState(false);
  const [searching,setSearching]=useState(false);
  useEffect(()=>{if(notice)setError(notice)},[notice]);
- useEffect(()=>{let live=true; if(tab==="home"){apiRequest<{posts:Post[]}>("/social/feed").then(d=>{if(live)setPosts((d.posts||[]).filter(p=>!p.body?false:true))}).catch(e=>live&&setError(e.message||t.error));}
- if(tab==="inbox")apiRequest<{messages:Message[]}>("/social/messages").then(d=>live&&setMessages(d.messages||[])).catch(e=>live&&setError(e.message||t.error));
+ useEffect(()=>{let live=true; if(tab==="home"){apiRequest<{posts:Post[]}>("/social/feed").then(d=>{if(live)setPosts((d.posts||[]).filter(p=>!p.body?false:true))}).catch(e=>live&&setError(e instanceof Error?e.message:t.error));}
+ if(tab==="inbox")apiRequest<{messages:Message[]}>("/social/messages").then(d=>live&&setMessages(d.messages||[])).catch(e=>live&&setError(e instanceof Error?e.message:t.error));
  if(tab==="account")apiRequest<{profile:{displayName:string}}>("/social/profile").then(d=>live&&setProfileName(d.profile?.displayName||account.displayName)).catch(()=>{});
  return()=>{live=false}},[tab,account.displayName,t.error]);
  async function discover(value:string){setSearching(true);try{const d=await apiRequest<{users:Person[]}>("/social/search?q="+encodeURIComponent(value));setPeople(d.users||[])}catch(e){setError(e instanceof Error?e.message:t.error)}finally{setSearching(false)}}
