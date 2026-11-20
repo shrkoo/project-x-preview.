@@ -2643,3 +2643,8 @@ html,body{background:linear-gradient(145deg,#0D0907 0%,#130d09 52%,#1A120D 100%)
 .novyra-bottom-tab.is-active:after{display:none!important}
 .novyra-bottom-tab span:last-child{font-size:9px!important}
 .novyra-create-button{display:none!important}
+
+.social-main-column:has(.nv-explore-screen)>.social-page-heading{display:none!important}
+.nv-explore-search-trigger{justify-content:space-between!important;flex-direction:row!important}
+.nv-explore-search-trigger span{margin-inline-end:auto!important}
+.nv-explore-search-trigger svg{margin-inline-start:0!important}
