@@ -109,7 +109,7 @@ function EyeMark({ visible }: { visible: boolean }) {
 
 export default function Onboarding({ onComplete, initialNotice }: Props) {
   const [language, setLanguage] = useState<Language>("fa");
-  const [stage, setStage] = useState<Stage>("auth");
+  const [stage, setStage] = useState<Stage>("language");
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -153,8 +153,6 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     const saved = localStorage.getItem("projectx-language") as Language | null;
     if (saved && copy[saved]) {
       setLanguage(saved);
-      // Returning signed-out users go straight to sign-in; language is first-run only.
-      setStage("auth");
     }
     const reset = new URLSearchParams(window.location.search).get("reset");
     if (reset) {
@@ -324,7 +322,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
       <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">NOVYRA</span></header>
       <section className="px-onboarding-stage">
-        {false && stage === "language" && <div className="px-glass-panel px-language-panel">
+        {stage === "language" && <div className="px-glass-panel px-language-panel">
           <div className="px-eyebrow">NOVYRA / YOUR EXPERIENCE</div>
           <div className="px-language-intro">{language === "fa" ? "یک جهان، به زبان تو" : language === "ku" ? "جیهانێک بە زمانی تۆ" : language === "ar" ? "عالمٌ بلغتك" : "A WORLD, IN YOUR LANGUAGE"}</div>
           <h1>{t("choose")}</h1><p className="px-stage-subtitle">{t("chooseSub")}</p>
