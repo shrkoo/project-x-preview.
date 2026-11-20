@@ -134,7 +134,7 @@ function formatExploreViews(value: number | undefined) {
     minimumFractionDigits: Number.isInteger(number) ? 0 : 1,
     maximumFractionDigits: 1,
   }).format(number).replace(/,/g, "٬").replace(/\./g, "٫");
-  if (count < 1000) return new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 0 }).format(Math.floor(count));
+  if (count < 10000) return new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 0 }).format(Math.floor(count));
   if (count < 1000000) return `${format(Math.round((count / 1000) * 10) / 10)} هزار`;
   return `${format(Math.round((count / 1000000) * 10) / 10)} میلیون`;
 }
