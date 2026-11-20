@@ -31,11 +31,11 @@ export default function MobileBottomNav({
   const initial = displayName.trim().charAt(0).toLocaleUpperCase() || "N";
   const showAvatar = Boolean(avatarUrl) && !avatarFailed;
   const tabs = [
-    { key: "home" as const, label: labels.home, icon: House },
-    { key: "reels" as const, label: labels.reels, icon: SquarePlay },
-    { key: "inbox" as const, label: labels.message, icon: Send },
-    { key: "search" as const, label: labels.search, icon: Search },
     { key: "profile" as const, label: labels.profile, icon: null },
+    { key: "search" as const, label: labels.search, icon: Search },
+    { key: "inbox" as const, label: labels.message, icon: Send },
+    { key: "reels" as const, label: labels.reels, icon: SquarePlay },
+    { key: "home" as const, label: labels.home, icon: House },
   ];
   return (
     <nav className="novyra-bottom-nav" aria-label="Main navigation" dir="rtl">
