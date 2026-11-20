@@ -145,7 +145,7 @@ const isoDate = value => {
 };
 function shapeSocialPost(row) {
   return {
-    id:row.id, body:row.body||"", mediaUrl:row.mediaUrl||null, mediaType:row.mediaType||null,
+    id:row.id, body:row.body||"", mediaUrl:row.mediaUrl||null, mediaType:row.mediaType||null, thumbnailUrl:row.thumbnailUrl||null,
     createdAt:isoDate(row.createdAt), authorId:row.authorId, authorName:row.authorName||"NOVYRA",
     likeCount:Number(row.likeCount||0), commentCount:Number(row.commentCount||0),
     likedByMe:Boolean(row.likedByMe),
@@ -369,7 +369,7 @@ export default {
     const reelsOnly = path === "/social/reels";
     const friendsOnly = reelsOnly && url.searchParams.get("friends") === "1";
     const rows = await db.prepare(`
-      SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
+      SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,p.created_at AS createdAt,
         p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,
         p.repost_count AS repostCount,p.share_count AS shareCount,
         (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
@@ -412,7 +412,7 @@ export default {
           (SELECT COUNT(*) FROM social_follows WHERE follower_id=?) AS followingCount
       `).bind(user.id,user.id,user.id).first(),
       db.prepare(`
-        SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
+        SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,p.created_at AS createdAt,
           p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,
           p.repost_count AS repostCount,p.share_count AS shareCount,
           (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
@@ -441,7 +441,7 @@ export default {
     const offset=Math.max(0,Number(url.searchParams.get("offset")||0));
     const seed=Math.min(1000000,Math.max(1,Math.floor(Number(url.searchParams.get("seed")||1))));
     const rows=await db.prepare(`
-      SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
+      SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,p.created_at AS createdAt,
         p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,
         p.repost_count AS repostCount,p.share_count AS shareCount,
         (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
@@ -475,7 +475,7 @@ export default {
     if(!target) return fail("کاربر پیدا نشد.",404);
     const [stats,posts]=await Promise.all([
      db.prepare("SELECT (SELECT COUNT(*) FROM social_posts WHERE author_id=?) AS postCount,(SELECT COUNT(*) FROM social_follows WHERE followed_id=?) AS followerCount,(SELECT COUNT(*) FROM social_follows WHERE follower_id=?) AS followingCount,EXISTS(SELECT 1 FROM social_follows WHERE follower_id=? AND followed_id=?) AS followedByMe").bind(targetId,targetId,targetId,user.id,targetId).first(),
-     db.prepare(`SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,p.repost_count AS repostCount,p.share_count AS shareCount,(SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
+     db.prepare(`SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,p.created_at AS createdAt,p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,p.repost_count AS repostCount,p.share_count AS shareCount,(SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
         COALESCE((SELECT json_group_array(liked.name) FROM (
           SELECT lu.display_name AS name FROM social_post_likes ll
           JOIN users lu ON lu.id=ll.user_id
@@ -499,7 +499,7 @@ export default {
 
    if(path==="/social/saved" && request.method==="GET") {
     const rows=await db.prepare(`
-      SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
+      SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,p.created_at AS createdAt,
         p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,
         p.repost_count AS repostCount,p.share_count AS shareCount,
         (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
@@ -558,7 +558,7 @@ export default {
         m.sender_id AS senderId,sender.display_name AS senderName,
         m.recipient_id AS recipientId,recipient.display_name AS recipientName,
         m.shared_post_id AS sharedPostId,
-        p.body AS postBody,p.media_url AS mediaUrl,p.media_type AS mediaType,
+        p.body AS postBody,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,
         p.author_id AS postAuthorId,postAuthor.display_name AS postAuthorName
       FROM social_direct_messages m
       JOIN users sender ON sender.id=m.sender_id
@@ -643,7 +643,7 @@ export default {
     let postsResult={results:[]};
     if(q) {
       postsResult=await db.prepare(`
-        SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
+        SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.thumbnail_url AS thumbnailUrl,p.created_at AS createdAt,
           p.author_id AS authorId,u.display_name AS authorName,
           (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
         COALESCE((SELECT json_group_array(liked.name) FROM (
