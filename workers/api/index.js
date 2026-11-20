@@ -157,6 +157,7 @@ function shapeSocialPost(row) {
 }
 
 export default {
+ async scheduled(controller, env, ctx) { ctx.waitUntil(env.DB.prepare("DELETE FROM stories WHERE expires_at<=CURRENT_TIMESTAMP").run()); },
  async fetch(request, env) {
   const origin = request.headers.get("Origin");
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: { ...corsHeaders, ...(origin === "http://localhost:3000" ? { "Access-Control-Allow-Origin": origin } : {}) } });
