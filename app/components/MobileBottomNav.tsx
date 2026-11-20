@@ -10,10 +10,10 @@ type Props = { active: NavKey; userId?: string; displayName?: string; onNavigate
 export default function MobileBottomNav({ active, onNavigate }: Props) {
   const isActive = (key: NavKey) => active === key;
   return <nav className="novyra-bottom-nav" aria-label="Main navigation"><div className="novyra-bottom-items">
-    <button type="button" className={`novyra-bottom-tab ${isActive("home") ? "is-active" : ""}`} onClick={() => onNavigate("home")}><AppIcon icon={House} fill={isActive("home") ? "currentColor" : "none"} /><span>Home</span></button>
-    <button type="button" className={`novyra-bottom-tab ${isActive("friends") ? "is-active" : ""}`} onClick={() => onNavigate("friends")}><AppIcon icon={UsersRound} fill={isActive("friends") ? "currentColor" : "none"} /><span>Friends</span></button>
+    <button type="button" className={`novyra-bottom-tab ${isActive("home") ? "is-active" : ""}`} onClick={() => onNavigate("home")}><AppIcon icon={House} /><span>Home</span></button>
+    <button type="button" className={`novyra-bottom-tab ${isActive("friends") ? "is-active" : ""}`} onClick={() => onNavigate("friends")}><AppIcon icon={UsersRound} /><span>Friends</span></button>
     <button type="button" className="novyra-create-button" onClick={() => onNavigate("create")} aria-label="Create"><span>+</span></button>
-    <button type="button" className={`novyra-bottom-tab ${isActive("inbox") ? "is-active" : ""}`} onClick={() => onNavigate("inbox")}><span className="novyra-inbox-icon"><AppIcon icon={MessageCircle} fill={isActive("inbox") ? "currentColor" : "none"} /><i /></span><span>Inbox</span></button>
-    <button type="button" className={`novyra-bottom-tab ${isActive("profile") ? "is-active" : ""}`} onClick={() => onNavigate("profile")}><AppIcon icon={CircleUserRound} fill={isActive("profile") ? "currentColor" : "none"} /><span>Profile</span></button>
+    <button type="button" className={`novyra-bottom-tab ${isActive("inbox") ? "is-active" : ""}`} onClick={() => onNavigate("inbox")}><span className="novyra-inbox-icon"><AppIcon icon={MessageCircle} /><i /></span><span>Inbox</span></button>
+    <button type="button" className={`novyra-bottom-tab ${isActive("profile") ? "is-active" : ""}`} onClick={() => onNavigate("profile")}><AppIcon icon={CircleUserRound} /><span>Profile</span></button>
   </div></nav>;
 }
