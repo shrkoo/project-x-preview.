@@ -6,7 +6,7 @@ import MobileBottomNav, { NavKey } from "./MobileBottomNav";
 import AppIcon from "./AppIcon";
 import { FeedMedia, MediaViewer, formatSocialCount } from "./MediaExperience";
 import type { SocialMediaPost, SocialMediaPerson } from "./MediaExperience";
-import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, Send, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound, Clock, Play, Eye, ArrowRight, ArrowLeft, Repeat2 } from "lucide-react";
+import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, Send, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound, Clock, Play, Eye, ArrowRight, ArrowLeft, Repeat2, Plus } from "lucide-react";
 
 type Language = "en" | "fa" | "ar" | "ku";
 type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string };
@@ -192,7 +192,7 @@ function PostCard({
       <button type="button" onClick={() => onShare(post)} aria-label={t.send}><AppIcon icon={Send}/><span>{formatSocialCount(post.shareCount)}</span></button>
       <button type="button" className={saved?"is-saved":""} onClick={() => onSave(post)} aria-label={t.save}><AppIcon icon={Bookmark} fill={saved?"currentColor":"none"}/></button>
     </div>
-    <div className="nv-post-like-summary">{post.likedByNames?.length ? <><span className="nv-post-liker-avatars">{post.likedByNames.slice(0,2).map(name=><Avatar key={name} name={name}/>)}</span><span><strong>{post.likedByNames[0]}</strong>{language==="fa"?" و دیگران پسندیدند":" and others liked this"}</span></> : <span>{language==="fa"?"هنوز کسی این پست را نپسندیده":"No likes yet"}</span>}</div>
+    <div className="nv-post-like-summary">{post.likedByNames?.length ? <><span className="nv-post-liker-avatars">{post.likedByNames.slice(0,2).map(name=><Avatar key={name} name={name}/>)}</span><span><strong>{post.likedByNames[0]}</strong>{language==="fa"?" و دیگران پسندیدند":" and others liked this"}</span></> : null}</div>
     {post.body && post.mediaUrl && <button type="button" className={captionExpanded?"nv-post-copy is-expanded":"nv-post-copy"} onClick={()=>setCaptionExpanded(value=>!value)}><strong><bdi dir="auto">{post.authorName}</bdi></strong> <bdi dir="auto">{post.body}</bdi>{!captionExpanded&&post.body.length>90?<span className="nv-post-more"> … بیشتر</span>:null}</button>}
     <small className="nv-post-age"><bdi dir="auto">{formatPostAge(post.createdAt,language)}</bdi></small>
     {commentsOpen && <div className="social-comments">
@@ -765,8 +765,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
           </section>}
 
           {!aiOpen && active === "home" && <section className="social-feed-screen">
-            <div className="nv-feed-header"><div className="nv-feed-switch"><button className="nv-feed-title" onClick={() => setFeedMenuOpen(v => !v)}>{t.home} <AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button onClick={() => {setFeedMenuOpen(false);navigate("home")}}>Feed</button><button onClick={() => {setFeedMenuOpen(false);navigate("friends")}}>Following</button><button onClick={() => {setFeedMenuOpen(false);navigate("reels")}}>Reels</button></div>}</div><div className="nv-feed-tools"><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell}/><i/></button></div></div>
-            <div className="nv-stories"><button className="nv-story add" onClick={() => navigate("create")} aria-label={t.create}><span className="nv-story-own-avatar"><Avatar name={account.displayName}/><b>+</b></span><small>{language === "fa" ? "پست جدید" : "New post"}</small></button></div>
+            <div className="nv-feed-header" dir="rtl"><button className="nv-home-create" type="button" onClick={() => navigate("create")} aria-label="ساخت پست"><AppIcon icon={Plus}/></button><div className="nv-feed-switch"><button className="nv-feed-title" onClick={() => setFeedMenuOpen(v => !v)} aria-label="انتخاب فید"><span>NOVYRA</span><AppIcon icon={ChevronDown}/></button>{feedMenuOpen && <div className="nv-feed-menu"><button onClick={() => {setFeedMenuOpen(false);navigate("friends")}}>دنبال‌شده‌ها</button><button onClick={() => {setFeedMenuOpen(false);setFriendsOnly(true);navigate("reels")}}>مورد علاقه‌ها</button><button onClick={() => {setFeedMenuOpen(false);navigate("home")}}>خانه</button></div>}</div><button type="button" className="nv-home-notifications" onClick={loadNotifications} aria-label="اعلان‌ها"><AppIcon icon={Heart}/>{notificationCount > 0 && <i/>}</button></div>
+            <div className="nv-stories" dir="rtl"><button className="nv-story add" onClick={() => navigate("create")} aria-label="داستان شما"><span className="nv-story-own-avatar"><Avatar name={account.displayName}/><b>+</b></span><small>داستان شما</small></button>{friends.map(person=><button className="nv-story nv-story-following" key={person.id} type="button" onClick={()=>void openPersonProfile(person.id)} aria-label={person.username||person.displayName}><span className="nv-story-ring"><Avatar name={person.displayName}/></span><small dir="ltr">{person.username||person.displayName}</small></button>)}</div>
             {loading ? <p className="social-muted social-center">{t.loading}</p> : posts.length ? <div className="social-post-list">{posts.map(renderPost)}</div> : <div className="nv-feed-empty"><strong>{t.noPosts}</strong><p>{t.noPostsHint}</p><button type="button" onClick={() => navigate("create")}>{t.create}</button></div>}
           </section>}
 
