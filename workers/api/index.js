@@ -403,7 +403,7 @@ export default {
       // Temporary compatibility for already-published clients: decode in memory, never persist payload in D1.
       const body=await readBody(request),dataUrl=String(body?.mediaData||"");
       type=body?.type==="video"?"video":"image";
-      const match=dataUrl.match(/^data:(image\\/(?:jpeg|png|webp)|video\\/(?:mp4|webm|quicktime));base64,([A-Za-z0-9+/=]+)$/);
+      const match=dataUrl.match(/^data:(image\/(?:jpeg|png|webp)|video\/(?:mp4|webm|quicktime));base64,([A-Za-z0-9+/=]+)$/);
       if(match && ((type==="image"&&match[1].startsWith("image/"))||(type==="video"&&match[1].startsWith("video/")))) {
         const binary=atob(match[2]),bytes=new Uint8Array(binary.length);
         for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
