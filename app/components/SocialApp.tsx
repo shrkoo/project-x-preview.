@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { apiRequest, clearSession } from "../lib/api";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
 import AppIcon from "./AppIcon";
-import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound, Clock, Play, Eye, ArrowRight, ArrowLeft } from "lucide-react";
+import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound, Clock, Play, Eye, ArrowRight, ArrowLeft, RotateCw } from "lucide-react";
 
 type Language = "en" | "fa" | "ar" | "ku";
 type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string };
@@ -50,7 +50,7 @@ type Props = {
 
 const copy: Record<Language, Record<string, string>> = {
   fa: {
-    home: "خانه", search: "جست‌وجو", create: "ساخت پست", reels: "ویدئوها", profile: "پروفایل", friends: "دوستان", inbox: "پیام‌ها", ai: "هوش مصنوعی",
+    home: "خانه", search: "اکسپلور", create: "ساخت پست", reels: "ویدئوها", profile: "پروفایل", friends: "دوستان", inbox: "پیام‌ها", ai: "هوش مصنوعی",
     hello: "فضای تو، صدای تو", feed: "تازه‌های NOVYRA", feedHint: "چیزهایی که افراد منتشر کرده‌اند",
     shareThought: "چه چیزی در ذهنت می‌گذرد؟", writePost: "چیزی بنویس…", publish: "انتشار", publishing: "در حال انتشار…",
     mediaLink: "لینک مستقیم تصویر یا ویدئو (اختیاری)", mediaHint: "فقط نشانی HTTPS فایل رسانه؛ بارگذاری مستقیم فایل هنوز فعال نیست.",
@@ -68,7 +68,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "نمایش همه", backHome: "بازگشت به خانه", profileUpdated: "نام نمایشی به‌روزرسانی شد."
   },
   en: {
-    home: "Home", search: "Search", create: "Create post", reels: "Reels", profile: "Profile", friends: "Friends", inbox: "Inbox", ai: "AI assistant",
+    home: "Home", search: "Explore", create: "Create post", reels: "Reels", profile: "Profile", friends: "Friends", inbox: "Inbox", ai: "AI assistant",
     hello: "Your space. Your voice.", feed: "What’s happening", feedHint: "Recent posts from the NOVYRA community",
     shareThought: "What’s on your mind?", writePost: "Write something…", publish: "Publish", publishing: "Publishing…",
     mediaLink: "Direct image or video link (optional)", mediaHint: "HTTPS media file URL only. Direct file uploads are not enabled yet.",
@@ -86,7 +86,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "View all", backHome: "Back home", profileUpdated: "Your display name has been updated."
   },
   ar: {
-    home: "الرئيسية", search: "بحث", create: "إنشاء منشور", reels: "فيديوهات", profile: "الملف الشخصي", friends: "الأصدقاء", inbox: "الرسائل", ai: "مساعد الذكاء الاصطناعي",
+    home: "الرئيسية", search: "استكشاف", create: "إنشاء منشور", reels: "فيديوهات", profile: "الملف الشخصي", friends: "الأصدقاء", inbox: "الرسائل", ai: "مساعد الذكاء الاصطناعي",
     hello: "مساحتك. صوتك.", feed: "أحدث المنشورات", feedHint: "ما يشاركه مجتمع NOVYRA",
     shareThought: "بماذا تفكر؟", writePost: "اكتب شيئاً…", publish: "نشر", publishing: "جارٍ النشر…",
     mediaLink: "رابط صورة أو فيديو مباشر (اختياري)", mediaHint: "رابط HTTPS لملف الوسائط فقط. رفع الملفات غير متاح بعد.",
@@ -104,7 +104,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "عرض الكل", backHome: "العودة للرئيسية", profileUpdated: "تم تحديث اسم العرض."
   },
   ku: {
-    home: "سەرەکی", search: "گەڕان", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک",
+    home: "سەرەکی", search: "گەڕانەوە", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک",
     hello: "شوێنی تۆ. دەنگی تۆ.", feed: "نوێترین بڵاوکراوەکان", feedHint: "ئەوەی ئەندامانی NOVYRA بڵاوی دەکەنەوە",
     shareThought: "لە مێشکتدا چییە؟", writePost: "شتێک بنووسە…", publish: "بڵاوکردنەوە", publishing: "لە بڵاوکردنەوەدایە…",
     mediaLink: "بەستەری ڕاستەوخۆی وێنە یان ڤیدیۆ (ئارەزوومەندانە)", mediaHint: "تەنها بەستەری HTTPS ـی فایل. بارکردنی ڕاستەوخۆی فایل هێشتا چالاک نییە.",
@@ -206,6 +206,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const [profileTab, setProfileTab] = useState<"Photos" | "Videos" | "Saved">("Photos");
   const [feedMenuOpen, setFeedMenuOpen] = useState(false);
   const [savedPostIds, setSavedPostIds] = useState<string[]>([]);
+  const [savedPosts, setSavedPosts] = useState<Post[]>([]);
   const [explorePosts, setExplorePosts] = useState<Post[]>([]);
   const [exploreOffset, setExploreOffset] = useState(0);
   const [exploreHasMore, setExploreHasMore] = useState(true);
@@ -220,6 +221,15 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const exploreSentinelRef = useRef<HTMLDivElement|null>(null);
 
   const notificationCount = useMemo(() => notifications.filter(item => !item.readAt).length, [notifications]);
+
+  useEffect(() => {
+    try {
+      const ids = JSON.parse(localStorage.getItem("novyra-saved-posts") || "[]");
+      const cached = JSON.parse(localStorage.getItem("novyra-saved-post-data") || "[]");
+      if (Array.isArray(ids)) setSavedPostIds(ids.filter((id): id is string => typeof id === "string"));
+      if (Array.isArray(cached)) setSavedPosts(cached.filter((post): post is Post => Boolean(post && typeof post.id === "string")));
+    } catch { /* Ignore invalid local saved-post cache. */ }
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -545,11 +555,13 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const visiblePosts = active === "reels" ? reels : posts;
 
   function toggleSavedPost(post: Post) {
-    setSavedPostIds(current => {
-      const next = current.includes(post.id) ? current.filter(id => id !== post.id) : [...current, post.id];
-      localStorage.setItem("novyra-saved-posts", JSON.stringify(next));
-      return next;
-    });
+    const removing = savedPostIds.includes(post.id);
+    const nextIds = removing ? savedPostIds.filter(id => id !== post.id) : [...savedPostIds, post.id];
+    const nextPosts = removing ? savedPosts.filter(item => item.id !== post.id) : [post, ...savedPosts.filter(item => item.id !== post.id)];
+    setSavedPostIds(nextIds);
+    setSavedPosts(nextPosts);
+    localStorage.setItem("novyra-saved-posts", JSON.stringify(nextIds));
+    localStorage.setItem("novyra-saved-post-data", JSON.stringify(nextPosts));
   }
 
   function renderPost(post: Post) {
@@ -623,9 +635,9 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
               <div className="nv-profile-hero"><div className="nv-avatar-wrap"><span className="nv-profile-avatar nv-profile-avatar-placeholder"><AppIcon icon={UserRound}/></span></div><h2>{viewedProfile.profile.displayName}</h2><p>@{viewedProfile.profile.displayName.toLowerCase().replace(/[^a-z0-9]/g,"")}</p></div>
               <div className="nv-profile-stats"><div><strong>{viewedProfile.profile.postCount}</strong><small>{t.postCount}</small></div><div><strong>{viewedProfile.profile.followerCount}</strong><small>{t.followers}</small></div><div><strong>{viewedProfile.profile.followingCount}</strong><small>{t.followingCount}</small></div></div>
               <div className="nv-profile-buttons"><button type="button" className="nv-follow-profile" onClick={()=>followPerson(viewedProfile.profile)}>{viewedProfile.profile.followedByMe?t.following:t.follow}</button></div>
-              <div className="nv-profile-grid is-other-profile">{viewedProfile.posts.filter(post=>post.mediaType==="image"||post.mediaType==="video").map(post=><button type="button" className="nv-profile-tile" key={post.id} onClick={()=>void openExplorePost(post)}>{post.mediaType==="video"?<><video src={post.mediaUrl||undefined} muted playsInline preload="metadata"/><span className="nv-tile-play"><AppIcon icon={Play}/></span></>:<img src={post.mediaUrl||undefined} alt="" loading="lazy"/>}</button>)}</div>
+              <div className="nv-profile-tabs" role="tablist" aria-label="User media"><button type="button" className={profileTab==="Photos"?"is-active":""} onClick={()=>setProfileTab("Photos")}>عکس‌ها</button><button type="button" className={profileTab==="Videos"?"is-active":""} onClick={()=>setProfileTab("Videos")}>ویدئوها</button></div><div className="nv-profile-grid is-other-profile">{viewedProfile.posts.filter(post=>profileTab==="Photos"?post.mediaType==="image":post.mediaType==="video").map(post=><button type="button" className="nv-profile-tile" key={post.id} onClick={()=>void openExplorePost(post)}>{post.mediaType==="video"?<><video src={post.mediaUrl||undefined} muted playsInline preload="metadata"/><span className="nv-tile-play"><AppIcon icon={Play}/></span></>:<img src={post.mediaUrl||undefined} alt="" loading="lazy"/>}</button>)}</div>
             </div> : !searchOpen ? <>
-              <div className="nv-explore-toolbar" dir="rtl"><button type="button" className="nv-explore-search-trigger" onClick={()=>setSearchOpen(true)}><span>جستجو</span><AppIcon icon={Search}/></button><button type="button" className="nv-explore-bookmark" aria-label="Saved posts" onClick={()=>{setProfileTab("Saved");navigate("profile");}}><AppIcon icon={Bookmark}/></button></div>
+              <div className="nv-explore-toolbar" dir="rtl"><button type="button" className="nv-explore-search-trigger" onClick={()=>setSearchOpen(true)}><span>جستجوی کاربران</span><AppIcon icon={Search}/></button><button type="button" className="nv-explore-bookmark" aria-label="Refresh explore" title="تازه‌سازی محتوا" onClick={()=>void loadExplore(true)} disabled={exploreLoading}><AppIcon icon={RotateCw}/></button></div>
               <div className="nv-explore-grid" dir="rtl" onTouchStart={event=>setTouchStartY(event.touches[0]?.clientY??null)} onTouchEnd={event=>{const end=event.changedTouches[0]?.clientY??0;if(touchStartY!==null&&end-touchStartY>70)void loadExplore(true,true);setTouchStartY(null);}}>
                 {explorePosts.map(post=><button type="button" className="nv-explore-tile" key={post.id} onClick={()=>void openExplorePost(post)}>
                   {post.mediaType==="video"&&post.mediaUrl?<video src={post.mediaUrl} muted playsInline preload="metadata"/>:post.mediaType==="image"&&post.mediaUrl?<img src={post.mediaUrl} alt="" loading="lazy"/>:<span className="nv-explore-text-tile">{post.body}</span>}
@@ -672,10 +684,10 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             {loading ? <p className="social-muted social-center">{t.loading}</p> : <>
               <div className="nv-profile-cover"><img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1400&auto=format&fit=crop" alt=""/><span className="nv-cover-status"/></div>
               <div className="nv-profile-hero"><div className="nv-avatar-wrap"><img className="nv-profile-avatar" src={`https://i.pravatar.cc/240?u=${encodeURIComponent(account.id)}`} alt=""/><button type="button" className="nv-camera-badge" aria-label="Change profile photo"><AppIcon icon={Camera}/></button></div><h2>{profile?.displayName || account.displayName}</h2><p>@{(profile?.displayName || account.displayName).toLowerCase().replace(/[^a-z0-9]/g,"") || "username"}</p></div>
-              <div className="nv-profile-stats"><div><strong>{(profile?.postCount ?? profilePosts.length) || 240}</strong><small>{t.postCount}</small></div><div><strong>{profile?.followerCount ? profile.followerCount.toLocaleString() : "47.36K"}</strong><small>{t.followers}</small></div><div><strong>{profile?.followingCount ? profile.followingCount.toLocaleString() : "32K"}</strong><small>{t.followingCount}</small></div></div>
+              <div className="nv-profile-stats"><div><strong>{profile?.postCount ?? profilePosts.length}</strong><small>{t.postCount}</small></div><div><strong>{(profile?.followerCount ?? 0).toLocaleString(language==="fa"?"fa-IR":undefined)}</strong><small>{t.followers}</small></div><div><strong>{(profile?.followingCount ?? 0).toLocaleString(language==="fa"?"fa-IR":undefined)}</strong><small>{t.followingCount}</small></div></div>
               <div className="nv-profile-buttons own-profile"><button type="button" className="nv-message-profile" onClick={() => document.getElementById("nv-profile-name")?.focus()}>{t.editProfile}</button></div>
               <div className="nv-profile-tabs" role="tablist" aria-label="Profile content">{(["Photos","Videos","Saved"] as const).map(tab=><button key={tab} type="button" className={profileTab===tab?"is-active":""} onClick={() => setProfileTab(tab)}>{tab==="Saved" && <AppIcon icon={LockKeyhole}/>}<span>{tab}</span></button>)}</div>
-              <div className="nv-profile-grid">{profilePosts.filter(post => profileTab === "Photos" ? post.mediaType === "image" : profileTab === "Videos" ? post.mediaType === "video" : savedPostIds.includes(post.id)).map(item=><button type="button" key={item.id} className="nv-profile-tile" onClick={()=>void openExplorePost(item)}>{item.mediaType==="video"?<><video src={item.mediaUrl||undefined} muted playsInline preload="metadata"/><AppIcon icon={Play}/></>:<img src={item.mediaUrl||undefined} alt="" loading="lazy"/>}</button>)}</div>
+              <div className="nv-profile-grid">{(profileTab==="Saved"?savedPosts:profilePosts.filter(post=>profileTab==="Photos"?post.mediaType==="image":post.mediaType==="video")).map(item=><button type="button" key={item.id} className="nv-profile-tile" onClick={()=>void openExplorePost(item)}>{item.mediaType==="video"?<><video src={item.mediaUrl||undefined} muted playsInline preload="metadata"/><AppIcon icon={Play}/></>:item.mediaUrl?<img src={item.mediaUrl} alt="" loading="lazy"/>:<span className="nv-explore-text-tile">{item.body}</span>}</button>)}</div>
               <form className="social-profile-edit" onSubmit={saveProfile}><label>{t.editProfile}<input id="nv-profile-name" value={profileName} onChange={event => setProfileName(event.target.value)} maxLength={32}/></label><button type="submit" disabled={profileSaving || profileName.trim().length<2}>{profileSaving?"…":t.save}</button></form>
               <div className="social-profile-settings"><label>{t.language}<select value={language} onChange={event => changeLanguage(event.target.value)}><option value="fa">فارسی</option><option value="en">English</option><option value="ar">العربية</option><option value="ku">کوردی</option></select></label><button type="button" className="social-logout-button" onClick={logout}>{t.logout}</button></div>
             </>}
