@@ -59,7 +59,7 @@ export default function Home() {
     return () => { alive = false; };
   }, []);
 
-  function completeOnboarding(user: Account | null, nextLanguage: Language) {
+  useEffect(() => {\n    if (startupReady && account) window.location.replace("/instagram-prototype.html");\n  }, [startupReady, account]);\n\n  function completeOnboarding(user: Account | null, nextLanguage: Language) {
     setLanguage(nextLanguage);
     localStorage.setItem("projectx-language", nextLanguage);
     document.documentElement.lang = nextLanguage;
