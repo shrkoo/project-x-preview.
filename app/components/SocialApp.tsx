@@ -555,17 +555,13 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const visiblePosts = active === "reels" ? reels : posts;
 
   function toggleSavedPost(post: Post) {
-    setSavedPostIds(current => {
-      const removing = current.includes(post.id);
-      const next = removing ? current.filter(id => id !== post.id) : [...current, post.id];
-      localStorage.setItem("novyra-saved-posts", JSON.stringify(next));
-      setSavedPosts(previous => {
-        const updated = removing ? previous.filter(item => item.id !== post.id) : [post, ...previous.filter(item => item.id !== post.id)];
-        localStorage.setItem("novyra-saved-post-data", JSON.stringify(updated));
-        return updated;
-      });
-      return next;
-    });
+    const removing = savedPostIds.includes(post.id);
+    const nextIds = removing ? savedPostIds.filter(id => id !== post.id) : [...savedPostIds, post.id];
+    const nextPosts = removing ? savedPosts.filter(item => item.id !== post.id) : [post, ...savedPosts.filter(item => item.id !== post.id)];
+    setSavedPostIds(nextIds);
+    setSavedPosts(nextPosts);
+    localStorage.setItem("novyra-saved-posts", JSON.stringify(nextIds));
+    localStorage.setItem("novyra-saved-post-data", JSON.stringify(nextPosts));
   }
 
   function renderPost(post: Post) {
