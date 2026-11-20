@@ -1,6 +1,6 @@
 "use client";
 
-import { House, UsersRound, MessageSquare, User } from "lucide-react";
+import { House, UsersRound, MessageCircle, CircleUserRound } from "lucide-react";
 import AppIcon from "./AppIcon";
 
 export type NavKey = "home" | "search" | "create" | "reels" | "profile" | "friends" | "inbox";
@@ -13,7 +13,7 @@ export default function MobileBottomNav({ active, onNavigate }: Props) {
     <button type="button" className={`novyra-bottom-tab ${isActive("home") ? "is-active" : ""}`} onClick={() => onNavigate("home")}><AppIcon icon={House} fill={isActive("home") ? "currentColor" : "none"} /><span>Home</span></button>
     <button type="button" className={`novyra-bottom-tab ${isActive("friends") ? "is-active" : ""}`} onClick={() => onNavigate("friends")}><AppIcon icon={UsersRound} fill={isActive("friends") ? "currentColor" : "none"} /><span>Friends</span></button>
     <button type="button" className="novyra-create-button" onClick={() => onNavigate("create")} aria-label="Create"><span>+</span></button>
-    <button type="button" className={`novyra-bottom-tab ${isActive("inbox") ? "is-active" : ""}`} onClick={() => onNavigate("inbox")}><span className="novyra-inbox-icon"><AppIcon icon={MessageSquare} fill={isActive("inbox") ? "currentColor" : "none"} /><i /></span><span>Inbox</span></button>
-    <button type="button" className={`novyra-bottom-tab ${isActive("profile") ? "is-active" : ""}`} onClick={() => onNavigate("profile")}><AppIcon icon={User} fill={isActive("profile") ? "currentColor" : "none"} /><span>Profile</span></button>
+    <button type="button" className={`novyra-bottom-tab ${isActive("inbox") ? "is-active" : ""}`} onClick={() => onNavigate("inbox")}><span className="novyra-inbox-icon"><AppIcon icon={MessageCircle} fill={isActive("inbox") ? "currentColor" : "none"} /><i /></span><span>Inbox</span></button>
+    <button type="button" className={`novyra-bottom-tab ${isActive("profile") ? "is-active" : ""}`} onClick={() => onNavigate("profile")}><AppIcon icon={CircleUserRound} fill={isActive("profile") ? "currentColor" : "none"} /><span>Profile</span></button>
   </div></nav>;
 }
