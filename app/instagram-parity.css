@@ -305,3 +305,35 @@ button{-webkit-tap-highlight-color:transparent}
  .nv-shared-inbox{padding:8px 0 24px!important}
  .nv-shared-inbox>header{padding-inline:14px!important}
 }
+
+/* Reference-aligned NOVYRA mobile feed: true black Instagram-style canvas. */
+.social-app,.social-app-frame,.social-layout,.social-main-column,.social-feed-screen{background:#000!important;color:#fff!important}
+.social-app{--nv-ig-bg:#000;--nv-ig-line:#262626;--nv-ig-muted:#a8a8a8;color-scheme:dark!important}
+.nv-feed-header{background:#000!important;border-color:#262626!important}
+.nv-feed-title{font-family:Georgia,"Times New Roman",serif!important;font-style:italic!important;font-weight:700!important;letter-spacing:-1.1px!important;font-size:25px!important;color:#fff!important}
+.nv-feed-title svg{width:13px!important;height:13px!important;margin-inline-start:5px!important}
+.nv-stories{background:#000!important;border-color:#262626!important}
+.nv-story-name{color:#f5f5f5!important}
+.nv-post-card,.nv-post-head,.nv-post-interactions{background:#000!important;color:#fff!important}
+.nv-post-person strong,.nv-post-copy,.nv-post-like-summary{color:#fff!important}
+.nv-post-person small,.nv-post-age{color:#a8a8a8!important}
+.nv-post-menu{background:transparent!important;color:#fff!important}
+.nv-post-copy{background:transparent!important}
+.novyra-bottom-nav{background:#000!important;border-top:1px solid #262626!important;box-shadow:none!important}
+.novyra-bottom-items{justify-content:space-between!important;padding-inline:19px!important}
+.novyra-bottom-tab{color:#f5f5f5!important;min-width:42px!important}
+.novyra-bottom-tab svg{width:25px!important;height:25px!important;stroke-width:1.8!important}
+.novyra-bottom-tab.is-active{color:#fff!important}
+.novyra-bottom-tab.is-active svg{fill:currentColor!important}
+.novyra-bottom-tab.novyra-profile-tab img,.novyra-bottom-tab .novyra-profile-fallback{width:26px!important;height:26px!important;border:1.5px solid #fff!important;border-radius:50%!important}
+@media(max-width:760px){
+ .social-app{background:#000!important}
+ .social-layout{padding:0!important}
+ .social-main-column{background:#000!important}
+ .nv-feed-header{height:55px!important;padding-inline:14px!important}
+ .nv-stories{padding:10px 8px 12px!important}
+ .novyra-bottom-nav{height:calc(54px + env(safe-area-inset-bottom))!important;padding-bottom:env(safe-area-inset-bottom)!important}
+ .novyra-bottom-items{height:54px!important}
+ .novyra-bottom-tab{gap:0!important}
+ .novyra-bottom-tab>span:not(.novyra-profile-fallback),.novyra-bottom-tab>small{display:none!important}
+}

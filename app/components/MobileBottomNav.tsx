@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { House, SquarePlay, Send, Plus } from "lucide-react";
+import { House, SquarePlay, Send, Search } from "lucide-react";
 import AppIcon from "./AppIcon";
 
 export type NavKey = "home" | "search" | "create" | "reels" | "profile" | "friends" | "inbox";
@@ -33,7 +33,7 @@ export default function MobileBottomNav({
   const tabs = [
     { key: "home" as const, label: labels.home, icon: House },
     { key: "reels" as const, label: labels.reels, icon: SquarePlay },
-    { key: "create" as const, label: "ساخت پست", icon: Plus },
+    { key: "search" as const, label: labels.search, icon: Search },
     { key: "inbox" as const, label: labels.message, icon: Send },
     { key: "profile" as const, label: labels.profile, icon: null },
   ];
@@ -42,10 +42,10 @@ export default function MobileBottomNav({
       <div className="novyra-bottom-items">
         {tabs.map(({ key, label, icon }) => (
           <button key={key} type="button"
-            className={`novyra-bottom-tab ${key === "profile" ? "novyra-profile-tab" : ""} ${key === "create" ? "novyra-create-button" : ""} ${key === "inbox" ? "novyra-inbox-tab" : ""} ${active === key ? "is-active" : ""}`}
+            className={`novyra-bottom-tab ${key === "profile" ? "novyra-profile-tab" : ""} ${key === "inbox" ? "novyra-inbox-tab" : ""} ${active === key ? "is-active" : ""}`}
             onClick={() => onNavigate(key)} aria-label={label}
             aria-current={active === key ? "page" : undefined}>
-            {key === "create" ? <AppIcon icon={Plus}/> : key === "profile" ? (
+            {key === "profile" ? (
               showAvatar ? <img src={avatarUrl} alt="" onError={() => setAvatarFailed(true)}/> :
                 <span className="novyra-profile-fallback" aria-hidden="true">{initial}</span>
             ) : icon ? <AppIcon icon={icon}/> : null}
