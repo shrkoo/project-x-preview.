@@ -415,7 +415,7 @@ export default {
    }
 
    if(path==="/social/search-history" && request.method==="GET") {
-    const rows=await db.prepare("SELECT h.id,h.search_type AS type,h.query_text AS query,h.target_user_id AS userId,h.created_at AS createdAt,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username FROM social_search_history h LEFT JOIN users u ON u.id=h.target_user_id WHERE h.owner_id=? ORDER BY h.created_at DESC,h.id DESC LIMIT 100").bind(user.id).all();
+    const rows=await db.prepare("SELECT h.id,h.search_type AS type,h.query_text AS query,h.target_user_id AS userId,h.created_at AS createdAt,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username FROM social_search_history h LEFT JOIN users u ON u.id=h.target_user_id WHERE h.owner_id=? ORDER BY h.created_at DESC,h.id DESC").bind(user.id).all();
     return json({items:rows.results||[]});
    }
    if(path==="/social/search-history" && request.method==="POST") {
