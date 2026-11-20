@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { apiRequest, clearSession } from "../lib/api";
+import { apiRequest, apiUpload, clearSession } from "../lib/api";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
 import StoriesExperience from "./StoriesExperience";
 import PublicShareCreator from "./PublicShareCreator";
@@ -221,9 +221,13 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const [pageError, setPageError] = useState("");
   const [query, setQuery] = useState("");
   const [postBody, setPostBody] = useState("");
-  const [mediaUrl, setMediaUrl] = useState("");
   const [mediaType, setMediaType] = useState<"image" | "video" | "">("");
+  const [selectedMedia, setSelectedMedia] = useState<File | null>(null);
+  const [mediaPreview, setMediaPreview] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [composerStep, setComposerStep] = useState<"media" | "details">("media");
   const [publishing, setPublishing] = useState(false);
+  const mediaInputRef = useRef<HTMLInputElement | null>(null);
   const [commentingPost, setCommentingPost] = useState<string | null>(null);
   const [commentsByPost, setCommentsByPost] = useState<Record<string, Comment[]>>({});
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
@@ -271,6 +275,13 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     void loadSavedPosts();
     void loadFriends();
   }, []);
+
+  useEffect(() => {
+    if (!selectedMedia) { setMediaPreview(""); return; }
+    const objectUrl = URL.createObjectURL(selectedMedia);
+    setMediaPreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [selectedMedia]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -562,24 +573,48 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   async function publishPost(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const body = postBody.trim();
-    const cleanMedia = mediaUrl.trim();
-    if (!body && !cleanMedia) return;
+    if (!body && !selectedMedia) return;
     setPublishing(true);
+    setUploadProgress(0);
     setPageError("");
     try {
-      await apiRequest("/social/posts", { method: "POST", body: JSON.stringify({ body, mediaUrl: cleanMedia || null, mediaType: cleanMedia ? mediaType || null : null }) });
+      const form = new FormData();
+      form.append("body", body);
+      if (selectedMedia) {
+        form.append("file", selectedMedia, selectedMedia.name);
+        form.append("mediaType", mediaType || (selectedMedia.type.startsWith("video/") ? "video" : "image"));
+      }
+      const created = await apiUpload<{ id: string; message: string }>("/social/posts", form, setUploadProgress);
+      const data = await apiRequest<{ posts: Post[] }>("/social/feed");
+      const refreshed = data.posts || [];
+      const newlyPublished = refreshed.find(post => post.id === created.id);
+      setPosts(newlyPublished ? [newlyPublished, ...refreshed.filter(post => post.id !== created.id)] : refreshed);
       setPostBody("");
-      setMediaUrl("");
+      setSelectedMedia(null);
       setMediaType("");
+      setComposerStep("media");
+      setUploadProgress(0);
       setActive("home");
       setAiOpen(false);
-      const data = await apiRequest<{ posts: Post[] }>("/social/feed");
-      setPosts(data.posts || []);
+      setPageError(t.postCreated);
     } catch (error) {
       setPageError(error instanceof Error ? error.message : t.genericError);
     } finally {
       setPublishing(false);
     }
+  }
+
+  function chooseMedia(file?: File) {
+    if (!file) return;
+    const isVideo = file.type.startsWith("video/");
+    const isImage = file.type.startsWith("image/");
+    if (!isVideo && !isImage) { setPageError("فقط تصویر یا ویدئو انتخاب کن."); return; }
+    const max = isVideo ? 20 * 1024 * 1024 : 5 * 1024 * 1024;
+    if (file.size > max) { setPageError(isVideo ? "حجم ویدئو حداکثر ۲۰ مگابایت است." : "حجم تصویر حداکثر ۵ مگابایت است."); return; }
+    setPageError("");
+    setSelectedMedia(file);
+    setMediaType(isVideo ? "video" : "image");
+    setComposerStep("details");
   }
 
   async function sendAI(event: FormEvent<HTMLFormElement>) {
@@ -722,6 +757,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         </button>
         <div className="social-topbar-right">
           <span className="social-online-label">YOUR SOCIAL SPACE</span>
+          <button type="button" className="social-notification-button" onClick={() => navigate("inbox")} aria-label={t.inbox}><AppIcon icon={MessageCircle}/></button>
           <button type="button" className="social-notification-button" onClick={loadNotifications} aria-label={t.notifications}>
             <AppIcon icon={Bell} />
             {notificationCount > 0 && <i />}
@@ -825,18 +861,27 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             </article>):<div className="nv-placeholder"><div className="nv-placeholder-icon"><AppIcon icon={MessageSquare}/></div><h2>{t.inbox}</h2><p>هنوز پستی برایت ارسال نشده است.</p></div>}
           </section>}
 
-          {!aiOpen && active === "create" && <section className="social-create-screen">
-            <div className="social-create-card">
-              <div className="social-create-heading"><Avatar name={account.displayName} size="large" /><div><strong>{account.displayName}</strong><small>{t.shareThought}</small></div></div>
+          {!aiOpen && active === "create" && <section className="social-create-screen nv-create-flow" dir="rtl">
+            <div className="nv-create-topline"><button type="button" onClick={() => navigate("home")} aria-label="بستن"><AppIcon icon={X}/></button><strong>پست جدید</strong><span>{composerStep === "media" ? "۱ از ۲" : "۲ از ۲"}</span></div>
+            <div className="social-create-card nv-create-card">
+              <div className="social-create-heading"><Avatar name={account.displayName} size="large" /><div><strong>{account.displayName}</strong><small>{composerStep === "media" ? "یک عکس یا ویدئو انتخاب کن" : "پیش‌نمایش و توضیحات پست"}</small></div></div>
               <form onSubmit={publishPost}>
-                <textarea value={postBody} onChange={event => setPostBody(event.target.value)} placeholder={t.writePost} maxLength={2000} rows={7} />
-                <div className="social-media-link"><label htmlFor="social-media-url">{t.mediaLink}</label><input id="social-media-url" type="url" dir="ltr" value={mediaUrl} onChange={event => setMediaUrl(event.target.value)} placeholder="https://example.com/media.jpg" /></div>
-                {mediaUrl && <div className="social-media-type"><button type="button" className={mediaType === "image" ? "selected" : ""} onClick={() => setMediaType("image")}>{t.image}</button><button type="button" className={mediaType === "video" ? "selected" : ""} onClick={() => setMediaType("video")}>{t.video}</button></div>}
-                <p className="social-field-note">{t.mediaHint}</p>
-                <div className="social-create-footer"><span>{postBody.length}/2000</span><button type="submit" disabled={publishing || (!postBody.trim() && !mediaUrl.trim())}>{publishing ? t.publishing : t.publish} <span>↗</span></button></div>
+                <input ref={mediaInputRef} className="nv-hidden-media-input" type="file" accept="image/*,video/mp4,video/webm,video/quicktime" onChange={event => chooseMedia(event.target.files?.[0] || undefined)} />
+                {selectedMedia && mediaPreview ? <div className="nv-selected-media">
+                  {mediaType === "video" ? <video src={mediaPreview} controls playsInline preload="metadata"/> : <img src={mediaPreview} alt="پیش‌نمایش پست"/>}
+                  <button type="button" className="nv-remove-media" onClick={() => {setSelectedMedia(null);setMediaType("");setComposerStep("media");if(mediaInputRef.current)mediaInputRef.current.value="";}} aria-label="حذف فایل"><AppIcon icon={X}/></button>
+                </div> : <button type="button" className="nv-gallery-picker" onClick={() => mediaInputRef.current?.click()}><span><AppIcon icon={Plus}/></span><strong>انتخاب از گالری</strong><small>عکس یا ویدئو از گوشی</small></button>}
+                {composerStep === "details" && <textarea value={postBody} onChange={event => setPostBody(event.target.value)} placeholder="برای این پست توضیحی بنویس…" maxLength={2000} rows={4}/>}
+                {composerStep === "media" && <textarea value={postBody} onChange={event => setPostBody(event.target.value)} placeholder="متن پست (اختیاری)…" maxLength={2000} rows={3}/>}
+                {publishing && <div className="nv-upload-status"><div><span>در حال بارگذاری و انتشار…</span><b>{uploadProgress}٪</b></div><progress max="100" value={uploadProgress}/></div>}
+                <div className="social-create-footer">
+                  <span>{selectedMedia ? (mediaType === "video" ? "ویدئو" : "تصویر") + " · " + (selectedMedia.size/1024/1024).toFixed(1) + " MB" : postBody.length + "/2000"}</span>
+                  {composerStep === "media" && !selectedMedia ? <button type="button" onClick={() => mediaInputRef.current?.click()}>انتخاب رسانه <span>＋</span></button> :
+                    composerStep === "media" && selectedMedia ? <button type="button" onClick={() => setComposerStep("details")}>بعدی <span>→</span></button> :
+                    <button type="submit" disabled={publishing || (!postBody.trim() && !selectedMedia)}>{publishing ? "در حال انتشار…" : "انتشار"} <span>↗</span></button>}
+                </div>
               </form>
             </div>
-            <PublicShareCreator />
           </section>}
 
           {!aiOpen && active === "reels" && <section className="nv-reels-screen">
