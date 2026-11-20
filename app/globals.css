@@ -2823,3 +2823,161 @@ html,body{background:linear-gradient(145deg,#0D0907 0%,#130d09 52%,#1A120D 100%)
   .novyra-bottom-tab svg { width:26px!important;height:26px!important; }
   .nv-full-reel-actions { left:12px!important; right:auto!important; }
 }
+
+
+/* Authentic Instagram-like feed surfaces: use account content, never stock placeholders */
+.social-avatar {
+  display:inline-grid!important;
+  place-items:center!important;
+  flex:0 0 auto!important;
+  width:38px!important;
+  height:38px!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  background:#262626!important;
+  border:1px solid #3a3a3a!important;
+  color:#fff!important;
+  font-size:15px!important;
+  font-weight:700!important;
+  line-height:1!important;
+}
+.social-avatar-large { width:58px!important;height:58px!important;font-size:21px!important; }
+.social-post-list { display:block!important; gap:0!important; }
+.nv-post-card {
+  background:#000!important;
+  color:#f5f5f5!important;
+  border:0!important;
+  border-bottom:1px solid #262626!important;
+  border-radius:0!important;
+  padding:12px 0 16px!important;
+  margin:0!important;
+  box-shadow:none!important;
+}
+.nv-post-head { margin-bottom:10px!important; }
+.nv-post-head .social-avatar { width:38px!important;height:38px!important; }
+.nv-post-person { min-width:0;display:flex;flex-direction:column;gap:3px; }
+.nv-post-person strong { color:#fff!important;font-size:13px!important; }
+.nv-post-person small { color:#a8a8a8!important;font-size:11px!important; }
+.nv-post-menu { color:#fff!important;background:transparent!important;border:0!important; }
+.nv-post-photo {
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0 -0px!important;
+  background:#111!important;
+  overflow:hidden!important;
+}
+.nv-post-photo .social-post-image-wrap { display:block!important;width:100%!important; }
+.nv-post-photo img,
+.nv-post-photo video,
+.nv-post-photo .social-post-image {
+  display:block!important;
+  width:100%!important;
+  max-height:min(76vh,720px)!important;
+  height:auto!important;
+  object-fit:contain!important;
+  background:#080808!important;
+}
+.nv-post-text-only {
+  min-height:150px;
+  display:flex;
+  align-items:center;
+  padding:26px 20px;
+  background:#161616;
+  color:#fff;
+  font-size:18px;
+  line-height:1.65;
+  overflow-wrap:anywhere;
+}
+.nv-post-text-only p { margin:0;white-space:pre-wrap; }
+.nv-post-interactions {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:17px!important;
+  padding:10px 0 4px!important;
+}
+.nv-post-interactions button {
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  min-width:30px!important;
+  padding:0!important;
+  color:#fff!important;
+  background:transparent!important;
+  border:0!important;
+  font-size:12px!important;
+}
+.nv-post-interactions button svg { width:25px!important;height:25px!important; }
+.nv-post-interactions button.liked { color:#ff3040!important; }
+.nv-post-copy { margin:5px 0 0!important;color:#f5f5f5!important;font-size:13px!important;line-height:1.6!important;white-space:pre-wrap;overflow-wrap:anywhere; }
+.nv-post-copy strong { color:#fff!important; }
+.nv-feed-empty {
+  min-height:38vh;
+  padding:40px 20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#fff;
+}
+.nv-feed-empty strong { font-size:17px; }
+.nv-feed-empty p { max-width:280px;color:#a8a8a8;font-size:13px;line-height:1.6; }
+.nv-feed-empty button {
+  border:0;border-radius:8px;padding:9px 16px;
+  background:#0095f6;color:#fff;font-weight:650;
+}
+.nv-stories {
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:flex-start!important;
+  padding:10px 0 13px!important;
+  border-bottom:1px solid #262626!important;
+}
+.nv-story.add { display:flex!important;flex-direction:column!important;align-items:center!important;gap:5px!important; }
+.nv-story-own-avatar { position:relative;display:inline-flex!important; }
+.nv-story-own-avatar .social-avatar { width:58px!important;height:58px!important;border:2px solid #555!important; }
+.nv-story-own-avatar b {
+  position:absolute;right:-2px;bottom:-1px;width:20px;height:20px;
+  display:grid;place-items:center;border-radius:50%;
+  background:#0095f6;color:#fff;border:2px solid #000;font-size:15px;line-height:1;
+}
+.nv-story.add small { color:#bdbdbd!important;font-size:11px!important; }
+.nv-profile-cover {
+  min-height:120px!important;
+  background:linear-gradient(135deg,#252525 0%,#101010 55%,#1b1b1b 100%)!important;
+}
+.nv-profile-cover img { display:none!important; }
+.nv-profile-avatar-placeholder {
+  display:grid!important;
+  place-items:center!important;
+  background:#262626!important;
+  color:#fff!important;
+  font-size:28px!important;
+  font-weight:700!important;
+  border:3px solid #000!important;
+}
+.nv-reel-list-card { position:relative!important;overflow:hidden!important;background:#101010!important; }
+.nv-reel-list-card video {
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  object-fit:cover!important;
+}
+.nv-reel-list-card span {
+  position:absolute!important;z-index:2!important;left:14px!important;right:14px!important;bottom:18px!important;
+  color:#fff!important;text-align:left!important;text-shadow:0 1px 8px #000!important;
+}
+.nv-full-reel-caption .nv-full-reel-user { gap:10px!important; }
+.nv-full-reel-caption .social-avatar { border:1px solid rgba(255,255,255,.5)!important; }
+
+@media(max-width:760px) {
+  .social-main-column { padding:0 0 84px!important; }
+  .social-feed-screen { padding:0 12px 20px!important; }
+  .nv-feed-header { min-height:48px!important;padding:0 2px!important;border-bottom:1px solid #262626!important; }
+  .nv-feed-title { color:#fff!important;font-size:19px!important;font-weight:750!important; }
+  .nv-post-card { padding:11px 0 16px!important; }
+  .nv-post-photo img,.nv-post-photo video,.nv-post-photo .social-post-image { max-height:72vh!important; }
+  .nv-reels-stack { padding:0!important; }
+  .nv-reel-list-card { min-height:calc(100dvh - 58px)!important; }
+  .nv-profile-cover { margin:0!important; }
+}
