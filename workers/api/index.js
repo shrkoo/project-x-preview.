@@ -415,7 +415,7 @@ export default {
    const otherProfileMatch=path.match(/^\/social\/users\/([a-f0-9-]+)\/profile$/i);
    if(otherProfileMatch && request.method==="GET") {
     const targetId=otherProfileMatch[1];
-    const target=await db.prepare("SELECT id,email,display_name AS displayName FROM users WHERE id=?").bind(targetId).first();
+    const target=await db.prepare("SELECT id,email,display_name AS displayName,LOWER(REPLACE(display_name,' ','')) AS username FROM users WHERE id=?").bind(targetId).first();
     if(!target) return fail("کاربر پیدا نشد.",404);
     const [stats,posts]=await Promise.all([
      db.prepare("SELECT (SELECT COUNT(*) FROM social_posts WHERE author_id=?) AS postCount,(SELECT COUNT(*) FROM social_follows WHERE followed_id=?) AS followerCount,(SELECT COUNT(*) FROM social_follows WHERE follower_id=?) AS followingCount,EXISTS(SELECT 1 FROM social_follows WHERE follower_id=? AND followed_id=?) AS followedByMe").bind(targetId,targetId,targetId,user.id,targetId).first(),
