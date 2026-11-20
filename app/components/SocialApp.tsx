@@ -676,7 +676,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
                   <span className="nv-explore-views"><AppIcon icon={Eye}/>{formatExploreViews(post.viewCount)}</span>
                 </button>)}
               </div>
-              {!savedPosts.length&&<p className="social-muted social-center">هنوز محتوایی ذخیره نکرده‌ای.</p>}
+              {!savedPosts.some(post=>Boolean(post.mediaUrl)&&(post.mediaType==="image"||post.mediaType==="video"))&&<p className="social-muted social-center">هنوز محتوایی ذخیره نکرده‌ای.</p>}
             </div> : !searchOpen ? <>
               <div className="nv-explore-toolbar" dir="rtl"><button type="button" className="nv-explore-search-trigger" onClick={()=>{setSearchOpen(true);setShowSavedPosts(false);}} aria-label="جستجو"><AppIcon icon={Search}/><span>جستجو</span></button><button type="button" className="nv-explore-bookmark" aria-label="ذخیره‌شده‌ها" title="ذخیره‌شده‌ها" onClick={()=>{setShowSavedPosts(true);setSearchOpen(false);setViewedProfile(null);}}><AppIcon icon={Bookmark}/></button></div>
               <div className="nv-explore-grid" dir="rtl" onTouchStart={event=>setTouchStartY(event.touches[0]?.clientY??null)} onTouchEnd={event=>{const end=event.changedTouches[0]?.clientY??0;if(window.scrollY<=2&&touchStartY!==null&&end-touchStartY>70)void loadExplore(true,true);setTouchStartY(null);}}>
