@@ -31,7 +31,7 @@ type Person = {
   username?: string;
 };
 type Comment = { id: string; body: string; createdAt: string; authorId: string; authorName: string };
-type Profile = Person & { email: string; createdAt?: string };
+type Profile = Person & { email: string; createdAt?: string; avatarUrl?: string; avatar_url?: string; photoUrl?: string; imageUrl?: string };
 
 type Props = {
   account: Account;
@@ -768,7 +768,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         <div className="nv-full-reel-caption"><div className="nv-full-reel-user"><Avatar name={selectedReel.authorName}/><div><strong><bdi dir="auto">{selectedReel.authorName}</bdi></strong><small><bdi dir="auto">{formatPostAge(selectedReel.createdAt,language)}</bdi></small></div></div>{selectedReel.body && <p>{selectedReel.body}</p>}</div><div className="nv-reel-home-indicator"/>
       </section>}
       <nav className="social-mobile-nav-wrap" style={selectedReel ? {display:"none"} : undefined}>
-        <MobileBottomNav active={active} labels={{home:t.home,reels:t.reels,message:t.inbox,search:t.search,profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName}
+        <MobileBottomNav active={active} labels={{home:t.home,reels:t.reels,message:t.inbox,search:t.search,profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName} avatarUrl={profile?.avatarUrl || profile?.avatar_url || profile?.photoUrl || profile?.imageUrl}
           onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} />
       </nav>
     </div>
