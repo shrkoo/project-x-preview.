@@ -335,7 +335,7 @@ export default {
     const media=await readStoryMedia(env,story.id);
     if(!media?.value) return fail("فایل استوری پیدا نشد یا منقضی شده است.",404);
     const bytes=new Uint8Array(media.value),size=bytes.byteLength,contentType=media.contentType||"application/octet-stream";
-    const baseHeaders={...corsHeaders,"Content-Type":contentType,"Accept-Ranges":"bytes","Cache-Control":"public, max-age=300","X-Content-Type-Options":"nosniff","Content-Length":String(size)};
+    const baseHeaders={...corsHeaders,"Content-Type":contentType,"Accept-Ranges":"bytes","Cache-Control":"public, max-age=300","X-Content-Type-Options":"nosniff","X-Robots-Tag":"noindex, nofollow","Content-Length":String(size)};
     if(request.method==="HEAD") return new Response(null,{status:200,headers:baseHeaders});
     const rangeHeader=request.headers.get("Range");
     if(story.type==="video" && rangeHeader) {
