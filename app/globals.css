@@ -2344,3 +2344,5 @@ html,body{background:#120c0a!important}
 .novyra-bottom-tab:not(.is-active) svg{
   fill:none!important;
 }
+
+/* Trigger Cloudflare preview build from the NOVYRA working branch. */
