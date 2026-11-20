@@ -86,7 +86,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "View all", backHome: "Back home", profileUpdated: "Your display name has been updated."
   },
   ar: {
-    home: "الرئيسية", search: "استكشاف", create: "إنشاء منشور", reels: "فيديوهات", profile: "الملف الشخصي", friends: "الأصدقاء", inbox: "الرسائل", ai: "مساعد الذكاء الاصطناعي",
+    home: "الرئيسية", search: "استكشاف", create: "إنشاء منشور", reels: "استكشاف", profile: "الملف الشخصي", friends: "الأصدقاء", inbox: "الرسائل", ai: "مساعد الذكاء الاصطناعي",
     hello: "مساحتك. صوتك.", feed: "أحدث المنشورات", feedHint: "ما يشاركه مجتمع NOVYRA",
     shareThought: "بماذا تفكر؟", writePost: "اكتب شيئاً…", publish: "نشر", publishing: "جارٍ النشر…",
     mediaLink: "رابط صورة أو فيديو مباشر (اختياري)", mediaHint: "رابط HTTPS لملف الوسائط فقط. رفع الملفات غير متاح بعد.",
@@ -104,7 +104,7 @@ const copy: Record<Language, Record<string, string>> = {
     viewAll: "عرض الكل", backHome: "العودة للرئيسية", profileUpdated: "تم تحديث اسم العرض."
   },
   ku: {
-    home: "سەرەکی", search: "گەڕان", create: "بڵاوکردنەوە", reels: "ڤیدیۆ", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک",
+    home: "سەرەکی", search: "گەڕانەوە", create: "بڵاوکردنەوە", reels: "گەڕان", profile: "پرۆفایل", friends: "هاوڕێکان", inbox: "نامەکان", ai: "یاریدەدەری زیرەک",
     hello: "شوێنی تۆ. دەنگی تۆ.", feed: "نوێترین بڵاوکراوەکان", feedHint: "ئەوەی ئەندامانی NOVYRA بڵاوی دەکەنەوە",
     shareThought: "لە مێشکتدا چییە؟", writePost: "شتێک بنووسە…", publish: "بڵاوکردنەوە", publishing: "لە بڵاوکردنەوەدایە…",
     mediaLink: "بەستەری ڕاستەوخۆی وێنە یان ڤیدیۆ (ئارەزوومەندانە)", mediaHint: "تەنها بەستەری HTTPS ـی فایل. بارکردنی ڕاستەوخۆی فایل هێشتا چالاک نییە.",
@@ -743,7 +743,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         <div className="nv-full-reel-caption"><div className="nv-full-reel-user"><Avatar name={selectedReel.authorName}/><div><strong><bdi dir="auto">{selectedReel.authorName}</bdi></strong><small><bdi dir="auto">19 hour ago</bdi></small></div><button>{t.follow}</button></div><p>{selectedReel.body.slice(0,110)}... <span>{language === "fa" ? "بیشتر" : "more"}</span></p><small><AppIcon icon={Music2}/> Remix with laddu_jaan...</small></div><div className="nv-reel-home-indicator"/>
       </section>}
       <nav className="social-mobile-nav-wrap" style={selectedReel ? {display:"none"} : undefined}>
-        <MobileBottomNav active={active} labels={{home:t.home,reels:t.reels,message:t.inbox,search:"",profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName}
+        <MobileBottomNav active={active} labels={{home:t.home,reels:language==="fa"?"ویدئوها":language==="en"?"Videos":language==="ar"?"فيديوهات":"ڤیدیۆ",message:t.inbox,search:"",profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName}
           onNavigate={navigate} onOpenAI={() => { setAiOpen(true); setNotificationsOpen(false); }} />
       </nav>
     </div>
