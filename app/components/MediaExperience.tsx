@@ -43,6 +43,9 @@ export function FeedMedia({ post, onOpen, onLike, onView }: FeedMediaProps) {
   const longPressed = useRef(false);
   const [muted, setMuted] = useState(true);
   const [showHeart, setShowHeart] = useState(false);
+  const [loading, setLoading] = useState(post.mediaType === "video");
+  const [failed, setFailed] = useState(false);
+  const [progress, setProgress] = useState(0);
   const heartTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -55,10 +58,12 @@ export function FeedMedia({ post, onOpen, onLike, onView }: FeedMediaProps) {
         video.muted = muted;
         void video.play().then(() => {
           if (!viewedRef.current) { viewedRef.current = true; onView(post); }
-        }).catch(() => undefined);
-      } else {
-        video.pause();
-      }
+        }).catch(() => {
+          video.muted = true;
+          setMuted(true);
+          void video.play().catch(() => setFailed(true));
+        });
+      } else video.pause();
     }, { threshold: [0, 0.6, 1] });
     observer.observe(hostRef.current);
     return () => { observer.disconnect(); videoRef.current?.pause(); };
@@ -66,44 +71,54 @@ export function FeedMedia({ post, onOpen, onLike, onView }: FeedMediaProps) {
 
   useEffect(() => { if (videoRef.current) videoRef.current.muted = muted; }, [muted]);
 
+  function toggleSound(event?: React.MouseEvent) {
+    event?.stopPropagation();
+    const video = videoRef.current;
+    const nextMuted = !muted;
+    setMuted(nextMuted);
+    if (video) {
+      video.volume = 1;
+      video.muted = nextMuted;
+      if (!nextMuted) void video.play().catch(() => { video.muted = true; setMuted(true); });
+    }
+  }
   function handleTap() {
     if (longPressed.current) { longPressed.current = false; return; }
     if (tapTimer.current) {
-      clearTimeout(tapTimer.current);
-      tapTimer.current = null;
-      onLike();
-      setShowHeart(true);
+      clearTimeout(tapTimer.current); tapTimer.current = null;
+      onLike(); setShowHeart(true);
       if (heartTimer.current) clearTimeout(heartTimer.current);
       heartTimer.current = setTimeout(() => setShowHeart(false), 650);
       return;
     }
-    tapTimer.current = setTimeout(() => {
-      tapTimer.current = null;
-      onOpen();
-    }, 260);
+    tapTimer.current = setTimeout(() => { tapTimer.current = null; onOpen(); }, 260);
   }
-
   function startPress() {
     longPressed.current = false;
-    longPressTimer.current = setTimeout(() => {
-      longPressed.current = true;
-      videoRef.current?.pause();
-    }, 360);
+    longPressTimer.current = setTimeout(() => { longPressed.current = true; videoRef.current?.pause(); }, 360);
   }
   function endPress() {
     if (longPressTimer.current) clearTimeout(longPressTimer.current);
     longPressTimer.current = null;
     if (longPressed.current) void videoRef.current?.play().catch(() => undefined);
   }
+  function retryVideo(event: React.MouseEvent) {
+    event.stopPropagation(); setFailed(false); setLoading(true);
+    const video = videoRef.current;
+    if (video) { video.load(); void video.play().catch(() => undefined); }
+  }
 
   if (!post.mediaUrl || !post.mediaType) return null;
   return <div className="nv-feed-media" ref={hostRef} onPointerDown={startPress} onPointerUp={endPress} onPointerCancel={endPress} onPointerLeave={endPress} onContextMenu={event => event.preventDefault()}>
     {post.mediaType === "video"
-      ? <video ref={videoRef} src={post.mediaUrl} className="nv-feed-media-el" muted={muted} loop playsInline controls preload="metadata" onClick={event => { event.stopPropagation(); handleTap(); }}/>
-      : <img src={post.mediaUrl} className="nv-feed-media-el" alt="" loading="lazy" onClick={handleTap}/>}
-    {post.mediaType === "video" && <button type="button" className="nv-feed-volume" aria-label={muted ? "فعال‌کردن صدا" : "بی‌صدا کردن"} onClick={event => {event.stopPropagation();setMuted(value => !value);}}>
-      {muted ? <VolumeX/> : <Volume2/>}
-    </button>}
+      ? <video ref={videoRef} src={post.mediaUrl} className="nv-feed-media-el" muted={muted} loop playsInline preload="metadata" poster="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200&auto=format&fit=crop" onLoadedData={() => {setLoading(false);setFailed(false);}} onCanPlay={() => setLoading(false)} onError={() => {setLoading(false);setFailed(true);}} onTimeUpdate={event => {const v=event.currentTarget; if(v.duration) setProgress(v.currentTime/v.duration*100);}} onClick={event => {event.stopPropagation();handleTap();}}/>
+      : <img src={post.mediaUrl} className="nv-feed-media-el" alt="" loading="lazy" onClick={handleTap} onError={event => {event.currentTarget.style.opacity="0";}}/>}
+    {post.mediaType === "video" && <>
+      {loading && !failed && <span className="nv-media-loading" aria-label="در حال بارگذاری"><i/></span>}
+      {failed && <button type="button" className="nv-media-retry" onClick={retryVideo}>↻<small>تلاش دوباره</small></button>}
+      <button type="button" className="nv-feed-volume" aria-label={muted ? "فعال‌کردن صدا" : "بی‌صدا کردن"} onClick={toggleSound}>{muted ? <VolumeX/> : <Volume2/>}</button>
+      <span className="nv-video-progress"><i style={{width: progress + "%"}}/></span>
+    </>}
     {showHeart && <span className="nv-feed-heart-pop"><Heart fill="currentColor"/></span>}
   </div>;
 }
