@@ -1,4 +1,4 @@
-/* Keep discovery entry in the bottom navigation; remove duplicate search shortcuts from feed and reels headers. */
+/* Keep Explore inside the Videos screen; remove duplicate header search shortcuts. */
 .social-app .nv-feed-tools .nv-round-action[aria-label="Search"],
 .social-app .nv-reels-tabs .nv-round-action[aria-label="Search"] {
   display: none !important;
@@ -31,8 +31,14 @@
 .social-app .nv-explore-grid {
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 2px !important;
+  gap: 1px !important;
 }
 .social-app .nv-explore-tile {
   aspect-ratio: 1 / 1.18 !important;
 }
+
+.social-app .nv-reels-mode-switch { position: relative; display: flex; align-items: center; }
+.social-app .nv-reels-mode-title { display: inline-flex; align-items: center; gap: 6px; color: #fff; background: transparent; border: 0; font-weight: 700; font-size: 18px; }
+.social-app .nv-reels-mode-title svg { width: 16px; height: 16px; }
+.social-app .nv-reels-mode-switch .nv-feed-menu { top: calc(100% + 8px); right: 0; left: auto; z-index: 30; }
+.social-app .nv-explore-tile { aspect-ratio: 3 / 4 !important; }
