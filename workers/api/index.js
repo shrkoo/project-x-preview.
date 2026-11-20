@@ -391,7 +391,24 @@ export default {
    if (path === "/social/explore" && request.method === "GET") {
     const limit=Math.min(40,Math.max(1,Number(url.searchParams.get("limit")||30)));
     const offset=Math.max(0,Number(url.searchParams.get("offset")||0));
-    const rows=await db.prepare("SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,(SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,(SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe FROM social_posts p JOIN users u ON u.id=p.author_id ORDER BY p.created_at DESC LIMIT ? OFFSET ?").bind(user.id,limit,offset).all();
+    const seed=Math.min(1000000,Math.max(1,Math.floor(Number(url.searchParams.get("seed")||1))));
+    const rows=await db.prepare(`
+      SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
+        p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,
+        (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
+        (SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,
+        EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe
+      FROM social_posts p JOIN users u ON u.id=p.author_id
+      WHERE p.media_type IN ('image','video') AND p.media_url IS NOT NULL AND TRIM(p.media_url)<>''
+      ORDER BY (
+        (unicode(substr(p.id,1,1))*? + unicode(substr(p.id,2,1))*? +
+         unicode(substr(p.id,3,1))*? + unicode(substr(p.id,4,1))*? +
+         unicode(substr(p.id,5,1))*? + unicode(substr(p.id,6,1))*?) % 1000003
+        + COALESCE(p.view_count,0)*20
+        + (SELECT COUNT(*) FROM social_post_likes popular WHERE popular.post_id=p.id)*50
+      ) DESC, p.created_at DESC
+      LIMIT ? OFFSET ?
+    `).bind(user.id,seed,(seed*3)%1000003+1,(seed*7)%1000003+1,(seed*11)%1000003+1,(seed*13)%1000003+1,(seed*17)%1000003+1,limit,offset).all();
     return json({posts:(rows.results||[]).map(shapeSocialPost),nextOffset:offset+(rows.results||[]).length,hasMore:(rows.results||[]).length===limit});
    }
 
