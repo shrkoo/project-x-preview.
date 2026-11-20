@@ -2467,3 +2467,11 @@ html,body{background:linear-gradient(145deg,#0D0907 0%,#130d09 52%,#1A120D 100%)
 @media(min-width:761px){.social-main-column{padding-top:26px!important}.novyra-bottom-nav{bottom:22px!important}}
 @media(max-width:760px){.social-main-column{padding:10px 14px 125px!important}.nv-profile-cover{margin:-10px -14px 0!important}.nv-profile-grid{grid-template-rows:repeat(2,130px)!important}.nv-post-photo{height:56vh}.social-mobile-nav-wrap{display:block!important}}
 @media(max-width:380px){.nv-post-photo{min-height:230px}.nv-profile-grid{grid-template-rows:repeat(2,116px)!important}.novyra-bottom-nav{width:96%!important}}
+
+
+.nv-feed-switch{position:relative}
+.nv-feed-menu{position:absolute;z-index:30;top:44px;left:0;min-width:145px;padding:7px;border-radius:14px;background:#1C1613;border:1px solid rgba(255,255,255,.1);box-shadow:0 12px 32px #0008;display:grid;gap:2px}
+.nv-feed-menu button{padding:10px 12px;text-align:start;border:0;border-radius:9px;background:transparent;color:#fff;font-size:13px}
+.nv-feed-menu button:active{background:rgba(255,255,255,.08)}
+.nv-profile-buttons.own-profile .nv-message-profile{flex:0 0 100%;background:#1C1613;color:#fff;border:1px solid rgba(255,255,255,.12)}
+.social-mobile-nav-wrap{display:block!important}
