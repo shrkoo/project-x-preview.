@@ -37,6 +37,7 @@ type Person = {
   followedByMe: boolean;
   username?: string;
 };
+type ShareTarget = Pick<Person,"id"|"displayName"|"username">;
 type Comment = { id: string; body: string; createdAt: string; authorId: string; authorName: string };
 type SharedMessage = { id: string; body: string; createdAt: string; senderId: string; senderName: string; recipientId: string; recipientName: string; sharedPostId?: string | null; postBody?: string | null; mediaUrl?: string | null; mediaType?: "image" | "video" | null; postAuthorId?: string | null; postAuthorName?: string | null; received: boolean };
 type Profile = Person & { email: string; createdAt?: string; avatarUrl?: string; avatar_url?: string; photoUrl?: string; imageUrl?: string };
@@ -240,7 +241,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const [viewerIndex, setViewerIndex] = useState(0);
   const [viewerMode, setViewerMode] = useState<"explore" | "profile">("explore");
   const [sharingPost, setSharingPost] = useState<Post | null>(null);
-  const [shareTargets, setShareTargets] = useState<Person[]>([]);
+  const [shareTargets, setShareTargets] = useState<ShareTarget[]>([]);
   const [shareSending, setShareSending] = useState<string | null>(null);
   const [sharedMessages, setSharedMessages] = useState<SharedMessage[]>([]);
   const [savedPostIds, setSavedPostIds] = useState<string[]>([]);
@@ -454,7 +455,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   async function openShareSheet(post: Post) {
     setSharingPost(post);
     try {
-      const data=await apiRequest<{users:Person[]}>(`/social/posts/${post.id}/share-targets`);
+      const data=await apiRequest<{users:ShareTarget[]}>(`/social/posts/${post.id}/share-targets`);
       setShareTargets(data.users||[]);
     } catch (error) {
       setShareTargets([]);
@@ -462,7 +463,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     }
   }
 
-  async function sendPostToUser(target: Person) {
+  async function sendPostToUser(target: ShareTarget) {
     if(!sharingPost || shareSending) return;
     setShareSending(target.id);
     try {
@@ -888,7 +889,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
       {sharingPost && <section className="nv-share-sheet-backdrop" role="dialog" aria-modal="true" onClick={()=>setSharingPost(null)}>
         <div className="nv-share-sheet" dir="rtl" onClick={event=>event.stopPropagation()}>
           <div className="nv-share-sheet-head"><strong>ارسال برای دوستان</strong><button type="button" onClick={()=>setSharingPost(null)} aria-label="بستن"><AppIcon icon={X}/></button></div>
-          {shareTargets.length ? shareTargets.map(person=><button type="button" className="nv-share-target" key={person.id} onClick={()=>void sendPostToUser(person)} disabled={Boolean(shareSending)}><Avatar name={person.displayName}/><span><strong>{person.displayName}</strong><small>@{person.username||person.displayName.toLowerCase().replace(/\s+/g,"")}</small></span><span className="nv-share-send">{shareSending===person.id?"…":"ارسال"}</span></button>) : <p className="social-muted social-center">هنوز کاربری را دنبال نمی‌کنی. برای ارسال پست، ابتدا یک نفر را دنبال کن.</p>}
+          {shareTargets.length ? shareTargets.map(person=><button type="button" className="nv-share-target" key={person.id} onClick={()=>void sendPostToUser(person)} disabled={Boolean(shareSending)}><Avatar name={person.displayName}/><span><strong>{person.displayName}</strong><small>@{person.username||person.displayName.toLowerCase().replace(/\s+/g,"")}</small></span><span className="nv-share-send">{shareSending===person.id?"…":"ارسال"}</span></button>) : <p className="social-muted social-center">هنوز کاربر دیگری در NOVYRA ثبت‌نام نکرده است.</p>}
         </div>
       </section>}
       <nav className="social-mobile-nav-wrap">
