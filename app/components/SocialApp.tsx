@@ -151,10 +151,10 @@ function PostCard({
       <div className="nv-post-author"><Avatar name={post.authorName} /><div><strong>{post.authorName} <span className="nv-verified"><AppIcon icon={BadgeCheck} /></span></strong><small>@{post.authorName.toLowerCase().replace(/[^a-z0-9]/g,"")} · {Number.isNaN(date.getTime()) ? "NOVYRA" : date.toLocaleDateString()}</small></div></div>
       <button className="nv-post-more" type="button" aria-label="Share post" title="Share post" onClick={() => { const url = window.location.href; if (navigator.share) void navigator.share({ title: "NOVYRA", text: post.body, url }).catch(() => undefined); else void navigator.clipboard?.writeText(url); }}><AppIcon icon={MoreHorizontal} /></button>
       <div className="nv-post-actions">
-        <button type="button" className={post.likedByMe ? "liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}><svg viewBox="0 0 24 24"><path d="M20.8 8.7c0 4.7-8.8 10.1-8.8 10.1S3.2 13.4 3.2 8.7A4.2 4.2 0 0 1 11 6.3a4.2 4.2 0 0 1 9.8 2.4Z"/></svg><small>{post.likeCount.toLocaleString()}</small></button>
-        <button type="button" onClick={() => onToggleComments(post)} aria-label={t.comments}><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 20l1-4.1a8.5 8.5 0 1 1 16.5-4.4Z"/></svg><small>{post.commentCount.toLocaleString()}</small></button>
-        <button type="button" aria-label="Share" onClick={() => { const url = window.location.href; if (navigator.share) void navigator.share({ title: "NOVYRA", text: post.body, url }).catch(() => undefined); else void navigator.clipboard?.writeText(url); }}><svg viewBox="0 0 24 24"><path d="m21 3-7.2 18-3.6-7.2L3 10.2 21 3Z M10.2 13.8 21 3"/></svg><small>Share</small></button>
-        <button type="button" aria-label="Save" onClick={() => { const key = "novyra-saved-posts"; const saved = JSON.parse(localStorage.getItem(key) || "[]") as string[]; localStorage.setItem(key, JSON.stringify(saved.includes(post.id) ? saved.filter(id => id !== post.id) : [...saved, post.id])); }}><svg viewBox="0 0 24 24"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg><small>Save</small></button>
+        <button type="button" className={post.likedByMe ? "liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}><AppIcon icon={Heart} fill={post.likedByMe ? "currentColor" : "none"} /><small>{post.likeCount.toLocaleString()}</small></button>
+        <button type="button" onClick={() => onToggleComments(post)} aria-label={t.comments}><AppIcon icon={MessageCircle} /><small>{post.commentCount.toLocaleString()}</small></button>
+        <button type="button" aria-label="Share" onClick={() => { const url = window.location.href; if (navigator.share) void navigator.share({ title: "NOVYRA", text: post.body, url }).catch(() => undefined); else void navigator.clipboard?.writeText(url); }}><AppIcon icon={Share2} /><small>Share</small></button>
+        <button type="button" aria-label="Save" onClick={() => { const key = "novyra-saved-posts"; const saved = JSON.parse(localStorage.getItem(key) || "[]") as string[]; localStorage.setItem(key, JSON.stringify(saved.includes(post.id) ? saved.filter(id => id !== post.id) : [...saved, post.id])); }}><AppIcon icon={Bookmark} /><small>Save</small></button>
       </div>
       <div className="nv-post-caption"><div className="nv-progress"><i /></div><p><strong>{post.authorName}</strong> {post.body}<small className="nv-post-hashtags"> #NOVYRA #community</small></p></div>
     </div>
@@ -169,7 +169,7 @@ function PostCard({
 
 export default function SocialApp({ account, language, notice, onClearNotice, onLanguageChange, onLogout }: Props) {
   const t = copy[language];
-  const dir = language === "fa" ? "rtl" : "ltr";
+  const dir = language === "en" ? "ltr" : "rtl";
   const [active, setActive] = useState<NavKey>("home");
   const [aiOpen, setAiOpen] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -421,7 +421,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     const next = value as Language;
     localStorage.setItem("projectx-language", next);
     document.documentElement.lang = next;
-    document.documentElement.dir = next === "fa" ? "rtl" : "ltr";
+    document.documentElement.dir = next === "en" ? "ltr" : "rtl";
     onLanguageChange(next);
     setPageError(copy[next].languageSaved);
   }
@@ -445,7 +445,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         <div className="social-topbar-right">
           <span className="social-online-label">YOUR SOCIAL SPACE</span>
           <button type="button" className="social-notification-button" onClick={loadNotifications} aria-label={t.notifications}>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" /></svg>
+            <AppIcon icon={Bell} />
             {notificationCount > 0 && <i />}
           </button>
           <Avatar name={profile?.displayName || account.displayName} />
@@ -527,7 +527,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             <div className="nv-top-tabs nv-reels-tabs"><button onClick={() => navigate("home")}>Feed</button><button onClick={() => navigate("friends")}>Following</button><button className="active">Reels<i /></button><span className="nv-top-spacer" /><button className="nv-round-action" onClick={() => navigate("search")} aria-label="Search"><AppIcon icon={Search} /></button><button className="nv-round-action nv-bell" onClick={loadNotifications} aria-label="Notifications"><AppIcon icon={Bell} /><i /></button></div>
             {loading ? <p className="social-muted social-center">{t.loading}</p> : reels.length ? <div className="nv-reels-stack">{reels.map((post,i)=><div className="nv-reel" key={post.id} style={{backgroundImage:`linear-gradient(0deg,rgba(0,0,0,.72),transparent 55%),url("${post.mediaType==="image"&&post.mediaUrl?post.mediaUrl:`https://picsum.photos/seed/novyra-reel-${i}/900/1600`}")`}}>
               {post.mediaType==="video"&&post.mediaUrl&&<video src={post.mediaUrl} autoPlay muted loop playsInline />}
-              <div className="nv-reel-actions"><button onClick={()=>toggleLike(post)} className={post.likedByMe?"liked":""}><AppIcon icon={Heart} /><small>{post.likeCount.toLocaleString()}</small></button><button onClick={()=>toggleComments(post)}><AppIcon icon={MessageCircle} /><small>{post.commentCount.toLocaleString()}</small></button><button aria-label="Share reel" onClick={() => { const url = window.location.href; if (navigator.share) void navigator.share({ title: "NOVYRA", text: post.body, url }).catch(() => undefined); else void navigator.clipboard?.writeText(url); }}><Share2 size={24} strokeWidth={1.75} /><small>Share</small></button><button aria-label="Save reel" onClick={() => { const key = "novyra-saved-posts"; const saved = JSON.parse(localStorage.getItem(key) || "[]") as string[]; localStorage.setItem(key, JSON.stringify(saved.includes(post.id) ? saved.filter(id => id !== post.id) : [...saved, post.id])); }}><AppIcon icon={Bookmark} /><small>Save</small></button></div>
+              <div className="nv-reel-actions"><button onClick={()=>toggleLike(post)} className={post.likedByMe?"liked":""}><AppIcon icon={Heart} /><small>{post.likeCount.toLocaleString()}</small></button><button onClick={()=>toggleComments(post)}><AppIcon icon={MessageCircle} /><small>{post.commentCount.toLocaleString()}</small></button><button aria-label="Share reel" onClick={() => { const url = window.location.href; if (navigator.share) void navigator.share({ title: "NOVYRA", text: post.body, url }).catch(() => undefined); else void navigator.clipboard?.writeText(url); }}><AppIcon icon={Share2} /><small>Share</small></button><button aria-label="Save reel" onClick={() => { const key = "novyra-saved-posts"; const saved = JSON.parse(localStorage.getItem(key) || "[]") as string[]; localStorage.setItem(key, JSON.stringify(saved.includes(post.id) ? saved.filter(id => id !== post.id) : [...saved, post.id])); }}><AppIcon icon={Bookmark} /><small>Save</small></button></div>
               <div className="nv-reel-meta"><strong>{post.authorName} <span className="nv-verified"><AppIcon icon={BadgeCheck} /></span></strong><p>{post.body||"#foryou #NOVYRA #social"}</p><small><AppIcon icon={Music2} /> Original audio</small></div><div className="nv-record"><AppIcon icon={Music2} /></div>
             </div>)}</div> : <div className="social-empty-state social-reels-empty"><span className="social-empty-mark"><AppIcon icon={Film} /></span><h2>{t.noVideos}</h2><p>{t.noVideosHint}</p><button type="button" onClick={() => navigate("create")}>{t.create} <span>↗</span></button></div>}
           </section>}
