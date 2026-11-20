@@ -133,7 +133,7 @@ async function authenticate(request, db) {
   const token = request.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
   if (!token || token.length < 30) return null;
   const tokenHash = await digest(token);
-  return await db.prepare("SELECT u.id,u.email,u.display_name,u.xp,u.games_played,u.role FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
+  return await db.prepare("SELECT u.id,u.email,u.display_name,u.xp,u.games_played,u.role,u.username,u.avatar_url,u.bio FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
 }
 function cleanName(value) { return String(value || "").trim().replace(/[<>]/g, "").slice(0, 32); }
 function cleanEmail(value) { return String(value ?? "").normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g, "").replace(/\s+/g, "").toLowerCase().slice(0, 254); }
@@ -392,7 +392,7 @@ export default {
 
    if(path === "/social/friends" && request.method === "GET") {
     const rows=await db.prepare(`
-      SELECT u.id,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username,
+      SELECT u.id,u.display_name AS displayName,COALESCE(u.username,LOWER(REPLACE(u.display_name,' ',''))) AS username,
         (SELECT COUNT(*) FROM social_posts p WHERE p.author_id=u.id) AS postCount,
         (SELECT COUNT(*) FROM social_follows f WHERE f.followed_id=u.id) AS followerCount,
         (SELECT COUNT(*) FROM social_follows f WHERE f.follower_id=u.id) AS followingCount,
@@ -430,7 +430,7 @@ export default {
       `).bind(user.id,user.id,user.id).all()
     ]);
     return json({
-      profile:{id:user.id,email:user.email,displayName:user.display_name,postCount:stats?.postCount||0,followerCount:stats?.followerCount||0,followingCount:stats?.followingCount||0},
+      profile:{id:user.id,email:user.email,displayName:user.display_name,username:user.username||"",avatarUrl:user.avatar_url||null,bio:user.bio||"",postCount:stats?.postCount||0,followerCount:stats?.followerCount||0,followingCount:stats?.followingCount||0},
       posts:(posts.results||[]).map(shapeSocialPost)
     });
    }
@@ -471,7 +471,7 @@ export default {
    const otherProfileMatch=path.match(/^\/social\/users\/([a-f0-9-]+)\/profile$/i);
    if(otherProfileMatch && request.method==="GET") {
     const targetId=otherProfileMatch[1];
-    const target=await db.prepare("SELECT id,email,display_name AS displayName,LOWER(REPLACE(display_name,' ','')) AS username FROM users WHERE id=?").bind(targetId).first();
+    const target=await db.prepare("SELECT id,email,display_name AS displayName,COALESCE(username,LOWER(REPLACE(display_name,' ',''))) AS username,avatar_url AS avatarUrl,bio FROM users WHERE id=?").bind(targetId).first();
     if(!target) return fail("کاربر پیدا نشد.",404);
     const [stats,posts]=await Promise.all([
      db.prepare("SELECT (SELECT COUNT(*) FROM social_posts WHERE author_id=?) AS postCount,(SELECT COUNT(*) FROM social_follows WHERE followed_id=?) AS followerCount,(SELECT COUNT(*) FROM social_follows WHERE follower_id=?) AS followingCount,EXISTS(SELECT 1 FROM social_follows WHERE follower_id=? AND followed_id=?) AS followedByMe").bind(targetId,targetId,targetId,user.id,targetId).first(),
@@ -548,7 +548,7 @@ export default {
 
    const shareTargetsMatch=path.match(/^\/social\/posts\/([a-f0-9-]+)\/share-targets$/i);
    if(shareTargetsMatch && request.method==="GET") {
-    const rows=await db.prepare("SELECT u.id,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username FROM users u WHERE u.id<>? ORDER BY u.created_at DESC LIMIT 50").bind(user.id).all();
+    const rows=await db.prepare("SELECT u.id,u.display_name AS displayName,COALESCE(u.username,LOWER(REPLACE(u.display_name,' ',''))) AS username FROM users u WHERE u.id<>? ORDER BY u.created_at DESC LIMIT 50").bind(user.id).all();
     return json({users:rows.results||[]});
    }
 
@@ -591,7 +591,7 @@ export default {
    }
 
    if(path==="/social/search-history" && request.method==="GET") {
-    const rows=await db.prepare("SELECT h.id,h.search_type AS type,h.query_text AS query,h.target_user_id AS userId,h.created_at AS createdAt,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username FROM social_search_history h LEFT JOIN users u ON u.id=h.target_user_id WHERE h.owner_id=? ORDER BY h.created_at DESC,h.id DESC").bind(user.id).all();
+    const rows=await db.prepare("SELECT h.id,h.search_type AS type,h.query_text AS query,h.target_user_id AS userId,h.created_at AS createdAt,u.display_name AS displayName,COALESCE(u.username,LOWER(REPLACE(u.display_name,' ',''))) AS username FROM social_search_history h LEFT JOIN users u ON u.id=h.target_user_id WHERE h.owner_id=? ORDER BY h.created_at DESC,h.id DESC").bind(user.id).all();
     return json({items:rows.results||[]});
    }
    if(path==="/social/search-history" && request.method==="POST") {
@@ -623,16 +623,16 @@ export default {
     const likeQuery=`%${q}%`;
     const usersResult= q
       ? await db.prepare(`
-          SELECT u.id,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username,
+          SELECT u.id,u.display_name AS displayName,COALESCE(u.username,LOWER(REPLACE(u.display_name,' ',''))) AS username,
             (SELECT COUNT(*) FROM social_posts p WHERE p.author_id=u.id) AS postCount,
             (SELECT COUNT(*) FROM social_follows f WHERE f.followed_id=u.id) AS followerCount,
             (SELECT COUNT(*) FROM social_follows f WHERE f.follower_id=u.id) AS followingCount,
             EXISTS(SELECT 1 FROM social_follows mine WHERE mine.follower_id=? AND mine.followed_id=u.id) AS followedByMe
-          FROM users u WHERE u.id<>? AND (u.display_name LIKE ? OR LOWER(REPLACE(u.display_name,' ','')) LIKE ?)
+          FROM users u WHERE u.id<>? AND (u.display_name LIKE ? OR LOWER(COALESCE(u.username,'')) LIKE ? OR LOWER(REPLACE(u.display_name,' ','')) LIKE ?)
           ORDER BY followerCount DESC,u.created_at DESC LIMIT 40
-        `).bind(user.id,user.id,likeQuery,likeQuery).all()
+        `).bind(user.id,user.id,likeQuery,likeQuery,likeQuery).all()
       : await db.prepare(`
-          SELECT u.id,u.display_name AS displayName,LOWER(REPLACE(u.display_name,char(32),'')) AS username,
+          SELECT u.id,u.display_name AS displayName,COALESCE(u.username,LOWER(REPLACE(u.display_name,char(32),''))) AS username,
             (SELECT COUNT(*) FROM social_posts p WHERE p.author_id=u.id) AS postCount,
             (SELECT COUNT(*) FROM social_follows f WHERE f.followed_id=u.id) AS followerCount,
             (SELECT COUNT(*) FROM social_follows f WHERE f.follower_id=u.id) AS followingCount,
