@@ -2652,3 +2652,9 @@ html,body{background:linear-gradient(145deg,#0D0907 0%,#130d09 52%,#1A120D 100%)
 .nv-explore-search-trigger{justify-content:flex-start!important;gap:10px!important}
 
 .nv-profile-grid:not(.is-other-profile) .nv-profile-tile{display:block;width:100%;border:0;padding:0;background:transparent;text-align:initial;color:inherit}
+
+/* Explore search field follows the Instagram-style discovery header. */
+.nv-explore-search-trigger{min-width:0;cursor:text}
+.nv-explore-search-trigger input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#fff;font-size:14px;text-align:right}
+.nv-explore-search-trigger input::placeholder{color:#aaa19a}
+.nv-explore-search-trigger:focus-within{outline:1px solid #51443d}
