@@ -351,6 +351,19 @@ export default {
    }
    if (!user) return fail("برای استفاده از این بخش وارد حساب شو.",401);
 
+   if(path==="/social/demo-data" && request.method==="DELETE") {
+    if(user.role!=="admin") return fail("فقط مدیر می‌تواند داده‌های نمونه را حذف کند.",403);
+    const [postCount,userCount]=await Promise.all([
+      db.prepare("SELECT COUNT(*) AS total FROM social_posts WHERE is_demo=1").first(),
+      db.prepare("SELECT COUNT(*) AS total FROM users WHERE is_demo=1").first()
+    ]);
+    await db.batch([
+      db.prepare("DELETE FROM social_posts WHERE is_demo=1"),
+      db.prepare("DELETE FROM users WHERE is_demo=1")
+    ]);
+    return json({ok:true,deletedPosts:Number(postCount?.total||0),deletedUsers:Number(userCount?.total||0)});
+   }
+
    // NOVYRA social core — additive routes; existing account and legacy API routes stay intact.
    if ((path === "/social/feed" || path === "/social/reels") && request.method === "GET") {
     const reelsOnly = path === "/social/reels";
