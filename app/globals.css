@@ -2658,3 +2658,50 @@ html,body{background:linear-gradient(145deg,#0D0907 0%,#130d09 52%,#1A120D 100%)
 .nv-explore-search-trigger input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#fff;font-size:14px;text-align:right}
 .nv-explore-search-trigger input::placeholder{color:#aaa19a}
 .nv-explore-search-trigger:focus-within{outline:1px solid #51443d}
+
+
+/* Final mobile navigation visibility fix: keep all five destinations visible. */
+.social-mobile-nav-wrap { display:block !important; visibility:visible !important; }
+.novyra-bottom-nav { display:block !important; visibility:visible !important; }
+.novyra-bottom-items {
+  display:grid !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  align-items:center !important;
+  justify-items:center !important;
+  width:100% !important;
+  direction:inherit !important;
+  gap:0 !important;
+}
+.novyra-bottom-tab {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:54px !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+.novyra-bottom-tab:last-child { display:flex !important; visibility:visible !important; }
+.novyra-bottom-tab.novyra-create-button {
+  display:flex !important;
+  width:52px !important;
+  height:52px !important;
+  min-height:52px !important;
+  border-radius:50% !important;
+  padding:0 !important;
+  margin:0 !important;
+  align-self:center !important;
+  justify-self:center !important;
+  background:linear-gradient(135deg,#ffb347,#f5821f) !important;
+  color:#1a0f05 !important;
+  border:3px solid #1c1613 !important;
+}
+.novyra-create-label { display:none !important; }
+.novyra-bottom-tab.novyra-create-button svg { width:27px !important;height:27px !important; }
+.novyra-bottom-tab:last-child span:last-child { display:inline !important; }
+@media (max-width:760px) {
+  .social-mobile-nav-wrap { display:block !important; }
+  .novyra-bottom-nav { left:12px !important;right:12px !important;bottom:12px !important;width:auto !important; }
+}
