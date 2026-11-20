@@ -152,16 +152,16 @@ function PostCard({
   const photo = post.mediaUrl && post.mediaType === "image" ? post.mediaUrl : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1000&auto=format&fit=crop";
   const ago = Number.isNaN(date.getTime()) ? "12 min ago" : "12 min ago";
   return <article className="nv-post-card">
-    <div className="nv-post-head"><Avatar name={post.authorName}/><div className="nv-post-person"><strong>{post.authorName}</strong><small>{ago}</small></div><button className="nv-post-menu" type="button" aria-label="Save post" onClick={() => onSave(post)}><AppIcon icon={EllipsisVertical}/></button></div>
+    <div className="nv-post-head"><Avatar name={post.authorName}/><div className="nv-post-person"><strong><bdi dir="auto">{post.authorName}</bdi></strong><small><bdi dir="auto">{ago}</bdi></small></div><button className="nv-post-menu" type="button" aria-label="Save post" onClick={() => onSave(post)}><AppIcon icon={EllipsisVertical}/></button></div>
     <div className="nv-post-photo"><img src={photo} alt="" loading="lazy"/>{post.mediaType === "video" && post.mediaUrl && <video src={post.mediaUrl} controls playsInline preload="metadata"/>}</div>
     <div className="nv-post-interactions">
       <button type="button" className={post.likedByMe ? "liked" : ""} onClick={() => onLike(post)} aria-label={t.likes}><AppIcon icon={Heart} fill="currentColor"/><span>{post.likeCount || 212}</span></button>
       <button type="button" onClick={() => onToggleComments(post)} aria-label={t.comments}><AppIcon icon={MessageCircle}/><span>{post.commentCount || 20}</span></button>
       <button type="button" className="nv-reply-pill" onClick={() => onToggleComments(post)}><AppIcon icon={Share2}/><span>Reply</span></button>
     </div>
-    <p className="nv-post-copy"><strong>{post.authorName}</strong> {post.body || "A little moment worth remembering. Sharing the good energy with everyone today."}</p>
+    <p className="nv-post-copy"><strong><bdi dir="auto">{post.authorName}</bdi></strong> {post.body || "A little moment worth remembering. Sharing the good energy with everyone today."}</p>
     {commentsOpen && <div className="social-comments">
-      {commentsLoading ? <p className="social-muted">{t.loading}</p> : comments.length ? comments.map(comment => <div className="social-comment" key={comment.id}><Avatar name={comment.authorName}/><div><strong>{comment.authorName}</strong><p>{comment.body}</p></div></div>) : <p className="social-muted">{t.emptyComments}</p>}
+      {commentsLoading ? <p className="social-muted">{t.loading}</p> : comments.length ? comments.map(comment => <div className="social-comment" key={comment.id}><Avatar name={comment.authorName}/><div><strong><bdi dir="auto">{comment.authorName}</bdi></strong><p>{comment.body}</p></div></div>) : <p className="social-muted">{t.emptyComments}</p>}
       <form className="social-comment-form" onSubmit={event => { event.preventDefault(); onSubmitComment(post); }}>
         <input value={commentDraft} onChange={event => onCommentDraft(event.target.value)} placeholder={t.writeComment} maxLength={1000}/><button type="submit" disabled={!commentDraft.trim()}>{t.send}</button>
       </form>
@@ -208,6 +208,12 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
   const notificationCount = useMemo(() => notifications.filter(item => !item.readAt).length, [notifications]);
 
   useEffect(() => {
+    const root = document.documentElement;
+    root.lang = language;
+    root.dir = language === "en" ? "ltr" : "rtl";
+  }, [language]);
+
+  useEffect(() => {
     if (notice) setPageError(notice);
   }, [notice]);
 
@@ -226,7 +232,8 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             if (alive) setReels(Array.isArray(data.posts) ? data.posts : []);
           }
         } catch (error) {
-          if (alive) setPageError(error instanceof Error ? error.message : t.genericError);
+          if (alive && active === "home") setPosts(demoPosts);
+          if (alive && active === "reels") setReels(demoPosts);
         } finally {
           if (alive) setLoading(false);
         }
@@ -560,7 +567,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
         <div className="nv-full-reel-media">{selectedReel.mediaType==="video"&&selectedReel.mediaUrl?<video src={selectedReel.mediaUrl} autoPlay loop playsInline controls/>:<img src={selectedReel.mediaUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1200"} alt="Reel"/>}</div>
         <div className="nv-full-reel-top"><button onClick={()=>setSelectedReel(null)} aria-label="Back"><AppIcon icon={ChevronDown}/></button><button onClick={()=>{setSelectedReel(null);navigate("search")}} aria-label="Search"><AppIcon icon={Search}/></button></div>
         <div className="nv-full-reel-actions"><button onClick={()=>toggleLike(selectedReel)}><AppIcon icon={Heart} fill={selectedReel.likedByMe?"#ef4444":"none"}/><small>4.2k</small></button><button onClick={()=>toggleComments(selectedReel)}><AppIcon icon={MessageCircle}/><small>4.2k</small></button><button onClick={()=>{const url=window.location.href;if(navigator.share)void navigator.share({title:"NOVYRA",text:selectedReel.body,url}).catch(()=>undefined);else void navigator.clipboard?.writeText(url)}}><AppIcon icon={Share2}/></button><button><AppIcon icon={MoreHorizontal}/></button></div>
-        <div className="nv-full-reel-caption"><div className="nv-full-reel-user"><Avatar name={selectedReel.authorName}/><div><strong>{selectedReel.authorName}</strong><small>19 hour ago</small></div><button>{t.follow}</button></div><p>{selectedReel.body.slice(0,110)}... <span>{language === "fa" ? "بیشتر" : "more"}</span></p><small><AppIcon icon={Music2}/> Remix with laddu_jaan...</small></div><div className="nv-reel-home-indicator"/>
+        <div className="nv-full-reel-caption"><div className="nv-full-reel-user"><Avatar name={selectedReel.authorName}/><div><strong><bdi dir="auto">{selectedReel.authorName}</bdi></strong><small><bdi dir="auto">19 hour ago</bdi></small></div><button>{t.follow}</button></div><p>{selectedReel.body.slice(0,110)}... <span>{language === "fa" ? "بیشتر" : "more"}</span></p><small><AppIcon icon={Music2}/> Remix with laddu_jaan...</small></div><div className="nv-reel-home-indicator"/>
       </section>}
       <nav className="social-mobile-nav-wrap" style={selectedReel ? {display:"none"} : undefined}>
         <MobileBottomNav active={active} labels={{home:t.home,search:t.search,message:t.inbox,profile:t.profile}} userId={account.id} displayName={profile?.displayName || account.displayName}
