@@ -23,7 +23,7 @@ export async function derivePasswordHash(password: string, salt: string) {
 export async function apiRequest<T = any>(path: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem("projectx-token");
   const headers = new Headers(options.headers || {});
-  headers.set("Content-Type", "application/json");
+  if (!(options.body instanceof FormData)) headers.set("Content-Type", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
   const response = await fetch(`${API_BASE}${path}`, { ...options, headers, cache: "no-store" });
   const data = await response.json().catch(() => ({}));
