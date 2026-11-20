@@ -15,6 +15,7 @@ type Post = {
   body: string;
   mediaUrl?: string | null;
   mediaType?: "image" | "video" | null;
+  thumbnailUrl?: string | null;
   createdAt: string;
   authorId: string;
   authorName: string;
