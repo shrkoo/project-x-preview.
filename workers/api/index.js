@@ -352,7 +352,7 @@ export default {
     const reelsOnly = path === "/social/reels";
     const rows = await db.prepare(`
       SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,
-        p.author_id AS authorId,u.display_name AS authorName,
+        p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,
         (SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,
         (SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,
         EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe
@@ -385,6 +385,61 @@ export default {
       profile:{id:user.id,email:user.email,displayName:user.display_name,postCount:stats?.postCount||0,followerCount:stats?.followerCount||0,followingCount:stats?.followingCount||0},
       posts:(posts.results||[]).map(shapeSocialPost)
     });
+   }
+
+
+   if (path === "/social/explore" && request.method === "GET") {
+    const limit=Math.min(40,Math.max(1,Number(url.searchParams.get("limit")||30)));
+    const offset=Math.max(0,Number(url.searchParams.get("offset")||0));
+    const rows=await db.prepare("SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,(SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,(SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe FROM social_posts p JOIN users u ON u.id=p.author_id WHERE p.media_type IN ('image','video') ORDER BY p.created_at DESC LIMIT ? OFFSET ?").bind(user.id,limit,offset).all();
+    return json({posts:(rows.results||[]).map(shapeSocialPost),nextOffset:offset+(rows.results||[]).length,hasMore:(rows.results||[]).length===limit});
+   }
+
+   const otherProfileMatch=path.match(/^\\/social\\/users\\/([a-f0-9-]+)\\/profile$/i);
+   if(otherProfileMatch && request.method==="GET") {
+    const targetId=otherProfileMatch[1];
+    const target=await db.prepare("SELECT id,email,display_name AS displayName FROM users WHERE id=?").bind(targetId).first();
+    if(!target) return fail("کاربر پیدا نشد.",404);
+    const [stats,posts]=await Promise.all([
+     db.prepare("SELECT (SELECT COUNT(*) FROM social_posts WHERE author_id=?) AS postCount,(SELECT COUNT(*) FROM social_follows WHERE followed_id=?) AS followerCount,(SELECT COUNT(*) FROM social_follows WHERE follower_id=?) AS followingCount,EXISTS(SELECT 1 FROM social_follows WHERE follower_id=? AND followed_id=?) AS followedByMe").bind(targetId,targetId,targetId,user.id,targetId).first(),
+     db.prepare("SELECT p.id,p.body,p.media_url AS mediaUrl,p.media_type AS mediaType,p.created_at AS createdAt,p.author_id AS authorId,u.display_name AS authorName,p.view_count AS viewCount,(SELECT COUNT(*) FROM social_post_likes l WHERE l.post_id=p.id) AS likeCount,(SELECT COUNT(*) FROM social_post_comments c WHERE c.post_id=p.id) AS commentCount,EXISTS(SELECT 1 FROM social_post_likes mine WHERE mine.post_id=p.id AND mine.user_id=?) AS likedByMe FROM social_posts p JOIN users u ON u.id=p.author_id WHERE p.author_id=? ORDER BY p.created_at DESC LIMIT 100").bind(user.id,targetId).all()
+    ]);
+    return json({profile:{...target,...stats},posts:(posts.results||[]).map(shapeSocialPost)});
+   }
+
+   const viewPostMatch=path.match(/^\\/social\\/posts\\/([a-f0-9-]+)\\/view$/i);
+   if(viewPostMatch && request.method==="POST") {
+    const result=await db.prepare("UPDATE social_posts SET view_count=COALESCE(view_count,0)+1 WHERE id=? RETURNING view_count AS viewCount").bind(viewPostMatch[1]).first();
+    if(!result) return fail("پست پیدا نشد.",404);
+    return json({viewCount:result.viewCount||0});
+   }
+
+   if(path==="/social/search-history" && request.method==="GET") {
+    const rows=await db.prepare("SELECT h.id,h.search_type AS type,h.query_text AS query,h.target_user_id AS userId,h.created_at AS createdAt,u.display_name AS displayName,LOWER(REPLACE(u.display_name,' ','')) AS username FROM social_search_history h LEFT JOIN users u ON u.id=h.target_user_id WHERE h.owner_id=? ORDER BY h.created_at DESC LIMIT 100").bind(user.id).all();
+    return json({items:rows.results||[]});
+   }
+   if(path==="/social/search-history" && request.method==="POST") {
+    const body=await readBody(request), type=body?.type==="user"?"user":"query";
+    const targetId=type==="user"?String(body?.userId||""):"";
+    const queryText=type==="query"?String(body?.query||"").trim().slice(0,100):"";
+    if(type==="user" && (!targetId || targetId===user.id)) return fail("کاربر جست‌وجو معتبر نیست.");
+    if(type==="query" && !queryText) return fail("عبارت جست‌وجو خالی است.");
+    if(type==="user" && !await db.prepare("SELECT id FROM users WHERE id=?").bind(targetId).first()) return fail("کاربر پیدا نشد.",404);
+    const existing=type==="user"
+     ? await db.prepare("SELECT id FROM social_search_history WHERE owner_id=? AND target_user_id=?").bind(user.id,targetId).first()
+     : await db.prepare("SELECT id FROM social_search_history WHERE owner_id=? AND search_type='query' AND query_text=?").bind(user.id,queryText).first();
+    const id=existing?.id||crypto.randomUUID();
+    await db.prepare("INSERT INTO social_search_history (id,owner_id,search_type,target_user_id,query_text,created_at) VALUES (?,?,?,?,?,CURRENT_TIMESTAMP) ON CONFLICT(id) DO UPDATE SET created_at=CURRENT_TIMESTAMP,query_text=excluded.query_text").bind(id,user.id,type,type==="user"?targetId:null,type==="query"?queryText:null).run();
+    return json({ok:true,id});
+   }
+   const historyItemMatch=path.match(/^\\/social\\/search-history\\/([a-f0-9-]+)$/i);
+   if(historyItemMatch && request.method==="DELETE") {
+    await db.prepare("DELETE FROM social_search_history WHERE id=? AND owner_id=?").bind(historyItemMatch[1],user.id).run();
+    return json({ok:true});
+   }
+   if(path==="/social/search-history/clear" && request.method==="DELETE") {
+    await db.prepare("DELETE FROM social_search_history WHERE owner_id=?").bind(user.id).run();
+    return json({ok:true});
    }
 
    if (path === "/social/search" && request.method === "GET") {
