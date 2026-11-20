@@ -99,7 +99,7 @@ export function FeedMedia({ post, onOpen, onLike, onView }: FeedMediaProps) {
   if (!post.mediaUrl || !post.mediaType) return null;
   return <div className="nv-feed-media" ref={hostRef} onPointerDown={startPress} onPointerUp={endPress} onPointerCancel={endPress} onPointerLeave={endPress} onContextMenu={event => event.preventDefault()}>
     {post.mediaType === "video"
-      ? <video ref={videoRef} src={post.mediaUrl} className="nv-feed-media-el" muted={muted} loop playsInline preload="metadata" onClick={handleTap}/>
+      ? <video ref={videoRef} src={post.mediaUrl} className="nv-feed-media-el" muted={muted} loop playsInline controls preload="metadata" onClick={event => { event.stopPropagation(); handleTap(); }}/>
       : <img src={post.mediaUrl} className="nv-feed-media-el" alt="" loading="lazy" onClick={handleTap}/>}
     {post.mediaType === "video" && <button type="button" className="nv-feed-volume" aria-label={muted ? "فعال‌کردن صدا" : "بی‌صدا کردن"} onClick={event => {event.stopPropagation();setMuted(value => !value);}}>
       {muted ? <VolumeX/> : <Volume2/>}
@@ -250,7 +250,7 @@ export function MediaViewer({
       {items.map((post, index) => <article className="nv-media-slide" data-index={index} key={post.id}>
         <div className="nv-media-stage" onClick={() => handleTap(post, index)} onPointerDown={() => startLongPress(post, index)} onPointerUp={() => endLongPress(post, index)} onPointerCancel={() => endLongPress(post, index)} onPointerLeave={() => endLongPress(post, index)} onContextMenu={event => event.preventDefault()}>
           {post.mediaType === "video" && post.mediaUrl
-            ? <video src={post.mediaUrl} playsInline loop muted={muted} preload={Math.abs(index - activeIndex) <= 1 ? "auto" : "metadata"} />
+            ? <video src={post.mediaUrl} playsInline loop controls muted={muted} preload={Math.abs(index - activeIndex) <= 1 ? "auto" : "metadata"} onClick={event => event.stopPropagation()} />
             : post.mediaUrl ? <img src={post.mediaUrl} alt="" loading={Math.abs(index - activeIndex) <= 1 ? "eager" : "lazy"} /> : <div className="nv-media-text-fallback">{post.body}</div>}
           {heartPostId === post.id && <span className="nv-media-heart-pop"><Heart fill="currentColor"/></span>}
           {volumePulse && index === activeIndex && post.mediaType === "video" && <span className="nv-media-volume-pop">{muted ? <VolumeX/> : <Volume2/>}</span>}
