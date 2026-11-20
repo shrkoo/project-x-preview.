@@ -375,7 +375,7 @@ export default {
    }
    if(path==="/social/stories" && request.method==="POST") {
     const body=await readBody(request),type=body?.type==="video"?"video":"image",dataUrl=String(body?.mediaData||"");
-    const match=dataUrl.match(/^data:(image\/(?:jpeg|png|webp)|video\/(?:mp4|webm));base64,([A-Za-z0-9+/=]+)$/);
+    const match=dataUrl.match(/^data:(image\/(?:jpeg|png|webp)|video\/(?:mp4|webm|quicktime));base64,([A-Za-z0-9+/=]+)$/);
     if(!match || (type==="image"&&!match[1].startsWith("image/")) || (type==="video"&&!match[1].startsWith("video/"))) return fail("فایل استوری معتبر نیست.");
     const binary=atob(match[2]);
     if(binary.length>1500000) return fail("حجم استوری باید کمتر از ۱٫۵ مگابایت باشد.",413);
