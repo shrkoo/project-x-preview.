@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Bookmark, Heart, MessageCircle, MoreHorizontal, Plus, Repeat2, Send, Volume2, VolumeX, ArrowRight, X } from "lucide-react";
 
 export type SocialMediaPost = {
-  id: string; body: string; mediaUrl?: string | null; mediaType?: "image" | "video" | null;
+  id: string; body: string; mediaUrl?: string | null; mediaType?: "image" | "video" | null; thumbnailUrl?: string | null;
   createdAt: string; authorId: string; authorName: string; likeCount: number; commentCount: number;
   likedByMe: boolean; viewCount?: number; repostCount?: number; shareCount?: number;
   saveCount?: number; savedByMe?: boolean;
@@ -111,7 +111,7 @@ export function FeedMedia({ post, onOpen, onLike, onView }: FeedMediaProps) {
   if (!post.mediaUrl || !post.mediaType) return null;
   return <div className="nv-feed-media" ref={hostRef} onPointerDown={startPress} onPointerUp={endPress} onPointerCancel={endPress} onPointerLeave={endPress} onContextMenu={event => event.preventDefault()}>
     {post.mediaType === "video"
-      ? <video ref={videoRef} src={post.mediaUrl} className="nv-feed-media-el" muted={muted} loop playsInline preload="metadata" poster="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200&auto=format&fit=crop" onLoadedData={() => {setLoading(false);setFailed(false);}} onCanPlay={() => setLoading(false)} onError={() => {setLoading(false);setFailed(true);}} onTimeUpdate={event => {const v=event.currentTarget; if(v.duration) setProgress(v.currentTime/v.duration*100);}} onClick={event => {event.stopPropagation();handleTap();}}/>
+      ? <video ref={videoRef} src={post.mediaUrl} className="nv-feed-media-el" muted={muted} loop playsInline preload="metadata" poster={post.thumbnailUrl || "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200&auto=format&fit=crop"} onLoadedData={() => {setLoading(false);setFailed(false);}} onCanPlay={() => setLoading(false)} onError={() => {setLoading(false);setFailed(true);}} onTimeUpdate={event => {const v=event.currentTarget; if(v.duration) setProgress(v.currentTime/v.duration*100);}} onClick={event => {event.stopPropagation();handleTap();}}/>
       : <img src={post.mediaUrl} className="nv-feed-media-el" alt="" loading="lazy" onClick={handleTap} onError={event => {event.currentTarget.style.opacity="0";}}/>}
     {post.mediaType === "video" && <>
       {loading && !failed && <span className="nv-media-loading" aria-label="در حال بارگذاری"><i/></span>}
