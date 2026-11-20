@@ -1,0 +1,38 @@
+/* Keep discovery entry in the bottom navigation; remove duplicate search shortcuts from feed and reels headers. */
+.social-app .nv-feed-tools .nv-round-action[aria-label="Search"],
+.social-app .nv-reels-tabs .nv-round-action[aria-label="Search"] {
+  display: none !important;
+}
+
+/* Instagram-style Explore: search at the top, refresh beside it, media grid below. */
+.social-app .nv-explore-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 0 10px !important;
+  padding: 0 12px !important;
+}
+.social-app .nv-explore-search-trigger {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: 44px !important;
+  border-radius: 12px !important;
+  background: #262626 !important;
+  color: #bdbdbd !important;
+}
+.social-app .nv-explore-bookmark {
+  flex: 0 0 44px !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 12px !important;
+  background: transparent !important;
+  color: #fff !important;
+}
+.social-app .nv-explore-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 2px !important;
+}
+.social-app .nv-explore-tile {
+  aspect-ratio: 1 / 1.18 !important;
+}
