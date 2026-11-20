@@ -23,28 +23,6 @@ export default function InstagramHomeReplica({ onCreate, onNotifications }: { on
         <div className="nv-ig-post-account" dir="rtl"><strong>digiato.ai</strong><small>پیشنهادشده برای شما</small></div>
         <span className="nv-ig-digiato-avatar" aria-hidden="true"><span>✦</span></span>
       </header>
-      <div className="nv-ig-post-media" role="img" aria-label="پوستر فناوری درباره رونمایی کره شمالی از چت‌بات هوش مصنوعی چشمه خرد">
-        <div className="nv-ig-cyber-scene">
-          <div className="nv-ig-neural-brain"><span/><i/><b/><em/></div>
-          <div className="nv-ig-nk-flag"><i/><b>★</b><span/></div>
-          <div className="nv-ig-monitor">
-            <div className="nv-ig-monitor-screen">
-              <div className="nv-ig-ai-top"><span>✦  CHESHMEH-E KHرد</span><i>● ● ●</i></div>
-              <div className="nv-ig-chat-row"><b>AI</b><span>سلام! من چشمه خرد هستم.</span></div>
-              <div className="nv-ig-chat-row right"><span>تحلیل داده‌های جدید را آغاز کن</span></div>
-              <div className="nv-ig-data-graph"><i/><i/><i/><i/><i/><i/><i/><i/><i/></div>
-              <div className="nv-ig-chat-input">پیام خود را بنویسید… <b>➤</b></div>
-            </div>
-            <div className="nv-ig-monitor-stand"/>
-          </div>
-          <div className="nv-ig-circuit circuit-one"/><div className="nv-ig-circuit circuit-two"/>
-        </div>
-        <div className="nv-ig-poster-shade"/>
-        <div className="nv-ig-post-copy" dir="rtl">
-          <strong>کره شمالی از چت‌بات هوش مصنوعی خود با نام «چشمه خرد» رونمایی کرد</strong>
-        </div>
-        <div className="nv-ig-digiato-mark" dir="ltr"><i/>DIGIATO AI</div>
-      </div>
       <div className="nv-ig-post-engagement" dir="rtl"><span>♡　◯　↗</span><span>⌑</span></div>
     </article>
 
