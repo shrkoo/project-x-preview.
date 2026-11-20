@@ -2752,3 +2752,67 @@ html,body{background:linear-gradient(145deg,#0D0907 0%,#130d09 52%,#1A120D 100%)
  .nv-profile-grid{grid-auto-rows:138px!important}
  .nv-profile-stats{margin-inline:4px!important}
 }
+
+
+/* Instagram-inspired black mobile experience */
+@media (max-width:760px) {
+  .social-app,
+  .social-app-frame,
+  .social-main-column,
+  .social-feed-screen,
+  .nv-explore-screen,
+  .nv-reels-screen,
+  .social-profile-screen {
+    background:#000!important;
+    color:#fff!important;
+  }
+  .social-app { min-height:100dvh!important; padding-bottom:82px!important; }
+  .social-app-frame { min-height:100dvh!important; }
+  .social-topbar { display:none!important; }
+  .social-layout { display:block!important; min-height:calc(100dvh - 82px)!important; }
+  .social-sidebar { display:none!important; }
+  .social-main-column { width:100%!important; max-width:none!important; padding:0 0 90px!important; margin:0!important; }
+  .social-page-heading { display:none!important; }
+  .social-mobile-nav-wrap { display:block!important; }
+  .novyra-bottom-nav {
+    display:flex!important; position:fixed!important; z-index:120!important;
+    left:0!important; right:0!important; bottom:0!important; width:100%!important;
+    max-width:none!important; height:calc(58px + env(safe-area-inset-bottom))!important;
+    margin:0!important; padding:5px 9px calc(5px + env(safe-area-inset-bottom))!important;
+    border-top:1px solid #242424!important; border-radius:0!important;
+    background:#000!important; color:#fff!important; box-shadow:none!important;
+  }
+  .novyra-bottom-items {
+    width:100%!important; max-width:520px!important; height:100%!important;
+    margin:0 auto!important; display:flex!important; align-items:center!important;
+    justify-content:space-around!important; gap:0!important;
+  }
+  .novyra-bottom-tab {
+    flex:1 1 20%!important; min-width:0!important; height:48px!important;
+    display:flex!important; flex-direction:column!important; justify-content:center!important;
+    align-items:center!important; gap:3px!important; border:0!important;
+    padding:2px 0!important; background:transparent!important; color:#a8a8a8!important;
+  }
+  .novyra-bottom-tab svg { width:25px!important; height:25px!important; stroke-width:1.7!important; }
+  .novyra-bottom-tab span:last-child { display:block!important; font-size:9px!important; line-height:1.1!important; }
+  .novyra-bottom-tab.is-active { color:#fff!important; }
+  .novyra-bottom-tab.is-active svg { stroke-width:2.35!important; }
+  .nv-explore-screen { margin:0!important; min-height:calc(100dvh - 58px)!important; background:#000!important; }
+  .nv-explore-toolbar { padding:9px 10px 10px!important; background:#000!important; }
+  .nv-explore-search-trigger { background:#262626!important; border:0!important; border-radius:10px!important; }
+  .nv-explore-bookmark { background:#000!important; border:0!important; }
+  .nv-explore-grid { gap:2px!important; background:#000!important; }
+  .nv-explore-tile { aspect-ratio:1/1.22!important; background:#161616!important; }
+  .nv-explore-views { background:rgba(0,0,0,.62)!important; }
+  .nv-reels-screen { margin:0!important; min-height:calc(100dvh - 58px)!important; background:#000!important; }
+  .nv-reels-tabs { top:8px!important; }
+  .nv-full-reel { position:fixed!important; inset:0!important; z-index:110!important; width:100vw!important; height:100dvh!important; background:#000!important; }
+  .nv-full-reel-media { position:absolute!important; inset:0!important; width:100%!important; height:100%!important; background:#000!important; }
+  .nv-full-reel-media img,.nv-full-reel-media video { width:100%!important; height:100%!important; object-fit:cover!important; }
+  .nv-full-reel-top { top:env(safe-area-inset-top, 8px)!important; }
+  .nv-full-reel-actions { right:12px!important; bottom:125px!important; gap:19px!important; }
+  .nv-full-reel-actions button { color:#fff!important; text-shadow:0 1px 4px #000!important; }
+  .nv-full-reel-caption { left:14px!important; right:76px!important; bottom:calc(26px + env(safe-area-inset-bottom))!important; color:#fff!important; }
+  .nv-reel-list-card { min-height:calc(100dvh - 58px)!important; border-radius:0!important; }
+  .social-profile-screen { background:#000!important; color:#fff!important; }
+}
