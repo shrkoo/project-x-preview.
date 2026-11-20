@@ -166,6 +166,9 @@ export function MediaViewer({
   const [menuPostId, setMenuPostId] = useState<string | null>(null);
   const [heartPostId, setHeartPostId] = useState<string | null>(null);
   const [volumePulse, setVolumePulse] = useState(false);
+  const [videoLoading, setVideoLoading] = useState<Record<string, boolean>>({});
+  const [videoFailed, setVideoFailed] = useState<Record<string, boolean>>({});
+  const [videoProgress, setVideoProgress] = useState<Record<string, number>>({});
   const volumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -190,7 +193,11 @@ export function MediaViewer({
           if (!viewedIds.current.has(post.id)) { viewedIds.current.add(post.id); onView(post); }
           if (video) {
             video.muted = muted;
-            void video.play().catch(() => undefined);
+            void video.play().catch(() => {
+              video.muted = true;
+              setMuted(true);
+              void video.play().catch(() => setVideoFailed(current => ({...current,[post.id]:true})));
+            });
           }
         } else if (video) {
           video.pause();
@@ -212,6 +219,24 @@ export function MediaViewer({
   }, [activeIndex, muted]);
 
   const activePost = items[activeIndex];
+  function toggleViewerSound(event?: React.MouseEvent) {
+    event?.stopPropagation();
+    const nextMuted = !muted;
+    setMuted(nextMuted);
+    const video = scrollRef.current?.querySelector<HTMLVideoElement>('.nv-media-slide[data-index="' + activeIndex + '"] video');
+    if (video) {
+      video.volume = 1;
+      video.muted = nextMuted;
+      if (!nextMuted) void video.play().catch(() => {video.muted = true;setMuted(true);});
+    }
+    showVolume();
+  }
+  function retryViewerVideo(post: SocialMediaPost, index: number) {
+    setVideoFailed(current => ({...current,[post.id]:false}));
+    setVideoLoading(current => ({...current,[post.id]:true}));
+    const video = scrollRef.current?.querySelector<HTMLVideoElement>('.nv-media-slide[data-index="' + index + '"] video');
+    if (video) {video.load();void video.play().catch(() => undefined);}
+  }
   function showVolume() {
     setVolumePulse(true);
     if (volumeTimer.current) clearTimeout(volumeTimer.current);
@@ -265,8 +290,14 @@ export function MediaViewer({
       {items.map((post, index) => <article className="nv-media-slide" data-index={index} key={post.id}>
         <div className="nv-media-stage" onClick={() => handleTap(post, index)} onPointerDown={() => startLongPress(post, index)} onPointerUp={() => endLongPress(post, index)} onPointerCancel={() => endLongPress(post, index)} onPointerLeave={() => endLongPress(post, index)} onContextMenu={event => event.preventDefault()}>
           {post.mediaType === "video" && post.mediaUrl
-            ? <video src={post.mediaUrl} playsInline loop controls muted={muted} preload={Math.abs(index - activeIndex) <= 1 ? "auto" : "metadata"} onClick={event => event.stopPropagation()} />
-            : post.mediaUrl ? <img src={post.mediaUrl} alt="" loading={Math.abs(index - activeIndex) <= 1 ? "eager" : "lazy"} /> : <div className="nv-media-text-fallback">{post.body}</div>}
+            ? <video src={post.mediaUrl} playsInline loop muted={muted} preload={Math.abs(index - activeIndex) <= 1 ? "auto" : "metadata"} poster="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200&auto=format&fit=crop" onLoadStart={() => setVideoLoading(current => ({...current,[post.id]:true}))} onLoadedData={() => {setVideoLoading(current => ({...current,[post.id]:false}));setVideoFailed(current => ({...current,[post.id]:false}));}} onCanPlay={() => setVideoLoading(current => ({...current,[post.id]:false}))} onError={() => {setVideoLoading(current => ({...current,[post.id]:false}));setVideoFailed(current => ({...current,[post.id]:true}));}} onTimeUpdate={event => {const v=event.currentTarget;if(v.duration)setVideoProgress(current => ({...current,[post.id]:v.currentTime/v.duration*100}));}} onClick={event => {event.stopPropagation();handleTap(post,index);}} />
+            : post.mediaUrl ? <img src={post.mediaUrl} alt="" loading={Math.abs(index - activeIndex) <= 1 ? "eager" : "lazy"} onError={event => {event.currentTarget.style.opacity="0";}} /> : <div className="nv-media-text-fallback">{post.body}</div>}
+          {post.mediaType === "video" && post.mediaUrl && <>
+            {videoLoading[post.id] && !videoFailed[post.id] && <span className="nv-media-loading"><i/></span>}
+            {videoFailed[post.id] && <button type="button" className="nv-media-retry" onClick={event => {event.stopPropagation();retryViewerVideo(post,index);}}>↻<small>تلاش دوباره</small></button>}
+            {index === activeIndex && <button type="button" className="nv-viewer-volume" aria-label={muted ? "فعال‌کردن صدا" : "بی‌صدا کردن"} onClick={toggleViewerSound}>{muted ? <VolumeX/> : <Volume2/>}</button>}
+            <span className="nv-video-progress"><i style={{width:(videoProgress[post.id] || 0) + "%"}}/></span>
+          </>}
           {heartPostId === post.id && <span className="nv-media-heart-pop"><Heart fill="currentColor"/></span>}
           {volumePulse && index === activeIndex && post.mediaType === "video" && <span className="nv-media-volume-pop">{muted ? <VolumeX/> : <Volume2/>}</span>}
         </div>
