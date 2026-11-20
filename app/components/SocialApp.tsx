@@ -5,6 +5,7 @@ import { apiRequest, apiUpload, clearSession } from "../lib/api";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
 import StoriesExperience from "./StoriesExperience";
 import AppIcon from "./AppIcon";
+import PostCreationFlow from "./PostCreationFlow";
 import { FeedMedia, MediaViewer, formatSocialCount } from "./MediaExperience";
 import type { SocialMediaPost, SocialMediaPerson } from "./MediaExperience";
 import { Search, Bell, Image as ImageIcon, Clapperboard, LockKeyhole, Heart, Bookmark, MoreHorizontal, EllipsisVertical, MessageCircle, Share2, Music2, Send, UsersRound, MessageSquare, Sparkles, Film, BadgeCheck, ChevronDown, X, Camera, UserRound, Clock, Play, Eye, ArrowRight, ArrowLeft, Repeat2, Plus } from "lucide-react";
@@ -570,38 +571,20 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
     }
   }
 
-  async function publishPost(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const body = postBody.trim();
-    if (!body && !selectedMedia) return;
-    setPublishing(true);
-    setUploadProgress(0);
-    setPageError("");
+  async function publishComposer(file: File | null, caption: string) {
+    const body = caption.trim();
+    if (!body && !file) return;
+    setPublishing(true); setUploadProgress(0); setPageError("");
     try {
-      const form = new FormData();
-      form.append("body", body);
-      if (selectedMedia) {
-        form.append("file", selectedMedia, selectedMedia.name);
-        form.append("mediaType", mediaType || (selectedMedia.type.startsWith("video/") ? "video" : "image"));
-      }
+      const form = new FormData(); form.append("body", body);
+      if (file) { form.append("file", file, file.name); form.append("mediaType", file.type.startsWith("video/") ? "video" : "image"); }
       const created = await apiUpload<{ id: string; message: string }>("/social/posts", form, setUploadProgress);
       const data = await apiRequest<{ posts: Post[] }>("/social/feed");
-      const refreshed = data.posts || [];
-      const newlyPublished = refreshed.find(post => post.id === created.id);
+      const refreshed = data.posts || [], newlyPublished = refreshed.find(post => post.id === created.id);
       setPosts(newlyPublished ? [newlyPublished, ...refreshed.filter(post => post.id !== created.id)] : refreshed);
-      setPostBody("");
-      setSelectedMedia(null);
-      setMediaType("");
-      setComposerStep("media");
-      setUploadProgress(0);
-      setActive("home");
-      setAiOpen(false);
-      setPageError(t.postCreated);
-    } catch (error) {
-      setPageError(error instanceof Error ? error.message : t.genericError);
-    } finally {
-      setPublishing(false);
-    }
+      setPostBody(""); setSelectedMedia(null); setMediaType(""); setComposerStep("media"); setUploadProgress(0); setActive("home"); setAiOpen(false); setPageError(t.postCreated);
+    } catch (error) { setPageError(error instanceof Error ? error.message : t.genericError); }
+    finally { setPublishing(false); }
   }
 
   function chooseMedia(file?: File) {
@@ -869,29 +852,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             </article>):<div className="nv-placeholder"><div className="nv-placeholder-icon"><AppIcon icon={MessageSquare}/></div><h2>{t.inbox}</h2><p>هنوز پستی برایت ارسال نشده است.</p></div>}
           </section>}
 
-          {!aiOpen && active === "create" && <section className="social-create-screen nv-create-flow" dir="rtl">
-            <div className="nv-create-topline"><button type="button" onClick={() => navigate("home")} aria-label="بستن"><AppIcon icon={X}/></button><strong>پست جدید</strong><span>{composerStep === "media" ? "۱ از ۲" : "۲ از ۲"}</span></div>
-            <div className="social-create-card nv-create-card">
-              <div className="social-create-heading"><Avatar name={account.displayName} size="large" /><div><strong>{account.displayName}</strong><small>{composerStep === "media" ? "یک عکس یا ویدئو انتخاب کن" : "پیش‌نمایش و توضیحات پست"}</small></div></div>
-              <form onSubmit={publishPost}>
-                <input ref={mediaInputRef} className="nv-hidden-media-input" type="file" accept="image/*,video/mp4,video/webm,video/quicktime" onChange={event => chooseMedia(event.target.files?.[0] || undefined)} />
-                {selectedMedia && mediaPreview ? <div className="nv-selected-media">
-                  {mediaType === "video" ? <video src={mediaPreview} controls playsInline preload="metadata"/> : <img src={mediaPreview} alt="پیش‌نمایش پست"/>}
-                  <button type="button" className="nv-remove-media" onClick={() => {setSelectedMedia(null);setMediaType("");setComposerStep("media");if(mediaInputRef.current)mediaInputRef.current.value="";}} aria-label="حذف فایل"><AppIcon icon={X}/></button>
-                </div> : <button type="button" className="nv-gallery-picker" onClick={() => mediaInputRef.current?.click()}><span><AppIcon icon={Plus}/></span><strong>انتخاب از گالری</strong><small>عکس یا ویدئو از گوشی</small></button>}
-                {composerStep === "details" && <textarea value={postBody} onChange={event => setPostBody(event.target.value)} placeholder="برای این پست توضیحی بنویس…" maxLength={2000} rows={4}/>}
-                {composerStep === "media" && <textarea value={postBody} onChange={event => setPostBody(event.target.value)} placeholder="متن پست (اختیاری)…" maxLength={2000} rows={3}/>}
-                {publishing && <div className="nv-upload-status"><div><span>در حال بارگذاری و انتشار…</span><b>{uploadProgress}٪</b></div><progress max="100" value={uploadProgress}/></div>}
-                <div className="social-create-footer">
-                  <span>{selectedMedia ? (mediaType === "video" ? "ویدئو" : "تصویر") + " · " + (selectedMedia.size/1024/1024).toFixed(1) + " MB" : postBody.length + "/2000"}</span>
-                  {composerStep === "media" && !selectedMedia && !postBody.trim() ? <button type="button" onClick={() => mediaInputRef.current?.click()}>انتخاب رسانه <span>＋</span></button> :
-                    composerStep === "media" && !selectedMedia && postBody.trim() ? <button type="submit" disabled={publishing}>انتشار متن <span>↗</span></button> :
-                    composerStep === "media" && selectedMedia ? <button type="button" onClick={() => setComposerStep("details")}>بعدی <span>→</span></button> :
-                    <button type="submit" disabled={publishing || (!postBody.trim() && !selectedMedia)}>{publishing ? "در حال انتشار…" : "انتشار"} <span>↗</span></button>}
-                </div>
-              </form>
-            </div>
-          </section>}
+          {!aiOpen && active === "create" && <PostCreationFlow onClose={() => navigate("home")} onPublish={publishComposer} publishing={publishing} uploadProgress={uploadProgress} error={pageError && pageError !== t.postCreated ? pageError : ""} />}
 
           {!aiOpen && active === "reels" && <section className="nv-reels-screen">
             <div className="nv-video-switcher" dir={dir}>
