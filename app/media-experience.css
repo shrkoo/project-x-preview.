@@ -273,3 +273,7 @@
 .nv-story-hit-left {left:0}.nv-story-hit-right {right:0}
 .nv-story-resume {position:absolute;z-index:8;top:50%;left:50%;transform:translate(-50%,-50%);padding:9px 18px;border:1px solid #ffffff55;border-radius:24px;background:#0009;color:#fff}
 @media(max-width:760px){.nv-story-viewer{padding-inline:7px}.nv-story-media{border-radius:6px}}
+
+.nv-story-own-avatar.has-story {border:0;background:conic-gradient(#ffd54a,#ff8a00,#ff3d83,#a64cff,#ffd54a);padding:3px}
+.nv-story-own-avatar.has-story .nv-story-avatar-fallback {border:3px solid #000}
+.nv-story-own-avatar>b {cursor:pointer}
