@@ -2635,3 +2635,11 @@ html,body{background:linear-gradient(145deg,#0D0907 0%,#130d09 52%,#1A120D 100%)
  .nv-profile-grid.is-other-profile{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:1px!important}
  .nv-profile-grid.is-other-profile .nv-profile-tile{aspect-ratio:3/4!important}
 }
+
+/* Explore tab uses the Instagram-style five-item navigation */
+.novyra-bottom-items{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;align-items:center!important;gap:0!important}
+.novyra-bottom-tab{min-width:0!important;min-height:54px!important;justify-content:center!important}
+.novyra-bottom-tab.is-active{width:46px!important;height:46px!important;min-height:46px!important;justify-self:center!important;align-self:center!important;border-radius:50%!important;background:#3a342f!important;color:#fff!important}
+.novyra-bottom-tab.is-active:after{display:none!important}
+.novyra-bottom-tab span:last-child{font-size:9px!important}
+.novyra-create-button{display:none!important}
