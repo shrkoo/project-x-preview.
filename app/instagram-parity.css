@@ -753,3 +753,11 @@ button{-webkit-tap-highlight-color:transparent}
  .nv-ig-post-head{height:60px!important}
  .nv-ig-post-copy strong{font-size:clamp(18px,5.2vw,26px)!important}
 }
+
+/* NOVYRA home: clean header and real community members; no demo stories or feature poster. */
+.nv-home-people{margin:0;padding:22px 18px 18px;border-bottom:1px solid #24252a;background:#050505}
+.nv-home-people-heading{margin-bottom:14px;color:#f4f4f5;font-size:13px;font-weight:750}
+.nv-home-people-list{display:flex;flex-wrap:wrap;gap:10px 18px}
+.nv-home-person{display:flex;align-items:center;gap:8px;min-height:36px;color:#dedee3;font-size:12px}
+.nv-home-person-avatar{display:grid;width:34px;height:34px;place-items:center;border:1px solid #34353d;border-radius:50%;background:#17181d;color:#d8a0c7}
+.nv-home-person-avatar svg{width:17px;height:17px}
