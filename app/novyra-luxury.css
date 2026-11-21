@@ -1103,3 +1103,32 @@
 .nv-finance .nv-goal-meta{margin-top:9px!important}
 .nv-finance .nf-page-actions{display:none!important}
 .nv-finance[data-theme="light"] .nf-page-actions{display:none!important}
+
+
+/* NOVYRA final reference alignment */
+@media(max-width:760px){
+  .nv-finance{padding-bottom:calc(150px + env(safe-area-inset-bottom))!important}
+  .nv-finance .nf-main{padding-bottom:calc(150px + env(safe-area-inset-bottom))!important}
+}
+.nv-finance .nf-footer{display:none!important}
+.nv-finance .nv-ref-subpage-head{display:none!important}
+.nv-finance .nv-ref-cheer{display:block!important;margin:8px 0 0!important;font-size:11px!important;font-weight:600!important}
+.nv-finance .nv-ref-balance .nv-ref-growth{font-size:12px!important;font-weight:500!important}
+.nv-finance .nv-ref-balance .nv-ref-growth em{font-size:10px!important;font-weight:400!important}
+.nv-finance .nv-ref-category-grid{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important;overscroll-behavior-inline:contain!important}
+.nv-finance .nv-ref-category-grid::-webkit-scrollbar{display:none!important}
+.nv-finance .nv-ref-category-grid article{flex:0 0 31%!important;width:31%!important;min-width:31%!important;max-width:31%!important}
+.nv-finance .nv-ref-wave{height:82px!important;align-items:center!important;gap:2px!important;margin:8px 0 4px!important}
+.nv-finance .nv-ref-wave i{height:auto!important;max-height:76px!important;min-height:12px!important}
+.nv-finance .nv-ref-category b{font-size:11px!important;font-weight:600!important}
+.nv-finance .nv-goal-title{padding-inline-start:0!important;padding-inline-end:0!important;justify-content:space-between!important;align-items:center!important}
+.nv-finance .nv-goal-title>b{margin-inline-start:0!important;text-align:right!important}
+.nv-finance .nv-goal-title>span{display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:center!important;min-width:38px!important;background:#e3f5eb!important;color:#229260!important;border-radius:99px!important;padding:5px 9px!important;font-size:11px!important;font-weight:700!important}
+.nv-finance .nv-goal-card:nth-of-type(2) .nv-goal-track i{background:linear-gradient(90deg,#70d1a3,#2aa879)!important}
+.nv-finance .nv-goal-card .nv-goal-track.yellow i{background:linear-gradient(90deg,#f7d77a,#e7ad39)!important}
+.nv-finance .nv-goal-card .nv-goal-track{height:9px!important;direction:rtl!important}
+.nv-finance .nv-goal-card .nv-goal-track i{position:relative!important;display:block!important;right:auto!important;left:auto!important;top:auto!important;height:100%!important;max-width:100%!important}
+.nv-finance .nv-goal-arrow{left:15px!important;right:auto!important;top:16px!important}
+.nv-finance .nv-spend-y{min-width:72px!important}
+.nv-finance .nv-spend-y span{font-variant-numeric:normal!important}
+.nv-finance .nf-settings>h2{display:none!important}
