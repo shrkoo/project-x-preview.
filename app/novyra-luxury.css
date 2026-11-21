@@ -1399,7 +1399,7 @@
 .nv-finance .nv-spend-chart>.nv-spend-y{grid-column:2!important;grid-row:1!important;position:static!important;inset:auto!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important;align-items:flex-start!important;width:auto!important;min-width:0!important;padding:3px 0!important;background:transparent!important;border:0!important;box-shadow:none!important;pointer-events:none!important;color:#718895!important;font-size:10px!important;white-space:nowrap!important}
 .nv-finance .nv-spend-y span{display:block!important;min-height:12px!important;white-space:nowrap!important;line-height:1.2!important}
 .nv-finance .nv-spend-y small{font-size:8px!important;color:#9aaab1!important}
-.nv-finance .nv-spend-tooltip{position:absolute!important;left:0!important;right:auto!important;top:7px!important;z-index:12!important;display:block!important;padding:7px 10px!important;border-radius:10px!important;background:#173d32!important;color:#fff!important;font-size:10px!important;white-space:nowrap!important;pointer-events:none!important;box-shadow:0 5px 14px #163c3228!important}
+.nv-finance .nv-spend-tooltip{position:absolute!important;top:7px!important;z-index:12!important;display:block!important;padding:7px 10px!important;border-radius:10px!important;background:#173d32!important;color:#fff!important;font-size:10px!important;white-space:nowrap!important;pointer-events:none!important;box-shadow:0 5px 14px #163c3228!important}
 .nv-finance .nv-spend-axis{width:calc(100% - 70px)!important;margin:0 70px 0 0!important;display:flex!important;justify-content:space-between!important}
 .nv-finance .nv-spend-chart svg line{stroke-width:1.5!important;vector-effect:non-scaling-stroke!important}
 .nv-finance .nv-goal-title{padding:0!important;min-height:30px!important;margin-bottom:4px!important}
@@ -1468,7 +1468,7 @@
  color:#718895!important;pointer-events:none!important;
 }
 .nv-finance .nv-spend-tooltip{
- position:absolute!important;left:auto!important;right:auto!important;top:7px!important;
+ position:absolute!important;top:7px!important;
  z-index:20!important;display:block!important;visibility:visible!important;
  padding:7px 10px!important;border-radius:10px!important;
  background:#173d32!important;color:#fff!important;white-space:nowrap!important;
@@ -1497,3 +1497,7 @@
  .nv-finance .nv-spend-chart{grid-template-columns:minmax(0,1fr) 58px!important}
  .nv-finance .nv-ref-spending-page{padding-bottom:calc(220px + env(safe-area-inset-bottom))!important}
 }
+
+/* Keep the chart tooltip at the touch-selected x coordinate */
+.nv-finance .nv-spend-tooltip{left:initial!important;right:initial!important}
+.nv-finance .nf-eyebrow{display:none!important}
