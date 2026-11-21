@@ -1,23 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import "./explore-cleanup.css";
-
-export const metadata: Metadata = {
-  title: "NOVYRA — شبکه اجتماعی و دستیار هوشمند",
-  description: "NOVYRA؛ فضایی برای ارتباط، اشتراک‌گذاری، ویدئو و کمک هوش مصنوعی.",
-  applicationName: "NOVYRA",
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  themeColor: "#0D0907",
-};
-
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <html lang="fa">
-      <body>{children}</body>
-    </html>
-  );
-}
+import "./novyra-luxury.css";
+export const metadata: Metadata = { title: "NOVYRA Finance — هوش مالی و حسابداری", description: "مدیریت شفاف درآمد، هزینه و تصمیم‌های مالی در تجربه‌ای آرام و مینیمال.", applicationName: "NOVYRA Finance" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#f7f6f1" };
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="fa"><body>{children}</body></html>; }
