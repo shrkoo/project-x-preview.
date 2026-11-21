@@ -874,3 +874,11 @@
 .nv-finance .nv-ref-dock button.nv-ref-dock-center .nf-dock-icon{width:40px!important;height:40px!important;margin-top:-15px!important;border:2px solid white!important;border-radius:50%!important;background:conic-gradient(#28a8ca,#69c994,#f0d15d,#e77d9c,#9877d8,#28a8ca)!important;color:white!important;box-shadow:0 4px 12px #719dbb55!important}
 @media(min-width:761px){.nv-finance .nf-shell{max-width:760px!important}.nv-finance .nf-sidebar{display:none!important}}
 @media(max-width:420px){.nv-finance .nf-shell{padding-inline:12px!important}.nv-finance .nv-ref-two-col{grid-template-columns:1fr!important}.nv-finance .nv-ref-highlights{display:grid!important;grid-template-columns:1fr 1fr!important}.nv-finance .nv-ref-highlights h2{grid-column:1/-1!important}}
+
+.nv-finance .nf-page-top.nv-ref-home-hide{display:none!important}
+.nv-finance .nf-page-top.nv-ref-subpage-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;margin:10px 2px 14px!important;padding:0!important}
+.nv-finance .nf-page-top.nv-ref-subpage-head h1{font-size:21px!important;color:#233f50!important;margin:4px 0!important}
+.nv-finance .nf-page-top.nv-ref-subpage-head p{color:#7e96a4!important}
+.nv-finance .nf-page-top.nv-ref-subpage-head .nf-eyebrow{color:#7b9bab!important}
+.nv-finance .nf-page-top.nv-ref-subpage-head .nf-page-actions{display:flex!important;gap:7px!important}
+.nv-finance .nf-page-top.nv-ref-subpage-head .nf-page-actions button{font-size:9px!important;padding:8px 10px!important;border-radius:12px!important}
