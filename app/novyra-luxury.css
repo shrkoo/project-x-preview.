@@ -1062,3 +1062,8 @@
  .nv-finance .nv-ref-category-grid article{flex-basis:78%!important}
  .nv-finance .nv-ref-dock.nf-mobile-dock{bottom:calc(16px + env(safe-area-inset-bottom))!important}
 }
+
+.nv-finance .nv-ref-category-status{display:block!important;margin-top:4px!important;font-size:9px!important;color:#8296a2!important}
+.nv-finance .nv-ref-category.food .nv-ref-category-status{color:#b18a37!important}
+.nv-finance .nv-ref-category.travel .nv-ref-category-status{color:#c45e5e!important}
+.nv-finance .nv-ref-category.shopping .nv-ref-category-status{color:#329b72!important}
