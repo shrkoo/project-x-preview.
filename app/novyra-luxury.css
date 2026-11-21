@@ -1528,3 +1528,87 @@
 
 .nv-finance .nv-spend-tooltip{max-width:calc(100% - 16px)!important;width:max-content!important;white-space:normal!important;overflow-wrap:anywhere!important}
 .nv-finance .nv-goal-card .nv-goal-title .nv-goal-percent-badge{margin-inline-start:0!important}
+
+
+/* NOVYRA requested final corrections — 2026-11-21 */
+.nv-finance,
+.nv-finance .nf-shell,
+.nv-finance .nf-main,
+.nv-finance .nv-ref-spending-page,
+.nv-finance .nv-income-page,
+.nv-finance .nf-settings {
+  padding-bottom: calc(240px + env(safe-area-inset-bottom)) !important;
+}
+.nv-finance .nf-main { overflow: visible !important; }
+.nv-finance .nv-ref-spending-page { min-height: 100dvh !important; overflow: visible !important; }
+.nv-finance .nf-settings { min-height: 100dvh !important; }
+.nv-finance .nv-spend-chart {
+  display: block !important; position: relative !important;
+  width: 100% !important; min-height: 190px !important;
+  padding: 0 !important; overflow: visible !important;
+}
+.nv-finance .nv-spend-chart > svg {
+  display: block !important; width: 100% !important;
+  max-width: none !important; height: 190px !important;
+  margin: 0 !important; touch-action: pan-y !important;
+}
+.nv-finance .nv-spend-chart > .nv-spend-y {
+  position: absolute !important; top: 4px !important;
+  right: 4px !important; left: auto !important; bottom: 8px !important;
+  z-index: 4 !important; display: flex !important;
+  flex-direction: column !important; justify-content: space-between !important;
+  align-items: flex-end !important; width: max-content !important;
+  max-width: 32% !important; padding: 0 !important;
+  background: transparent !important; pointer-events: none !important;
+}
+.nv-finance .nv-spend-chart > .nv-spend-y span {
+  direction: rtl !important; text-align: right !important;
+  white-space: nowrap !important; background: #ffffffd9 !important;
+  border-radius: 4px !important; padding: 1px 3px !important;
+}
+.nv-finance .nv-spend-axis {
+  display: flex !important; justify-content: space-between !important;
+  width: 100% !important; margin: 0 !important; padding: 0 !important;
+}
+.nv-finance .nv-goal-card .nv-goal-title {
+  position: relative !important; display: flex !important;
+  align-items: center !important; min-height: 38px !important;
+  padding: 0 42px 0 0 !important; direction: rtl !important;
+}
+.nv-finance .nv-goal-card .nv-goal-title .nv-goal-arrow {
+  position: absolute !important; right: 0 !important; left: auto !important;
+  top: 2px !important;
+}
+.nv-finance .nv-goal-card .nv-goal-title .nv-goal-percent-badge {
+  position: absolute !important; right: 42px !important; left: auto !important;
+  top: 2px !important; margin: 0 !important;
+}
+.nv-finance .nv-goal-card .nv-goal-amount-row {
+  display: block !important; width: 100% !important;
+  max-width: 100% !important; margin-top: 12px !important;
+  white-space: normal !important; overflow: visible !important;
+  text-align: right !important;
+}
+.nv-finance .nv-goal-card:not(.nv-goal-travel) .nv-goal-track { background: #e5f4eb !important; }
+.nv-finance .nv-goal-card:not(.nv-goal-travel) .nv-goal-track > i { background: linear-gradient(90deg,#a8e5c4,#36a879) !important; }
+.nv-finance .nv-goal-card.nv-goal-travel .nv-goal-track { background: #fff2d8 !important; }
+.nv-finance .nv-goal-card.nv-goal-travel .nv-goal-track > i { background: linear-gradient(90deg,#f9e4a8,#e6b64c) !important; }
+.nv-finance .nf-page-top,
+.nv-finance .nf-page-top *,
+.nv-finance .nv-ref-subpage-head,
+.nv-finance .nv-spending-page-title,
+.nv-finance .nv-income-page-title,
+.nv-finance .nv-settings-page-title { display: none !important; }
+.nv-finance .nv-ref-insight .nv-insight-rtl {
+  direction: rtl !important; text-align: right !important;
+  unicode-bidi: isolate !important;
+}
+@media (max-width:760px) {
+  .nv-finance, .nv-finance .nf-shell, .nv-finance .nf-main,
+  .nv-finance .nv-ref-spending-page, .nv-finance .nv-income-page,
+  .nv-finance .nf-settings {
+    padding-bottom: calc(240px + env(safe-area-inset-bottom)) !important;
+  }
+  .nv-finance .nv-spend-chart { width: 100% !important; }
+  .nv-finance .nv-spend-axis { width: 100% !important; margin: 0 !important; }
+}
