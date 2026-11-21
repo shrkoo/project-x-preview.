@@ -1507,7 +1507,7 @@
 .nv-finance .nv-spend-chart>svg{display:block!important;width:100%!important;height:190px!important;margin:0!important}
 .nv-finance .nv-spend-chart>.nv-spend-y{position:absolute!important;top:4px!important;right:5px!important;left:auto!important;bottom:8px!important;z-index:3!important;display:flex!important;align-items:flex-end!important;justify-content:space-between!important;width:auto!important;max-width:27%!important;padding:0!important;background:transparent!important;pointer-events:none!important}
 .nv-finance .nv-spend-chart>.nv-spend-y span{font-size:9px!important;text-align:right!important;white-space:nowrap!important;background:#ffffffc9!important;border-radius:4px!important;padding:1px 3px!important}
-.nv-finance .nv-spend-tooltip{left:clamp(8px, var(--tooltip-x, 50%), calc(100% - 8px))!important;max-width:calc(100% - 16px)!important;width:max-content!important;white-space:normal!important;overflow-wrap:anywhere!important;transform:translateX(-50%)!important}
+.nv-finance .nv-spend-tooltip{max-width:calc(100% - 16px)!important;width:max-content!important;white-space:normal!important;overflow-wrap:anywhere!important}
 .nv-finance .nv-spend-axis{width:100%!important;margin:0!important;padding:0 2px!important;display:flex!important;justify-content:space-between!important}
 .nv-finance .nv-goal-card .nv-goal-title{position:relative!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;padding:0 42px 0 0!important;min-height:38px!important}
 .nv-finance .nv-goal-card .nv-goal-title .nv-goal-percent-badge{position:static!important;flex:0 0 auto!important;margin-inline-start:auto!important}
@@ -1526,5 +1526,5 @@
  .nv-finance .nv-spend-axis{margin:0!important;width:100%!important}
 }
 
-.nv-finance .nv-spend-tooltip{left:auto!important;max-width:calc(100% - 16px)!important;width:max-content!important;white-space:normal!important;overflow-wrap:anywhere!important}
+.nv-finance .nv-spend-tooltip{max-width:calc(100% - 16px)!important;width:max-content!important;white-space:normal!important;overflow-wrap:anywhere!important}
 .nv-finance .nv-goal-card .nv-goal-title .nv-goal-percent-badge{margin-inline-start:0!important}
