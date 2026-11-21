@@ -1132,3 +1132,9 @@
 .nv-finance .nv-spend-y{min-width:72px!important}
 .nv-finance .nv-spend-y span{font-variant-numeric:normal!important}
 .nv-finance .nf-settings>h2{display:none!important}
+
+.nv-finance .nv-ref-actions>button:not(.nv-ref-orb){min-height:56px!important;height:auto!important;flex-direction:row!important;gap:9px!important;white-space:normal!important;text-align:start!important}
+.nv-finance .nv-ref-actions>button:not(.nv-ref-orb)>span{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:3px!important;line-height:1.25!important}
+.nv-finance .nv-ref-actions>button:not(.nv-ref-orb)>span b{font-size:11px!important;font-weight:700!important}
+.nv-finance .nv-ref-actions>button:not(.nv-ref-orb)>span small{display:block!important;font-size:9px!important;color:#8497a8!important;font-weight:400!important}
+.nv-finance .nv-ref-wave i{flex:1 1 2px!important;width:auto!important;min-width:2px!important;max-width:3px!important}
