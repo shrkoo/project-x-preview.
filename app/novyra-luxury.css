@@ -1881,3 +1881,5 @@ body{position:relative!important}
     flex:0 0 31%!important;width:31%!important;min-width:31%!important;max-width:31%!important;
   }
 }
+
+.nv-finance .nv-ref-category-grid .nv-ref-category.other .nv-ref-category-status::after{content:none!important}
