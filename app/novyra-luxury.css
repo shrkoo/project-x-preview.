@@ -1612,3 +1612,130 @@
   .nv-finance .nv-spend-chart { width: 100% !important; }
   .nv-finance .nv-spend-axis { width: 100% !important; margin: 0 !important; }
 }
+
+
+/* NOVYRA exact four-point correction — 2026-11-21 */
+@media (max-width:760px) {
+  .nv-finance .nf-main { padding-top: 8px !important; }
+}
+.nv-finance,
+.nv-finance .nf-shell,
+.nv-finance .nf-main,
+.nv-finance .nv-ref-spending-page,
+.nv-finance .nv-income-page,
+.nv-finance .nf-settings {
+  padding-bottom: calc(180px + env(safe-area-inset-bottom)) !important;
+}
+.nv-finance .nf-main { overflow: visible !important; }
+.nv-finance .nv-ref-spending-page,
+.nv-finance .nv-income-page,
+.nv-finance .nf-settings { min-height: 0 !important; }
+
+/* Goal title: full-width RTL title, badge and arrow remain in the left side. */
+.nv-finance .nv-goal-card .nv-goal-title {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 9px !important;
+  direction: rtl !important;
+  position: relative !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+.nv-finance .nv-goal-card .nv-goal-title > b {
+  display: block !important;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+.nv-finance .nv-goal-card .nv-goal-title .nv-goal-percent-badge {
+  position: static !important;
+  inset: auto !important;
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+.nv-finance .nv-goal-card .nv-goal-title .nv-goal-arrow {
+  position: static !important;
+  inset: auto !important;
+  flex: 0 0 32px !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+}
+
+/* Keep the Y-axis labels in a dedicated right-hand gutter, never over the plot. */
+.nv-finance .nv-spend-chart {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 64px !important;
+  grid-template-rows: 190px !important;
+  column-gap: 8px !important;
+  align-items: stretch !important;
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 190px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+.nv-finance .nv-spend-chart > svg {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 190px !important;
+  margin: 0 !important;
+  touch-action: pan-y !important;
+}
+.nv-finance .nv-spend-chart > .nv-spend-y {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  position: static !important;
+  inset: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  justify-content: space-between !important;
+  width: 64px !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  padding: 3px 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+  overflow: visible !important;
+}
+.nv-finance .nv-spend-chart > .nv-spend-y span {
+  display: block !important;
+  direction: rtl !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+.nv-finance .nv-spend-tooltip {
+  position: absolute !important;
+  top: 8px !important;
+  z-index: 30 !important;
+  display: block !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+}
+.nv-finance .nv-spend-axis {
+  width: calc(100% - 72px) !important;
+  margin: 0 72px 0 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+}
