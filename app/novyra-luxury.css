@@ -1067,3 +1067,39 @@
 .nv-finance .nv-ref-category.food .nv-ref-category-status{color:#b18a37!important}
 .nv-finance .nv-ref-category.travel .nv-ref-category-status{color:#c45e5e!important}
 .nv-finance .nv-ref-category.shopping .nv-ref-category-status{color:#329b72!important}
+
+
+/* Reference-match fixes: safe-area, chart, goals, categories and quick actions */
+@media(max-width:760px){
+  .nv-finance{padding-bottom:calc(140px + env(safe-area-inset-bottom))!important}
+  .nv-finance .nf-main{padding-bottom:calc(140px + env(safe-area-inset-bottom))!important}
+  .nv-finance .nf-footer{padding-bottom:calc(150px + env(safe-area-inset-bottom))!important}
+  .nv-finance .nv-ref-category-grid{display:flex!important;gap:8px!important;padding-inline:2px!important}
+  .nv-finance .nv-ref-category-grid article{flex:0 0 31%!important;min-width:110px!important;width:31%!important;max-width:31%!important;min-height:142px!important;padding:13px 10px!important;border:0!important;scroll-snap-align:start!important}
+  .nv-finance .nv-ref-wave{height:38px!important;gap:2px!important;margin:12px 0 8px!important}
+  .nv-finance .nv-ref-wave i{flex:0 0 2px!important;width:2px!important;min-width:2px!important;max-width:2px!important;border-radius:2px!important;opacity:.92!important}
+  .nv-finance .nv-ref-category.food,.nv-finance .nv-ref-category.travel,.nv-finance .nv-ref-category.shopping{border:0!important}
+}
+.nv-finance .nv-ref-cheer{display:inline-flex!important;margin:8px 0 0 8px!important;color:#24966b!important;font-size:11px!important;font-weight:600!important;vertical-align:middle!important}
+.nv-finance .nv-spend-chart{position:relative!important;touch-action:pan-y!important}
+.nv-finance .nv-spend-chart svg{cursor:crosshair!important}
+.nv-finance .nv-spend-tooltip{position:absolute!important;top:6px!important;inset-inline-start:12px!important;z-index:3!important;padding:7px 10px!important;border-radius:10px!important;background:#173d32!important;color:#fff!important;font-size:10px!important;box-shadow:0 5px 14px #163c3228!important;pointer-events:none!important}
+.nv-finance .nv-spend-axis{display:flex!important;justify-content:space-between!important;margin:7px 0 0 34px!important;padding:0 1px!important;direction:ltr!important}
+.nv-finance .nv-spend-y{min-width:72px!important;white-space:nowrap!important}
+.nv-finance .nv-spend-quick button{height:62px!important;min-height:62px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;padding:12px 10px!important;font-size:clamp(9px,2.5vw,11px)!important;gap:5px!important}
+.nv-finance .nv-spend-quick button svg{flex:0 0 14px!important;width:14px!important}
+.nv-finance .nv-income-sources{display:grid!important;grid-template-columns:1fr 1fr!important;gap:0!important;border-top:1px solid #e6eff8!important;margin-top:10px!important;padding:0!important}
+.nv-finance .nv-income-sources section{display:flex!important;flex-direction:column!important;gap:8px!important;padding:12px 10px!important;min-width:0!important}
+.nv-finance .nv-income-sources section+section{border-inline-start:1px solid #dce8f2!important}
+.nv-finance .nv-income-sources span{font-size:12px!important;color:#56728f!important}
+.nv-finance .nv-income-sources b{font-size:14px!important;color:#294e70!important;overflow-wrap:anywhere!important}
+.nv-finance .nv-goal-card{padding:18px!important;padding-top:17px!important}
+.nv-finance .nv-goal-title{justify-content:space-between!important;gap:8px!important;padding-inline-start:48px!important;min-height:34px!important}
+.nv-finance .nv-goal-title span{white-space:nowrap!important}
+.nv-finance .nv-goal-card .nv-goal-arrow{top:16px!important;left:15px!important;right:auto!important;transform:none!important;width:32px!important;height:32px!important}
+.nv-finance .nv-goal-card .nv-goal-track{direction:rtl!important;position:relative!important;width:100%!important;margin-top:10px!important}
+.nv-finance .nv-goal-card .nv-goal-track i{position:absolute!important;right:0!important;left:auto!important;top:0!important;height:100%!important}
+.nv-finance .nv-goal-card p{margin:8px 0 6px!important}
+.nv-finance .nv-goal-meta{margin-top:9px!important}
+.nv-finance .nf-page-actions{display:none!important}
+.nv-finance[data-theme="light"] .nf-page-actions{display:none!important}
