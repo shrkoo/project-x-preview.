@@ -1354,7 +1354,7 @@
 }
 .nv-finance .nv-spend-y span{font-size:9px!important;line-height:1.2!important}
 .nv-finance .nv-spend-tooltip{
- position:absolute!important;left:0;top:7px!important;z-index:9!important;
+ position:absolute!important;top:7px!important;z-index:9!important;
 }
 .nv-finance .nv-spend-axis{
  display:flex!important;justify-content:space-between!important;
@@ -1498,6 +1498,4 @@
  .nv-finance .nv-ref-spending-page{padding-bottom:calc(220px + env(safe-area-inset-bottom))!important}
 }
 
-/* Keep the chart tooltip at the touch-selected x coordinate */
-.nv-finance .nv-spend-tooltip{left:initial!important;right:initial!important}
 .nv-finance .nf-eyebrow{display:none!important}
