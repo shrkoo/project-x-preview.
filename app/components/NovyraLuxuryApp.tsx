@@ -81,11 +81,11 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
       travel:{total:653120,status:"بیش از سقف",series:[2,4,3,6,5,8,6,9,7,11,8,12,9,14,10,13,11,16,12,15,13,18,14,17,15,19,16,20]},
       shopping:{total:185430,status:"عادی",series:[3,4,3,5,4,5,4,6,5,6,4,7,5,6,5,7,6,8,6,7,5,8,6,7,6,9,7,8]}
     };
-    const demo=demoByTone[c.tone];const total=demo.total;const status=demo.status;const chartSeries=demo.series;const wavePath=smoothWavePath(chartSeries);const waveArea=wavePath.concat(" L 98 30 L 2 30 Z");
-   return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category "+c.tone}>
+    const demo=demoByTone[c.tone];const chartSeries=demo.series;const chartMax=Math.max(...chartSeries,1);
+   return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category nv-ref-chart-card "+c.tone}>
     <div className="nv-ref-category-top"><small>{c.name}</small></div>
-    <div className={"nv-ref-wave nv-ref-area "+(chartSeries.length===0?"is-empty":"")} role="img" aria-label={"روند هزینه "+c.name}><svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-area-fill" d={waveArea}/><path className="nv-ref-area-line" d={wavePath}/></svg></div>
-    <b>{dashboardCash(total)}</b><span className="nv-ref-category-status">{status}</span>
+    <div className="nv-ref-wave nv-ref-bars nv-ref-category-chart" role="img" aria-label={"نمودار روند هزینه "+c.name}><svg viewBox="0 0 100 46" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-chart-baseline" d="M0 44.5H100"/>{chartSeries.map((value,i)=>{const h=5+(value/chartMax)*34;return <rect key={i} x={i*3.55+0.45} y={44-h} width="2.15" height={h} rx="1.05"/>})}</svg></div>
+    <span className="nv-ref-chart-caption">روند هزینه در ماه جاری</span>
    </article>
   })}
  </div>
