@@ -541,3 +541,47 @@
   .nv-finance[lang="fa"] .nv-ref-insight{margin-left:24px!important;margin-right:24px!important}
   .nv-finance[lang="fa"] .nv-ref-section{margin-left:24px!important;margin-right:24px!important}
 }
+
+
+/* NOVYRA: replace monthly category amount/status tiles with clear mini charts */
+.nv-finance[lang="fa"] .nv-ref-category-grid{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:10px!important;overflow:visible!important;direction:rtl!important;padding:2px 0 8px!important;
+}
+.nv-finance[lang="fa"] .nv-ref-category.nv-ref-chart-card{
+ min-width:0!important;min-height:154px!important;height:154px!important;
+ display:flex!important;flex-direction:column!important;justify-content:flex-start!important;
+ gap:8px!important;padding:13px 11px 10px!important;border:1px solid #e8eef2!important;
+ border-radius:17px!important;background:linear-gradient(180deg,#fff 0%,#f8fbfd 100%)!important;
+}
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-top{flex:0 0 auto!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-top small{
+ color:#536f80!important;font-size:11px!important;font-weight:800!important
+}
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart{
+ display:block!important;flex:1 1 auto!important;width:100%!important;height:88px!important;
+ min-height:88px!important;margin:0!important;padding:0!important;background:transparent!important;
+ border:0!important;overflow:hidden!important
+}
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart svg{
+ display:block!important;width:100%!important;height:100%!important;min-height:0!important
+}
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart rect{
+ fill:currentColor!important;opacity:.78!important
+}
+.nv-finance[lang="fa"] .nv-ref-chart-card.food .nv-ref-category-chart{color:#d9a91e!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card.travel .nv-ref-category-chart{color:#df6861!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card.shopping .nv-ref-category-chart{color:#39a879!important}
+.nv-finance[lang="fa"] .nv-ref-chart-baseline{stroke:#dce6eb!important;stroke-width:.7!important;fill:none!important}
+.nv-finance[lang="fa"] .nv-ref-chart-caption{
+ display:block!important;color:#91a0a9!important;font-size:9px!important;font-weight:600!important;
+ line-height:1.4!important;text-align:right!important;white-space:nowrap!important
+}
+.nv-finance[lang="fa"] .nv-ref-chart-card>b,
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-status{display:none!important}
+@media(max-width:380px){
+ .nv-finance[lang="fa"] .nv-ref-category-grid{gap:7px!important}
+ .nv-finance[lang="fa"] .nv-ref-category.nv-ref-chart-card{padding:11px 8px 9px!important;min-height:142px!important;height:142px!important}
+ .nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart{height:75px!important;min-height:75px!important}
+ .nv-finance[lang="fa"] .nv-ref-chart-caption{font-size:8px!important}
+}
