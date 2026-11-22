@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { apiRequest, setSession, createPasswordSalt, derivePasswordHash } from "../lib/api";
+import { API_BASE, apiRequest, setSession, createPasswordSalt, derivePasswordHash } from "../lib/api";
 
 type Language = "en" | "fa" | "ar" | "ku";
 type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string };
@@ -272,7 +272,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     finally { setBusy(false); }
   }
   function socialUnavailable() {
-    window.location.assign("https://project-x-api.projectx-novyratam.workers.dev/auth/google/start");
+    window.location.assign(`${API_BASE}/auth/google/start`);
   }
   function appleUnavailable() {
     setNotice(language === "en" ? "Apple sign-in is not configured yet." : "ورود با Apple هنوز پیکربندی نشده است.");
