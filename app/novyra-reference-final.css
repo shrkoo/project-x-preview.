@@ -66,3 +66,38 @@
   .nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars{height:18px!important;gap:2.5px!important}
   .nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars i{max-height:10px!important}
 }
+
+
+/* Monthly Spending Level — soft organic area-wave mini charts */
+.nv-finance[lang="en"] .nv-ref-wave.nv-ref-area{
+  display:block!important;
+  width:100%!important;
+  height:23px!important;
+  margin:5px 0 7px!important;
+  padding:0!important;
+  overflow:visible!important;
+  color:currentColor!important;
+}
+.nv-finance[lang="en"] .nv-ref-wave.nv-ref-area svg{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  overflow:visible!important;
+}
+.nv-finance[lang="en"] .nv-ref-wave.nv-ref-area .nv-ref-area-fill{
+  fill:currentColor!important;
+  opacity:.13!important;
+  stroke:none!important;
+}
+.nv-finance[lang="en"] .nv-ref-wave.nv-ref-area .nv-ref-area-line{
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.8!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+  opacity:.88!important;
+}
+@media(max-width:380px){
+  .nv-finance[lang="en"] .nv-ref-wave.nv-ref-area{height:21px!important;margin:5px 0 6px!important}
+  .nv-finance[lang="en"] .nv-ref-wave.nv-ref-area .nv-ref-area-line{stroke-width:2!important}
+}
