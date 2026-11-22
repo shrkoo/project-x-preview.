@@ -44,3 +44,25 @@
   .nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars{height:20px!important}
   .nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars i{max-height:14px!important}
 }
+
+
+/* Monthly Spending Level — airy, organic mini bars */
+.nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars{
+  height:19px!important;
+  gap:3px!important;
+  margin:5px 0 7px!important;
+  align-items:flex-end!important;
+  justify-content:space-between!important;
+}
+.nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars i{
+  flex:1 1 0!important;
+  min-width:0!important;
+  max-width:8px!important;
+  max-height:11px!important;
+  border-radius:5px!important;
+  opacity:.82!important;
+}
+@media(max-width:380px){
+  .nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars{height:18px!important;gap:2.5px!important}
+  .nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars i{max-height:10px!important}
+}
