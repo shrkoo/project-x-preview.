@@ -334,3 +334,9 @@
  .nv-finance[lang="en"] .nv-ref-category-grid{gap:7px!important}
  .nv-finance[lang="en"] .nv-ref-category{padding:10px 7px!important}
 }
+
+/* Dashboard mini charts: responsive, clean SVG sparklines */
+.nv-finance .nv-ref-wave.nv-ref-sparkline{display:block!important;height:48px!important;margin:7px 0!important;overflow:hidden!important;opacity:1!important;color:#b69a64!important}
+.nv-finance .nv-ref-category.travel .nv-ref-wave.nv-ref-sparkline{color:#7f9b84!important}
+.nv-finance .nv-ref-category.shopping .nv-ref-wave.nv-ref-sparkline{color:#b9876e!important}
+.nv-finance .nv-ref-wave.nv-ref-sparkline svg{display:block!important;width:100%!important;height:100%!important;overflow:visible!important}
