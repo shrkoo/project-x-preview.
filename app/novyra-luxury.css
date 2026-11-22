@@ -2024,3 +2024,49 @@ body{position:relative!important}
 .nv-finance .nv-ref-insight{cursor:pointer!important}
 .nv-finance .nv-ref-insight:active{transform:scale(.995)!important}
 .nv-finance .nv-ref-cheer{display:inline-flex!important;align-items:center!important;vertical-align:middle!important}
+
+
+/* NOVYRA settings, budgets and honest empty-state refinement */
+.nv-finance .nf-page-top.nv-ref-subpage-head{margin:0 0 12px!important;padding:0!important;min-height:0!important}
+.nv-finance .nf-main{padding-top:8px!important;padding-bottom:calc(180px + env(safe-area-inset-bottom))!important}
+.nv-finance .nf-settings{display:grid!important;gap:14px!important;padding:0 0 calc(180px + env(safe-area-inset-bottom))!important;background:transparent!important;border:0!important;box-shadow:none!important}
+.nv-finance .nf-setting-section{display:grid;gap:12px;padding:18px;border:1px solid rgba(255,255,255,.68);border-radius:18px;background:rgba(255,255,255,.68);box-shadow:0 10px 28px rgba(35,55,45,.055);backdrop-filter:blur(16px)}
+.nv-finance .nf-setting-section h3{margin:0 0 2px;font-size:14px;font-weight:800;color:var(--ink)}
+.nv-finance .nf-setting-section p,.nv-finance .nf-setting-section small,.nv-finance .nf-setting-note{font-size:10px;line-height:1.9;color:var(--muted);margin:0}
+.nv-finance .nf-setting-section>label{display:grid;gap:6px;font-size:11px;color:var(--ink)}
+.nv-finance .nf-setting-section input:not([type=checkbox]),.nv-finance .nf-setting-section select{width:100%;min-width:0;min-height:42px;padding:8px 11px;border:1px solid var(--line);border-radius:10px;background:#fffefa;color:var(--ink);font:inherit}
+.nv-finance .nf-setting-section input[readonly]{opacity:.72}
+.nv-finance .nf-setting-actions{display:flex;flex-wrap:wrap;gap:9px}
+.nv-finance .nf-setting-actions button,.nv-finance .nf-category-add button{min-height:42px;padding:8px 13px;border-radius:10px;font-size:10px}
+.nv-finance .nf-setting-section .nf-primary,.nv-finance .nf-category-add button{border:1px solid var(--g);background:var(--g);color:#fff}
+.nv-finance .nf-setting-section .nf-quiet{border:1px solid var(--line);background:#fffefa;color:var(--ink)}
+.nv-finance .nf-setting-section .nf-danger{border:1px solid #e7b9b3;background:#fff5f3;color:#a8483f}
+.nv-finance .nf-plan-card{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:13px;background:linear-gradient(120deg,#f1f7f2,#fffaf1);border:1px solid #dce9df}
+.nv-finance .nf-plan-card div{display:grid;gap:4px}
+.nv-finance .nf-plan-card small,.nv-finance .nf-plan-card span{font-size:10px;color:#74877d}
+.nv-finance .nf-plan-card b{font-size:19px;color:#285f48}
+.nv-finance .nf-plan-card strong{font-size:12px;letter-spacing:1px;color:#438365}
+.nv-finance .nf-switch-row{display:flex!important;align-items:center;justify-content:space-between;gap:12px}
+.nv-finance .nf-switch-row input{width:20px;height:20px;accent-color:#388b68}
+.nv-finance .nf-category-add{display:flex;gap:8px}
+.nv-finance .nf-category-add input{flex:1;min-width:0}
+.nv-finance .nf-category-list{display:flex;flex-wrap:wrap;gap:8px}
+.nv-finance .nf-category-list>div{display:flex;align-items:center;gap:7px;padding:5px 8px 5px 5px;border:1px solid var(--line);border-radius:30px;background:#fffefa;font-size:10px}
+.nv-finance .nf-category-list button{width:28px;height:28px;min-height:28px;border:0;border-radius:50%;background:#f8e8e5;color:#a8483f;font-size:17px}
+.nv-finance .nf-file-label input{padding:7px!important}
+.nv-finance .nf-settings .nf-logout{min-height:48px;margin:0 0 12px!important}
+.nv-finance .nv-spend-budget{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:#f2f7f3;color:#47715b;font-size:10px;text-align:right}
+.nv-finance .nv-spend-chart>svg{width:100%!important;flex:1 1 0!important}
+.nv-finance .nv-spend-quick{align-items:stretch!important;gap:9px!important}
+.nv-finance .nv-spend-quick button{min-height:70px!important;height:70px!important;padding:11px 12px!important;border-radius:13px!important}
+.nv-finance .nv-spend-quick button span{display:grid;gap:4px;min-width:0}
+.nv-finance .nv-spend-quick button b{font-size:10px!important;white-space:nowrap}
+.nv-finance .nv-spend-quick button small{font-size:9px!important;white-space:nowrap}
+.nv-finance .nv-ref-category-status{font-size:8px!important;white-space:nowrap!important}
+.nv-finance[data-theme="dark"] .nf-setting-section{background:rgba(18,23,29,.92);border-color:#292f36}
+.nv-finance[data-theme="dark"] .nf-setting-section input:not([type=checkbox]),.nv-finance[data-theme="dark"] .nf-setting-section select,.nv-finance[data-theme="dark"] .nf-category-list>div,.nv-finance[data-theme="dark"] .nf-setting-section .nf-quiet{background:#12171d;border-color:#2b3138;color:#e9e5dc}
+.nv-finance[data-theme="dark"] .nf-plan-card{background:#17231d;border-color:#2c4538}
+.nv-finance[data-theme="dark"] .nf-plan-card b,.nv-finance[data-theme="dark"] .nf-plan-card strong{color:#a5d8bb}
+.nv-finance[data-theme="dark"] .nv-spend-budget{background:#17231d;color:#a5d8bb}
+@media(prefers-color-scheme:dark){.nv-finance[data-theme="auto"]{--paper:#090b0e;--panel:#11151a;--ink:#f1eee7;--muted:#92959a;--line:#272c32;--g:#d1b47d;color-scheme:dark}.nv-finance[data-theme="auto"] .nf-setting-section{background:rgba(18,23,29,.92);border-color:#292f36}.nv-finance[data-theme="auto"] .nf-setting-section input:not([type=checkbox]),.nv-finance[data-theme="auto"] .nf-setting-section select{background:#12171d;border-color:#2b3138;color:#e9e5dc}}
+@media(max-width:760px){.nv-finance .nf-settings{padding:0 0 calc(180px + env(safe-area-inset-bottom))!important}.nv-finance .nf-setting-section{padding:15px}.nv-finance .nv-spend-quick button{height:68px!important;min-height:68px!important}}
