@@ -84,7 +84,7 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
     const demo=demoByTone[c.tone];const total=demo.total;const status=demo.status;const chartSeries=demo.series;const wavePath=smoothWavePath(chartSeries);const waveArea=wavePath.concat(" L 98 30 L 2 30 Z");
    return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category "+c.tone}>
     <div className="nv-ref-category-top"><small>{c.name}</small></div>
-    <div className={"nv-ref-wave nv-ref-area "+(!hasCategoryData?"is-empty":"")} role="img" aria-label={"روند هزینه "+c.name}><svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-area-fill" d={waveArea}/><path className="nv-ref-area-line" d={wavePath}/></svg></div>
+    <div className={"nv-ref-wave nv-ref-area "+(chartSeries.length===0?"is-empty":"")} role="img" aria-label={"روند هزینه "+c.name}><svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-area-fill" d={waveArea}/><path className="nv-ref-area-line" d={wavePath}/></svg></div>
     <b>{dashboardCash(total)}</b><span className="nv-ref-category-status">{status}</span>
    </article>
   })}
