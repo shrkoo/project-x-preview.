@@ -56,9 +56,9 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
   <div>
    <small>موجودی کل</small>
    <strong>{showBalance?dashboardCash(balance):"••••••"}</strong>
-   <div className="nv-ref-net-row"><span className="nv-ref-net-chip">خالص این ماه: {dashboardCash(mi-me)}</span><span className="nv-ref-cheer-chip">آفرین! این ماه پس‌انداز کرده‌اید.</span></div>
+   <div className="nv-ref-net-row"><span className="nv-ref-net-chip">خالص این ماه: {dashboardCash(mi-me)}</span><span className="nv-ref-cheer-chip">{mi-me>0?"آفرین! این ماه پس‌انداز کرده‌اید.":"پس‌انداز این ماه هنوز ثبت نشده است."}</span></div>
   </div>
-  <button className="nv-ref-eye" onClick={()=>setShowBalance(v=>!v)} aria-label={showBalance?"مخفی کردن موجودی":"نمایش موجودی"}>{showBalance?<EyeOff size={19}/>:<Eye size={19}/>}</button>
+  <button className="nv-ref-eye" onClick={()=>setShowBalance(v=>!v)} aria-label={showBalance?"مخفی کردن موجودی":"نمایش موجودی"}>{showBalance?<Eye size={19}/>:<EyeOff size={19}/>}</button>
  </div>
  <div className="nv-ref-actions">
   <button className="nv-ref-action-expense" onClick={()=>{setForm(v=>({...v,kind:"expense"}));setShow(true)}}><ArrowUpRight size={17}/><span>ثبت هزینه</span></button>
@@ -78,10 +78,10 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
    const categoryItems=monthItems.filter(x=>x.kind==="expense"&&c.keys.includes(x.category));
    const total=categoryItems.reduce((n,x)=>n+x.amount,0);
    const limit=Number(prefs.categoryBudgets[c.name]||0);
-   const status=limit>0&&total>limit?"بیش از سقف":limit>0&&total>=limit*.8?"متوسط":total>0?"عادی":"عادی";
+   const status=limit>0&&total>limit?"بیش از سقف":limit>0&&total>=limit*.8?"متوسط":total>0?"عادی":"بدون داده";
    const chartDayCount=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate();
    const bars=Array.from({length:28},(_,i)=>{const firstDay=Math.floor(i*chartDayCount/28)+1;const lastDay=Math.floor((i+1)*chartDayCount/28);return categoryItems.filter(x=>{const day=Number(x.date.slice(8,10));return day>=firstDay&&day<=lastDay}).reduce((n,x)=>n+x.amount,0)});
-   const wavePath=smoothWavePath(bars);
+   const hasCategoryData=bars.some(v=>v>0);const wavePath=hasCategoryData?smoothWavePath(bars):smoothWavePath([1,3,6,9,7,4,2,5,8,6,3,1,4,7,5,2,4,8,6,3,1,5,7,4,2,6,8,5]);
    return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category "+c.tone}>
     <div className="nv-ref-category-top"><small>{c.name}</small></div>
     <div className="nv-ref-wave nv-ref-sparkline nv-ref-area" role="img" aria-label={"روند هزینه "+c.name}><svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-area-fill" d={wavePath+" L 98 29 L 2 29 Z"}/><path className="nv-ref-area-line" d={wavePath}/></svg></div>
