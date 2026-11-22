@@ -2017,3 +2017,10 @@ body{position:relative!important}
   .nv-finance .nv-spend-axis{width:calc(100% - 56px)!important;margin-right:56px!important}
   .nv-finance .nf-settings .nf-logout{margin-bottom:10px!important;min-height:48px!important}
 }
+
+/* Ensure every control meets the requested touch target. */
+.nv-finance button{min-height:44px!important}
+.nv-finance .nf-mobile-dock button{min-height:44px!important}
+.nv-finance .nv-ref-insight{cursor:pointer!important}
+.nv-finance .nv-ref-insight:active{transform:scale(.995)!important}
+.nv-finance .nv-ref-cheer{display:inline-flex!important;align-items:center!important;vertical-align:middle!important}
