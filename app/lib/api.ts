@@ -23,10 +23,34 @@ export async function derivePasswordHash(password: string, salt: string) {
 export async function apiRequest<T = any>(path: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem("projectx-token");
   const headers = new Headers(options.headers || {});
-  headers.set("Content-Type", "application/json");
+  if (!(options.body instanceof FormData)) headers.set("Content-Type", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
   const response = await fetch(`${API_BASE}${path}`, { ...options, headers, cache: "no-store" });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data?.error || "ارتباط با سرور برقرار نشد.");
   return data as T;
+}
+
+
+export async function apiUpload<T = any>(path: string, formData: FormData, onProgress?: (percent: number) => void): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `${API_BASE}${path}`);
+    const token = localStorage.getItem("projectx-token");
+    if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    xhr.upload.onprogress = event => {
+      if (event.lengthComputable && onProgress) onProgress(Math.min(99, Math.round(event.loaded / event.total * 100)));
+    };
+    xhr.onload = () => {
+      let data: any = {};
+      try { data = JSON.parse(xhr.responseText || "{}"); } catch { /* handled below */ }
+      if (xhr.status >= 200 && xhr.status < 300) {
+        if (onProgress) onProgress(100);
+        resolve(data as T);
+      } else reject(new Error(data?.error || "بارگذاری فایل ناموفق بود."));
+    };
+    xhr.onerror = () => reject(new Error("ارتباط با سرور هنگام بارگذاری قطع شد."));
+    xhr.onabort = () => reject(new Error("بارگذاری لغو شد."));
+    xhr.send(formData);
+  });
 }
