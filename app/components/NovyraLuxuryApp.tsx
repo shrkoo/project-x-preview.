@@ -81,10 +81,10 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
    const status=limit>0&&total>limit?"بیش از سقف":limit>0&&total>=limit*.8?"متوسط":total>0?"عادی":"بدون داده";
    const chartDayCount=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate();
    const bars=Array.from({length:28},(_,i)=>{const firstDay=Math.floor(i*chartDayCount/28)+1;const lastDay=Math.floor((i+1)*chartDayCount/28);return categoryItems.filter(x=>{const day=Number(x.date.slice(8,10));return day>=firstDay&&day<=lastDay}).reduce((n,x)=>n+x.amount,0)});
-   const hasCategoryData=bars.some(v=>v>0);const chartBars=hasCategoryData?bars:[2,3,2,4,3,2,5,3,4,2,3,5,2,4,3,2,4,3,5,2,3,4,2,3,4,2,3,2];const chartMax=Math.max(...chartBars,1);
+   const hasCategoryData=bars.some(v=>v>0);const chartSeries=hasCategoryData?bars:[3,5,4,7,6,4,8,5,9,6,4,7,5,10,8,6,9,5,7,11,8,6,9,5,7,10,6,8];const wavePath=smoothWavePath(chartSeries);const waveArea=wavePath?wavePath.replace(/^M /,"M ").concat(" L 98 30 L 2 30 Z"):"";
    return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category "+c.tone}>
     <div className="nv-ref-category-top"><small>{c.name}</small></div>
-    <div className={"nv-ref-wave nv-ref-bars "+(!hasCategoryData?"is-empty":"")} role="img" aria-label={"روند هزینه "+c.name}><svg viewBox="0 0 112 42" preserveAspectRatio="none" aria-hidden="true">{chartBars.map((v,i)=><rect key={i} x={i*4+1} y={42-Math.max(4,(v/chartMax)*37)} width="2.1" height={Math.max(4,(v/chartMax)*37)} rx="1.05" />)}</svg></div>
+    <div className={"nv-ref-wave nv-ref-area "+(!hasCategoryData?"is-empty":"")} role="img" aria-label={"روند هزینه "+c.name}><svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-area-fill" d={waveArea}/><path className="nv-ref-area-line" d={wavePath}/></svg></div>
     <b>{dashboardCash(total)}</b><span className="nv-ref-category-status">{status}</span>
    </article>
   })}
