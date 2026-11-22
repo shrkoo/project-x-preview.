@@ -330,3 +330,56 @@
  .nv-finance[lang="fa"] .nv-ref-category{min-height:139px!important;padding:9px 7px!important}
  .nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-bars{height:42px!important;min-height:42px!important;flex-basis:42px!important}
 }
+
+
+/* Final mockup alignment: soft organic spending waves and left-to-right card order */
+.nv-finance[lang="fa"] .nv-ref-category-grid{
+  direction:ltr!important;
+  grid-auto-flow:column!important;
+}
+.nv-finance[lang="fa"] .nv-ref-category{
+  direction:rtl!important;
+  text-align:right!important;
+}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area{
+  display:block!important;
+  flex:0 0 54px!important;
+  height:54px!important;
+  min-height:54px!important;
+  width:100%!important;
+  margin:4px 0!important;
+  overflow:hidden!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area svg{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-area-fill{
+  display:block!important;
+  stroke:none!important;
+  opacity:.22!important;
+}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-area-line{
+  display:block!important;
+  fill:none!important;
+  stroke-width:2.1!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+  vector-effect:non-scaling-stroke!important;
+}
+.nv-finance[lang="fa"] .nv-ref-category.food .nv-ref-area-fill{fill:#E3B52F!important}
+.nv-finance[lang="fa"] .nv-ref-category.food .nv-ref-area-line{stroke:#E3B52F!important}
+.nv-finance[lang="fa"] .nv-ref-category.travel .nv-ref-area-fill{fill:#E15D58!important}
+.nv-finance[lang="fa"] .nv-ref-category.travel .nv-ref-area-line{stroke:#E15D58!important}
+.nv-finance[lang="fa"] .nv-ref-category.shopping .nv-ref-area-fill{fill:#39A879!important}
+.nv-finance[lang="fa"] .nv-ref-category.shopping .nv-ref-area-line{stroke:#39A879!important}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.is-empty .nv-ref-area-fill{opacity:.12!important}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.is-empty .nv-ref-area-line{opacity:.55!important}
+@media(max-width:380px){
+ .nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area{height:48px!important;min-height:48px!important;flex-basis:48px!important}
+}
