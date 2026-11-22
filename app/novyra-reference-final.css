@@ -198,3 +198,71 @@
  .nv-finance .nv-ref-insight{padding:14px!important}
  .nv-finance .nf-mobile-dock.nv-ref-dock{min-height:65px!important}
 }
+
+
+/* NOVYRA — strict reference alignment: sky blue, clean white surfaces, blue actions and charts */
+.nv-finance{
+  --paper:#f5f9fc!important;--panel:#ffffff!important;--ink:#263f50!important;--muted:#8298a6!important;--line:#e6eef3!important;--g:#438fda!important;
+  color:#263f50!important;
+  background:linear-gradient(180deg,#a9dcf5 0,#c8eafa 190px,#eaf5fb 390px,#f6f9fc 700px)!important;
+  font-family:Inter,"SF Pro Display","Helvetica Neue",Arial,"Vazirmatn",sans-serif!important;
+  font-variant-numeric:lining-nums tabular-nums!important;
+}
+.nv-finance[data-theme="dark"],.nv-finance[data-theme="light"]{color:#263f50!important;background:linear-gradient(180deg,#a9dcf5 0,#c8eafa 190px,#eaf5fb 390px,#f6f9fc 700px)!important}
+.nv-finance .nf-topbar.nv-ref-topbar{background:rgba(185,226,247,.58)!important;border:0!important;box-shadow:none!important;backdrop-filter:blur(18px)!important}
+.nv-finance .nf-brand,.nv-finance .nf-mark{color:#193c4d!important}
+.nv-finance .nf-icon.nv-ref-bell,.nv-finance .nf-avatar.nv-ref-profile{background:#ffffffc9!important;border:1px solid #ffffffdf!important;color:#456779!important;box-shadow:0 4px 14px #5b91aa14!important}
+.nv-finance .nf-avatar.nv-ref-profile small{color:#36586b!important}
+.nv-finance .nv-ref-balance{background:linear-gradient(145deg,#c8eafa,#edf8fd)!important;border:1px solid #ffffffd9!important;border-radius:20px!important;box-shadow:0 8px 23px #5a9abb13!important;color:#18384b!important}
+.nv-finance .nv-ref-balance:after{border-color:#438fda28!important;box-shadow:0 0 0 22px #438fda0b,0 0 0 46px #438fda08!important}
+.nv-finance .nv-ref-balance-head small{color:#6f8999!important}
+.nv-finance .nv-ref-balance-head strong{color:#102d40!important;font-weight:750!important}
+.nv-finance .nv-ref-growth{background:#e0f6e9!important;color:#238e64!important}
+.nv-finance .nv-ref-growth em,.nv-finance .nv-ref-cheer{color:#668b7c!important}
+.nv-finance .nv-ref-eye{color:#44677b!important}
+.nv-finance .nv-ref-actions button{background:#ffffffc9!important;border:1px solid #ffffffdf!important;color:#397da8!important;border-radius:24px!important;font-weight:650!important;box-shadow:0 4px 12px #5b91aa10!important}
+.nv-finance .nv-ref-actions button span{color:#397da8!important}
+.nv-finance .nv-ref-actions button.nv-ref-orb{background:#438fda!important;border:0!important;color:#fff!important;box-shadow:0 5px 13px #438fd944!important}
+.nv-finance .nv-ref-insight{border:1px solid #c8edf7!important;border-radius:15px!important;background:linear-gradient(110deg,#e5faff,#c9f0f8)!important;color:#284d60!important;box-shadow:none!important}
+.nv-finance .nv-ref-insight b{color:#467f99!important}
+.nv-finance .nv-ref-insight p{color:#365667!important}
+.nv-finance .nv-ref-insight>button{background:#ffffffc9!important;color:#548eaa!important}
+.nv-finance .nv-ref-section-head h2,.nv-finance .nf-panel h2,.nv-finance .nf-panel-head h2,.nv-finance .nv-spend-heading,.nv-finance .nv-goals-head h2{color:#27465a!important}
+.nv-finance .nv-ref-section-head button{color:#438fba!important}
+.nv-finance .nv-ref-category,.nv-finance .nf-panel,.nv-finance .nf-account-card,.nv-finance .nf-timeline,.nv-finance .nf-settings,.nv-finance .nv-spend-total,.nv-finance .nv-income-card,.nv-finance .nv-spend-highlights article,.nv-finance .nv-spend-quick button,.nv-finance .nv-goal-card{background:#ffffffed!important;border:1px solid #e8eff4!important;border-radius:17px!important;box-shadow:0 6px 19px #6c91a710!important;color:#263f50!important}
+.nv-finance .nv-ref-category>b,.nv-finance .nf-transaction b,.nv-finance .nf-transaction strong{color:#29495c!important}
+.nv-finance .nv-ref-category-top small,.nv-finance .nv-ref-category-status,.nv-finance .nf-panel p,.nv-finance .nf-panel small,.nv-finance .nf-transaction small{color:#8298a6!important}
+.nv-finance .nv-ref-category.food .nv-ref-wave i{background:linear-gradient(#ffe98a,#f5d75d)!important}
+.nv-finance .nv-ref-category.travel .nv-ref-wave i{background:linear-gradient(#f6a29a,#e87c73)!important}
+.nv-finance .nv-ref-category.shopping .nv-ref-wave i{background:linear-gradient(#9cdda9,#62bd7b)!important}
+.nv-finance .nf-primary,.nv-finance .nv-spend-filter button,.nv-finance .nf-report-actions button{background:linear-gradient(135deg,#5ba8e4,#347fc0)!important;color:#fff!important;border:0!important;border-radius:13px!important;font-weight:700!important;box-shadow:0 5px 14px #438fda30!important}
+.nv-finance .nf-primary *,.nv-finance .nv-spend-filter button *{color:#fff!important}
+.nv-finance .nv-spend-chart{height:190px!important}
+.nv-finance .nv-spend-chart svg path[fill="url(#spendFill)"]{fill:url(#spendFill)!important}
+.nv-finance .nv-spend-chart svg path[stroke="#35a979"]{stroke:#438fda!important}
+.nv-finance .nv-spend-chart svg line[stroke="#6ba98d"]{stroke:#79b6e4!important}
+.nv-finance .nv-spend-chart svg circle[fill="#35a979"]{fill:#438fda!important}
+.nv-finance .nv-spend-chart svg line[stroke="#b8c9c0"]{stroke:#b9d4e5!important}
+.nv-finance .nv-spend-chart svg text{fill:#8298a6!important}
+.nv-finance .nv-spend-chart svg defs linearGradient stop:first-child{stop-color:#438fda!important}
+.nv-finance .nv-spend-chart svg defs linearGradient stop:last-child{stop-color:#438fda!important}
+.nv-finance .nv-goal-track{background:#e6eef3!important}
+.nv-finance .nv-goal-track i{background:linear-gradient(90deg,#53a9e4,#438fda)!important}
+.nv-finance .nv-goal-percent-badge{background:#e1f5e9!important;color:#278a5c!important}
+.nv-finance .nv-goal-percent-badge.yellow{background:#fff4bd!important;color:#9b8124!important}
+.nv-finance .nv-spend-total h2,.nv-finance .nv-income-card h2{color:#204d7e!important}
+.nv-finance .nf-toolbar label,.nv-finance .nf-toolbar select,.nv-finance .nf-modal label input,.nv-finance .nf-modal label select,.nv-finance .nf-settings select,.nv-finance input:not([type=checkbox]),.nv-finance select,.nv-finance textarea{background:#f7fafc!important;border:1px solid #e2edf3!important;color:#304957!important;border-radius:12px!important;box-shadow:none!important}
+.nv-finance input:focus,.nv-finance select:focus,.nv-finance textarea:focus{border-color:#72b8df!important;box-shadow:0 0 0 3px #73bce322!important}
+.nv-finance .nf-modal{background:#fff!important;border:1px solid #e2edf3!important;border-radius:20px!important}
+.nv-finance .nf-modal-head h2{color:#304958!important}
+.nv-finance .nf-toast{background:#fff!important;color:#35596b!important;border:1px solid #dcecf3!important}
+.nv-finance .nf-mobile-dock.nv-ref-dock{background:rgba(255,255,255,.93)!important;border:1px solid #ffffff!important;box-shadow:0 8px 28px #567b921c!important;backdrop-filter:blur(20px) saturate(150%)!important}
+.nv-finance .nv-ref-dock button{color:#8296a2!important}
+.nv-finance .nv-ref-dock button.active{color:#438db8!important;background:#edf7fc!important}
+.nv-finance .nv-ref-dock button.nv-ref-dock-center .nf-dock-icon{background:conic-gradient(#28a8ca,#69c994,#f0d15d,#e77d9c,#9877d8,#28a8ca)!important;color:#fff!important;box-shadow:0 4px 12px #719dbb55!important}
+.nv-finance *{font-variant-numeric:lining-nums tabular-nums}
+@media(max-width:760px){
+ .nv-finance .nv-ref-balance{padding:15px 15px 13px!important;border-radius:18px!important}
+ .nv-finance .nv-ref-actions button{height:39px!important}
+ .nv-finance .nf-mobile-dock.nv-ref-dock{min-height:64px!important}
+}
