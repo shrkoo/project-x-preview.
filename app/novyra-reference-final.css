@@ -383,3 +383,13 @@
 @media(max-width:380px){
  .nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area{height:48px!important;min-height:48px!important;flex-basis:48px!important}
 }
+
+/* Clearly separated demo dashboard presentation */
+.nv-finance[lang="fa"] .nv-demo-banner{display:flex!important;align-items:center!important;gap:9px!important;margin:5px 18px 2px!important;padding:9px 12px!important;border:1px solid rgba(51,139,190,.18)!important;border-radius:12px!important;background:rgba(255,255,255,.62)!important;color:#547286!important;font-size:10px!important;line-height:1.7!important;font-weight:600!important}
+.nv-finance[lang="fa"] .nv-demo-banner>span,.nv-finance[lang="fa"] .nv-demo-inline{display:inline-flex!important;align-items:center!important;justify-content:center!important;padding:3px 7px!important;border-radius:6px!important;background:#e7f2ff!important;color:#2675ad!important;font-size:9px!important;font-weight:900!important;letter-spacing:.6px!important}
+.nv-finance[lang="fa"] .nv-demo-inline{margin-inline-start:5px!important;vertical-align:middle!important}
+.nv-finance[lang="fa"] .nv-ref-insight p small{display:block!important;margin-top:4px!important;color:#708795!important;font-size:9px!important}
+.nv-finance[lang="fa"] .nv-ref-category.food .nv-ref-category-status{background:#fff7df!important;color:#9a7512!important;padding:3px 7px!important;border-radius:12px!important}
+.nv-finance[lang="fa"] .nv-ref-category.travel .nv-ref-category-status{background:#fff0ef!important;color:#bb514c!important;padding:3px 7px!important;border-radius:12px!important}
+.nv-finance[lang="fa"] .nv-ref-category.shopping .nv-ref-category-status{background:#eaf7ef!important;color:#25845b!important;padding:3px 7px!important;border-radius:12px!important}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-area-fill{opacity:.27!important}
