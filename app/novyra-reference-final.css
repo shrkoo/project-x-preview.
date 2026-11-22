@@ -52,3 +52,36 @@
   .nv-finance[lang="en"] .nv-ref-category .nv-ref-area-line{stroke-width:1.4!important}
   .nv-finance[lang="en"] .nv-ref-category{padding:8px 7px 7px!important}
 }
+
+
+/* Reference-match refinements: category-specific waveform colors and softer dashboard rhythm */
+.nv-finance[lang="en"] .nv-ref-category.food .nv-ref-wave{color:#E3B52F!important}
+.nv-finance[lang="en"] .nv-ref-category.travel .nv-ref-wave{color:#E15D58!important}
+.nv-finance[lang="en"] .nv-ref-category.shopping .nv-ref-wave{color:#39A879!important}
+.nv-finance[lang="en"] .nv-ref-category .nv-ref-area-fill{opacity:.23!important}
+.nv-finance[lang="en"] .nv-ref-category .nv-ref-area-line{stroke-width:1.9!important;opacity:1!important}
+.nv-finance[lang="en"] .nv-ref-category .nv-ref-wave.nv-ref-area,
+.nv-finance[lang="en"] .nv-ref-category .nv-ref-wave.nv-ref-area svg{height:34px!important;min-height:34px!important}
+.nv-finance[lang="en"] .nv-ref-category.food .nv-ref-area-fill{fill:#E3B52F!important}
+.nv-finance[lang="en"] .nv-ref-category.food .nv-ref-area-line{stroke:#E3B52F!important}
+.nv-finance[lang="en"] .nv-ref-category.travel .nv-ref-area-fill{fill:#E15D58!important}
+.nv-finance[lang="en"] .nv-ref-category.travel .nv-ref-area-line{stroke:#E15D58!important}
+.nv-finance[lang="en"] .nv-ref-category.shopping .nv-ref-area-fill{fill:#39A879!important}
+.nv-finance[lang="en"] .nv-ref-category.shopping .nv-ref-area-line{stroke:#39A879!important}
+
+/* Compact controls and calmer spacing/shadows to follow the reference mockup */
+.nv-finance[lang="en"] .nv-ref-eye{width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.nv-finance[lang="en"] .nv-ref-eye svg{width:16px!important;height:16px!important;stroke-width:1.7!important}
+.nv-finance[lang="en"] .nv-ref-actions{gap:10px!important;margin-top:15px!important}
+.nv-finance[lang="en"] .nv-ref-actions button{min-height:42px!important;padding:0 17px!important;gap:8px!important}
+.nv-finance[lang="en"] .nv-ref-insight{padding:14px 16px!important;gap:12px!important}
+.nv-finance[lang="en"] .nv-ref-category-grid{gap:10px!important}
+.nv-finance[lang="en"] .nv-ref-balance,
+.nv-finance[lang="en"] .nv-ref-insight,
+.nv-finance[lang="en"] .nv-ref-category{box-shadow:0 5px 16px rgba(28,53,72,.055)!important}
+.nv-finance[lang="en"] .nv-ref-section{margin-top:19px!important}
+.nv-finance[lang="en"] .nv-ref-category{padding:9px 9px 8px!important}
+@media(max-width:380px){
+ .nv-finance[lang="en"] .nv-ref-category .nv-ref-wave.nv-ref-area,
+ .nv-finance[lang="en"] .nv-ref-category .nv-ref-wave.nv-ref-area svg{height:31px!important;min-height:31px!important}
+}
