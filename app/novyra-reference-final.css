@@ -154,3 +154,23 @@
  .nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area,
  .nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area svg{height:65px!important;min-height:65px!important}
 }
+
+
+/* Dashboard final pass: keep decorative empty-state waves visible without implying spend data */
+.nv-finance[lang="fa"] .nv-ref-balance-head{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:12px!important}
+.nv-finance[lang="fa"] .nv-ref-balance-head>div{min-width:0!important;flex:1!important}
+.nv-finance[lang="fa"] .nv-ref-eye{flex:0 0 34px!important;width:34px!important;height:34px!important;display:grid!important;place-items:center!important;margin-top:2px!important;border:0!important;background:transparent!important;box-shadow:none!important;color:#71818c!important}
+.nv-finance[lang="fa"] .nv-ref-category-grid{align-items:stretch!important}
+.nv-finance[lang="fa"] .nv-ref-category{min-height:154px!important;gap:5px!important}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area{flex:0 0 68px!important;height:68px!important;min-height:68px!important;margin:2px 0!important;overflow:visible!important}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area svg{height:68px!important;min-height:68px!important;overflow:visible!important}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-area-fill{opacity:.32!important}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-area-line{stroke-width:2.5!important}
+.nv-finance[lang="fa"] .nv-ref-category-status{min-height:18px!important;line-height:1.2!important}
+.nv-finance[lang="fa"] .nv-ref-section{margin-top:16px!important}
+.nv-finance[lang="fa"] .nv-ref-insight{margin-top:14px!important}
+@media(max-width:380px){
+ .nv-finance[lang="fa"] .nv-ref-category{min-height:146px!important}
+ .nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area,
+ .nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area svg{height:61px!important;min-height:61px!important}
+}
