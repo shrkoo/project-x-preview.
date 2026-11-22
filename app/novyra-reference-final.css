@@ -340,3 +340,88 @@
 .nv-finance .nv-ref-category.travel .nv-ref-wave.nv-ref-sparkline{color:#7f9b84!important}
 .nv-finance .nv-ref-category.shopping .nv-ref-wave.nv-ref-sparkline{color:#b9876e!important}
 .nv-finance .nv-ref-wave.nv-ref-sparkline svg{display:block!important;width:100%!important;height:100%!important;overflow:visible!important}
+
+
+/* Monthly Spending Level — readable compact cards and horizontal mini bars */
+.nv-finance[lang="en"] .nv-ref-category-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:8px!important;
+  align-items:stretch!important;
+}
+.nv-finance[lang="en"] .nv-ref-category{
+  min-width:0!important;
+  padding:11px 9px 10px!important;
+  overflow:visible!important;
+}
+.nv-finance[lang="en"] .nv-ref-category-top,
+.nv-finance[lang="en"] .nv-ref-category-top small{
+  display:block!important;
+  min-width:0!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  font-size:10px!important;
+  line-height:1.25!important;
+}
+.nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars{
+  display:flex!important;
+  align-items:flex-end!important;
+  justify-content:space-between!important;
+  gap:3px!important;
+  width:100%!important;
+  height:40px!important;
+  margin:8px 0 9px!important;
+  padding:0 1px!important;
+  overflow:hidden!important;
+  opacity:1!important;
+}
+.nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars i{
+  display:block!important;
+  flex:1 1 0!important;
+  min-width:2px!important;
+  max-width:9px!important;
+  border-radius:4px 4px 1px 1px!important;
+}
+.nv-finance[lang="en"] .nv-ref-category.food .nv-ref-wave.nv-ref-bars i{
+  background:linear-gradient(180deg,#ffe78a 0%,#e8bd45 100%)!important;
+}
+.nv-finance[lang="en"] .nv-ref-category.travel .nv-ref-wave.nv-ref-bars i{
+  background:linear-gradient(180deg,#ffaaa2 0%,#e45d58 100%)!important;
+}
+.nv-finance[lang="en"] .nv-ref-category.shopping .nv-ref-wave.nv-ref-bars i{
+  background:linear-gradient(180deg,#a5e3b2 0%,#43a96b 100%)!important;
+}
+.nv-finance[lang="en"] .nv-ref-category>b{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  color:#294a61!important;
+  font-size:clamp(9px,2.45vw,11px)!important;
+  line-height:1.25!important;
+  font-weight:800!important;
+  letter-spacing:-.035em!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  font-variant-numeric:tabular-nums!important;
+}
+.nv-finance[lang="en"] .nv-ref-category-status{
+  display:block!important;
+  width:100%!important;
+  margin-top:4px!important;
+  font-size:clamp(7px,1.95vw,8.5px)!important;
+  line-height:1.25!important;
+  font-weight:800!important;
+  letter-spacing:-.015em!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+.nv-finance[lang="en"] .nv-ref-category.food .nv-ref-category-status{color:#ad8317!important}
+.nv-finance[lang="en"] .nv-ref-category.travel .nv-ref-category-status{color:#d34f4a!important}
+.nv-finance[lang="en"] .nv-ref-category.shopping .nv-ref-category-status{color:#278b55!important}
+@media(max-width:380px){
+  .nv-finance[lang="en"] .nv-ref-category-grid{gap:6px!important}
+  .nv-finance[lang="en"] .nv-ref-category{padding:10px 7px 9px!important}
+  .nv-finance[lang="en"] .nv-ref-category-status{font-size:7px!important}
+}
