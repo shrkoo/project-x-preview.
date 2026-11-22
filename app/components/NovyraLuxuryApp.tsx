@@ -51,12 +51,13 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
 <div className="nf-shell"><aside className="nf-sidebar"><div className="nf-side-label">{tab==="overview"?"فضای کاری":"WORKSPACE"}</div><div className="nf-workspace"><span className="nf-workspace-mark">N</span><span><b>{tab==="overview"?homeT.personal:t.personal}</b><small>{tab==="overview"?homeT.space:t.space}</small></span></div><nav>{nav.map(([key,Icon,label])=><button key={key} className={tab===key?"active":""} onClick={()=>setTab(key)}><Icon size={17}/>{label}</button>)}</nav><div className="nf-side-bottom"><ShieldCheck size={16}/>{tab==="overview"?homeT.privacy:t.privacy}<button onClick={logout} title={tab==="overview"?homeT.logout:t.logout}><LogOut size={16}/></button></div></aside>
 <section className="nf-main"><div className={"nf-page-top "+(tab==="overview"?"nv-ref-home-hide":"nv-ref-subpage-head")}><div><div className="nf-eyebrow">{language==="en"?"NOVYRA | FINANCIAL WELLNESS":"نوویرا | مدیریت مالی"}</div><h1>{tab==="overview"?t.hello+(language==="en"?", ":"، ")+(prefs.profileName||account.displayName):nav.find(x=>x[0]===tab)?.[2]}</h1><p>{tab==="overview"?t.sub:tab==="timeline"?t.timeSub:""}</p></div>{tab==="reports"&&<div className="nf-page-actions"><button className="nf-quiet" onClick={exportCsv}><Download size={15}/>{t.export}</button><button className="nf-primary" onClick={()=>setShow(true)}><Plus size={16}/>{t.add}</button></div>}</div>
 {tab==="overview"&&<>
+<div className="nv-demo-banner"><span>DEMO</span> حالت نمایشی؛ اعداد نمونه‌اند و در اطلاعات واقعی یا تراکنش‌های حساب ذخیره نمی‌شوند.</div>
 <section className="nv-ref-balance">
  <div className="nv-ref-balance-head">
   <div>
-   <small>موجودی کل</small>
-   <strong>{showBalance?dashboardCash(balance):"••••••"}</strong>
-   <div className="nv-ref-net-row"><span className="nv-ref-net-chip"><TrendingUp size={14}/>{mi-me>0?dashboardCash(mi-me):"۰ ریال"}</span><span className="nv-ref-cheer-text">{mi-me>0?"آفرین! این ماه پس‌انداز کرده‌اید.":"پس‌انداز این ماه هنوز ثبت نشده است."}</span></div>
+   <small>موجودی کل · نمونه نمایشی</small>
+   <strong>{showBalance?dashboardCash(45764960):"••••••"}</strong>
+   <div className="nv-ref-net-row"><span className="nv-ref-net-chip"><TrendingUp size={14}/>{dashboardCash(954230)}</span><span className="nv-ref-cheer-text">آفرین! این ماه پس‌انداز کرده‌اید.</span></div>
   </div>
   <button className="nv-ref-eye" onClick={()=>setShowBalance(v=>!v)} aria-label={showBalance?"مخفی کردن موجودی":"نمایش موجودی"}>{showBalance?<EyeOff size={19}/>:<Eye size={19}/>}</button>
  </div>
@@ -67,21 +68,20 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
  </div>
 </section>
 <section className="nv-ref-insight" onClick={()=>setTab("reports")}>
- <div><b><Sparkles size={17}/> بینش مالی</b>
-  <p className="nv-insight-rtl">{diningChange===null?<>برای مقایسه هزینه‌های خوراک، در هر دو هفته دادهٔ کافی ثبت کنید.</>:<>هزینه خوراک شما نسبت به هفته قبل<br/><strong className="nv-insight-highlight">{Math.abs(diningChange).toLocaleString("fa-IR")}٪</strong> {diningChange>0?"بیشتر شده است.":diningChange<0?"کمتر شده است.":"تغییری نکرده است."}</>}</p>
+ <div><b><Sparkles size={17}/> بینش مالی <span className="nv-demo-inline">DEMO</span></b>
+  <p className="nv-insight-rtl">هزینه خوراک شما نسبت به هفته گذشته <strong className="nv-insight-highlight">۱۲٪</strong> بیشتر شده است. <small>نمونه تحلیلی؛ نه بر اساس تراکنش‌های واقعی</small></p>
  </div><button onClick={()=>setTab("reports")} aria-label="جزئیات بینش"><ChevronRight size={18}/></button>
 </section>
 <section className="nv-ref-section">
- <div className="nv-ref-section-head"><h2>سطح هزینه‌های ماهانه</h2><button onClick={()=>{setSpendCategory("");setTab("spending")}}>جزئیات بیشتر ←</button></div>
+ <div className="nv-ref-section-head"><h2>سطح هزینه‌های ماهانه <span className="nv-demo-inline">DEMO</span></h2><button onClick={()=>{setSpendCategory("");setTab("spending")}}>جزئیات بیشتر ←</button></div>
  <div className="nv-ref-category-grid">
   {[{name:"خوراک",keys:["خوراک","Fo"+"od","غذا"],tone:"food"},{name:"رفت‌وآمد",keys:["حمل‌ونقل","Tra"+"vel","رفت‌وآمد"],tone:"travel"},{name:"خرید",keys:["Shop"+"ping","خرید"],tone:"shopping"}].map(c=>{
-   const categoryItems=monthItems.filter(x=>x.kind==="expense"&&c.keys.includes(x.category));
-   const total=categoryItems.reduce((n,x)=>n+x.amount,0);
-   const limit=Number(prefs.categoryBudgets[c.name]||0);
-   const status=limit>0&&total>limit?"بیش از سقف":limit>0&&total>=limit*.8?"متوسط":total>0?"عادی":"بدون داده";
-   const chartDayCount=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate();
-   const bars=Array.from({length:28},(_,i)=>{const firstDay=Math.floor(i*chartDayCount/28)+1;const lastDay=Math.floor((i+1)*chartDayCount/28);return categoryItems.filter(x=>{const day=Number(x.date.slice(8,10));return day>=firstDay&&day<=lastDay}).reduce((n,x)=>n+x.amount,0)});
-   const hasCategoryData=bars.some(v=>v>0);const chartSeries=hasCategoryData?bars:[3,5,4,7,6,4,8,5,9,6,4,7,5,10,8,6,9,5,7,11,8,6,9,5,7,10,6,8];const wavePath=smoothWavePath(chartSeries);const waveArea=wavePath?wavePath.replace(/^M /,"M ").concat(" L 98 30 L 2 30 Z"):"";
+    const demoByTone:Record<string,{total:number;status:string;series:number[]}>={
+      food:{total:205760,status:"متوسط",series:[2,3,4,3,6,5,7,4,8,6,7,5,9,7,8,6,10,8,9,7,11,8,10,7,12,9,11,8]},
+      travel:{total:653120,status:"بیش از سقف",series:[2,4,3,6,5,8,6,9,7,11,8,12,9,14,10,13,11,16,12,15,13,18,14,17,15,19,16,20]},
+      shopping:{total:185430,status:"عادی",series:[3,4,3,5,4,5,4,6,5,6,4,7,5,6,5,7,6,8,6,7,5,8,6,7,6,9,7,8]}
+    };
+    const demo=demoByTone[c.tone];const total=demo.total;const status=demo.status;const chartSeries=demo.series;const wavePath=smoothWavePath(chartSeries);const waveArea=wavePath.concat(" L 98 30 L 2 30 Z");
    return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category "+c.tone}>
     <div className="nv-ref-category-top"><small>{c.name}</small></div>
     <div className={"nv-ref-wave nv-ref-area "+(!hasCategoryData?"is-empty":"")} role="img" aria-label={"روند هزینه "+c.name}><svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-area-fill" d={waveArea}/><path className="nv-ref-area-line" d={wavePath}/></svg></div>
