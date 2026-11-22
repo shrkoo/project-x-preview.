@@ -585,3 +585,32 @@
  .nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart{height:75px!important;min-height:75px!important}
  .nv-finance[lang="fa"] .nv-ref-chart-caption{font-size:8px!important}
 }
+
+
+/* NOVYRA home screen — refined Persian fintech mockup */
+.nv-finance[lang="fa"]{background:linear-gradient(180deg,#eaf2f7 0%,#f2f6f9 55%,#f7f9fb 100%)!important}
+.nv-finance[lang="fa"] .nv-ref-balance{background:transparent!important;border:0!important;box-shadow:none!important;color:#172d3c!important;padding:20px 22px 12px!important;margin:0 18px!important}
+.nv-finance[lang="fa"] .nv-ref-balance:before{display:none!important}
+.nv-finance[lang="fa"] .nv-ref-balance-head>div>small{color:#718493!important}
+.nv-finance[lang="fa"] .nv-ref-balance-head strong{color:#172d3c!important;font-size:clamp(30px,8vw,42px)!important;font-weight:850!important}
+.nv-finance[lang="fa"] .nv-ref-eye{color:#718493!important}
+.nv-finance[lang="fa"] .nv-ref-net-chip{background:#e3f5eb!important;color:#198b58!important;border:1px solid #d0efdf!important}
+.nv-finance[lang="fa"] .nv-ref-cheer-text{color:#31815e!important}
+.nv-finance[lang="fa"] .nv-ref-actions .nv-ref-action-expense,.nv-finance[lang="fa"] .nv-ref-actions .nv-ref-action-income{background:#fff!important;color:#31536a!important;border:1px solid #e0e9ef!important;box-shadow:0 5px 14px rgba(36,73,94,.06)!important}
+.nv-finance[lang="fa"] .nv-ref-actions .nv-ref-action-qr{background:#287fbd!important;color:#fff!important;border:0!important;border-radius:50%!important;width:54px!important;height:54px!important;box-shadow:0 8px 20px rgba(40,127,189,.25)!important}
+.nv-finance[lang="fa"] .nv-ref-insight{background:#e4f2fa!important;border:1px solid #d5eaf6!important;box-shadow:none!important}
+.nv-finance[lang="fa"] .nv-ref-insight>div>b{color:#24658d!important}
+.nv-finance[lang="fa"] .nv-ref-insight p{color:#496d82!important}
+.nv-finance[lang="fa"] .nv-ref-category-grid{direction:rtl!important}
+.nv-finance[lang="fa"] .nv-ref-category.nv-ref-chart-card{min-height:164px!important;height:164px!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart{height:65px!important;min-height:65px!important;flex:0 0 65px!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart path{stroke:#dce6eb!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card.food .nv-ref-category-chart{color:#e2b52f!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card.travel .nv-ref-category-chart{color:#e15d58!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card.shopping .nv-ref-category-chart{color:#39a879!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card>b,.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-status{display:block!important}
+.nv-finance[lang="fa"] .nv-ref-chart-amount{display:block!important;color:#294b60!important;font-size:12px!important;font-weight:850!important;white-space:nowrap!important;direction:rtl!important}
+.nv-finance[lang="fa"] .nv-ref-chart-caption{color:#82929c!important;font-size:10px!important}
+.nv-finance[lang="fa"] .nv-ref-dock>button.nv-ref-dock-center{background:conic-gradient(from 30deg,#ffbd59,#ff6d83,#a16df5,#3eafe2,#48cda0,#ffbd59)!important;box-shadow:0 8px 20px rgba(115,113,220,.25)!important}
+.nv-finance[lang="fa"] .nv-demo-banner,.nv-finance[lang="fa"] .nv-demo-inline{display:none!important}
+@media(max-width:380px){.nv-finance[lang="fa"] .nv-ref-chart-amount{font-size:10px!important}.nv-finance[lang="fa"] .nv-ref-category.nv-ref-chart-card{height:155px!important;min-height:155px!important}}
