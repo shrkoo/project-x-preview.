@@ -174,3 +174,8 @@
  .nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area,
  .nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area svg{height:61px!important;min-height:61px!important}
 }
+
+
+/* Final correction: visual order follows the reference mockup in Persian RTL too */
+.nv-finance[lang="fa"] .nv-ref-category-grid{direction:ltr!important;flex-direction:row!important}
+.nv-finance[lang="fa"] .nv-ref-category{direction:rtl!important;text-align:right!important}
