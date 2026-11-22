@@ -132,3 +132,69 @@
  .nv-finance .nv-ref-insight{margin:9px 0 15px!important}
  .nv-finance .nf-mobile-dock.nv-ref-dock{width:100%!important;min-height:60px!important}
 }
+
+
+/* NOVYRA — international luxury fintech visual system */
+.nv-finance{
+  --paper:#f4f2ed!important;--panel:#fffefa!important;--ink:#17221f!important;--muted:#89918a!important;--line:#e6e2d9!important;--g:#b99a62!important;
+  color:#17221f!important;
+  background:radial-gradient(ellipse at 50% -12%,#e7dfcf 0,#f3f0e9 42%,#f7f6f2 100%)!important;
+  font-family:Inter,"SF Pro Display","Helvetica Neue",Arial,sans-serif!important;
+  font-variant-numeric:lining-nums tabular-nums!important;
+}
+.nv-finance[data-theme="dark"],.nv-finance[data-theme="light"]{background:radial-gradient(ellipse at 50% -12%,#e7dfcf 0,#f3f0e9 42%,#f7f6f2 100%)!important}
+.nv-finance .nf-topbar.nv-ref-topbar{height:66px!important;background:rgba(247,246,242,.82)!important;border-bottom:1px solid #ded8ca!important;backdrop-filter:blur(24px)!important}
+.nv-finance .nf-brand{color:#18241f!important}
+.nv-finance .nf-mark{font-family:Georgia,"Times New Roman",serif!important;font-size:31px!important;font-weight:500!important;letter-spacing:-.08em!important;color:#17251f!important}
+.nv-finance .nf-icon.nv-ref-bell,.nv-finance .nf-avatar.nv-ref-profile{background:#fffefa!important;border:1px solid #e7e1d6!important;color:#26342d!important;box-shadow:0 5px 18px #27251e0b!important}
+.nv-finance .nf-avatar.nv-ref-profile small{color:#26342d!important}
+.nv-finance .nf-shell{max-width:470px!important}
+.nv-finance .nv-ref-balance{position:relative!important;overflow:hidden!important;padding:25px 22px 21px!important;border:1px solid #33483d!important;border-radius:25px!important;background:linear-gradient(145deg,#263a31 0%,#14251f 58%,#101c18 100%)!important;box-shadow:0 18px 42px #18251f26,inset 0 1px #ffffff18!important;color:#fff!important}
+.nv-finance .nv-ref-balance:after{content:"";position:absolute;right:-68px;top:-110px;width:230px;height:230px;border:1px solid #c7a87335;border-radius:50%;box-shadow:0 0 0 22px #c7a8730b,0 0 0 46px #c7a87308!important;pointer-events:none}
+.nv-finance .nv-ref-balance-head small{color:#c3c8bd!important;font-size:10px!important;letter-spacing:.035em!important}
+.nv-finance .nv-ref-balance-head strong{color:#fffdf7!important;font-family:Inter,"Helvetica Neue",Arial,sans-serif!important;font-size:clamp(30px,8vw,38px)!important;font-weight:650!important;letter-spacing:-.055em!important;font-variant-numeric:lining-nums tabular-nums!important}
+.nv-finance .nv-ref-growth{background:#dce9d9!important;color:#28583d!important;font-size:10px!important}
+.nv-finance .nv-ref-growth em,.nv-finance .nv-ref-cheer{color:#c5cbbf!important}
+.nv-finance .nv-ref-eye{color:#e4d6b8!important}
+.nv-finance .nv-ref-actions button{height:44px!important;border:1px solid #d8c8a8!important;border-radius:14px!important;background:#f8f4eb!important;color:#25372e!important;font-size:11px!important;font-weight:650!important;box-shadow:0 5px 15px #18251f0d!important}
+.nv-finance .nv-ref-actions button.nv-ref-orb{width:46px!important;height:46px!important;border:1px solid #d7c49d!important;background:linear-gradient(145deg,#d8c39a,#b49762)!important;color:#18241d!important;box-shadow:0 7px 18px #9a80502c!important}
+.nv-finance .nv-ref-insight{border:1px solid #e3dac8!important;border-radius:17px!important;background:linear-gradient(115deg,#f5f0e5,#fffdf8)!important;color:#29362f!important;box-shadow:0 8px 24px #28251b08!important}
+.nv-finance .nv-ref-insight b{color:#94794d!important}
+.nv-finance .nv-ref-insight p{color:#6e776f!important}
+.nv-finance .nv-ref-insight>button{background:#eee7d9!important;color:#826b43!important}
+.nv-finance .nv-ref-section-head h2,.nv-finance .nf-panel h2,.nv-finance .nf-panel-head h2{color:#1d2b24!important;font-size:13px!important;letter-spacing:-.01em!important}
+.nv-finance .nv-ref-section-head button{color:#9a8053!important}
+.nv-finance .nv-ref-category{border:1px solid #e8e3d9!important;border-radius:17px!important;background:#fffefa!important;box-shadow:0 8px 22px #29251b09!important}
+.nv-finance .nv-ref-category-top small,.nv-finance .nv-ref-category-status{color:#8a9088!important}
+.nv-finance .nv-ref-category>b{color:#26352d!important;font-size:10px!important}
+.nv-finance .nv-ref-category.food .nv-ref-wave i{background:linear-gradient(#d9c28f,#b69a64)!important}
+.nv-finance .nv-ref-category.travel .nv-ref-wave i{background:linear-gradient(#b7c6b6,#7f9b84)!important}
+.nv-finance .nv-ref-category.shopping .nv-ref-wave i{background:linear-gradient(#d8b9a8,#b9876e)!important}
+.nv-finance .nf-panel,.nv-finance .nf-account-card,.nv-finance .nf-timeline,.nv-finance .nf-settings,.nv-finance .nv-spend-total,.nv-finance .nv-income-card{background:#fffefa!important;border:1px solid #e7e2d8!important;border-radius:20px!important;box-shadow:0 10px 30px #29251b0a!important;color:#26352d!important}
+.nv-finance .nf-panel p,.nv-finance .nf-panel small,.nv-finance .nf-transaction small{color:#858d84!important}
+.nv-finance .nf-toolbar label,.nv-finance .nf-toolbar select,.nv-finance .nf-modal label input,.nv-finance .nf-modal label select,.nv-finance .nf-settings select,.nv-finance .nf-scenario-grid input,.nv-finance input:not([type=checkbox]),.nv-finance select,.nv-finance textarea{background:#f8f7f2!important;border:1px solid #e5e0d5!important;color:#1e2b24!important;border-radius:13px!important;box-shadow:none!important}
+.nv-finance input:focus,.nv-finance select:focus,.nv-finance textarea:focus{border-color:#b99a62!important;box-shadow:0 0 0 3px #b99a621c!important}
+.nv-finance .nf-transaction{border-color:#eeeae2!important}
+.nv-finance .nf-transaction b,.nv-finance .nf-transaction strong{color:#26352d!important}
+.nv-finance .nf-tx-icon{background:#f1eee5!important;border:1px solid #e7e0d2!important;color:#92794e!important}
+.nv-finance .nf-modal{background:#fffefa!important;border:1px solid #e4ddcf!important;border-radius:23px!important;box-shadow:0 24px 80px #17251f30!important}
+.nv-finance .nf-modal-head h2{color:#1d2b24!important}
+.nv-finance .nf-primary,.nv-finance .nv-spend-filter button{background:linear-gradient(135deg,#c9b17e,#a88b59)!important;color:#17231c!important;border:0!important;border-radius:13px!important;font-weight:750!important}
+.nv-finance .nf-toast{background:#1d3027!important;color:#fff!important;border:1px solid #3c5144!important}
+.nv-finance .nf-mobile-dock.nv-ref-dock{background:rgba(249,248,244,.94)!important;border-top:1px solid #e5dfd3!important;box-shadow:0 -8px 25px #26251e08!important;backdrop-filter:blur(24px)!important}
+.nv-finance .nv-ref-dock button{color:#858b82!important}
+.nv-finance .nv-ref-dock button.active{color:#92774b!important;background:#eee8dc!important}
+.nv-finance .nv-ref-dock button.nv-ref-dock-center .nf-dock-icon{background:linear-gradient(145deg,#d8c49d,#b59662)!important;color:#1b2b22!important;box-shadow:0 5px 15px #a58a5c35!important}
+.nv-finance .nv-spend-total h2,.nv-finance .nv-income-card h2,.nv-finance .nv-spend-heading,.nv-finance .nv-goals-head h2{color:#203128!important}
+.nv-finance .nv-spend-highlights article,.nv-finance .nv-spend-quick button,.nv-finance .nv-goal-card{background:#fffefa!important;border:1px solid #e7e2d8!important;border-radius:18px!important;box-shadow:0 8px 24px #29251b09!important}
+.nv-finance .nv-goal-track{background:#e9e6dd!important}
+.nv-finance .nv-goal-track i{background:linear-gradient(90deg,#b99a62,#d7c397)!important}
+.nv-finance .nv-goal-percent-badge{background:#e6eee4!important;color:#416b4d!important}
+.nv-finance .nv-goal-percent-badge.yellow{background:#f3ead7!important;color:#927448!important}
+.nv-finance *{font-variant-numeric:lining-nums tabular-nums}
+.nv-finance .nf-mobile-dock button,.nv-finance button{transition:transform .18s ease,background .18s ease,border-color .18s ease!important}
+@media(max-width:760px){
+ .nv-finance .nv-ref-balance{margin-top:9px!important;padding:23px 19px 19px!important;border-radius:23px!important}
+ .nv-finance .nv-ref-insight{padding:14px!important}
+ .nv-finance .nf-mobile-dock.nv-ref-dock{min-height:65px!important}
+}
