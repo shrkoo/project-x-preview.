@@ -21,3 +21,26 @@
   .nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars{height:24px!important;gap:2px!important;margin:5px 0!important}
   .nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars i{max-height:17px!important;min-width:2px!important}
 }
+
+/* Final Monthly Spending Level alignment and softer mini bars */
+.nv-finance[lang="en"] .nv-ref-category-grid{
+  direction:ltr!important;
+}
+.nv-finance[lang="en"] .nv-ref-category{
+  direction:ltr!important;
+}
+.nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars{
+  height:22px!important;
+  gap:2px!important;
+  margin:4px 0 5px!important;
+  align-items:flex-end!important;
+}
+.nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars i{
+  max-height:15px!important;
+  border-radius:4px 4px 2px 2px!important;
+  opacity:.88;
+}
+@media(max-width:380px){
+  .nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars{height:20px!important}
+  .nv-finance[lang="en"] .nv-ref-wave.nv-ref-bars i{max-height:14px!important}
+}
