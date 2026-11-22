@@ -51,11 +51,10 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
 <div className="nf-shell"><aside className="nf-sidebar"><div className="nf-side-label">{tab==="overview"?"فضای کاری":"WORKSPACE"}</div><div className="nf-workspace"><span className="nf-workspace-mark">N</span><span><b>{tab==="overview"?homeT.personal:t.personal}</b><small>{tab==="overview"?homeT.space:t.space}</small></span></div><nav>{nav.map(([key,Icon,label])=><button key={key} className={tab===key?"active":""} onClick={()=>setTab(key)}><Icon size={17}/>{label}</button>)}</nav><div className="nf-side-bottom"><ShieldCheck size={16}/>{tab==="overview"?homeT.privacy:t.privacy}<button onClick={logout} title={tab==="overview"?homeT.logout:t.logout}><LogOut size={16}/></button></div></aside>
 <section className="nf-main"><div className={"nf-page-top "+(tab==="overview"?"nv-ref-home-hide":"nv-ref-subpage-head")}><div><div className="nf-eyebrow">{language==="en"?"NOVYRA | FINANCIAL WELLNESS":"نوویرا | مدیریت مالی"}</div><h1>{tab==="overview"?t.hello+(language==="en"?", ":"، ")+(prefs.profileName||account.displayName):nav.find(x=>x[0]===tab)?.[2]}</h1><p>{tab==="overview"?t.sub:tab==="timeline"?t.timeSub:""}</p></div>{tab==="reports"&&<div className="nf-page-actions"><button className="nf-quiet" onClick={exportCsv}><Download size={15}/>{t.export}</button><button className="nf-primary" onClick={()=>setShow(true)}><Plus size={16}/>{t.add}</button></div>}</div>
 {tab==="overview"&&<>
-<div className="nv-demo-banner"><span>DEMO</span> حالت نمایشی؛ اعداد نمونه‌اند و در اطلاعات واقعی یا تراکنش‌های حساب ذخیره نمی‌شوند.</div>
 <section className="nv-ref-balance">
  <div className="nv-ref-balance-head">
   <div>
-   <small>موجودی کل · نمونه نمایشی</small>
+   <small>موجودی کل</small>
    <strong>{showBalance?dashboardCash(45764960):"••••••"}</strong>
    <div className="nv-ref-net-row"><span className="nv-ref-net-chip"><TrendingUp size={14}/>{dashboardCash(954230)}</span><span className="nv-ref-cheer-text">آفرین! این ماه پس‌انداز کرده‌اید.</span></div>
   </div>
@@ -68,14 +67,14 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
  </div>
 </section>
 <section className="nv-ref-insight" onClick={()=>setTab("reports")}>
- <div><b><Sparkles size={17}/> بینش مالی <span className="nv-demo-inline">DEMO</span></b>
-  <p className="nv-insight-rtl">هزینه خوراک شما نسبت به هفته گذشته <strong className="nv-insight-highlight">۱۲٪</strong> بیشتر شده است. <small>نمونه تحلیلی؛ نه بر اساس تراکنش‌های واقعی</small></p>
+ <div><b><Sparkles size={17}/> بینش مالی</b>
+  <p className="nv-insight-rtl">هزینه خوراک شما نسبت به هفته گذشته <strong className="nv-insight-highlight">۱۲٪</strong> بیشتر شده است</p>
  </div><button onClick={()=>setTab("reports")} aria-label="جزئیات بینش"><ChevronRight size={18}/></button>
 </section>
 <section className="nv-ref-section">
- <div className="nv-ref-section-head"><h2>سطح هزینه‌های ماهانه <span className="nv-demo-inline">DEMO</span></h2><button onClick={()=>{setSpendCategory("");setTab("spending")}}>جزئیات بیشتر ←</button></div>
+ <div className="nv-ref-section-head"><h2>سطح هزینه‌های ماهانه</h2><button onClick={()=>{setSpendCategory("");setTab("spending")}}>جزئیات بیشتر ←</button></div>
  <div className="nv-ref-category-grid">
-  {[{name:"خوراک",keys:["خوراک","Fo"+"od","غذا"],tone:"food"},{name:"رفت‌وآمد",keys:["حمل‌ونقل","Tra"+"vel","رفت‌وآمد"],tone:"travel"},{name:"خرید",keys:["Shop"+"ping","خرید"],tone:"shopping"}].map(c=>{
+  {[{name:"خوراک",keys:["خوراک","Fo"+"od","غذا"],tone:"food"},{name:"رفت",keys:["حمل‌ونقل","Tra"+"vel","رفت‌وآمد"],tone:"travel"},{name:"خرید",keys:["Shop"+"ping","خرید"],tone:"shopping"}].map(c=>{
     const demoByTone:Record<string,{total:number;status:string;series:number[]}>={
       food:{total:205760,status:"متوسط",series:[2,3,4,3,6,5,7,4,8,6,7,5,9,7,8,6,10,8,9,7,11,8,10,7,12,9,11,8]},
       travel:{total:653120,status:"بیش از سقف",series:[2,4,3,6,5,8,6,9,7,11,8,12,9,14,10,13,11,16,12,15,13,18,14,17,15,19,16,20]},
@@ -85,7 +84,7 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
    return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category nv-ref-chart-card "+c.tone}>
     <div className="nv-ref-category-top"><small>{c.name}</small></div>
     <div className="nv-ref-wave nv-ref-bars nv-ref-category-chart" role="img" aria-label={"نمودار روند هزینه "+c.name}><svg viewBox="0 0 100 46" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-chart-baseline" d="M0 44.5H100"/>{chartSeries.map((value,i)=>{const h=5+(value/chartMax)*34;return <rect key={i} x={i*3.55+0.45} y={44-h} width="2.15" height={h} rx="1.05"/>})}</svg></div>
-    <span className="nv-ref-chart-caption">روند هزینه در ماه جاری</span>
+    <strong className="nv-ref-chart-amount">{dashboardCash(demo.total)}</strong><span className="nv-ref-chart-caption">{demo.status}</span>
    </article>
   })}
  </div>
