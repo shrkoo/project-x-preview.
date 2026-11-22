@@ -56,7 +56,7 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
   <div>
    <small>موجودی کل</small>
    <strong>{showBalance?dashboardCash(balance):"••••••"}</strong>
-   <div className="nv-ref-net-row"><span className="nv-ref-net-chip">خالص این ماه: {dashboardCash(mi-me)}</span><span className="nv-ref-cheer-text">{mi-me>0?"آفرین! این ماه پس‌انداز کرده‌اید.":"پس‌انداز این ماه هنوز ثبت نشده است."}</span></div>
+   <div className="nv-ref-net-row"><span className="nv-ref-net-chip"><TrendingUp size={14}/>{mi-me>0?dashboardCash(mi-me):"۰ ریال"}</span><span className="nv-ref-cheer-text">{mi-me>0?"آفرین! این ماه پس‌انداز کرده‌اید.":"پس‌انداز این ماه هنوز ثبت نشده است."}</span></div>
   </div>
   <button className="nv-ref-eye" onClick={()=>setShowBalance(v=>!v)} aria-label={showBalance?"مخفی کردن موجودی":"نمایش موجودی"}>{showBalance?<EyeOff size={19}/>:<Eye size={19}/>}</button>
  </div>
