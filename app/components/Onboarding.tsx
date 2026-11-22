@@ -213,6 +213,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       setEmail(signedInUser.email);
       setPassword(""); setConfirmPassword("");
       if (mode === "signup") {
+        try { const key = "novyra-events:" + signedInUser.id; const events = JSON.parse(localStorage.getItem(key) || "[]"); events.push({ name: "signup", at: new Date().toISOString() }); localStorage.setItem(key, JSON.stringify(events.slice(-500))); } catch {}
         localStorage.setItem("projectx-profile-complete:" + signedInUser.id, "1");
         localStorage.setItem("projectx-account", JSON.stringify({ name: signedInUser.displayName, email: signedInUser.email }));
       } else {
