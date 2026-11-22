@@ -1883,3 +1883,60 @@ body{position:relative!important}
 }
 
 .nv-finance .nv-ref-category-grid .nv-ref-category.other .nv-ref-category-status::after{content:none!important}
+
+
+/* NOVYRA requested refinements — 2026-11-22 */
+.nv-finance .nf-main{
+  padding-top:8px!important;
+  padding-bottom:calc(180px + env(safe-area-inset-bottom))!important;
+}
+.nv-finance .nv-ref-spending-page,
+.nv-finance .nv-income-page,
+.nv-finance .nf-settings{
+  margin-top:0!important;
+  padding-top:0!important;
+  min-height:0!important;
+}
+.nv-finance .nf-settings{
+  padding-bottom:0!important;
+}
+.nv-finance .nf-settings .nf-logout{
+  margin-bottom:0!important;
+}
+.nv-finance .nv-ref-balance-head>div{
+  column-gap:4px!important;
+}
+.nv-finance .nv-ref-growth,
+.nv-finance .nv-ref-cheer{
+  margin-inline-start:0!important;
+  gap:3px!important;
+}
+.nv-finance .nv-goal-card .nv-goal-track{
+  background:#d6e5dc!important;
+}
+.nv-finance .nv-goal-card.nv-goal-travel .nv-goal-track{
+  background:#f0dfb8!important;
+}
+.nv-finance .nv-goal-card .nv-goal-track>.nv-goal-percent-badge{
+  right:12px!important;
+  transform:translateY(-50%)!important;
+}
+.nv-finance .nv-goal-card .nv-goal-track.yellow>.nv-goal-percent-badge{
+  right:12px!important;
+  transform:translateY(-50%)!important;
+}
+.nv-finance .nv-spend-chart{
+  width:100%!important;
+}
+.nv-finance .nv-spend-chart>svg{
+  flex:1 1 0!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+}
+.nv-finance .nv-spend-axis{
+  width:calc(100% - 56px)!important;
+  margin:0 56px 0 0!important;
+  padding:0!important;
+  justify-content:space-between!important;
+}
