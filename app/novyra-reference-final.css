@@ -85,3 +85,37 @@
  .nv-finance[lang="en"] .nv-ref-category .nv-ref-wave.nv-ref-area,
  .nv-finance[lang="en"] .nv-ref-category .nv-ref-wave.nv-ref-area svg{height:31px!important;min-height:31px!important}
 }
+
+
+/* Persian RTL home dashboard — real user data only */
+.nv-finance[lang="fa"] .nv-ref-balance,
+.nv-finance[lang="fa"] .nv-ref-insight,
+.nv-finance[lang="fa"] .nv-ref-section{direction:rtl;text-align:right}
+.nv-finance[lang="fa"] .nv-ref-actions{display:grid!important;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr)!important;align-items:center!important;gap:10px!important;margin-top:18px!important}
+.nv-finance[lang="fa"] .nv-ref-actions button{width:100%!important;min-width:0!important;min-height:48px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;padding:0 10px!important;border-radius:14px!important;font-weight:700!important}
+.nv-finance[lang="fa"] .nv-ref-actions .nv-ref-action-qr{width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;padding:0!important;border:0!important;border-radius:50%!important;background:#258bd0!important;color:#fff!important;box-shadow:0 7px 18px rgba(37,139,208,.24)!important}
+.nv-finance[lang="fa"] .nv-ref-actions .nv-ref-action-expense,
+.nv-finance[lang="fa"] .nv-ref-actions .nv-ref-action-income{background:#f1f7fb!important;color:#31566d!important;border:1px solid #dcebf4!important}
+.nv-finance[lang="fa"] .nv-ref-net-row{display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:wrap!important;margin-top:10px!important}
+.nv-finance[lang="fa"] .nv-ref-net-chip{display:inline-flex!important;align-items:center!important;min-height:30px!important;padding:5px 11px!important;border-radius:20px!important;background:#e8f7ee!important;color:#21865d!important;font-size:12px!important;font-weight:800!important}
+.nv-finance[lang="fa"] .nv-ref-cheer-chip{display:inline-flex!important;align-items:center!important;min-height:30px!important;padding:5px 11px!important;border-radius:20px!important;background:#e8f7ee!important;color:#21865d!important;font-size:12px!important;font-weight:800!important}
+.nv-finance[lang="fa"] .nv-ref-insight{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important}
+.nv-finance[lang="fa"] .nv-ref-insight>div{min-width:0!important;flex:1!important}
+.nv-finance[lang="fa"] .nv-ref-insight p{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;margin:6px 0 0!important;font-size:12px!important}
+.nv-finance[lang="fa"] .nv-ref-insight b{display:flex!important;align-items:center!important;gap:7px!important}
+.nv-finance[lang="fa"] .nv-ref-insight b svg{color:#e3a82e!important}
+.nv-finance[lang="fa"] .nv-ref-category-grid{display:flex!important;flex-wrap:nowrap!important;direction:rtl!important;gap:9px!important;overflow-x:auto!important;overflow-y:hidden!important;padding:2px 1px 8px!important;scrollbar-width:none!important;scroll-snap-type:x mandatory!important}
+.nv-finance[lang="fa"] .nv-ref-category-grid::-webkit-scrollbar{display:none!important}
+.nv-finance[lang="fa"] .nv-ref-category{flex:0 0 calc((100% - 27px)/3.5)!important;min-width:0!important;min-height:150px!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important;scroll-snap-align:start!important;padding:10px 9px!important;direction:rtl!important}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area{display:flex!important;align-items:stretch!important;flex:1 1 auto!important;width:100%!important;height:66px!important;min-height:66px!important;margin:5px 0!important;overflow:hidden!important;background:transparent!important;border:0!important;padding:0!important}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-wave.nv-ref-area svg{display:block!important;width:100%!important;height:100%!important;min-height:66px!important;overflow:visible!important}
+.nv-finance[lang="fa"] .nv-ref-category.food .nv-ref-area-fill{fill:#E3B52F!important;opacity:.24!important}
+.nv-finance[lang="fa"] .nv-ref-category.food .nv-ref-area-line{stroke:#E3B52F!important}
+.nv-finance[lang="fa"] .nv-ref-category.travel .nv-ref-area-fill{fill:#E15D58!important;opacity:.24!important}
+.nv-finance[lang="fa"] .nv-ref-category.travel .nv-ref-area-line{stroke:#E15D58!important}
+.nv-finance[lang="fa"] .nv-ref-category.shopping .nv-ref-area-fill{fill:#39A879!important;opacity:.24!important}
+.nv-finance[lang="fa"] .nv-ref-category.shopping .nv-ref-area-line{stroke:#39A879!important}
+.nv-finance[lang="fa"] .nv-ref-category.other .nv-ref-area-fill{fill:#4F9BC7!important;opacity:.24!important}
+.nv-finance[lang="fa"] .nv-ref-category.other .nv-ref-area-line{stroke:#4F9BC7!important}
+.nv-finance[lang="fa"] .nv-ref-category .nv-ref-area-line{fill:none!important;stroke-width:2!important;stroke-linecap:round!important;stroke-linejoin:round!important;vector-effect:non-scaling-stroke!important}
+@media(max-width:380px){.nv-finance[lang="fa"] .nv-ref-category{flex-basis:calc((100% - 27px)/3.5)!important;padding:8px 7px!important}.nv-finance[lang="fa"] .nv-ref-actions{gap:7px!important}}
