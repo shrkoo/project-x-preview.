@@ -4,6 +4,7 @@ import {Activity,ArrowDownLeft,ArrowUpRight,QrCode,Home,CalendarClock,ChartNoAxe
 import {apiRequest,clearSession} from "../lib/api";
 const USE_LATIN_DIGITS = false;
 const fmt=(n:number,digits:"fa"|"en"="fa")=>Math.round(n).toLocaleString(digits==="en"&&USE_LATIN_DIGITS?"en-US":"fa-IR",{maximumFractionDigits:0}).replace(/,/g,"٬");
+const faNumber=(n:number,digits:"fa"|"en"="fa")=>fmt(n,digits);
 function rng(seed:number){let s=seed;return()=>(s=(s*16807)%2147483647)/2147483647}
 function makeSeries(kind:"rising"|"plateau"|"falling",seed:number,n=40){const r=rng(seed),out:number[]=[];for(let i=0;i<n;i++){const t=i/(n-1);let b;if(kind==="rising")b=0.2+0.75*Math.pow(t,1.5);else if(kind==="plateau")b=0.55+0.22*Math.sin(t*6.5)+0.1*Math.sin(t*17);else b=0.72-0.3*t+0.16*Math.sin(t*9);out.push(Math.max(0.14,Math.min(1,b+(r()-0.5)*0.2)))}return out}
 type Language="fa"|"en"|"ar"|"ku";
