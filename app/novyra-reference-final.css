@@ -1618,3 +1618,22 @@
   pointer-events:none!important;
   z-index:-1!important;
 }
+
+
+/* NOVYRA finishing pass — softer insight typography, glass balance and cooler page gradient */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight p.nv-insight-rtl{
+  font-size:15px!important;
+  font-weight:500!important;
+  line-height:1.7!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance{
+  background:rgba(255,255,255,.60)!important;
+  border:1px solid rgba(255,255,255,.82)!important;
+  border-radius:26px!important;
+  box-shadow:0 12px 32px rgba(49,82,105,.075),inset 0 1px 0 rgba(255,255,255,.72)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(1.18)!important;
+  backdrop-filter:blur(14px) saturate(1.18)!important;
+}
+.nv-finance.nv-home-active[lang="fa"]{
+  background:linear-gradient(180deg,#cfe8fb 0%,#e5f1fa 48%,#f4f8fd 100%)!important;
+}
