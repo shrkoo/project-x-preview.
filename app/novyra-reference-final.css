@@ -614,3 +614,38 @@
 .nv-finance[lang="fa"] .nv-ref-dock>button.nv-ref-dock-center{background:conic-gradient(from 30deg,#ffbd59,#ff6d83,#a16df5,#3eafe2,#48cda0,#ffbd59)!important;box-shadow:0 8px 20px rgba(115,113,220,.25)!important}
 .nv-finance[lang="fa"] .nv-demo-banner,.nv-finance[lang="fa"] .nv-demo-inline{display:none!important}
 @media(max-width:380px){.nv-finance[lang="fa"] .nv-ref-chart-amount{font-size:10px!important}.nv-finance[lang="fa"] .nv-ref-category.nv-ref-chart-card{height:155px!important;min-height:155px!important}}
+
+
+/* NOVYRA Persian reference parity — final precision pass */
+.nv-finance[lang="fa"] .nv-ref-balance-head{direction:ltr!important;align-items:flex-start!important;justify-content:flex-start!important}
+.nv-finance[lang="fa"] .nv-ref-balance-head>div{direction:rtl!important;text-align:right!important;width:100%!important}
+.nv-finance[lang="fa"] .nv-ref-balance-value-row{display:flex!important;direction:ltr!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;width:100%!important}
+.nv-finance[lang="fa"] .nv-ref-balance-value-row>strong{display:block!important;direction:rtl!important;text-align:right!important;white-space:nowrap!important;font-size:clamp(30px,8vw,43px)!important;line-height:1.12!important}
+.nv-finance[lang="fa"] .nv-ref-balance-value-row .nv-ref-eye{position:static!important;display:inline-flex!important;flex:0 0 34px!important;width:34px!important;height:34px!important;align-items:center!important;justify-content:center!important;margin:0!important;padding:0!important;color:#718493!important;background:transparent!important;border:0!important}
+.nv-finance[lang="fa"] .nv-ref-net-row{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;margin-top:10px!important;white-space:nowrap!important}
+.nv-finance[lang="fa"] .nv-ref-net-chip{flex:0 0 auto!important;min-height:26px!important;padding:4px 9px!important;border-radius:999px!important;display:inline-flex!important;align-items:center!important;gap:4px!important;font-size:11px!important}
+.nv-finance[lang="fa"] .nv-ref-cheer-text{flex:0 1 auto!important;min-width:0!important;font-size:11px!important;line-height:1.5!important;white-space:nowrap!important}
+.nv-finance[lang="fa"] .nv-ref-actions{gap:10px!important;margin-top:16px!important}
+.nv-finance[lang="fa"] .nv-ref-actions .nv-ref-action-expense,.nv-finance[lang="fa"] .nv-ref-actions .nv-ref-action-income{min-height:46px!important;height:46px!important;border-radius:16px!important;font-size:13px!important;padding:0 14px!important;letter-spacing:0!important}
+.nv-finance[lang="fa"] .nv-ref-insight{background:#edf6fb!important;border:1px solid #e4f0f7!important;padding:14px 16px!important;border-radius:18px!important}
+.nv-finance[lang="fa"] .nv-ref-insight p{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;max-width:100%!important;font-size:12px!important;line-height:1.8!important}
+.nv-finance[lang="fa"] .nv-ref-category-grid{direction:rtl!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart{display:block!important;flex:0 0 58px!important;width:100%!important;height:58px!important;min-height:58px!important;margin:1px 0 0!important;overflow:hidden!important;background:transparent!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart svg{display:block!important;width:100%!important;height:100%!important;overflow:visible!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-area-fill{fill:currentColor!important;stroke:none!important;opacity:.16!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-area-line{fill:none!important;stroke:currentColor!important;stroke-width:2.2!important;stroke-linecap:round!important;stroke-linejoin:round!important;vector-effect:non-scaling-stroke!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card.shopping .nv-ref-category-chart{color:#39a879!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card.travel .nv-ref-category-chart{color:#e15d58!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card.food .nv-ref-category-chart{color:#e2b52f!important}
+.nv-finance[lang="fa"] .nv-ref-chart-amount{font-size:12px!important;line-height:1.5!important;margin-top:0!important}
+.nv-finance[lang="fa"] .nv-ref-chart-caption{font-size:10px!important;line-height:1.4!important}
+.nv-finance[lang="fa"] .nv-ref-dock>button.nv-ref-dock-center{width:58px!important;height:58px!important;min-height:58px!important;flex-basis:58px!important;border-radius:50%!important;background:conic-gradient(from 25deg,#ffbd59,#ff7188,#a16df5,#42afe2,#48cda0,#ffbd59)!important;color:#fff!important;box-shadow:0 8px 20px rgba(115,113,220,.24)!important}
+.nv-finance[lang="fa"] .nv-ref-dock>button.nv-ref-dock-center .nf-dock-icon{width:100%!important;height:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;color:#fff!important;background:transparent!important}
+@media(max-width:380px){
+.nv-finance[lang="fa"] .nv-ref-balance{padding-left:15px!important;padding-right:15px!important}
+.nv-finance[lang="fa"] .nv-ref-net-row{gap:5px!important}
+.nv-finance[lang="fa"] .nv-ref-net-chip{font-size:10px!important;padding:4px 7px!important}
+.nv-finance[lang="fa"] .nv-ref-cheer-text{font-size:9px!important}
+.nv-finance[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart{flex-basis:52px!important;height:52px!important;min-height:52px!important}
+.nv-finance[lang="fa"] .nv-ref-chart-amount{font-size:10px!important}
+}
