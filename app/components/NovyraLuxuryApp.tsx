@@ -1,6 +1,6 @@
 "use client";
 import {useEffect,useMemo,useState,type FormEvent} from "react";
-import {Activity,ArrowDownLeft,ArrowUpRight,QrCode,Home,CalendarClock,ChartNoAxesCombined,Download,LayoutDashboard,LogOut,Plus,Search,Settings,ShieldCheck,Sparkles,Wallet,X,Sun,Moon,Bell,Eye,EyeOff,Target,ChevronRight,TrendingUp} from "lucide-react";
+import {Activity,ArrowDownLeft,ArrowUpRight,QrCode,Home,CalendarClock,ChartNoAxesCombined,Download,LayoutDashboard,LogOut,Plus,Search,Settings,ShieldCheck,Sparkles,Wallet,X,Sun,Moon,Bell,Eye,EyeOff,Target,ChevronRight,TrendingUp,User,ArrowLeft} from "lucide-react";
 import {apiRequest,clearSession} from "../lib/api";
 type Language="fa"|"en"|"ar"|"ku";
 type Account={id:string;email:string;displayName:string;role?:string};
@@ -50,7 +50,7 @@ async function logout(){if(!window.confirm(language==="en"?"Are you sure you wan
 const nav:[Tab,any,string][]=[["overview",LayoutDashboard,homeT.overview],["spending",ChartNoAxesCombined,tab==="overview"?"هزینه‌ها":language==="en"?"Spending":"هزینه‌ها"],["income",Target,tab==="overview"?"درآمد و اهداف":language==="en"?"Income & goals":"درآمد و اهداف"],["timeline",CalendarClock,tab==="overview"?homeT.timeline:t.timeline],["settings",Settings,tab==="overview"?homeT.settings:t.settings]];
 if(!ready)return <main className="nv-finance-loading">NOVYRA</main>;
 return <main className={"nv-finance "+(tab==="overview"?"nv-home-active":"")} data-theme={theme} dir={tab==="overview"?"rtl":dir} lang={tab==="overview"?"fa":language}>
-<header className="nf-topbar nv-ref-topbar" dir="ltr"><button className="nf-brand" onClick={()=>setTab("overview")} aria-label="NOVYRA"><span className="nf-mark">N</span></button><div className="nf-top-right"><button className="nf-icon nv-ref-bell" onClick={()=>setNoticeOpen(v=>!v)} aria-label="اعلان‌ها"><Bell size={17}/></button><button className="nf-avatar nv-ref-profile" onClick={()=>{setTab("settings");setMsg(language==="en"?"Pro\u0066ile settings":"پروفایل حساب")}}><span>{(account.displayName||"N").slice(0,1)}</span><small>{tab==="overview"?"پروفایل":"Pro\u0066ile"}</small></button>{noticeOpen&&<div className="nf-notice-panel"><b>{tab==="overview"?"اعلان‌ها":language==="en"?"Notifications":"اعلان‌ها"}</b><p>{tab==="overview"?"اعلان‌های هوشمند · به‌زودی":language==="en"?"You are all caught up.":"اعلان‌های هوشمند · به‌زودی"}</p><button onClick={()=>setNoticeOpen(false)}>×</button></div>}</div></header>
+<header className="nf-topbar nv-ref-topbar" dir="ltr"><button className="nf-brand" onClick={()=>setTab("overview")} aria-label="NOVYRA"><span className="nf-mark">N</span></button><div className="nf-top-right"><button className="nf-icon nv-ref-bell" onClick={()=>setNoticeOpen(v=>!v)} aria-label="اعلان‌ها"><Bell size={17}/></button><button className="nf-avatar nv-ref-profile" onClick={()=>{setTab("settings");setMsg(language==="en"?"Pro\u0066ile settings":"پروفایل حساب")}}><span>{(account.displayName||"N").slice(0,1)}</span><small><User size={14}/>{tab==="overview"?"پروفایل":"Pro\u0066ile"}</small></button>{noticeOpen&&<div className="nf-notice-panel"><b>{tab==="overview"?"اعلان‌ها":language==="en"?"Notifications":"اعلان‌ها"}</b><p>{tab==="overview"?"اعلان‌های هوشمند · به‌زودی":language==="en"?"You are all caught up.":"اعلان‌های هوشمند · به‌زودی"}</p><button onClick={()=>setNoticeOpen(false)}>×</button></div>}</div></header>
 <div className="nf-shell"><aside className="nf-sidebar"><div className="nf-side-label">{tab==="overview"?"فضای کاری":"WORKSPACE"}</div><div className="nf-workspace"><span className="nf-workspace-mark">N</span><span><b>{tab==="overview"?homeT.personal:t.personal}</b><small>{tab==="overview"?homeT.space:t.space}</small></span></div><nav>{nav.map(([key,Icon,label])=><button key={key} className={tab===key?"active":""} onClick={()=>setTab(key)}><Icon size={17}/>{label}</button>)}</nav><div className="nf-side-bottom"><ShieldCheck size={16}/>{tab==="overview"?homeT.privacy:t.privacy}<button onClick={logout} title={tab==="overview"?homeT.logout:t.logout}><LogOut size={16}/></button></div></aside>
 <section className="nf-main"><div className={"nf-page-top "+(tab==="overview"?"nv-ref-home-hide":"nv-ref-subpage-head")}><div><div className="nf-eyebrow">{language==="en"?"NOVYRA | FINANCIAL WELLNESS":"نوویرا | مدیریت مالی"}</div><h1>{tab==="overview"?t.hello+(language==="en"?", ":"، ")+(prefs.profileName||account.displayName):nav.find(x=>x[0]===tab)?.[2]}</h1><p>{tab==="overview"?t.sub:tab==="timeline"?t.timeSub:""}</p></div>{tab==="reports"&&<div className="nf-page-actions"><button className="nf-quiet" onClick={exportCsv}><Download size={15}/>{t.export}</button><button className="nf-primary" onClick={()=>setShow(true)}><Plus size={16}/>{t.add}</button></div>}</div>
 {tab==="overview"&&<>
@@ -72,6 +72,7 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active":"")} da
  <div><b><Sparkles size={17}/> بینش مالی</b>
   <p className="nv-insight-rtl">{!viewItems.some(x=>x.kind==="expense")?"اولین هزینه‌ات را ثبت کن تا بینش بگیری":diningChange!==null?<>هزینه خوراک نسبت به هفته قبل <strong className="nv-insight-highlight">{diningChange>0?"+":""}{diningChange}%</strong></>:"هزینه‌هایت را ثبت کن تا بینش دقیق‌تری بگیری"}</p>
  </div>
+ <button type="button" className="nv-ref-insight-arrow" aria-label="مشاهده گزارش مالی" onClick={e=>{e.stopPropagation();setTab("reports")}}><ArrowLeft size={18}/></button>
 </section>
 <section className="nv-ref-section">
  <div className="nv-ref-section-head"><h2>سطح هزینه‌های ماهانه</h2><button onClick={()=>{setSpendCategory("");setTab("spending")}}>جزئیات بیشتر ←</button></div>
@@ -79,7 +80,8 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active":"")} da
   {[
    {name:"خوراک",keys:["خوراک","Food","غذا"],tone:"food"},
    {name:"رفت‌وآمد",keys:["حمل‌ونقل","حمل و نقل","رفت‌وآمد","Travel","Transport"],tone:"travel"},
-   {name:"خرید",keys:["Shopping","خرید"],tone:"shopping"}
+   {name:"خرید",keys:["Shopping","خرید"],tone:"shopping"},
+   {name:"سایر",keys:["سایر","Other"],tone:"other"}
   ].map(c=>{
     const demoByTone:Record<string,{total:number;status:string;series:number[]}>={
       food:{total:205760,status:"متعادل",series:[10,11,10,12,11,10,12,11,10,11,12,10,11,10,12,11,10,12,11,10,11,12,10,11,10,12,11,10]},
@@ -101,7 +103,7 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active":"")} da
     const status=demoMode?demoByTone[c.tone].status:(categoryBudget>0&&total>categoryBudget?"بیش از سقف":categoryBudget>0&&total>=categoryBudget*.8?"متعادل":total>0?"عادی":"بدون داده");
     return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category nv-ref-chart-card "+c.tone+(hasCategoryData?" has-data":" is-empty")}>
       <div className="nv-ref-category-top"><small>{c.name}</small></div>
-      <div className="nv-ref-wave nv-ref-category-chart" role="img" aria-label={"نمودار موجی هزینه "+c.name}><svg className="nv-category-wave" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-area-fill" d={wavePath?wavePath+" L98 34 L2 34 Z":""}/><path className="nv-ref-area-line" d={wavePath}/></svg></div>
+      <div className="nv-ref-wave nv-ref-category-chart" role="img" aria-label={"نمودار میله‌ای هزینه "+c.name}><svg className="nv-category-wave nv-category-bars" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id={"novyra-bars-"+c.tone} x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="currentColor" stopOpacity=".95"/><stop offset="100%" stopColor="currentColor" stopOpacity=".04"/></linearGradient></defs>{categoryBarHeights(hasCategoryData?chartSeries:[],hasCategoryData).map((h,i)=><rect key={i} x={i*2.2+.25} y={34-h/3} width="1.35" height={h/3} rx=".55" fill={"url(#novyra-bars-"+c.tone+")"}/>)}</svg></div>
       <strong className="nv-ref-chart-amount">{dashboardCash(amount,prefs.digits)}</strong><span className="nv-ref-chart-caption">{status}</span>
     </article>
   })}
