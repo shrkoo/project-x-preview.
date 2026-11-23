@@ -1967,3 +1967,8 @@
 .nv-finance nav.nf-mobile-dock.nv-ref-dock::before{
   background:linear-gradient(to bottom,rgba(244,248,253,0),rgba(244,248,253,.82) 68%,rgba(244,248,253,0))!important;
 }
+
+/* Align six Persian Y-axis labels with the chart grid lines */
+.nv-finance .nv-ref-spending-page .nv-spend-y{
+  padding:26px 0 14px!important;
+}
