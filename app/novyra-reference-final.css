@@ -1030,3 +1030,82 @@
 .nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.has-data .nv-ref-area-fill{
   opacity:.30!important;
 }
+
+
+/* NOVYRA Persian dashboard — final reference polish */
+.nv-finance.nv-home-active[lang="fa"]{
+  background:linear-gradient(180deg,#eaf4fc 0%,#f4f8fb 220px,#f4f8fb 100%)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar .nv-ref-bell,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar .nv-ref-profile{
+  background:rgba(255,255,255,.5)!important;
+  -webkit-backdrop-filter:blur(12px)!important;backdrop-filter:blur(12px)!important;
+  border:1px solid rgba(255,255,255,.72)!important;
+  box-shadow:0 4px 14px rgba(55,91,119,.06)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar .nv-ref-profile small{
+  display:inline-flex!important;align-items:center!important;gap:8px!important;
+  font-size:12px!important;font-weight:500!important;color:#526779!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar .nv-ref-profile small svg{flex:none!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:14px!important;
+  background:linear-gradient(110deg,#e5f2ff 0%,#f1f8ff 58%,#fff 100%)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight>div{flex:1 1 auto!important;min-width:0!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight-arrow{
+  flex:0 0 40px!important;width:40px!important;height:40px!important;
+  min-width:40px!important;min-height:40px!important;padding:0!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  border:0!important;border-radius:50%!important;background:#fff!important;
+  color:#347fe8!important;box-shadow:0 4px 12px rgba(48,104,169,.12)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight-arrow svg{transform:none!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions .nv-ref-action-expense,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions .nv-ref-action-income{
+  height:60px!important;min-height:60px!important;border-radius:17px!important;
+  font-weight:500!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions .nv-ref-action-qr{
+  width:60px!important;height:60px!important;min-height:60px!important;
+  border-radius:50%!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{
+  display:flex!important;flex-flow:row nowrap!important;direction:rtl!important;
+  gap:10px!important;overflow-x:auto!important;overflow-y:hidden!important;
+  padding:0 0 8px!important;margin:0!important;
+  scroll-snap-type:x mandatory!important;-webkit-overflow-scrolling:touch!important;
+  scrollbar-width:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid::-webkit-scrollbar{display:none!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-chart-card{
+  flex:0 0 31%!important;width:31%!important;min-width:31%!important;
+  scroll-snap-align:start!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-category-bars{
+  width:100%!important;height:78px!important;display:block!important;
+  overflow:hidden!important;opacity:1!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.is-empty .nv-category-bars{opacity:.72!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-amount{
+  font-weight:500!important;color:#34495a!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-caption{
+  font-weight:400!important;color:#64748b!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-category-top small{
+  font-weight:500!important;color:#64748b!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-head>div>small{font-weight:500!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-net-chip,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-cheer-text{font-weight:500!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-dock{
+  background:transparent!important;border:0!important;box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+}
+@media(max-width:380px){
+ .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-chart-card{
+   flex-basis:31%!important;width:31%!important;min-width:31%!important;
+ }
+}
