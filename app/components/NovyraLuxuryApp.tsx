@@ -136,6 +136,10 @@ const max=10_000_000,weekStart=new Date(now);weekStart.setDate(now.getDate()-6);
 const recentExpenses=expenses.filter(x=>new Date(x.date+"T12:00:00")>=weekStart);
 const high=recentExpenses.reduce<Tx|null>((a,x)=>!a||x.amount>a.amount?x:a,null),low=recentExpenses.reduce<Tx|null>((a,x)=>!a||x.amount<a.amount?x:a,null);
 const isDemo=days.every(v=>v===0);
+const previousWeekStart=new Date(weekStart);previousWeekStart.setDate(weekStart.getDate()-7);
+const categoryWeekChange=(category:string)=>{const current=expenses.filter(x=>x.category===category&&new Date(x.date+"T12:00:00")>=weekStart).reduce((n,x)=>n+x.amount,0);const previous=expenses.filter(x=>x.category===category&&new Date(x.date+"T12:00:00")>=previousWeekStart&&new Date(x.date+"T12:00:00")<weekStart).reduce((n,x)=>n+x.amount,0);return previous>0?(current-previous)/previous*100:0};
+const highTrend=isDemo?4.65:high?categoryWeekChange(high.category):0;
+const lowTrend=isDemo?-2.43:low?categoryWeekChange(low.category):0;
 const demo=[4_200_000,3_800_000,4_600_000,5_100_000,5_000_000,6_200_000,5_900_000,7_400_000,6_100_000,4_800_000,5_200_000,5_000_000,5_400_000,6_600_000,5_800_000,5_100_000,4_400_000,4_900_000,4_100_000,3_564_620];
 const chartValues=isDemo?demo:days;
 const hasData=chartValues.some(v=>v>0);
@@ -178,8 +182,8 @@ return <div className="nv-ref-spending-page">
 </section>
 <h2 className="nv-spend-heading">برجسته‌های این هفته</h2>
 <div className="nv-spend-highlights">
-<article className="high"><small><TrendingUp size={15} aria-hidden="true"/> بیشترین هزینه</small><div className="nv-spend-highlight-value"><b>{isDemo?cash(1850000,"IRR",loc,"fa"):high?cash(high.amount,"IRR",loc,"fa"):"۰ ریال"}</b><i className={trend>0?"up":"down"}>{trend>0?"▲ ":"▼ "}{fmtPercent(Math.abs(trend))}٪</i></div><em>{isDemo?"خرید و نیازهای روزمره":high?.title||"—"}</em><p>ماه قبل هزینه‌ی شما {cash(displayPrevious,"IRR",loc,"fa")} بود</p></article>
-<article className="low"><small><TrendingDown size={15} aria-hidden="true"/> کمترین هزینه</small><div className="nv-spend-highlight-value"><b>{isDemo?cash(125000,"IRR",loc,"fa"):low?cash(low.amount,"IRR",loc,"fa"):"۰ ریال"}</b><i className={trend>0?"up":"down"}>{trend>0?"▲ ":"▼ "}{fmtPercent(Math.abs(trend))}٪</i></div><em>{isDemo?"هزینه‌های متفرقه":low?.title||"—"}</em><p>ماه قبل هزینه‌ی شما {cash(displayPrevious,"IRR",loc,"fa")} بود</p></article>
+<article className="high"><small><TrendingUp size={15} aria-hidden="true"/> بیشترین هزینه</small><div className="nv-spend-highlight-value"><b>{isDemo?cash(1850000,"IRR",loc,"fa"):high?cash(high.amount,"IRR",loc,"fa"):"۰ ریال"}</b><i className={highTrend>0?"up":"down"}>{highTrend>0?"▲ ":"▼ "}{fmtPercent(Math.abs(highTrend))}٪</i></div><em>{isDemo?"خرید و نیازهای روزمره":high?.title||"—"}</em><p>ماه قبل هزینه‌ی شما {cash(displayPrevious,"IRR",loc,"fa")} بود</p></article>
+<article className="low"><small><TrendingDown size={15} aria-hidden="true"/> کمترین هزینه</small><div className="nv-spend-highlight-value"><b>{isDemo?cash(125000,"IRR",loc,"fa"):low?cash(low.amount,"IRR",loc,"fa"):"۰ ریال"}</b><i className={lowTrend>0?"up":"down"}>{lowTrend>0?"▲ ":"▼ "}{fmtPercent(Math.abs(lowTrend))}٪</i></div><em>{isDemo?"هزینه‌های متفرقه":low?.title||"—"}</em><p>ماه قبل هزینه‌ی شما {cash(displayPrevious,"IRR",loc,"fa")} بود</p></article>
 </div>
 <h2 className="nv-spend-heading">اقدام‌های سریع</h2>
 <div className="nv-spend-quick"><button onClick={()=>setTab("reports")}><span><b>بررسی بودجه ماهانه</b><small>نمای کلی ماه</small></span><span className="nv-quick-chevron">‹</span></button><button onClick={()=>setTab("transactions")}><span><b>به‌روزرسانی دسته‌بندی هزینه‌ها</b><small>مدیریت تراکنش‌ها</small></span><span className="nv-quick-chevron">‹</span></button></div>
