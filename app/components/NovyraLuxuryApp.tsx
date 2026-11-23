@@ -77,10 +77,9 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active":"")} da
  <div className="nv-ref-section-head"><h2>سطح هزینه‌های ماهانه</h2><button onClick={()=>{setSpendCategory("");setTab("spending")}}>جزئیات بیشتر ←</button></div>
  <div className="nv-ref-category-grid">
   {[
-   {name:"خرید",keys:["Shopping","خرید"],tone:"shopping"},
-   {name:"رفت‌وآمد",keys:["حمل‌ونقل","حمل و نقل","رفت‌وآمد","Travel","Transport"],tone:"travel"},
    {name:"خوراک",keys:["خوراک","Food","غذا"],tone:"food"},
-   {name:"سایر",keys:["سایر","Other","عمومی"],tone:"other"}
+   {name:"رفت‌وآمد",keys:["حمل‌ونقل","حمل و نقل","رفت‌وآمد","Travel","Transport"],tone:"travel"},
+   {name:"خرید",keys:["Shopping","خرید"],tone:"shopping"}
   ].map(c=>{
     const demoByTone:Record<string,{total:number;status:string;series:number[]}>={
       food:{total:205760,status:"متعادل",series:[10,11,10,12,11,10,12,11,10,11,12,10,11,10,12,11,10,12,11,10,11,12,10,11,10,12,11,10]},
@@ -96,13 +95,13 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active":"")} da
     });
     const hasCategoryData=demoMode||total>0;
     const displaySeries=hasCategoryData?chartSeries:[];
-    const barHeights=categoryBarHeights(displaySeries,hasCategoryData);
+    const wavePath=smoothWavePath(displaySeries);
     const amount=demoMode?demoByTone[c.tone].total:total;
     const categoryBudget=Number(c.keys.map(key=>Number(prefs.categoryBudgets[key]||0)).find(value=>value>0)||0);
     const status=demoMode?demoByTone[c.tone].status:(categoryBudget>0&&total>categoryBudget?"بیش از سقف":categoryBudget>0&&total>=categoryBudget*.8?"متعادل":total>0?"عادی":"بدون داده");
     return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category nv-ref-chart-card "+c.tone+(hasCategoryData?" has-data":" is-empty")}>
       <div className="nv-ref-category-top"><small>{c.name}</small></div>
-      <div className="nv-ref-wave nv-ref-category-chart" role="img" aria-label={"نمودار روند هزینه "+c.name}><svg className="nv-category-bars" viewBox="0 0 157.5 96" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id={"novyra-bar-"+c.tone} x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={c.tone==="food"?"#F5C518":c.tone==="travel"?"#E5484D":c.tone==="shopping"?"#46B96B":"#9B7FD4"} stopOpacity="1"/><stop offset="100%" stopColor={c.tone==="food"?"#F5C518":c.tone==="travel"?"#E5484D":c.tone==="shopping"?"#46B96B":"#9B7FD4"} stopOpacity="0"/></linearGradient></defs>{barHeights.map((h,i)=><rect key={i} x={i*3.5} y={96-h} width="2" height={h} rx="1" fill={"url(#novyra-bar-"+c.tone+")"}/>)}</svg></div>
+      <div className="nv-ref-wave nv-ref-category-chart" role="img" aria-label={"نمودار موجی هزینه "+c.name}><svg className="nv-category-wave" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-area-fill" d={wavePath?wavePath+" L98 34 L2 34 Z":""}/><path className="nv-ref-area-line" d={wavePath}/></svg></div>
       <strong className="nv-ref-chart-amount">{dashboardCash(amount,prefs.digits)}</strong><span className="nv-ref-chart-caption">{status}</span>
     </article>
   })}
