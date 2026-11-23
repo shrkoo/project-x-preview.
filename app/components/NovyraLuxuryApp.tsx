@@ -171,7 +171,7 @@ return <div className="nv-ref-spending-page an-screen">
 <div className="nv-spend-chart an-chart">
 <div className="nv-spend-y an-y-labels">{yLabels.map(v=><span key={v}>{v===0?"۰":fmt(v/1_000_000)+"م"}</span>)}</div>
 <div className="nv-spend-plot an-chart-plot">
-<svg viewBox="0 0 600 190" preserveAspectRatio="none" role="img" aria-label="نمودار ناحیه‌ای هزینه‌های روزانه ماه" onPointerDown={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((1-(e.clientX-r.left)/r.width)*29)+1)) )}} onPointerMove={e=>{if(e.pointerType==="mouse"||e.buttons>0){const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((1-(e.clientX-r.left)/r.width)*29)+1)) )}}} onPointerLeave={e=>{if(e.pointerType==="mouse")setActiveDay(null)}} onClick={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((1-(e.clientX-r.left)/r.width)*29)+1)) )}}>
+<svg viewBox="0 0 600 190" preserveAspectRatio="none" role="img" aria-label="نمودار ناحیه‌ای هزینه‌های روزانه ماه" onPointerDown={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round(((e.clientX-r.left)/r.width)*29)+1)) )}} onPointerMove={e=>{if(e.pointerType==="mouse"||e.buttons>0){const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round(((e.clientX-r.left)/r.width)*29)+1)) )}}} onPointerLeave={e=>{if(e.pointerType==="mouse")setActiveDay(null)}} onClick={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round(((e.clientX-r.left)/r.width)*29)+1)) )}}>
 <defs><linearGradient id="spendFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#22A06B" stopOpacity=".35"/><stop offset="100%" stopColor="#22A06B" stopOpacity="0"/></linearGradient></defs>
 {yLabels.map((v,i)=><line key={"h"+v} x1="0" x2="600" y1={26+i*30} y2={26+i*30} stroke="#64748B" strokeOpacity=".12" strokeWidth="1" strokeDasharray="3 5"/>)}
 
@@ -180,9 +180,9 @@ return <div className="nv-ref-spending-page an-screen">
 {hasData&&selected&&<><line x1={selected.x} x2={selected.x} y1={selected.y} y2="184" stroke="#22A06B" strokeWidth="1"/></>}
 </svg>
 {hasData&&selected&&<>
-<i className="nv-spend-dot an-chart-point" style={{left:`${(1-selected.x/600)*100}%`,top:`${selected.y/190*100}%`}}/>
+<i className="nv-spend-dot an-chart-point" style={{left:`${(selected.x/600)*100}%`,top:`${selected.y/190*100}%`}}/>
 </>}
-{hasData&&selected&&<div className={"nv-spend-tooltip an-chart-tooltip"+(selected.y<44?" below":"")} style={{left:`clamp(72px, ${(1-selected.x/600)*100}%, calc(100% - 72px))`,top:`${selected.y/190*100}%`}} aria-live="polite">{fmt(selected.v)} ریال</div>}
+{hasData&&selected&&<div className={"nv-spend-tooltip an-chart-tooltip"+(selected.y<44?" below":"")} style={{left:`clamp(72px, ${(selected.x/600)*100}%, calc(100% - 72px))`,top:`${selected.y/190*100}%`}} aria-live="polite">{fmt(selected.v)} ریال</div>}
 </div>
 </div>
 {monthlyBudget&&<div className="nv-spend-budget">بودجه ماهانه: {cash(Number(monthlyBudget)||0,"IRR",loc,"fa")} · {Number(monthlyBudget)>0?Math.round(currentTotal/Number(monthlyBudget)*100)+"% used":"—"}</div>}
