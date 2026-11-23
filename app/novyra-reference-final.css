@@ -3293,7 +3293,7 @@
   border-radius:99px!important;
 }
 .nv-finance .nv-income-page .nv-goal-track>i::after{
-  content:""!important;position:absolute!important;right:0!important;top:-3px!important;
+  content:""!important;position:absolute!important;left:0!important;top:-3px!important;
   width:2px!important;height:10px!important;border-radius:2px!important;
   background:#148d4c!important;
 }
