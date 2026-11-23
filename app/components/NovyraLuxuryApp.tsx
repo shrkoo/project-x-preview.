@@ -93,10 +93,11 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active":"")} da
       const day=new Date();day.setHours(0,0,0,0);day.setDate(day.getDate()-(13-i));
       return viewItems.filter(x=>matches(x)&&x.date===day.toISOString().slice(0,10)).reduce((n,x)=>n+x.amount,0);
     });
-    const displaySeries=total>0?chartSeries:[0.5,1.4,0.8,2.3,1.1,2.8,1.3,2.1,0.9,2.5,1.2,2.0,0.7,1.6];
+    const hasCategoryData=demoMode||total>0;
+    const displaySeries=hasCategoryData?chartSeries:[0.5,1.4,0.8,2.3,1.1,2.8,1.3,2.1,0.9,2.5,1.2,2.0,0.7,1.6];
     const amount=demoMode?demoByTone[c.tone].total:total;
     const status=demoMode?demoByTone[c.tone].status:(total>0?"ثبت‌شده":"بدون داده");
-    return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category nv-ref-chart-card "+c.tone+(total>0?" has-data":" is-empty")}>
+    return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category nv-ref-chart-card "+c.tone+(hasCategoryData?" has-data":" is-empty")}>
       <div className="nv-ref-category-top"><small>{c.name}</small></div>
       <div className="nv-ref-wave nv-ref-area nv-ref-category-chart" role="img" aria-label={"نمودار روند هزینه "+c.name}><svg viewBox="0 0 100 46" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-area-fill" d={smoothWavePath(displaySeries)+" L98 44 L2 44 Z"}/><path className="nv-ref-area-line" d={smoothWavePath(displaySeries)}/></svg></div>
       <strong className="nv-ref-chart-amount">{dashboardCash(amount)}</strong><span className="nv-ref-chart-caption">{status}</span>
