@@ -1401,3 +1401,63 @@
     flex-basis:144px!important;
   }
 }
+
+
+/* NOVYRA final corrective pass — compact charts, vivid seeded bars and safe dock */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-category-bars{
+  opacity:1!important;
+  filter:saturate(1.35) contrast(1.12)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.food .nv-category-bars{color:#e5a900!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.travel .nv-category-bars{color:#e43f42!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.shopping .nv-category-bars{color:#16a765!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.is-empty .nv-category-bars{opacity:1!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-chart-card{
+  height:178px!important;min-height:178px!important;max-height:178px!important;
+  padding:10px 9px 9px!important;gap:2px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart{
+  flex:0 0 92px!important;height:92px!important;min-height:92px!important;
+  max-height:92px!important;margin:0!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-category-bars{
+  height:92px!important;min-height:92px!important;max-height:92px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-amount{
+  margin:0!important;font-size:11px!important;line-height:1.35!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-caption{
+  margin:0!important;font-size:10px!important;line-height:1.3!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight p,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight b{
+  font-size:15px!important;line-height:1.75!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nf-main{
+  padding-bottom:calc(140px + env(safe-area-inset-bottom))!important;
+  overflow-x:clip!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock{
+  left:0!important;right:0!important;bottom:0!important;
+  width:100%!important;max-width:100vw!important;min-width:0!important;
+  box-sizing:border-box!important;overflow:hidden!important;
+  margin-inline:0!important;transform:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center{
+  background:conic-gradient(from 180deg,#ff5f6d,#ffc371,#7bed9f,#54a0ff,#a55eea,#ff5f6d)!important;
+  opacity:1!important;filter:none!important;
+  box-shadow:0 8px 22px rgba(92,110,205,.28)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center .nf-dock-icon,
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center svg{
+  color:#fff!important;stroke:#fff!important;opacity:1!important;
+}
+@media(max-width:380px){
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-chart-card{
+    height:178px!important;min-height:178px!important;max-height:178px!important;
+  }
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart,
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-category-bars{
+    height:92px!important;min-height:92px!important;max-height:92px!important;flex-basis:92px!important;
+  }
+}
