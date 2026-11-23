@@ -95,7 +95,7 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active":"")} da
     });
     const hasCategoryData=demoMode||total>0;
     const displaySeries=hasCategoryData?chartSeries:[];
-    const wavePath=smoothWavePath(displaySeries);
+    const wavePath=smoothWavePath(hasCategoryData?displaySeries:[3,5,2,6,4,3,7,4,2,5,3,6,2,4]);
     const amount=demoMode?demoByTone[c.tone].total:total;
     const categoryBudget=Number(c.keys.map(key=>Number(prefs.categoryBudgets[key]||0)).find(value=>value>0)||0);
     const status=demoMode?demoByTone[c.tone].status:(categoryBudget>0&&total>categoryBudget?"بیش از سقف":categoryBudget>0&&total>=categoryBudget*.8?"متعادل":total>0?"عادی":"بدون داده");
