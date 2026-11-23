@@ -708,3 +708,55 @@
 .nv-finance[lang="fa"] .nv-ref-topbar .nv-ref-bell{flex-shrink:0!important;min-width:0!important}
 .nv-finance[lang="fa"] .nv-ref-topbar .nf-avatar,
 .nv-finance[lang="fa"] .nv-ref-topbar .nv-ref-bell{min-height:40px!important}
+
+
+/* NOVYRA home-only final fixes */
+.nv-finance.nv-home-active[lang="fa"] .nf-main{
+  padding-bottom:calc(180px + env(safe-area-inset-bottom))!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{
+  display:flex!important;flex-wrap:nowrap!important;flex-direction:row!important;
+  direction:rtl!important;gap:10px!important;overflow-x:auto!important;overflow-y:hidden!important;
+  padding:4px 12px 14px 28px!important;margin:0 -2px!important;
+  scroll-padding-inline:12px!important;scroll-snap-type:x mandatory!important;
+  -webkit-overflow-scrolling:touch!important;scrollbar-width:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid::-webkit-scrollbar{display:none!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category{
+  flex:0 0 29%!important;min-width:108px!important;width:29%!important;max-width:none!important;
+  scroll-snap-align:start!important;box-sizing:border-box!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-category-top small{
+  display:block!important;max-width:100%!important;white-space:nowrap!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;font-size:11px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.is-empty .nv-ref-area-fill{
+  opacity:.07!important;fill:currentColor!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.is-empty .nv-ref-area-line{
+  opacity:.35!important;stroke:currentColor!important;stroke-width:1.8!important;
+  stroke-dasharray:3 3!important;fill:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.has-data .nv-ref-area-fill{
+  opacity:.18!important;fill:currentColor!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.has-data .nv-ref-area-line{
+  opacity:1!important;stroke:currentColor!important;stroke-width:2.2!important;
+  stroke-dasharray:none!important;fill:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.other .nv-ref-category-chart{color:#9672c9!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight{
+  min-width:0!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight>div{min-width:0!important;width:100%!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight p{
+  white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+  font-size:12px!important;line-height:1.6!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-dock>button.nv-ref-dock-center .nf-dock-icon svg{
+  fill:none!important;stroke:#fff!important;stroke-width:1.8!important;
+}
+@media(max-width:380px){
+ .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{gap:8px!important;padding-left:25px!important;padding-right:10px!important}
+ .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category{flex-basis:29%!important;min-width:104px!important}
+}
