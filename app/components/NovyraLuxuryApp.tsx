@@ -17,7 +17,7 @@ ku:{overview:"پوختە",transactions:"مامەڵەکان",accounts:"هەژما
 };
 const today=()=>new Date().toISOString().slice(0,10);
 const faNumber=(n:number,digits:"fa"|"en"="fa")=>Math.round(n).toLocaleString(digits==="fa"?"fa-IR":"en-US",{maximumFractionDigits:0});
-const dashboardCash=(n:number,digits:"fa"|"en"="en")=><bdi dir="ltr">{faNumber(n,digits)} ریال</bdi>;
+const dashboardCash=(n:number,digits:"fa"|"en"="fa")=><bdi dir="ltr">{faNumber(n,digits)} ریال</bdi>;
 function categoryBarHeights(values:number[],hasData:boolean,seed:number=0){const count=50;const phase=seed*.71;const wave=Array.from({length:count},(_,i)=>.53+.20*Math.sin(i*.31+phase)+.13*Math.sin(i*.13+phase*1.7)+.09*Math.cos(i*.57+phase*.6)+.045*Math.sin(i*.91+phase*2));if(!hasData){const min=Math.min(...wave),max=Math.max(...wave);return wave.map(v=>54+((v-min)/(max-min))*82)}const src=values.length?values:[0];const sampled=Array.from({length:count},(_,i)=>{const p=i*(src.length-1)/(count-1),lo=Math.floor(p),hi=Math.min(src.length-1,Math.ceil(p)),t=p-lo;return (src[lo]||0)*(1-t)+(src[hi]||0)*t});const smoothed=sampled.map((_,i)=>{const at=(j:number)=>sampled[Math.max(0,Math.min(count-1,j))];return (at(i-2)+2*at(i-1)+3*at(i)+2*at(i+1)+at(i+2))/9});const min=Math.min(...smoothed),max=Math.max(...smoothed);return smoothed.map((v,i)=>{const base=max===min?96:52+((v-min)/(max-min))*88;return Math.max(42,Math.min(140,base*(1+.055*Math.sin(i*.37+phase)+.025*Math.cos(i*.19+phase*1.7))))})}
 const cash=(n:number,c:string,l:string,digits:"fa"|"en"="en")=>c==="IRR"?<bdi dir="ltr">{faNumber(n,digits)} ریال</bdi>:new Intl.NumberFormat(digits==="fa"?"fa-IR":l,{style:"currency",currency:c,minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
 function smoothWavePath(values:number[]){if(!values.length)return "";const source=values.map(v=>Math.max(0,v));const smoothed=source.map((_,i)=>{const at=(j:number)=>source[Math.max(0,Math.min(source.length-1,j))];return (at(i-2)+2*at(i-1)+3*at(i)+2*at(i+1)+at(i+2))/9});const count=Math.min(10,smoothed.length);const sampled=Array.from({length:count},(_,i)=>{const pos=i*(smoothed.length-1)/Math.max(1,count-1),lo=Math.floor(pos),hi=Math.ceil(pos),mix=pos-lo;return smoothed[lo]*(1-mix)+smoothed[hi]*mix});const max=Math.max(...sampled,1);const pts=sampled.map((v,i)=>({x:2+i*96/Math.max(1,sampled.length-1),y:27-Math.sqrt(v/max)*21}));if(pts.length===1)return `M ${pts[0].x} ${pts[0].y}`;let d=`M ${pts[0].x} ${pts[0].y}`;for(let i=0;i<pts.length-1;i++){const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)],dx=p2.x-p1.x;const tension=.72,c1x=p1.x+dx*tension/3,c1y=p1.y+(p2.y-p0.y)*tension/6,c2x=p2.x-dx*tension/3,c2y=p2.y-(p3.y-p1.y)*tension/6;d+=` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`}return d}
@@ -156,6 +156,7 @@ return <div className="nv-ref-spending-page">
 <div className="nv-spend-total-head"><div><small>مجموع هزینه ماهانه</small><h2>{cash(displayTotal,"IRR",loc,"fa")}</h2>{displayPrevious>0&&<span className={"nv-spend-change "+(trend>0?"up":"down")}>{(trend>0?"▲ ":"▼ ")+fmtPercent(Math.abs(trend))+"٪ نسبت به ماه قبل"}</span>}{isDemo&&<small className="nv-spend-demo-tag">نمونه</small>}</div><button onClick={()=>setTab("reports")} aria-label="گزارش کامل"><ChevronRight size={19}/></button></div>
 <div className="nv-spend-chart">
 <div className="nv-spend-y">{yLabels.map(v=><span key={v}>{v===0?"۰":fmt(v/1_000_000)+"م"}</span>)}</div>
+<div className="nv-spend-plot">
 <svg viewBox="0 0 600 190" preserveAspectRatio="none" role="img" aria-label="نمودار ناحیه‌ای هزینه‌های روزانه ماه" onPointerDown={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)) )}} onPointerMove={e=>{if(e.pointerType==="mouse"||e.buttons>0){const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)) )}}} onPointerLeave={e=>{if(e.pointerType==="mouse")setActiveDay(null)}} onClick={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)) )}}>
 <defs><linearGradient id="spendFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#48b88a" stopOpacity=".22"/><stop offset="100%" stopColor="#48b88a" stopOpacity=".015"/></linearGradient></defs>
 {yLabels.map((v,i)=><line key={"h"+v} x1="0" x2="600" y1={26+i*30} y2={26+i*30} stroke="#8ca6b5" strokeOpacity=".16" strokeWidth="1"/>)}
@@ -163,8 +164,13 @@ return <div className="nv-ref-spending-page">
 <path d={area} fill="url(#spendFill)" opacity={isDemo ? 0.72 : 1}/>
 <path d={line} fill="none" stroke="#23a36d" strokeWidth={2.8} strokeOpacity={isDemo?.68:1} strokeLinecap="round" strokeLinejoin="round"/>
 
-{hasData&&selected&&<><line x1={selected.x} x2={selected.x} y1="18" y2="184" stroke="#269b69" strokeDasharray="4 4" strokeOpacity=".8"/><circle cx={selected.x} cy={selected.y} r="5" fill="#269b69" stroke="#fff" strokeWidth="2"/><g><rect x={Math.max(5,Math.min(495,selected.x-58))} y={Math.max(2,selected.y-31)} width="116" height="23" rx="8" fill="#effcf5" stroke="#55b98a" strokeWidth="1.2"/><text x={Math.max(63,Math.min(537,selected.x))} y={Math.max(18,selected.y-15)} textAnchor="middle" fill="#278b62" fontSize="12" fontWeight="600">{fmt(selected.v)} ریال</text></g></>}
+{hasData&&selected&&<line x1={selected.x} x2={selected.x} y1="18" y2="184" stroke="#269b69" strokeDasharray="4 4" strokeOpacity=".8"/>}
 </svg>
+{hasData&&selected&&<>
+<i className="nv-spend-dot" style={{left:`${selected.x/600*100}%`,top:`${selected.y/190*100}%`}}/>
+<span className="nv-spend-bubble" style={{left:`${Math.min(90,Math.max(10,selected.x/600*100))}%`,top:`${selected.y/190*100}%`}}>{fmt(selected.v)} ریال</span>
+</>}
+</div>
 <div className="nv-spend-tooltip" aria-live="polite">{hasData&&selected?("روز "+fmt(selected.day)+" · "+cash(selected.v,"IRR",loc,"fa")):""}</div>
 </div>
 {monthlyBudget&&<div className="nv-spend-budget">بودجه ماهانه: {cash(Number(monthlyBudget)||0,"IRR",loc,"fa")} · {Number(monthlyBudget)>0?Math.round(currentTotal/Number(monthlyBudget)*100)+"% used":"—"}</div>}
