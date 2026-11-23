@@ -3369,9 +3369,7 @@
 .nv-finance .nv-ref-spending-page .nv-spend-plot>svg line{
   stroke-opacity:.15!important;
 }
-.nv-finance .nv-ref-spending-page .nv-spend-plot>svg line[x1][x2]:not([y1="26"]){
-  display:none!important;
-}
+.nv-finance .nv-ref-spending-page .nv-spend-plot>svg line[x1][x2]{display:block!important}
 .nv-finance .nv-ref-spending-page .nv-spend-plot>svg path:nth-of-type(2){
   stroke-width:1.9!important;stroke-linecap:round!important;stroke-linejoin:round!important;
 }
