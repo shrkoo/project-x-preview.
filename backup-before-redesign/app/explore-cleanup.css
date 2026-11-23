@@ -1,0 +1,491 @@
+/* Explore-only presentation overrides. Other app screens retain their existing styles. */
+
+.social-app:has(.nv-explore-screen) .social-topbar {
+  display: none !important;
+}
+.social-main-column:has(.nv-explore-screen) > .social-page-heading {
+  display: none !important;
+}
+.social-app .nv-explore-screen {
+  width: 100%;
+  min-width: 0;
+  min-height: 70vh;
+  color: #fff;
+  background: #0a0c10;
+}
+.social-app .nv-explore-screen > .nv-top-tabs {
+  display: none !important;
+}
+.social-app .nv-explore-toolbar {
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  height: 66px !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  direction: rtl !important;
+  background: #0a0c10 !important;
+}
+.social-app .nv-explore-search-trigger {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex-direction: row !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+  height: 50px !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  background: #1c1e24 !important;
+  color: #aeb3bd !important;
+  text-align: right !important;
+  font-size: 15px !important;
+}
+.social-app .nv-explore-search-trigger svg {
+  width: 21px !important;
+  height: 21px !important;
+  flex: none !important;
+  color: #fff !important;
+  stroke-width: 2 !important;
+}
+.social-app .nv-explore-search-trigger span {
+  color: #aeb3bd !important;
+  margin: 0 !important;
+}
+.social-app .nv-explore-bookmark {
+  display: grid !important;
+  flex: 0 0 34px !important;
+  width: 34px !important;
+  height: 50px !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+}
+.social-app .nv-explore-bookmark svg {
+  width: 23px !important;
+  height: 23px !important;
+  stroke-width: 1.8 !important;
+}
+.social-app .nv-explore-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-auto-flow: row !important;
+  gap: 1px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  direction: rtl !important;
+}
+.social-app .nv-explore-tile {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  aspect-ratio: 3 / 4 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #1c1e24 !important;
+  color: #fff !important;
+}
+.social-app .nv-explore-tile > img,
+.social-app .nv-explore-tile > video {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  opacity: 0;
+  transition: opacity 160ms ease-out;
+}
+.social-app .nv-explore-tile > [data-loaded="true"] {
+  opacity: 1 !important;
+}
+.social-app .nv-explore-views {
+  position: absolute !important;
+  right: 12px !important;
+  bottom: 12px !important;
+  z-index: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  max-width: calc(100% - 20px) !important;
+  padding: 2px 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  text-shadow: 0 1px 4px #000, 0 0 8px #000 !important;
+  direction: rtl !important;
+}
+.social-app .nv-explore-views svg {
+  width: 16px !important;
+  height: 16px !important;
+  flex: none !important;
+  stroke-width: 1.8 !important;
+}
+.social-app .nv-explore-tile::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 34%;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(0,0,0,.42));
+}
+.social-app .nv-tile-play {
+  display: none !important;
+}
+.social-app .nv-explore-sentinel {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aeb3bd;
+  font-size: 11px;
+}
+.social-app .nv-search-page,
+.social-app .nv-saved-explore-screen {
+  min-height: 70vh;
+  direction: rtl;
+  background: #0a0c10;
+  color: #fff;
+}
+.social-app .nv-search-page {
+  padding: 8px 16px 20px;
+}
+.social-app .nv-search-page-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 0 22px !important;
+  direction: rtl !important;
+}
+.social-app .nv-search-page-head > button {
+  display: grid !important;
+  flex: 0 0 34px !important;
+  width: 34px !important;
+  height: 50px !important;
+  place-items: center !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+}
+.social-app .nv-search-page-head > button svg {
+  width: 23px !important;
+  height: 23px !important;
+}
+.social-app .nv-search-page-head form {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  height: 50px !important;
+  min-width: 0 !important;
+  padding: 0 16px !important;
+  border-radius: 20px !important;
+  background: #1c1e24 !important;
+  color: #fff !important;
+}
+.social-app .nv-search-page-head form svg {
+  width: 20px !important;
+  height: 20px !important;
+  flex: none !important;
+  color: #fff !important;
+}
+.social-app .nv-search-page-head input {
+  width: 100% !important;
+  min-width: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-size: 15px !important;
+  text-align: right !important;
+}
+.social-app .nv-search-page-head input::placeholder {
+  color: #aeb3bd !important;
+}
+.social-app .nv-recent-heading {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin: 7px 2px 12px !important;
+}
+.social-app .nv-recent-heading strong {
+  color: #fff !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+}
+.social-app .nv-recent-heading button,
+.social-app .nv-clear-history {
+  border: 0 !important;
+  background: transparent !important;
+  color: #3995ff !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+.social-app .nv-recent-list,
+.social-app .nv-live-results {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+}
+.social-app .nv-recent-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  min-height: 80px !important;
+  padding: 8px 2px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+.social-app .nv-recent-main {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: inherit !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+.social-app .nv-recent-avatar {
+  display: grid !important;
+  flex: 0 0 60px !important;
+  width: 60px !important;
+  height: 60px !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  border-radius: 50% !important;
+  background: #282b32 !important;
+  color: #9ba1ad !important;
+}
+.social-app .nv-recent-avatar svg {
+  width: 27px !important;
+  height: 27px !important;
+  stroke-width: 1.6 !important;
+}
+.social-app .nv-recent-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  min-width: 0 !important;
+  text-align: right !important;
+}
+.social-app .nv-recent-copy strong {
+  overflow: hidden !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+.social-app .nv-recent-copy small {
+  overflow: hidden !important;
+  color: #aeb3bd !important;
+  font-size: 12px !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+.social-app .nv-recent-remove {
+  flex: 0 0 36px !important;
+  width: 36px !important;
+  height: 42px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #87909f !important;
+  font-size: 22px !important;
+  font-weight: 300 !important;
+}
+.social-app .nv-clear-history {
+  display: block !important;
+  margin: 16px auto !important;
+}
+.social-app .nv-saved-explore-screen {
+  min-height: 70vh;
+}
+.social-app .nv-explore-subpage-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 80px;
+  padding: 0 16px;
+  color: #fff;
+  direction: rtl;
+}
+.social-app .nv-explore-subpage-head button {
+  display: grid;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 44px;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #fff;
+}
+.social-app .nv-explore-subpage-head strong {
+  font-size: 18px;
+  font-weight: 700;
+}
+.social-app .nv-other-profile {
+  background: #0a0c10;
+  color: #fff;
+}
+.social-app .nv-other-profile-head button {
+  background: #1c1e24 !important;
+}
+.social-app .nv-profile-grid.is-other-profile {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-auto-flow: row !important;
+  gap: 1px !important;
+  margin-top: 12px !important;
+}
+.social-app .nv-profile-grid.is-other-profile .nv-profile-tile {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  aspect-ratio: 3 / 4 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #1c1e24 !important;
+}
+.social-app .nv-profile-grid.is-other-profile .nv-profile-tile > img,
+.social-app .nv-profile-grid.is-other-profile .nv-profile-tile > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.social-app .nv-grid-post-viewer {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 3000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #000 !important;
+}
+.social-app .nv-grid-viewer-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.social-app .nv-grid-viewer-media img,
+.social-app .nv-grid-viewer-media video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.social-app .nv-grid-viewer-close {
+  position: absolute !important;
+  top: calc(env(safe-area-inset-top) + 16px) !important;
+  right: 16px !important;
+  z-index: 2 !important;
+  width: 42px !important;
+  height: 42px !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #1c1e24 !important;
+  color: #fff !important;
+  font-size: 27px !important;
+}
+.novyra-bottom-items {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+.social-app:has(.nv-explore-screen) .nv-explore-screen,
+.social-app:has(.nv-explore-screen) .nv-search-page,
+.social-app:has(.nv-explore-screen) .nv-saved-explore-screen,
+.social-app:has(.nv-explore-screen) .nv-other-profile {
+  color: #fff;
+}
+.social-app .nv-reels-mode-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.social-app .nv-reels-mode-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+.social-app .nv-reels-mode-title svg {
+  width: 16px;
+  height: 16px;
+}
+.social-app .nv-reels-mode-switch .nv-feed-menu {
+  top: calc(100% + 8px);
+  right: 0;
+  left: auto;
+  z-index: 30;
+}
+@media (max-width: 760px) {
+  .social-app .nv-explore-screen {
+    margin: 0 -14px !important;
+    width: calc(100% + 28px) !important;
+  }
+}
+
+/* Instagram-style Explore refinements; deliberately scoped to Explore only. */
+.social-app .nv-explore-search-trigger input {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  font: inherit !important;
+  text-align: right !important;
+}
+.social-app .nv-explore-search-trigger input::placeholder {
+  color: #aeb3bd !important;
+  opacity: 1 !important;
+}
+.social-app .nv-explore-tile > img,
+.social-app .nv-explore-tile > video,
+.social-app .nv-profile-grid.is-other-profile .nv-profile-tile > img,
+.social-app .nv-profile-grid.is-other-profile .nv-profile-tile > video {
+  background: #1c1e24 !important;
+}
+.social-app .nv-profile-grid.is-other-profile {
+  margin-top: 0 !important;
+}
+.social-app .nv-explore-screen,
+.social-app .nv-search-page,
+.social-app .nv-saved-explore-screen,
+.social-app .nv-other-profile {
+  color: #fff !important;
+  background: #0a0c10 !important;
+}
