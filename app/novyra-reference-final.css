@@ -2287,3 +2287,12 @@
  .nv-finance .nv-income-page .nv-income-sources b{font-size:14px!important}
  .nv-finance .nv-income-page .nv-goal-meta{font-size:10px!important}
 }
+
+.nv-finance .nv-income-page .nv-goal-remaining{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  max-width:40%!important;padding:7px 10px!important;border-radius:18px!important;
+  background:rgba(218,234,250,.82)!important;color:#6798bd!important;
+  font-size:11px!important;font-weight:700!important;white-space:nowrap!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;
+}
+.nv-finance .nv-income-page .nv-goal-title{gap:8px!important}
