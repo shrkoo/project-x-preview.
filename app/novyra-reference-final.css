@@ -800,24 +800,20 @@
 }
 
 
-/* NOVYRA home-only: show approximately 30% of the fourth category card */
-.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{
-  gap:8px!important;
-  padding:4px!important;
-}
-.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category{
-  flex:0 0 27%!important;
-  width:27%!important;
-  min-width:0!important;
-}
-@media(max-width:380px){
-  .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{
-    gap:8px!important;
-    padding-inline-start:4px!important;
-    padding-inline-end:4px!important;
-  }
-  .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category{
-    flex-basis:27%!important;
-    width:27%!important;
-  }
-}
+/* NOVYRA home-only: reveal about 30% of the fourth category card */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{gap:8px!important;padding:4px!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category{flex:0 0 28.3%!important;width:28.3%!important;min-width:0!important}
+@media(max-width:380px){.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{gap:8px!important;padding-inline-start:4px!important;padding-inline-end:4px!important}.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category{flex-basis:28.3%!important;width:28.3%!important}}
+
+
+/* NOVYRA reference-style category bars: 44 slim vertical equalizer columns */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart{display:block!important;flex:0 0 70px!important;width:100%!important;height:70px!important;min-height:70px!important;max-height:70px!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important;border:0!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart svg.nv-category-bars{display:block!important;width:100%!important;height:70px!important;min-height:70px!important;overflow:hidden!important;background:none!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.is-empty .nv-category-bars{opacity:.25!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.has-data .nv-category-bars{opacity:1!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.food .nv-ref-chart-amount,.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.food .nv-ref-chart-caption{color:#b58b08!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.travel .nv-ref-chart-amount,.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.travel .nv-ref-chart-caption{color:#d94c50!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.shopping .nv-ref-chart-amount,.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.shopping .nv-ref-chart-caption{color:#32975b!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.other .nv-ref-chart-amount,.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.other .nv-ref-chart-caption{color:#8862ba!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-amount{direction:ltr!important;text-align:right!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-caption{font-weight:700!important}
