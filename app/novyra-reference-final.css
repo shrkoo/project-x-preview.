@@ -760,3 +760,41 @@
  .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{gap:8px!important;padding-left:25px!important;padding-right:10px!important}
  .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category{flex-basis:29%!important;min-width:104px!important}
 }
+
+
+/* NOVYRA home-only: final category rail alignment, fourth-card peek and glass finish */
+.nv-finance.nv-home-active[lang="fa"] .nf-main{
+  padding-bottom:calc(180px + env(safe-area-inset-bottom))!important;
+  scroll-padding-bottom:calc(180px + env(safe-area-inset-bottom))!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-section{
+  overflow:visible!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{
+  display:flex!important;flex-wrap:nowrap!important;flex-direction:row!important;
+  direction:rtl!important;gap:10px!important;
+  width:100%!important;max-width:100%!important;box-sizing:border-box!important;
+  margin:0!important;padding:4px 16px 18px!important;
+  overflow-x:auto!important;overflow-y:visible!important;
+  scroll-padding-inline:16px!important;scroll-snap-type:x mandatory!important;
+  -webkit-overflow-scrolling:touch!important;scrollbar-width:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid::-webkit-scrollbar{display:none!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category{
+  flex:0 0 31%!important;min-width:0!important;width:31%!important;max-width:none!important;
+  box-sizing:border-box!important;scroll-snap-align:start!important;
+  background:rgba(255,255,255,.72)!important;
+  -webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;
+  border:1px solid rgba(255,255,255,.78)!important;
+  box-shadow:0 5px 18px rgba(47,79,99,.045)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category.other{
+  background:rgba(255,255,255,.72)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category.other .nv-ref-category-chart{
+  color:#9672c9!important;
+}
+@media(max-width:380px){
+ .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{gap:9px!important;padding-inline:16px!important}
+ .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category{flex-basis:31%!important;min-width:0!important}
+}
