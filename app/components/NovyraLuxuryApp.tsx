@@ -156,7 +156,7 @@ const fmtPercent=(n:number)=>new Intl.NumberFormat("en-US",{minimumFractionDigit
 return <div className="nv-ref-spending-page">
 {categoryFilter&&<div className="nv-spend-filter"><span>{en?"Category: ":"دسته: "}{categoryFilter}</span><button onClick={clearCategory}>{en?"Clear filter":"حذف فیلتر"}</button></div>}
 <section className="nf-panel nv-spend-total">
-<div className="nv-spend-total-head"><div><small>مجموع هزینه ماهانه</small><h2>{cash(displayTotal,"IRR",loc,"en")}</h2>{displayPrevious>0&&<span className={"nv-spend-change "+(trend>0?"up":"down")}>{(trend>0?"▲ ":"▼ ")+fmtPercent(Math.abs(trend))+"% نسبت به ماه قبل"}</span>}{isDemo&&<small className="nv-spend-demo-tag">نمونه</small>}</div><button onClick={()=>setTab("reports")} aria-label="گزارش کامل"><ChevronRight size={19}/></button></div>
+<div className="nv-spend-total-head"><div><small>مجموع هزینه ماهانه</small><h2>{cash(displayTotal,"IRR",loc,"en")}</h2>{isDemo&&<small className="nv-spend-demo-tag">نمونه</small>}</div><button onClick={()=>setTab("reports")} aria-label="گزارش کامل"><ChevronRight size={19}/></button></div>
 <div className="nv-spend-chart">
 <div className="nv-spend-y">{yLabels.map(v=><span key={v}>{v===0?"0":fmt(v/1_000_000)+"M"}</span>)}</div>
 <div className="nv-spend-plot">
@@ -164,8 +164,8 @@ return <div className="nv-ref-spending-page">
 <svg viewBox="0 0 600 190" preserveAspectRatio="none" role="img" aria-label="نمودار هزینه‌های روزانه ماه" onPointerDown={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)))}} onPointerMove={e=>{if(e.pointerType==="mouse"||e.buttons>0){const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)))}}} onPointerLeave={e=>{if(e.pointerType==="mouse")setActiveDay(null)}} onClick={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)))}}>
 <defs><linearGradient id="spendFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#48b88a" stopOpacity=".22"/><stop offset="100%" stopColor="#48b88a" stopOpacity=".015"/></linearGradient></defs>
 {yLabels.map((v,i)=><line key={"h"+v} x1="0" x2="600" y1={26+i*30} y2={26+i*30} stroke="#8ca6b5" strokeOpacity=".08" strokeWidth="1"/>)}
-{hasData&&<path d={area} fill="url(#spendFill)" opacity={isDemo?.72:1}/>}
-<path d={hasData?line:"M 0 176 L 600 176"} fill="none" stroke="#23a36d" strokeWidth={2.4} strokeOpacity={hasData?(isDemo?.68:1):.34} strokeDasharray={hasData?undefined:"6 7"} strokeLinecap="round" strokeLinejoin="round"/>
+{hasData&&<path d={area} fill="url(#spendFill)" opacity={isDemo ? 0.72 : 1}/>}
+<path d={hasData?line:"M 0 176 L 600 176"} fill="none" stroke="#23a36d" strokeWidth={2.4} strokeOpacity={hasData ? (isDemo ? 0.68 : 1) : 0.34} strokeDasharray={hasData?undefined:"6 7"} strokeLinecap="round" strokeLinejoin="round"/>
 {hasData&&selected&&<line x1={selected.x} x2={selected.x} y1="18" y2="184" stroke="#269b69" strokeDasharray="4 4" strokeOpacity=".7" strokeWidth="1"/>}
 </svg>
 {hasData&&selected&&<>
