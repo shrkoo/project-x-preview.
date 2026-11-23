@@ -141,7 +141,7 @@ const line=points.map((p,i)=>{if(i===0)return `M ${p.x} ${p.y}`;const prev=point
 const area=line+" L 600 184 L 0 184 Z";
 const selected=activeDay===null?null:points[activeDay-1];
 const yLabels=[10_000_000,8_000_000,6_000_000,4_000_000,2_000_000,0];
-const fmt=(n:number)=>new Intl.NumberFormat("fa-IR",{maximumFractionDigits:0}).format(n);
+const fmt=(n:number)=>new Intl.NumberFormat("fa-IR",{maximumFractionDigits:0}).format(n).replace(/,/g,"٬");
 const trend=prevTotal?((currentTotal-prevTotal)/prevTotal*100):0;
 return <div className="nv-ref-spending-page">
 {categoryFilter&&<div className="nv-spend-filter"><span>{en?"Category: ":"دسته: "}{categoryFilter}</span><button onClick={clearCategory}>{en?"Clear filter":"حذف فیلتر"}</button></div>}
