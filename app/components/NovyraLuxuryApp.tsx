@@ -170,7 +170,7 @@ return <div className="nv-ref-spending-page an-screen">
 
 <path d={area} fill="url(#spendFill)" opacity={isDemo ? 0.72 : 1}/>
 <path d={line} fill="none" stroke="#22A06B" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
-{hasData&&selected&&<><line x1={selected.x} x2={selected.x} y1={selected.y} y2="184" stroke="#22A06B" strokeWidth="1"/><circle cx={selected.x} cy={selected.y} r="5" fill="#fff" stroke="#22A06B" strokeWidth="2"/></>}
+{hasData&&selected&&<><line x1={selected.x} x2={selected.x} y1={selected.y} y2="184" stroke="#22A06B" strokeWidth="1"/><circle cx={selected.x} cy={selected.y} r="13" fill="#fff" stroke="#22A06B" strokeWidth="5.5"/></>}
 </svg>
 {hasData&&selected&&<>
 
