@@ -2159,3 +2159,131 @@
 .nv-finance.nv-home-active[lang="fa"] .nf-main{
   padding-bottom:calc(120px + env(safe-area-inset-bottom))!important;
 }
+
+/* Income & goals page — match the supplied mobile reference */
+.nv-finance .nv-income-page{
+  display:flex!important;flex-direction:column!important;gap:14px!important;
+  padding:0 14px 110px!important;max-width:620px!important;margin:0 auto!important;
+}
+.nv-finance .nv-income-page .nv-income-card{
+  padding:22px 22px 19px!important;margin:0!important;
+  border:1px solid rgba(255,255,255,.8)!important;border-radius:27px!important;
+  background:rgba(255,255,255,.62)!important;
+  box-shadow:0 10px 30px rgba(54,105,137,.07)!important;
+  -webkit-backdrop-filter:blur(17px)!important;backdrop-filter:blur(17px)!important;
+}
+.nv-finance .nv-income-page .nv-income-card>small{
+  display:block!important;color:#718796!important;font-size:12px!important;
+  margin:0 0 8px!important;letter-spacing:0!important;
+}
+.nv-finance .nv-income-page .nv-income-amount{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:12px!important;margin:0 0 22px!important;
+}
+.nv-finance .nv-income-page .nv-income-amount h2{
+  margin:0!important;color:#172f3d!important;font-size:clamp(25px,7vw,32px)!important;
+  line-height:1.12!important;font-weight:850!important;letter-spacing:-.7px!important;
+  overflow-wrap:anywhere!important;
+}
+.nv-finance .nv-income-page .nv-income-arrow,
+.nv-finance .nv-income-page .nv-goal-arrow{
+  display:grid!important;place-items:center!important;flex:0 0 42px!important;
+  width:42px!important;height:42px!important;min-width:42px!important;
+  border:1px solid rgba(255,255,255,.9)!important;border-radius:50%!important;
+  background:rgba(255,255,255,.88)!important;color:#4d9acb!important;
+  box-shadow:0 3px 10px rgba(64,119,151,.06)!important;
+}
+.nv-finance .nv-income-page .nv-income-sources{
+  display:grid!important;grid-template-columns:1fr 1fr!important;
+  gap:12px!important;margin:0!important;
+}
+.nv-finance .nv-income-page .nv-income-sources section{
+  min-width:0!important;display:flex!important;flex-direction:column-reverse!important;
+  align-items:flex-start!important;gap:4px!important;padding:0 0 0 12px!important;
+  border-left:2px solid #79a9cb!important;
+}
+.nv-finance .nv-income-page .nv-income-sources section+section{border-left-color:#78bd91!important}
+.nv-finance .nv-income-page .nv-income-sources b{
+  color:#263e4b!important;font-size:16px!important;font-weight:800!important;
+  line-height:1.25!important;overflow-wrap:anywhere!important;
+}
+.nv-finance .nv-income-page .nv-income-sources span{
+  color:#8496a1!important;font-size:12px!important;line-height:1.2!important;
+}
+.nv-finance .nv-income-page .nv-goals-head{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  margin:22px 2px 0!important;padding:0!important;
+}
+.nv-finance .nv-income-page .nv-goals-head h2{
+  margin:0!important;color:#213b49!important;font-size:19px!important;font-weight:800!important;
+}
+.nv-finance .nv-income-page .nv-goals-head button{
+  color:#78909e!important;background:transparent!important;border:0!important;
+  box-shadow:none!important;font-size:13px!important;font-weight:600!important;padding:7px 2px!important;
+}
+.nv-finance .nv-income-page .nv-goal-card{
+  position:relative!important;display:flex!important;flex-direction:column!important;
+  gap:9px!important;margin:0!important;padding:22px 22px 19px!important;
+  border:1px solid rgba(255,255,255,.85)!important;border-radius:27px!important;
+  background:rgba(255,255,255,.66)!important;
+  box-shadow:0 9px 28px rgba(55,101,128,.055)!important;
+  -webkit-backdrop-filter:blur(16px)!important;backdrop-filter:blur(16px)!important;
+}
+.nv-finance .nv-income-page .nv-goal-title{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:10px!important;margin:0!important;
+}
+.nv-finance .nv-income-page .nv-goal-title>b{
+  color:#263d4a!important;font-size:16px!important;font-weight:800!important;
+}
+.nv-finance .nv-income-page .nv-goal-title .nv-goal-arrow{
+  flex-basis:40px!important;width:40px!important;height:40px!important;min-width:40px!important;
+}
+.nv-finance .nv-income-page .nv-goal-amount-row{
+  margin:-3px 0 2px!important;color:#293e49!important;font-size:15px!important;
+  font-weight:750!important;line-height:1.4!important;
+}
+.nv-finance .nv-income-page .nv-goal-amount-row span{color:#6f8796!important;font-weight:600!important}
+.nv-finance .nv-income-page .nv-goal-track{
+  position:relative!important;height:11px!important;margin:5px 0 2px!important;
+  overflow:visible!important;border-radius:30px!important;background:rgba(255,255,255,.95)!important;
+}
+.nv-finance .nv-income-page .nv-goal-track i{
+  display:block!important;height:100%!important;border-radius:30px!important;
+  background:linear-gradient(90deg,#8bcf8d,#079b42)!important;
+  box-shadow:0 1px 3px rgba(15,145,68,.15)!important;
+}
+.nv-finance .nv-income-page .nv-goal-track.yellow i{
+  background:linear-gradient(90deg,#f8e66b,#f0ca20)!important;
+  box-shadow:0 1px 3px rgba(225,185,23,.15)!important;
+}
+.nv-finance .nv-income-page .nv-goal-percent-badge{
+  position:absolute!important;top:-25px!important;right:calc(50% - 34px)!important;
+  transform:none!important;min-width:68px!important;height:34px!important;
+  display:grid!important;place-items:center!important;padding:0 10px!important;
+  border-radius:22px!important;background:#079b42!important;color:#fff!important;
+  font-size:13px!important;font-weight:800!important;box-shadow:0 3px 9px rgba(0,130,55,.16)!important;
+}
+.nv-finance .nv-income-page .nv-goal-percent-badge.yellow{
+  background:#f2d72e!important;color:#4e4610!important;
+  box-shadow:0 3px 9px rgba(200,170,20,.15)!important;
+}
+.nv-finance .nv-income-page .nv-goal-meta{
+  display:flex!important;justify-content:space-between!important;gap:8px!important;
+  color:#82939d!important;font-size:11px!important;line-height:1.3!important;
+}
+.nv-finance .nv-income-page .nv-goal-monthly{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  min-height:39px!important;margin:10px 0 0!important;padding:0 14px!important;
+  border:1px solid rgba(255,255,255,.65)!important;border-radius:22px!important;
+  background:rgba(218,234,250,.76)!important;color:#6e9cc0!important;
+  font-size:12px!important;font-weight:650!important;
+}
+.nv-finance .nv-income-page .nv-goal-monthly::first-letter{color:inherit!important}
+.nv-finance .nv-income-page .nv-goal-travel .nv-goal-track i{background:linear-gradient(90deg,#f8e66b,#f0ca20)!important}
+@media(max-width:390px){
+ .nv-finance .nv-income-page{padding-left:12px!important;padding-right:12px!important}
+ .nv-finance .nv-income-page .nv-income-card,.nv-finance .nv-income-page .nv-goal-card{padding:18px 16px 16px!important}
+ .nv-finance .nv-income-page .nv-income-sources b{font-size:14px!important}
+ .nv-finance .nv-income-page .nv-goal-meta{font-size:10px!important}
+}
