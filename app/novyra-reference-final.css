@@ -1540,3 +1540,63 @@
     flex-basis:108px!important;
   }
 }
+
+
+/* NOVYRA corrective override — prevent dock overlap and restore chart fade */
+.nv-finance.nv-home-active[lang="fa"] .nf-main{
+  padding-bottom:calc(150px + env(safe-area-inset-bottom))!important;
+  overflow-x:clip!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart{
+  flex:0 0 116px!important;
+  height:116px!important;
+  min-height:116px!important;
+  max-height:116px!important;
+  margin:0!important;
+  overflow:hidden!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-category-bars{
+  display:block!important;
+  width:100%!important;
+  height:116px!important;
+  min-height:116px!important;
+  max-height:116px!important;
+  overflow:hidden!important;
+  mask-image:linear-gradient(to bottom,#000 40%,transparent 100%)!important;
+  -webkit-mask-image:linear-gradient(to bottom,#000 40%,transparent 100%)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-chart-card{
+  height:190px!important;
+  min-height:190px!important;
+  max-height:190px!important;
+  padding:8px 9px 7px!important;
+  gap:1px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock{
+  position:fixed!important;
+  left:12px!important;
+  right:12px!important;
+  bottom:calc(10px + env(safe-area-inset-bottom))!important;
+  width:calc(100% - 24px)!important;
+  max-width:calc(100vw - 24px)!important;
+  height:78px!important;
+  min-height:78px!important;
+  box-sizing:border-box!important;
+  padding:8px 12px!important;
+  border:1px solid rgba(255,255,255,.84)!important;
+  border-radius:28px!important;
+  background:rgba(247,251,255,.68)!important;
+  box-shadow:0 10px 30px rgba(38,76,108,.14)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(1.3)!important;
+  backdrop-filter:blur(20px) saturate(1.3)!important;
+  overflow:hidden!important;
+}
+@media(max-width:380px){
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart,
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-category-bars{
+    height:116px!important;
+    min-height:116px!important;
+    max-height:116px!important;
+    flex-basis:116px!important;
+  }
+}
