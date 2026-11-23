@@ -4154,3 +4154,55 @@
 @media(prefers-reduced-motion:no-preference){
   .nv-finance.nv-home-active.home-screen[lang="fa"] button,.nv-finance.an-screen-active[lang="fa"] button{transition:transform .2s ease,background .2s ease,box-shadow .2s ease!important}
 }
+
+
+/* Final mobile QA corrections for profile, chart anchor and Analytics vertical fit */
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-logo-button{
+  width:36px!important;min-width:36px!important;max-width:36px!important;flex:0 0 36px!important;
+}
+.nv-finance.nv-home-active.home-screen[lang="fa"] .profile-btn{
+  width:auto!important;min-width:112px!important;max-width:none!important;flex:0 0 auto!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .nf-main{
+  padding-top:0!important;padding-bottom:calc(110px + env(safe-area-inset-bottom))!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen{
+  margin-top:0!important;padding-top:0!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-total{
+  padding:18px 18px 12px!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-chart{
+  margin-top:6px!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-plot{
+  height:190px!important;min-height:190px!important;max-height:190px!important;overflow:visible!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-plot svg{
+  height:190px!important;min-height:190px!important;max-height:190px!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-axis{
+  margin:2px 0 0!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-bubble{
+  left:auto!important;width:max-content!important;min-width:0!important;max-width:none!important;
+  box-sizing:content-box!important;transform:translate(50%,-130%)!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-heading{
+  margin:0!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-highlights{
+  padding-bottom:4px!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-highlights article{
+  height:104px!important;min-height:104px!important;max-height:104px!important;padding:12px!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-highlights article b{
+  margin:4px 0!important;line-height:1.15!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-month-note{
+  margin:2px 0 0!important;line-height:1.4!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-quick{
+  padding-bottom:0!important;
+}
