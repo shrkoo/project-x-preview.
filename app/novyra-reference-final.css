@@ -4208,6 +4208,6 @@
 }
 
 .nv-finance.an-screen-active[lang="fa"] .an-screen .nv-spend-dot{
-  left:auto!important;transform:translate(50%,-50%)!important;width:10px!important;height:10px!important;
+  right:auto!important;transform:translate(-50%,-50%)!important;width:10px!important;height:10px!important;
   border:2px solid #22A06B!important;border-radius:50%!important;background:#fff!important;z-index:4!important;
 }
