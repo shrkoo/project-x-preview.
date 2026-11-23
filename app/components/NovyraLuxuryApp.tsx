@@ -1,6 +1,6 @@
 "use client";
 import {useEffect,useMemo,useState,type FormEvent} from "react";
-import {Activity,ArrowDownLeft,ArrowUpRight,QrCode,Home,CalendarClock,ChartNoAxesCombined,Download,LayoutDashboard,LogOut,Plus,Search,Settings,ShieldCheck,Sparkles,Wallet,X,Sun,Moon,Bell,Eye,EyeOff,Target,ChevronRight,TrendingUp,TrendingDown,User,ArrowLeft} from "lucide-react";
+import {Activity,ArrowDownLeft,ArrowUpRight,QrCode,Home,CalendarClock,ChartLine,Download,LayoutDashboard,LogOut,Plus,Search,Settings,ShieldCheck,Sparkles,Wallet,X,Sun,Moon,Bell,Eye,EyeOff,Target,ChevronRight,TrendingUp,TrendingDown,User,ArrowLeft} from "lucide-react";
 import {apiRequest,clearSession} from "../lib/api";
 type Language="fa"|"en"|"ar"|"ku";
 type Account={id:string;email:string;displayName:string;role?:string};
