@@ -1600,3 +1600,21 @@
     flex-basis:116px!important;
   }
 }
+
+
+/* NOVYRA dock fade — soften the card edge behind the floating navigation */
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock{
+  overflow:visible!important;
+  isolation:isolate!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock::before{
+  content:""!important;
+  position:absolute!important;
+  left:-12px!important;
+  right:-12px!important;
+  bottom:calc(100% - 1px)!important;
+  height:48px!important;
+  background:linear-gradient(to bottom,rgba(234,244,251,0),rgba(234,244,251,.94))!important;
+  pointer-events:none!important;
+  z-index:-1!important;
+}
