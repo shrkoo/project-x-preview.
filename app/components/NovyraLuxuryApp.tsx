@@ -173,7 +173,7 @@ return <div className="nv-ref-spending-page an-screen">
 {hasData&&selected&&<><line x1={selected.x} x2={selected.x} y1={selected.y} y2="184" stroke="#22A06B" strokeWidth="1"/></>}
 </svg>
 {hasData&&selected&&<>
-<i className="nv-spend-dot" style={{right:`${selected.x/600*100}%`,top:`${selected.y/190*100}%`}}/>
+<i className="nv-spend-dot" style={{left:`${(1-selected.x/600)*100}%`,top:`${selected.y/190*100}%`}}/>
 <span className="nv-spend-bubble" style={{right:`${selected.x/600*100}%`,top:`${selected.y/190*100}%`}}>{fmt(selected.v)} ریال</span>
 </>}
 </div>
