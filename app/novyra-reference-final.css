@@ -2068,3 +2068,9 @@
     flex-basis:78%!important;width:78%!important;min-width:78%!important;
   }
 }
+
+/* Keep the four navigation destinations in their intended slots around the centered action */
+.nv-finance nav.nf-mobile-dock.nv-ref-dock>button:nth-child(1){grid-column:1!important}
+.nv-finance nav.nf-mobile-dock.nv-ref-dock>button:nth-child(2){grid-column:2!important}
+.nv-finance nav.nf-mobile-dock.nv-ref-dock>button:nth-child(4){grid-column:4!important}
+.nv-finance nav.nf-mobile-dock.nv-ref-dock>button:nth-child(5){grid-column:5!important}
