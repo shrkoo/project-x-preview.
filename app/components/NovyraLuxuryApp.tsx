@@ -148,7 +148,6 @@ const line=points.map((p,i)=>{if(i===0)return `M ${p.x} ${p.y}`;const prev=point
 const area=line+" L 600 184 L 0 184 Z";
 const selected=activeDay===null?(isDemo?points[points.length-1]:null):points[Math.min(points.length-1,Math.max(0,Math.round((activeDay-1)*(points.length-1)/29)))];
 const yLabels=[10_000_000,8_000_000,6_000_000,4_000_000,2_000_000,0];
-const fmt=(n:number)=>fmt(n);
 const demoTotal=6_650_000,demoPrevious=6_354_860;
 const displayTotal=isDemo?demoTotal:currentTotal;
 const displayPrevious=isDemo?demoPrevious:prevTotal;
