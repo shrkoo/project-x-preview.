@@ -170,10 +170,10 @@ return <div className="nv-ref-spending-page an-screen">
 
 <path d={area} fill="url(#spendFill)" opacity={isDemo ? 0.72 : 1}/>
 <path d={line} fill="none" stroke="#22A06B" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
-{hasData&&selected&&<><line x1={selected.x} x2={selected.x} y1={selected.y} y2="184" stroke="#22A06B" strokeWidth="1"/><circle cx={selected.x} cy={selected.y} r="13" fill="#fff" stroke="#22A06B" strokeWidth="5.5"/></>}
+{hasData&&selected&&<><line x1={selected.x} x2={selected.x} y1={selected.y} y2="184" stroke="#22A06B" strokeWidth="1"/></>}
 </svg>
 {hasData&&selected&&<>
-
+<i className="nv-spend-dot" style={{right:`${selected.x/600*100}%`,top:`${selected.y/190*100}%`}}/>
 <span className="nv-spend-bubble" style={{right:`${selected.x/600*100}%`,top:`${selected.y/190*100}%`}}>{fmt(selected.v)} ریال</span>
 </>}
 </div>
