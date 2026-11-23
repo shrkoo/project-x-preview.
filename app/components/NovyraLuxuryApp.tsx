@@ -182,8 +182,8 @@ return <div className="nv-ref-spending-page an-screen">
 {hasData&&selected&&<>
 <i className="nv-spend-dot an-chart-point" style={{left:`${(1-selected.x/600)*100}%`,top:`${selected.y/190*100}%`}}/>
 </>}
-</div>
 {hasData&&selected&&<div className={"nv-spend-tooltip an-chart-tooltip"+(selected.y<44?" below":"")} style={{left:`clamp(72px, ${(1-selected.x/600)*100}%, calc(100% - 72px))`,top:`${selected.y/190*100}%`}} aria-live="polite">{fmt(selected.v)} ریال</div>}
+</div>
 </div>
 {monthlyBudget&&<div className="nv-spend-budget">بودجه ماهانه: {cash(Number(monthlyBudget)||0,"IRR",loc,"fa")} · {Number(monthlyBudget)>0?Math.round(currentTotal/Number(monthlyBudget)*100)+"% used":"—"}</div>}
 <div className="nv-spend-axis an-x-axis">{[1,5,10,15,20,25,30].map(day=><span key={day}>{fmt(day)}</span>)}</div>
