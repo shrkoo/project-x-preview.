@@ -110,7 +110,7 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active":"")} da
  </div>
 </section>
 </>}
-{tab==="spending"&&<SpendingPage items={viewItems} currency={viewCurrency} loc={loc} t={t} language={language} digits={prefs.digits} setTab={setTab} categoryFilter={spendCategory} clearCategory={()=>setSpendCategory("")} monthlyBudget={prefs.monthlyBudget}/> }
+{tab==="spending"&&<SpendingPage items={viewItems} currency={viewCurrency} loc={loc} t={t} language={language} digits={prefs.digits} setTab={setTab} categoryFilter={spendCategory} clearCategory={()=>setSpendCategory("")} monthlyBudget={prefs.monthlyBudget} demoMode={demoMode}/> }
 {tab==="income"&&<IncomeGoals mi={mi} items={viewItems} currency={viewCurrency} loc={loc} t={t} language={language} digits={prefs.digits} setTab={setTab} plan={plan} onUpgrade={()=>openPaywall()}/>}
 {tab==="transactions"&&<section className="nf-panel"><div className="nf-toolbar"><label><Search size={15}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={t.search}/></label><select value={kindFilter} onChange={e=>setKindFilter(e.target.value)}><option value="all">{t.allTypes}</option><option value="income">{t.in}</option><option value="expense">{t.out}</option></select></div>{sorted.filter(x=>(kindFilter==="all"||x.kind===kindFilter)&&(x.title+" "+x.category).toLowerCase().includes(query.toLowerCase())).map(x=><TxRow key={x.id} x={x} currency={viewCurrency} locale={loc} digits={prefs.digits} del={del} t={t}/>)}{!sorted.length&&<Empty title={t.empty} sub={t.emptySub} add={()=>setShow(true)} label={t.add}/>}</section>}
 {tab==="accounts"&&<section className="nf-panel nf-account-card"><Wallet size={25}/><div><small>{t.account}</small><h2>{cash(balance,viewCurrency,loc,prefs.digits)}</h2><p>{t.localNote}</p></div></section>}
@@ -122,7 +122,7 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active":"")} da
 {show&&<div className="nf-modal-backdrop" onClick={e=>{if(e.target===e.currentTarget)setShow(false)}}><form className="nf-modal" onSubmit={add}><div className="nf-modal-head"><h2>{t.new}</h2><button type="button" onClick={()=>setShow(false)}><X size={17}/></button></div><label>{t.kind}<select value={form.kind} onChange={e=>setForm(f=>({...f,kind:e.target.value as "income"|"expense"}))}><option value="expense">{t.out}</option><option value="income">{t.in}</option></select></label><label>{t.title}<input required value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))}/></label><label>{t.amount}<input required inputMode="numeric" value={form.amount?Number(form.amount).toLocaleString("en-US"):""} onChange={e=>setForm(f=>({...f,amount:e.target.value.replace(/[^0-9]/g,"")}))}/></label><label>{t.category}<select value={form.category} onChange={e=>setForm(f=>({...f,category:e.target.value}))}>{[...new Set(prefs.categories)].map(c=><option key={c} value={c}>{categoryDisplayLabel(c,language==="en")}</option>)}</select></label><label>{t.date}<input type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))}/></label><label>{t.note}<input value={form.note} onChange={e=>setForm(f=>({...f,note:e.target.value}))}/></label><label className="nf-sms-label">{language==="en"?"Paste bank SMS":"چسباندن پیامک بانکی"}<textarea value={smsText} onChange={e=>setSmsText(e.target.value)} placeholder={language==="en"?"Paste the bank message here":"متن پیامک بانکی را اینجا بچسبان"}/></label><button type="button" className="nf-quiet" onClick={()=>{const normalizedSms=smsText.replace(/[0-9]/g,d=>String("0123456789".indexOf(d))).replace(/[٠-٩]/g,d=>String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));const cleanSms=normalizedSms.replace(/\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}/g," ");const matches=[...cleanSms.matchAll(/([\d][\d,٬،.]{2,})/g)];const amount=matches.map(m=>m[1].replace(/[,٬،.]/g,"")).sort((a,b)=>Number(b)-Number(a))[0]||"";const kind=/واریز|دریافت|deposit/i.test(smsText)?"income":"expense";const d=smsText.match(/(\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2})/);setForm(v=>({...v,amount:amount||v.amount,title:v.title||"تراکنش از پیامک",kind,date:d?d[1].replaceAll("/","-"):v.date}));setMsg(amount?"مبلغ و نوع از متن استخراج شد؛ قبل از ذخیره بررسی کن.":"مبلغ از پیامک تشخیص داده نشد؛ دستی وارد کن.")}}>{language==="en"?"Extract and fill form":"استخراج و پرکردن فرم"}</button><label className="nf-switch-row">{language==="en"?"Recurring transaction":"تراکنش تکرارشونده"}<input type="checkbox" checked={form.recurring} onChange={e=>setForm(v=>({...v,recurring:e.target.checked}))}/></label>{form.recurring&&<label>دوره تکرار<select value={form.frequency} onChange={e=>setForm(v=>({...v,frequency:e.target.value as "monthly"|"weekly"}))}><option value="monthly">ماهانه</option><option value="weekly">هفتگی</option></select></label>}<div className="nf-modal-actions"><button type="button" className="nf-quiet" onClick={()=>setShow(false)}>{t.cancel}</button><button type="submit" className="nf-primary">{t.save}</button></div></form></div>}
 {paywall&&<Paywall onClose={()=>setPaywall(false)} onStart={()=>{localStorage.setItem("novyra-trial:"+account.id,"started");logEvent("trial_started");setPlan("pro");localStorage.setItem("novyra-plan:"+account.id,"pro");localStorage.setItem("novyra-trial-expiry:"+account.id,String(Date.now()+7*24*60*60*1000));setMsg("دوره آزمایشی 7 روزه روی همین دستگاه فعال شد؛ پرداخت پس از اتصال درگاه فعال می‌شود.");setPaywall(false)}}/>}{msg&&<div className="nf-toast">{msg}<button onClick={()=>{setMsg("");onClearNotice()}}>×</button></div>}</main>;
 }
-function SpendingPage({items,loc,t,language,digits,setTab,categoryFilter,clearCategory,monthlyBudget}:{items:Tx[];currency:string;loc:string;t:Record<string,string>;language:Language;digits:"fa"|"en";setTab:(v:Tab)=>void;categoryFilter:string;clearCategory:()=>void;monthlyBudget:string}){
+function SpendingPage({items,loc,t,language,digits,setTab,categoryFilter,clearCategory,monthlyBudget,demoMode}:{items:Tx[];currency:string;loc:string;t:Record<string,string>;language:Language;digits:"fa"|"en";setTab:(v:Tab)=>void;categoryFilter:string;clearCategory:()=>void;monthlyBudget:string;demoMode:boolean}){
 const en=language==="en";const [activeDay,setActiveDay]=useState<number|null>(null);
 const aliases:Record<string,string[]>={"خوراک":["خوراک","Food","غذا"],"رفت‌وآمد":["رفت‌وآمد","حمل‌ونقل","Travel"],"خرید":["خرید","Shopping"],"سایر":["سایر","Other"]};
 const accepted=categoryFilter?aliases[categoryFilter]||[categoryFilter]:[];
@@ -135,51 +135,53 @@ const days=Array.from({length:30},(_,i)=>{const d=new Date(now.getFullYear(),now
 const max=10_000_000,weekStart=new Date(now);weekStart.setDate(now.getDate()-6);
 const recentExpenses=expenses.filter(x=>new Date(x.date+"T12:00:00")>=weekStart);
 const high=recentExpenses.reduce<Tx|null>((a,x)=>!a||x.amount>a.amount?x:a,null),low=recentExpenses.reduce<Tx|null>((a,x)=>!a||x.amount<a.amount?x:a,null);
-const isDemo=days.every(v=>v===0);
-const demo=[4_200_000,3_800_000,4_600_000,5_100_000,5_000_000,6_200_000,5_900_000,7_400_000,6_100_000,4_800_000,5_200_000,5_000_000,5_400_000,6_600_000,5_800_000,5_100_000,4_400_000,4_900_000,4_100_000,3_564_620];
+const isDemo=demoMode;
+const max=10_000_000,weekStart=new Date(now);weekStart.setDate(now.getDate()-6);
+const recentExpenses=expenses.filter(x=>new Date(x.date+"T12:00:00")>=weekStart);
+const high=recentExpenses.reduce<Tx|null>((a,x)=>!a||x.amount>a.amount?x:a,null),low=recentExpenses.reduce<Tx|null>((a,x)=>!a||x.amount<a.amount?x:a,null);
+const demo=[4_200_000,3_800_000,4_600_000,5_100_000,5_000_000,6_200_000,5_900_000,7_400_000,6_100_000,4_800_000,5_200_000,5_000_000,5_400_000,6_600_000,5_800_000,5_100_000,4_400_000,4_900_000,4_100_000,3_564_620,4_250_000,4_600_000,4_100_000,4_850_000,5_200_000,4_700_000,4_300_000,4_900_000,4_200_000,4_600_000];
 const chartValues=isDemo?demo:days;
 const hasData=chartValues.some(v=>v>0);
-const points=chartValues.map((v,i)=>({x:i*600/(chartValues.length-1),y:176-(Math.min(v,max)/max)*150,v,day:i+1}));
+const points=chartValues.map((v,i)=>({x:i*600/29,y:176-(Math.min(v,max)/max)*150,v,day:i+1}));
 const line=points.map((p,i)=>{if(i===0)return `M ${p.x} ${p.y}`;const prev=points[i-1],mid=(prev.x+p.x)/2;return ` C ${mid} ${prev.y}, ${mid} ${p.y}, ${p.x} ${p.y}`}).join("");
 const area=line+" L 600 184 L 0 184 Z";
-const selected=activeDay===null?(isDemo?points[points.length-1]:null):points[Math.min(points.length-1,Math.max(0,Math.round((activeDay-1)*(points.length-1)/29)))];
+const selected=hasData?(activeDay===null?(isDemo?points[points.length-1]:null):points[Math.min(points.length-1,Math.max(0,activeDay-1))]):null;
 const yLabels=[10_000_000,8_000_000,6_000_000,4_000_000,2_000_000,0];
-const fmt=(n:number)=>new Intl.NumberFormat("fa-IR",{maximumFractionDigits:0}).format(n).replace(/,/g,"٬");
+const fmt=(n:number)=>new Intl.NumberFormat("en-US",{maximumFractionDigits:0}).format(n);
 const demoTotal=6_650_000,demoPrevious=6_354_860;
 const displayTotal=isDemo?demoTotal:currentTotal;
 const displayPrevious=isDemo?demoPrevious:prevTotal;
 const trend=displayPrevious?((displayTotal-displayPrevious)/displayPrevious*100):0;
-const fmtPercent=(n:number)=>new Intl.NumberFormat("fa-IR",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
+const fmtPercent=(n:number)=>new Intl.NumberFormat("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
 return <div className="nv-ref-spending-page">
 {categoryFilter&&<div className="nv-spend-filter"><span>{en?"Category: ":"دسته: "}{categoryFilter}</span><button onClick={clearCategory}>{en?"Clear filter":"حذف فیلتر"}</button></div>}
 <section className="nf-panel nv-spend-total">
-<div className="nv-spend-total-head"><div><small>مجموع هزینه ماهانه</small><h2>{cash(displayTotal,"IRR",loc,"fa")}</h2>{displayPrevious>0&&<span className={"nv-spend-change "+(trend>0?"up":"down")}>{(trend>0?"▲ ":"▼ ")+fmtPercent(Math.abs(trend))+"٪ نسبت به ماه قبل"}</span>}{isDemo&&<small className="nv-spend-demo-tag">نمونه</small>}</div><button onClick={()=>setTab("reports")} aria-label="گزارش کامل"><ChevronRight size={19}/></button></div>
+<div className="nv-spend-total-head"><div><small>مجموع هزینه ماهانه</small><h2>{cash(displayTotal,"IRR",loc,"en")}</h2>{displayPrevious>0&&<span className={"nv-spend-change "+(trend>0?"up":"down")}>{(trend>0?"▲ ":"▼ ")+fmtPercent(Math.abs(trend))+"% نسبت به ماه قبل"}</span>}{isDemo&&<small className="nv-spend-demo-tag">نمونه</small>}</div><button onClick={()=>setTab("reports")} aria-label="گزارش کامل"><ChevronRight size={19}/></button></div>
 <div className="nv-spend-chart">
-<div className="nv-spend-y">{yLabels.map(v=><span key={v}>{v===0?"۰":fmt(v/1_000_000)+"م"}</span>)}</div>
+<div className="nv-spend-y">{yLabels.map(v=><span key={v}>{v===0?"0":fmt(v/1_000_000)+"M"}</span>)}</div>
 <div className="nv-spend-plot">
-<svg viewBox="0 0 600 190" preserveAspectRatio="none" role="img" aria-label="نمودار ناحیه‌ای هزینه‌های روزانه ماه" onPointerDown={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)) )}} onPointerMove={e=>{if(e.pointerType==="mouse"||e.buttons>0){const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)) )}}} onPointerLeave={e=>{if(e.pointerType==="mouse")setActiveDay(null)}} onClick={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)) )}}>
+<div className="nv-spend-svg-wrap">
+<svg viewBox="0 0 600 190" preserveAspectRatio="none" role="img" aria-label="نمودار هزینه‌های روزانه ماه" onPointerDown={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)))}} onPointerMove={e=>{if(e.pointerType==="mouse"||e.buttons>0){const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)))}}} onPointerLeave={e=>{if(e.pointerType==="mouse")setActiveDay(null)}} onClick={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)))}}>
 <defs><linearGradient id="spendFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#48b88a" stopOpacity=".22"/><stop offset="100%" stopColor="#48b88a" stopOpacity=".015"/></linearGradient></defs>
-{yLabels.map((v,i)=><line key={"h"+v} x1="0" x2="600" y1={26+i*30} y2={26+i*30} stroke="#8ca6b5" strokeOpacity=".16" strokeWidth="1"/>)}
-{[0,5,10,15,20,25,29].map(d=><line key={"v"+d} x1={d*600/29} x2={d*600/29} y1="26" y2="184" stroke="#8ca6b5" strokeOpacity=".10" strokeWidth="1"/>)}
-<path d={area} fill="url(#spendFill)" opacity={isDemo ? 0.72 : 1}/>
-<path d={line} fill="none" stroke="#23a36d" strokeWidth={2.8} strokeOpacity={isDemo?.68:1} strokeLinecap="round" strokeLinejoin="round"/>
-
-{hasData&&selected&&<line x1={selected.x} x2={selected.x} y1="18" y2="184" stroke="#269b69" strokeDasharray="4 4" strokeOpacity=".8"/>}
+{yLabels.map((v,i)=><line key={"h"+v} x1="0" x2="600" y1={26+i*30} y2={26+i*30} stroke="#8ca6b5" strokeOpacity=".08" strokeWidth="1"/>)}
+{hasData&&<path d={area} fill="url(#spendFill)" opacity={isDemo?.72:1}/>}
+<path d={hasData?line:"M 0 176 L 600 176"} fill="none" stroke="#23a36d" strokeWidth={2.4} strokeOpacity={hasData?(isDemo?.68:1):.34} strokeDasharray={hasData?undefined:"6 7"} strokeLinecap="round" strokeLinejoin="round"/>
+{hasData&&selected&&<line x1={selected.x} x2={selected.x} y1="18" y2="184" stroke="#269b69" strokeDasharray="4 4" strokeOpacity=".7" strokeWidth="1"/>}
 </svg>
 {hasData&&selected&&<>
 <i className="nv-spend-dot" style={{left:`${selected.x/600*100}%`,top:`${selected.y/190*100}%`}}/>
-<span className="nv-spend-bubble" style={{left:`${Math.min(90,Math.max(10,selected.x/600*100))}%`,top:`${selected.y/190*100}%`}}>{fmt(selected.v)} ریال</span>
+<span className="nv-spend-bubble" style={{left:`${Math.min(84,Math.max(16,selected.x/600*100))}%`,top:`${Math.max(18,selected.y/190*100)}%`}}>{fmt(selected.v)} IRR</span>
 </>}
 </div>
-<div className="nv-spend-tooltip" aria-live="polite">{hasData&&selected?("روز "+fmt(selected.day)+" · "+cash(selected.v,"IRR",loc,"fa")):""}</div>
-</div>
-{monthlyBudget&&<div className="nv-spend-budget">بودجه ماهانه: {cash(Number(monthlyBudget)||0,"IRR",loc,"fa")} · {Number(monthlyBudget)>0?Math.round(currentTotal/Number(monthlyBudget)*100)+"% used":"—"}</div>}
 <div className="nv-spend-axis">{[1,5,10,15,20,25,30].map(day=><span key={day}>{fmt(day)}</span>)}</div>
+</div>
+</div>
+{monthlyBudget&&<div className="nv-spend-budget">بودجه ماهانه: {cash(Number(monthlyBudget)||0,"IRR",loc,"en")} · {Number(monthlyBudget)>0?Math.round(currentTotal/Number(monthlyBudget)*100)+"% used":"—"}</div>}
 </section>
 <h2 className="nv-spend-heading">برجسته‌های این هفته</h2>
 <div className="nv-spend-highlights">
-<article className="high"><small><TrendingUp size={15} aria-hidden="true"/> بیشترین هزینه</small><div className="nv-spend-highlight-value"><b>{isDemo?cash(1850000,"IRR",loc,"fa"):high?cash(high.amount,"IRR",loc,"fa"):"۰ ریال"}</b><i className={trend>0?"up":"down"}>{trend>0?"▲ ":"▼ "}{fmtPercent(Math.abs(trend))}٪</i></div><em>{isDemo?"خرید و نیازهای روزمره":high?.title||"—"}</em><p>ماه قبل هزینه‌ی شما {cash(displayPrevious,"IRR",loc,"fa")} بود</p></article>
-<article className="low"><small><TrendingDown size={15} aria-hidden="true"/> کمترین هزینه</small><div className="nv-spend-highlight-value"><b>{isDemo?cash(125000,"IRR",loc,"fa"):low?cash(low.amount,"IRR",loc,"fa"):"۰ ریال"}</b><i className={trend>0?"up":"down"}>{trend>0?"▲ ":"▼ "}{fmtPercent(Math.abs(trend))}٪</i></div><em>{isDemo?"هزینه‌های متفرقه":low?.title||"—"}</em><p>ماه قبل هزینه‌ی شما {cash(displayPrevious,"IRR",loc,"fa")} بود</p></article>
+<article className="high"><small><TrendingUp size={15} aria-hidden="true"/> بیشترین هزینه</small><div className="nv-spend-highlight-value"><b>{isDemo?cash(1850000,"IRR",loc,"en"):high?cash(high.amount,"IRR",loc,"en"):"بدون داده"}</b>{(isDemo||high)&&<i className={trend>0?"up":"down"}>{trend>0?"▲ ":"▼ "}{fmtPercent(Math.abs(trend))}%</i>}</div><em>{isDemo?"خرید و نیازهای روزمره":high?.title||"بدون داده"}</em>{displayPrevious>0&&(isDemo||high)&&<p>ماه قبل هزینه شما {cash(displayPrevious,"IRR",loc,"en")} بود</p>}</article>
+<article className="low"><small><TrendingDown size={15} aria-hidden="true"/> کمترین هزینه</small><div className="nv-spend-highlight-value"><b>{isDemo?cash(125000,"IRR",loc,"en"):low?cash(low.amount,"IRR",loc,"en"):"بدون داده"}</b>{(isDemo||low)&&<i className={trend>0?"up":"down"}>{trend>0?"▲ ":"▼ "}{fmtPercent(Math.abs(trend))}%</i>}</div><em>{isDemo?"هزینه‌های متفرقه":low?.title||"بدون داده"}</em>{displayPrevious>0&&(isDemo||low)&&<p>ماه قبل هزینه شما {cash(displayPrevious,"IRR",loc,"en")} بود</p>}</article>
 </div>
 <h2 className="nv-spend-heading">اقدام‌های سریع</h2>
 <div className="nv-spend-quick"><button onClick={()=>setTab("reports")}><span><b>بررسی بودجه ماهانه</b><small>نمای کلی ماه</small></span><ChevronRight/></button><button onClick={()=>setTab("transactions")}><span><b>به‌روزرسانی دسته‌بندی هزینه‌ها</b><small>مدیریت تراکنش‌ها</small></span><ChevronRight/></button></div>
