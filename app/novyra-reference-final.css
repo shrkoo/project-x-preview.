@@ -2886,3 +2886,896 @@
  .nv-finance .nv-spend-highlights>article{flex-basis:78%!important}
  .nv-finance .nv-spend-quick>button{padding:9px!important}
 }
+
+
+/* NOVYRA home dashboard — precise reference alignment pass */
+.nv-finance.nv-home-active[lang="fa"]{
+  position:relative!important;
+  background:
+    radial-gradient(circle at 8% 5%,rgba(255,255,255,.9) 0 1px,transparent 1.7px),
+    radial-gradient(circle at 27% 12%,rgba(110,160,183,.18) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 53% 4%,rgba(255,255,255,.95) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 76% 10%,rgba(111,159,181,.16) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 92% 18%,rgba(255,255,255,.9) 0 1px,transparent 1.7px),
+    linear-gradient(180deg,#f7fbfd 0%,#f2f7fa 310px,#f5f8fa 100%)!important;
+}
+.nv-finance.nv-home-active[lang="fa"]::before{
+  content:""!important;position:absolute!important;inset:0 0 auto!important;
+  height:300px!important;pointer-events:none!important;z-index:0!important;
+  background:
+    radial-gradient(circle at 13% 28%,rgba(255,255,255,.9) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 39% 17%,rgba(111,153,177,.14) 0 1px,transparent 1.7px),
+    radial-gradient(circle at 66% 31%,rgba(255,255,255,.95) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 87% 43%,rgba(111,153,177,.13) 0 1px,transparent 1.7px);
+}
+.nv-finance.nv-home-active[lang="fa"] .nf-topbar,
+.nv-finance.nv-home-active[lang="fa"] .nf-shell{position:relative!important;z-index:2!important}
+
+/* Keep the complete top controls below the browser safe area */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar{
+  position:sticky!important;top:0!important;z-index:90!important;
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  box-sizing:border-box!important;width:100%!important;height:auto!important;
+  min-height:calc(72px + env(safe-area-inset-top))!important;
+  padding: max(7px,env(safe-area-inset-top)) 18px 7px!important;
+  margin:0 0 8px!important;overflow:visible!important;
+  background:rgba(247,251,253,.78)!important;
+  border:0!important;border-bottom:1px solid rgba(218,231,238,.55)!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:blur(16px) saturate(1.12)!important;
+  backdrop-filter:blur(16px) saturate(1.12)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar .nf-brand{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  flex:0 0 42px!important;width:42px!important;height:48px!important;
+  min-width:42px!important;padding:0!important;margin:0!important;
+  background:transparent!important;border:0!important;box-shadow:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar .nf-mark{
+  display:block!important;width:auto!important;height:auto!important;
+  padding:0!important;margin:0!important;border:0!important;border-radius:0!important;
+  background:repeating-linear-gradient(135deg,#111820 0 1.7px,transparent 1.7px 3.1px)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;color:transparent!important;
+  font-size:35px!important;line-height:1!important;font-weight:950!important;
+  letter-spacing:-3px!important;box-shadow:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar .nf-top-right{
+  display:flex!important;align-items:center!important;gap:10px!important;
+  height:auto!important;min-height:48px!important;overflow:visible!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar .nv-ref-bell,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar .nv-ref-profile{
+  position:relative!important;display:flex!important;align-items:center!important;
+  justify-content:center!important;visibility:visible!important;opacity:1!important;
+  flex:0 0 42px!important;width:42px!important;height:42px!important;
+  min-width:42px!important;min-height:42px!important;padding:0!important;margin:0!important;
+  border-radius:50%!important;box-sizing:border-box!important;overflow:visible!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar .nv-ref-bell svg{
+  width:19px!important;height:19px!important;stroke-width:1.65!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar .nv-ref-profile small{display:none!important}
+
+/* Balance row follows RTL: amount at right, eye at left */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance{
+  margin:0 18px!important;padding:18px 18px 15px!important;
+  border-radius:24px!important;background:rgba(255,255,255,.76)!important;
+  border:1px solid rgba(255,255,255,.92)!important;
+  box-shadow:0 9px 28px rgba(47,82,105,.055)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-head>div>small{
+  display:block!important;text-align:right!important;color:#83939d!important;
+  font-size:11px!important;font-weight:600!important;margin:0 0 7px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-value-row{
+  display:flex!important;direction:rtl!important;align-items:center!important;
+  justify-content:flex-start!important;gap:12px!important;width:100%!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-value-row>strong{
+  display:block!important;flex:1 1 auto!important;min-width:0!important;
+  direction:rtl!important;text-align:right!important;font-size:clamp(28px,7.8vw,39px)!important;
+  line-height:1.2!important;letter-spacing:-.5px!important;color:#1c3545!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-value-row .nv-ref-eye{
+  order:2!important;flex:0 0 30px!important;width:30px!important;height:30px!important;
+  display:grid!important;place-items:center!important;margin:0!important;padding:0!important;
+  color:#7e909b!important;background:transparent!important;border:0!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-value-row .nv-ref-eye svg{
+  width:17px!important;height:17px!important;stroke-width:1.6!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-net-row{
+  display:flex!important;direction:rtl!important;align-items:center!important;
+  justify-content:flex-start!important;flex-wrap:nowrap!important;gap:9px!important;
+  margin-top:10px!important;white-space:nowrap!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-net-chip{
+  display:inline-flex!important;align-items:center!important;gap:4px!important;
+  flex:0 0 auto!important;min-height:27px!important;padding:4px 10px!important;
+  border-radius:999px!important;background:#e9f7ef!important;color:#21865c!important;
+  border:1px solid #d9f0e3!important;font-size:11px!important;font-weight:750!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-net-chip svg{display:none!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-cheer-text{
+  display:inline!important;flex:0 1 auto!important;min-width:0!important;
+  padding:0!important;margin:0!important;border:0!important;background:transparent!important;
+  color:#82919a!important;font-size:10px!important;font-weight:500!important;
+  line-height:1.5!important;white-space:nowrap!important;
+}
+
+/* Elliptical translucent actions, with a high-contrast QR symbol */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions{
+  display:grid!important;direction:ltr!important;
+  grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr)!important;
+  align-items:center!important;gap:10px!important;
+  width:100%!important;max-width:100%!important;margin:16px 0 0!important;
+  padding:0!important;box-sizing:border-box!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions>button{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  gap:7px!important;min-width:0!important;width:100%!important;height:43px!important;
+  min-height:43px!important;padding:0 10px!important;border-radius:999px!important;
+  box-sizing:border-box!important;font-size:11px!important;font-weight:600!important;
+  line-height:1.2!important;white-space:nowrap!important;
+  color:#2678a8!important;background:rgba(239,249,253,.54)!important;
+  border:1px solid rgba(169,211,230,.48)!important;
+  box-shadow:0 3px 12px rgba(49,110,143,.045)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(1.25)!important;
+  backdrop-filter:blur(14px) saturate(1.25)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions>button svg{
+  flex:0 0 auto!important;width:15px!important;height:15px!important;
+  color:#2678a8!important;stroke-width:1.7!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions .nv-ref-action-qr{
+  width:48px!important;height:43px!important;min-width:48px!important;min-height:43px!important;
+  padding:0!important;border:0!important;border-radius:999px!important;
+  background:#2c83d9!important;color:#fff!important;
+  box-shadow:0 5px 14px rgba(44,131,217,.2)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions .nv-ref-action-qr svg{
+  width:20px!important;height:20px!important;color:#fff!important;stroke:#fff!important;
+  stroke-width:2!important;
+}
+
+/* Soft white-to-turquoise insight card */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight{
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  margin:14px 18px 0!important;padding:13px 15px!important;gap:10px!important;
+  border:1px solid rgba(207,235,235,.78)!important;border-radius:19px!important;
+  background:linear-gradient(112deg,#fff 0%,#f7fcfd 42%,#e1f8f4 100%)!important;
+  box-shadow:0 8px 24px rgba(66,151,145,.075)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight::before{
+  content:""!important;position:absolute!important;z-index:-1!important;
+  width:170px!important;height:110px!important;left:-45px!important;top:-42px!important;
+  border-radius:50%!important;background:rgba(113,225,211,.2)!important;
+  filter:blur(28px)!important;pointer-events:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight>div>b{
+  display:flex!important;align-items:center!important;gap:6px!important;
+  color:#637d88!important;font-size:11px!important;font-weight:650!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight>div>b svg{
+  width:14px!important;height:14px!important;color:#4b9c9c!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight p{
+  margin:5px 0 0!important;color:#526b78!important;
+  font-size:12px!important;font-weight:500!important;line-height:1.7!important;
+  white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight .nv-insight-highlight{
+  color:#e34b55!important;font-weight:800!important;font-size:1.05em!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight-arrow{
+  flex:0 0 28px!important;width:28px!important;height:28px!important;
+  min-width:28px!important;min-height:28px!important;background:rgba(255,255,255,.56)!important;
+}
+
+/* Centered category cards; neutral labels; scroll rail reaches the viewport edge */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-section{
+  margin:18px 18px 0!important;overflow:visible!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-section-head{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:10px!important;margin:0 0 10px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-section-head h2{
+  margin:0!important;color:#405967!important;font-size:14px!important;
+  font-weight:650!important;line-height:1.4!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-section-head button{
+  color:#83929a!important;font-size:10px!important;font-weight:500!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{
+  display:flex!important;flex-flow:row nowrap!important;direction:rtl!important;
+  justify-content:flex-start!important;align-items:stretch!important;gap:9px!important;
+  width:calc(100% + 36px)!important;max-width:none!important;min-width:0!important;
+  margin:0 -18px!important;padding:5px 18px 14px!important;box-sizing:border-box!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
+  scroll-snap-type:x mandatory!important;-webkit-overflow-scrolling:touch!important;
+  scrollbar-width:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid::-webkit-scrollbar{display:none!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-chart-card{
+  flex:0 0 29%!important;width:29%!important;min-width:0!important;max-width:none!important;
+  height:174px!important;min-height:174px!important;max-height:174px!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;
+  justify-content:flex-start!important;gap:7px!important;padding:12px 8px 10px!important;
+  box-sizing:border-box!important;overflow:hidden!important;text-align:center!important;
+  scroll-snap-align:start!important;border-radius:18px!important;
+  background:rgba(255,255,255,.72)!important;border:1px solid rgba(255,255,255,.9)!important;
+  box-shadow:0 6px 18px rgba(47,79,99,.05)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-category-top,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-amount,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-caption{
+  display:block!important;flex:0 0 auto!important;width:100%!important;
+  text-align:center!important;min-width:0!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-category-top small{
+  display:block!important;color:#566d7b!important;font-size:11px!important;
+  font-weight:650!important;text-align:center!important;white-space:nowrap!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-category-chart{
+  display:block!important;flex:0 0 76px!important;width:100%!important;
+  height:76px!important;min-height:76px!important;max-height:76px!important;
+  margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-category-wave{
+  display:block!important;width:100%!important;height:76px!important;
+  min-height:76px!important;max-height:76px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-amount{
+  color:#263c4a!important;font-size:11px!important;font-weight:700!important;
+  direction:rtl!important;text-align:center!important;line-height:1.35!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-caption{
+  color:#84929b!important;font-size:9px!important;font-weight:500!important;
+  text-align:center!important;line-height:1.3!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.food .nv-ref-chart-caption,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.travel .nv-ref-chart-caption,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.shopping .nv-ref-chart-caption,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.other .nv-ref-chart-caption{color:#84929b!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.is-empty .nv-category-bars{
+  opacity:.48!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.is-empty .nv-category-bars rect{
+  opacity:.18!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.has-data .nv-category-bars{opacity:1!important}
+
+/* Remove the old raised white dock: icons sit directly over the page gradient */
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock{
+  position:fixed!important;left:0!important;right:0!important;
+  bottom:0!important;z-index:300!important;
+  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  align-items:center!important;justify-items:stretch!important;gap:0!important;
+  width:100%!important;height:calc(66px + env(safe-area-inset-bottom))!important;
+  min-height:calc(66px + env(safe-area-inset-bottom))!important;
+  padding:4px 10px calc(4px + env(safe-area-inset-bottom))!important;
+  box-sizing:border-box!important;border:0!important;border-radius:0!important;
+  background:linear-gradient(180deg,rgba(245,250,252,0) 0%,rgba(241,247,250,.52) 100%)!important;
+  box-shadow:none!important;overflow:visible!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button{
+  position:relative!important;inset:auto!important;top:auto!important;left:auto!important;right:auto!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  justify-self:center!important;align-self:center!important;grid-row:1!important;
+  width:100%!important;max-width:48px!important;height:48px!important;min-height:48px!important;
+  min-width:0!important;margin:0!important;padding:0!important;transform:none!important;translate:none!important;
+  border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;color:#91a1aa!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.active{color:#2785b5!important}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button .nf-dock-icon{
+  display:grid!important;place-items:center!important;width:100%!important;height:100%!important;
+  margin:0!important;padding:0!important;background:transparent!important;border:0!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button svg{
+  display:block!important;width:21px!important;height:21px!important;
+  stroke-width:1.65!important;fill:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(1){grid-column:1!important}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(2){grid-column:2!important}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(3){grid-column:3!important}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(4){grid-column:4!important}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(5){grid-column:5!important}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center{
+  position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+  grid-column:3!important;grid-row:1!important;justify-self:center!important;align-self:center!important;
+  width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;
+  max-width:48px!important;margin:0!important;padding:0!important;transform:none!important;
+  border:0!important;border-radius:50%!important;
+  background:conic-gradient(from 0deg,#ff263f,#ff8a24,#f4dc30,#23c778,#20a9df,#7546e8,#ff263f)!important;
+  box-shadow:0 3px 12px rgba(76,93,170,.18)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center svg{
+  width:21px!important;height:21px!important;color:#fff!important;stroke:#fff!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nf-main{
+  padding-bottom:calc(92px + env(safe-area-inset-bottom))!important;
+}
+
+/* Spending highlights and quick actions can scroll/align to the same page edges */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page{
+  width:100%!important;max-width:100%!important;min-width:0!important;overflow:visible!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-highlights{
+  width:calc(100% + 36px)!important;margin-inline:-18px!important;
+  padding:2px 18px 10px!important;box-sizing:border-box!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
+  scroll-padding-inline:18px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-highlights>article{
+  flex:0 0 calc(50% - 5px)!important;min-width:0!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-quick{
+  width:calc(100% + 36px)!important;margin-inline:-18px!important;
+  padding-inline:18px!important;box-sizing:border-box!important;
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:9px!important;overflow:visible!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-quick>button{
+  flex:none!important;width:100%!important;min-width:0!important;max-width:none!important;
+  min-height:68px!important;padding:10px 11px!important;border-radius:18px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-quick>button b{
+  font-size:10px!important;font-weight:600!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-quick>button small{
+  font-size:9px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-heading{
+  color:#526b79!important;font-size:13px!important;font-weight:650!important;
+}
+@media(max-width:380px){
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-actions{grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr)!important;gap:7px!important}
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-actions .nv-ref-action-qr{width:44px!important;min-width:44px!important}
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-actions>button{font-size:10px!important;padding:0 7px!important}
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-chart-card{flex-basis:31%!important;width:31%!important}
+  .nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock{padding-inline:6px!important}
+}
+
+
+/* NOVYRA follow-up: RTL progress, chart fidelity, typography and page-edge rails */
+.nv-finance[lang="fa"] .nv-home-active,
+.nv-finance[lang="fa"] .nf-main,
+.nv-finance[lang="fa"] .nv-ref-spending-page,
+.nv-finance[lang="fa"] .nv-income-page{
+  color:#111820!important;
+  font-weight:450!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nf-main{
+  padding-left:18px!important;padding-right:18px!important;
+  padding-bottom:calc(112px + env(safe-area-inset-bottom))!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-value-row>strong,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-amount{
+  color:#111820!important;font-weight:600!important;
+  font-family:Tahoma,Arial,sans-serif!important;
+  font-variant-numeric:lining-nums tabular-nums!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-amount{
+  font-size:12px!important;line-height:1.4!important;min-height:17px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight-arrow{
+  flex:0 0 20px!important;width:20px!important;height:20px!important;
+  min-width:20px!important;min-height:20px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight-arrow svg{
+  width:13px!important;height:13px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight>div>b{font-weight:500!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight p{font-weight:450!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-section-head h2{font-weight:500!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-head>div>small{font-weight:450!important}
+
+/* Goals: the fill and its percentage marker both advance from the RTL right edge */
+.nv-finance .nv-income-page .nv-goal-progress{
+  direction:rtl!important;position:relative!important;
+  height:34px!important;min-height:34px!important;margin:0 0 9px!important;
+  padding:0!important;overflow:visible!important;
+}
+.nv-finance .nv-income-page .nv-goal-track{
+  direction:rtl!important;display:flex!important;justify-content:flex-start!important;
+  position:absolute!important;left:0!important;right:0!important;top:19px!important;
+  width:100%!important;height:4px!important;min-height:4px!important;
+  border-radius:99px!important;overflow:visible!important;
+  background:rgba(207,220,226,.7)!important;
+}
+.nv-finance .nv-income-page .nv-goal-track>i{
+  position:relative!important;display:block!important;flex:0 0 auto!important;
+  height:4px!important;min-height:4px!important;margin:0!important;
+  border-radius:99px!important;
+}
+.nv-finance .nv-income-page .nv-goal-track>i::after{
+  content:""!important;position:absolute!important;left:0!important;top:-3px!important;
+  width:2px!important;height:10px!important;border-radius:2px!important;
+  background:#148d4c!important;
+}
+.nv-finance .nv-income-page .nv-goal-track.yellow>i::after{background:#d5b61a!important}
+.nv-finance .nv-income-page .nv-goal-percent-badge{
+  position:absolute!important;top:0!important;left:auto!important;
+  right:var(--goal-progress,0%)!important;transform:translateX(50%)!important;
+  padding:3px 8px!important;border-radius:12px!important;
+  font-size:9px!important;line-height:1.1!important;font-weight:600!important;
+  white-space:nowrap!important;z-index:3!important;
+}
+.nv-finance .nv-income-page .nv-goal-monthly{
+  color:#4388c1!important;font-size:11px!important;font-weight:450!important;
+}
+.nv-finance .nv-income-page .nv-goal-monthly span,
+.nv-finance .nv-income-page .nv-goal-monthly b{
+  color:#4388c1!important;font-weight:450!important;
+}
+.nv-finance .nv-income-page .nv-goal-arrow{
+  flex:0 0 28px!important;width:28px!important;height:28px!important;
+  min-width:28px!important;min-height:28px!important;max-width:28px!important;
+  display:grid!important;place-items:center!important;position:static!important;
+  overflow:visible!important;color:#3b8cc6!important;
+}
+.nv-finance .nv-income-page .nv-goal-arrow svg{
+  width:16px!important;height:16px!important;stroke-width:1.7!important;
+  transform:none!important;
+}
+.nv-finance .nv-income-page .nv-goal-actions{
+  flex:0 0 auto!important;min-width:0!important;gap:5px!important;
+}
+.nv-finance .nv-income-page .nv-income-card{
+  overflow:visible!important;position:relative!important;
+}
+.nv-finance .nv-income-page .nv-income-amount{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:10px!important;min-width:0!important;overflow:visible!important;
+}
+.nv-finance .nv-income-page .nv-income-amount h2{
+  min-width:0!important;flex:1 1 auto!important;color:#111820!important;
+  font-weight:550!important;overflow-wrap:anywhere!important;
+}
+.nv-finance .nv-income-page .nv-income-arrow{
+  position:static!important;inset:auto!important;transform:none!important;
+  display:grid!important;place-items:center!important;flex:0 0 30px!important;
+  width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;
+  margin:0!important;overflow:visible!important;
+}
+
+/* Spending chart: full-width, evenly spaced day labels, horizontal-only grid and fine daily points */
+.nv-finance .nv-ref-spending-page .nv-spend-total{
+  margin-left:18px!important;margin-right:18px!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-total-head small{
+  color:#667782!important;font-size:11px!important;font-weight:450!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-total-head h2{
+  color:#111820!important;font-weight:550!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-chart{
+  grid-template-columns:78px minmax(0,1fr)!important;
+  grid-template-rows:190px auto!important;gap:0 7px!important;
+  align-items:stretch!important;overflow:visible!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot{
+  grid-column:2!important;grid-row:1!important;position:relative!important;
+  min-width:0!important;width:100%!important;overflow:visible!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot>svg{
+  display:block!important;width:100%!important;height:190px!important;
+  min-width:0!important;overflow:visible!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot>svg line{
+  stroke-opacity:.15!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot>svg line[x1][x2]{display:block!important}
+.nv-finance .nv-ref-spending-page .nv-spend-plot>svg path:nth-of-type(2){
+  stroke-width:1.9!important;stroke-linecap:round!important;stroke-linejoin:round!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot>svg circle{
+  display:block!important;vector-effect:non-scaling-stroke!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-axis{
+  display:flex!important;direction:ltr!important;justify-content:space-between!important;
+  width:calc(100% - 85px)!important;margin:7px 0 0 85px!important;
+  padding:0!important;box-sizing:border-box!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-axis span{
+  flex:0 0 auto!important;text-align:center!important;
+  font-size:10px!important;font-weight:450!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot .nv-spend-bubble{
+  left:clamp(35%,var(--spend-bubble-x,50%),65%)!important;
+  max-width:calc(100% - 16px)!important;padding:5px 8px!important;
+  white-space:nowrap!important;overflow:visible!important;
+  font-size:10px!important;transform:translate(-50%,calc(-100% - 8px))!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights{
+  width:calc(100% + 36px)!important;margin:0 -18px!important;
+  padding:2px 18px 10px!important;box-sizing:border-box!important;
+  scroll-padding-inline:18px!important;overflow-x:auto!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article{
+  flex:0 0 calc(50% - 5px)!important;min-width:0!important;
+  box-sizing:border-box!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article small{
+  font-size:10px!important;font-weight:500!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article.high small,
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article.high small svg,
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article.high em{color:#df5960!important}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article.low small,
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article.low small svg,
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article.low em{color:#279b6a!important}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights article i{
+  display:inline-flex!important;align-items:center!important;
+  font-size:10px!important;font-style:normal!important;font-weight:650!important;
+  white-space:nowrap!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights article i.up{color:#df5960!important}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights article i.down{color:#279b6a!important}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights article em{
+  display:block!important;font-size:10px!important;font-weight:500!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-quick{
+  width:calc(100% + 36px)!important;margin:0 -18px!important;
+  padding:0 18px!important;box-sizing:border-box!important;
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:9px!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-quick>button{
+  min-width:0!important;min-height:60px!important;padding:8px 10px!important;
+  border-radius:16px!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-quick>button .nv-quick-chevron{
+  display:block!important;flex:0 0 auto!important;color:#77909f!important;
+  font-size:22px!important;font-weight:400!important;line-height:1!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-heading{
+  margin:17px 18px 9px!important;font-size:14px!important;
+  font-weight:500!important;color:#475e6a!important;
+}
+.nv-finance .nv-ref-spending-page{padding-bottom:calc(125px + env(safe-area-inset-bottom))!important}
+.nv-finance .nv-income-page{padding-bottom:calc(120px + env(safe-area-inset-bottom))!important}
+.nv-finance .nf-main{padding-bottom:calc(120px + env(safe-area-inset-bottom))!important}
+@media(max-width:390px){
+  .nv-finance .nv-ref-spending-page .nv-spend-chart{grid-template-columns:72px minmax(0,1fr)!important;gap:0 7px!important}
+  .nv-finance .nv-ref-spending-page .nv-spend-axis{width:calc(100% - 79px)!important;margin-left:79px!important}
+  .nv-finance .nv-ref-spending-page .nv-spend-highlights>article{flex-basis:calc(50% - 5px)!important}
+}
+
+
+/* NOVYRA design-reference pass: consistent RTL geometry and refined visual system */
+.nv-finance.nv-home-active[lang="fa"] {
+  --nv-page-gutter:18px;
+  --nv-ink:#111111;
+  --nv-muted:#7b8790;
+  --nv-blue:#3B82F6;
+}
+.nv-finance.nv-home-active[lang="fa"] .nf-main,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page,
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page {
+  color:var(--nv-ink)!important;
+  font-weight:400!important;
+  padding-inline:var(--nv-page-gutter)!important;
+  padding-bottom:calc(118px + env(safe-area-inset-bottom))!important;
+  box-sizing:border-box!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nf-main :is(p,span,small,button,label) {
+  font-weight:400;
+}
+.nv-finance.nv-home-active[lang="fa"] .nf-main :is(h1,h2,h3,.nv-ref-section-head h2,.nv-spend-heading) {
+  color:#111!important;
+  font-weight:600!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-section-head h2,
+.nv-finance.nv-home-active[lang="fa"] .nv-spend-heading {
+  font-size:14px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-section-head>button {
+  color:#8b9298!important;
+  font-weight:400!important;
+}
+
+/* Header: transparent striped brand mark, matched circular controls, subtle particles */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar {
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:visible!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-topbar::after {
+  content:""!important;
+  position:absolute!important;
+  inset:-12px 0 -8px!important;
+  z-index:-1!important;
+  pointer-events:none!important;
+  background:
+    radial-gradient(circle at 13% 28%,rgba(59,130,246,.22) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 26% 68%,rgba(59,130,246,.17) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 43% 20%,rgba(59,130,246,.2) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 61% 58%,rgba(59,130,246,.16) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 78% 25%,rgba(59,130,246,.2) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 91% 72%,rgba(59,130,246,.16) 0 1px,transparent 1.8px);
+}
+.nv-finance.nv-home-active[lang="fa"] .nf-brand .nf-mark {
+  display:block!important;
+  width:34px!important;height:34px!important;
+  border:0!important;border-radius:0!important;
+  background:repeating-linear-gradient(135deg,#111 0 2px,transparent 2px 4px)!important;
+  clip-path:polygon(9% 0,91% 0,100% 13%,100% 87%,91% 100%,9% 100%,0 87%,0 13%)!important;
+  box-shadow:none!important;
+  color:transparent!important;font-size:0!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-bell,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-profile {
+  width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;
+  max-width:40px!important;max-height:40px!important;
+  display:grid!important;place-items:center!important;
+  box-sizing:border-box!important;border-radius:50%!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-profile small {display:none!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-bell {padding:0!important}
+
+/* Balance and savings: RTL alignment, positive-net-only compact pill */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-head,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-head>div {
+  width:100%!important;align-items:flex-start!important;text-align:right!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-head>div>small {
+  display:block!important;width:100%!important;text-align:right!important;
+  color:#858d94!important;font-size:12px!important;font-weight:400!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-value-row {
+  width:100%!important;display:flex!important;flex-direction:row!important;
+  direction:rtl!important;align-items:center!important;justify-content:space-between!important;
+  text-align:right!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-value-row>strong {
+  margin-inline-start:auto!important;text-align:right!important;color:#111!important;font-weight:600!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-eye {order:2!important;margin-inline-start:auto!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-net-row {
+  display:flex!important;flex-direction:row!important;direction:rtl!important;
+  justify-content:flex-start!important;align-items:center!important;gap:8px!important;
+  width:100%!important;margin-top:8px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-net-chip {
+  display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;gap:4px!important;
+  padding:4px 8px!important;border-radius:999px!important;
+  color:#168b59!important;background:rgba(28,168,105,.10)!important;
+  font-size:11px!important;font-weight:500!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-net-chip svg {order:0!important;color:#168b59!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-cheer-text {
+  color:#8b9298!important;font-size:10px!important;font-weight:400!important;
+}
+
+/* Glass action pills and high-contrast QR */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions {
+  display:grid!important;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr)!important;
+  align-items:center!important;gap:10px!important;
+  width:100%!important;margin-inline:0!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions>button:not(.nv-ref-action-qr) {
+  min-width:0!important;height:42px!important;min-height:42px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;
+  padding:0 12px!important;border-radius:999px!important;
+  color:#3B82F6!important;background:rgba(255,255,255,.5)!important;
+  border:1px solid rgba(255,255,255,.72)!important;
+  -webkit-backdrop-filter:blur(12px)!important;backdrop-filter:blur(12px)!important;
+  box-shadow:0 4px 14px rgba(52,105,151,.06)!important;
+  font-size:11px!important;font-weight:400!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions>button:not(.nv-ref-action-qr) svg {
+  color:#3B82F6!important;width:16px!important;height:16px!important;stroke-width:1.6!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions .nv-ref-action-qr {
+  width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;
+  border-radius:50%!important;background:#3B82F6!important;color:#fff!important;
+  border:0!important;display:grid!important;place-items:center!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-actions .nv-ref-action-qr svg {
+  color:#fff!important;stroke:#fff!important;width:21px!important;height:21px!important;
+}
+
+/* Insight card: white-to-cyan glow, restrained label and red key figure */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight {
+  position:relative!important;overflow:hidden!important;
+  background:linear-gradient(112deg,#fff 0%,#f8fdff 48%,#e9faff 100%)!important;
+  border:1px solid rgba(127,208,235,.18)!important;
+  box-shadow:0 9px 25px rgba(66,171,207,.10),0 0 22px rgba(95,205,233,.08)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight::before {
+  content:""!important;position:absolute!important;inset:auto -22px -38px auto!important;
+  width:150px!important;height:110px!important;border-radius:50%!important;
+  background:rgba(120,220,244,.14)!important;filter:blur(24px)!important;pointer-events:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight>div>b {
+  display:flex!important;align-items:center!important;gap:6px!important;
+  color:#3B82F6!important;font-size:11px!important;font-weight:600!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight>div>b svg {width:14px!important;height:14px!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight p {
+  color:#394650!important;font-size:13px!important;font-weight:450!important;line-height:1.8!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight .nv-insight-highlight {
+  color:#e5484d!important;font-weight:650!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight-arrow {
+  width:22px!important;height:22px!important;min-width:22px!important;min-height:22px!important;
+  border-radius:50%!important;background:rgba(59,130,246,.09)!important;
+}
+
+/* Full-bleed horizontal rails; internal gutters preserve the same 18px page rhythm */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-highlights,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-quick {
+  width:calc(100% + 36px)!important;max-width:none!important;
+  margin-inline:-18px!important;padding-inline:18px!important;
+  box-sizing:border-box!important;scroll-padding-inline:18px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid {
+  display:flex!important;overflow-x:auto!important;overflow-y:hidden!important;
+  gap:10px!important;scrollbar-width:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid::-webkit-scrollbar,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-highlights::-webkit-scrollbar {display:none!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-chart-card {
+  flex:0 0 31%!important;width:31%!important;min-width:112px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-highlights {
+  display:flex!important;gap:10px!important;overflow-x:auto!important;overflow-y:hidden!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-quick {
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:9px!important;overflow:visible!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-quick>button {
+  min-width:0!important;min-height:58px!important;padding:8px 10px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-quick .nv-quick-chevron {
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  color:#6B7280!important;font-size:0!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-quick .nv-quick-chevron svg {
+  width:15px!important;height:15px!important;stroke-width:1.5!important;
+}
+
+/* Monthly category cards: centered type, neutral status and true empty baseline */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-category-top small {
+  color:#7d8790!important;font-size:10px!important;font-weight:500!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-amount {
+  color:#111!important;font-size:12px!important;font-weight:600!important;text-align:center!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-caption,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.food .nv-ref-chart-caption,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.travel .nv-ref-chart-caption,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.shopping .nv-ref-chart-caption,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.other .nv-ref-chart-caption {
+  color:#8a9298!important;font-size:9px!important;font-weight:400!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.is-empty .nv-category-bars rect {
+  opacity:0!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card.is-empty .nv-category-bars {
+  opacity:.22!important;
+}
+
+/* Statistics: safe tooltip clamp, total heading, horizontal-only grid and compact highlights */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-total-head small::before {
+  content:""!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-total-head small {
+  font-size:12px!important;color:#6B7280!important;font-weight:500!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-total-head h2 {
+  color:#111!important;font-weight:600!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-plot>svg line {
+  display:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-plot>svg line[x1][x2][y1][y2] {
+  display:block!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-plot .nv-spend-bubble {
+  left:clamp(42px,var(--spend-bubble-x,50%),calc(100% - 42px))!important;
+  max-width:calc(100% - 16px)!important;box-sizing:border-box!important;
+  white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+  transform:translate(-50%,calc(-100% - 8px))!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-highlights>article {
+  min-width:0!important;min-height:92px!important;padding:12px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-highlight-value {
+  display:flex!important;align-items:center!important;justify-content:space-between!important;gap:6px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-highlight-value>b {
+  color:#111!important;font-size:12px!important;font-weight:600!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-highlight-value>i {
+  font-size:10px!important;font-style:normal!important;font-weight:600!important;white-space:nowrap!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-highlight-value>i.up {color:#df5960!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-spending-page .nv-spend-highlight-value>i.down {color:#279b6a!important}
+
+/* Goals: edit arrow stays adjacent to the remaining pill; lighter progress marker and safe income arrow */
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-goal-topline {
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:10px!important;min-width:0!important;overflow:visible!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-goal-topline>div:first-child {
+  min-width:0!important;flex:1 1 auto!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-goal-actions {
+  display:flex!important;flex:0 0 auto!important;align-items:center!important;
+  justify-content:flex-end!important;gap:6px!important;white-space:nowrap!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-goal-arrow {
+  border-radius:50%!important;background:rgba(59,130,246,.08)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-goal-progress {
+  height:36px!important;min-height:36px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-goal-track {
+  top:21px!important;height:3px!important;min-height:3px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-goal-track>i {
+  height:3px!important;min-height:3px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-goal-track>i::after {
+  top:-4px!important;width:2px!important;height:11px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-goal-percent-badge {
+  top:0!important;transform:translateX(50%)!important;margin-bottom:0!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-goal-monthly {
+  color:#8fc5f2!important;font-weight:400!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-goal-monthly span,
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-goal-monthly b {
+  color:#8fc5f2!important;font-weight:400!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-income-card,
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-income-amount {
+  overflow:visible!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-income-page .nv-income-arrow {
+  flex:0 0 32px!important;width:32px!important;height:32px!important;
+  min-width:32px!important;min-height:32px!important;position:relative!important;
+  z-index:2!important;
+}
+
+/* Bottom navigation: all five controls share one baseline, no floating white dock */
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock {
+  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  align-items:center!important;justify-items:center!important;
+  height:calc(64px + env(safe-area-inset-bottom))!important;
+  min-height:calc(64px + env(safe-area-inset-bottom))!important;
+  padding:3px 12px calc(3px + env(safe-area-inset-bottom))!important;
+  background:linear-gradient(180deg,rgba(245,250,252,0) 0%,rgba(241,247,250,.36) 100%)!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button,
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center {
+  position:relative!important;top:auto!important;inset:auto!important;
+  grid-row:1!important;align-self:center!important;justify-self:center!important;
+  width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;
+  max-width:42px!important;margin:0!important;padding:0!important;transform:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center {
+  background:conic-gradient(from 0deg,#ff263f,#ff8a24,#f4dc30,#23c778,#20a9df,#7546e8,#ff263f)!important;
+  border-radius:50%!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button svg {
+  width:21px!important;height:21px!important;stroke-width:1.5!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.active {color:#3B82F6!important}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:not(.active):not(.nv-ref-dock-center) {color:#6B7280!important}
+.nv-finance.nv-home-active[lang="fa"] .nf-main {padding-bottom:calc(112px + env(safe-area-inset-bottom))!important}
+@media(max-width:380px) {
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-actions {grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr)!important;gap:7px!important}
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-actions .nv-ref-action-qr {width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important}
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-chart-card {flex-basis:31%!important;width:31%!important;min-width:104px!important}
+}
