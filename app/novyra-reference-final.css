@@ -2095,3 +2095,67 @@
 .nv-finance .nv-ref-spending-page .nv-spend-change{display:inline-flex!important;margin-top:7px!important;padding:4px 8px!important;border-radius:9px!important;font-size:11px!important}
 .nv-finance .nv-ref-spending-page .nv-spend-change.up,.nv-finance .nv-ref-spending-page .nv-spend-highlight-value .up{color:#d65e5e!important}.nv-finance .nv-ref-spending-page .nv-spend-change.down,.nv-finance .nv-ref-spending-page .nv-spend-highlight-value .down{color:#26996b!important}
 .nv-finance .nv-ref-spending-page .nv-spend-highlight-value i{font-size:11px!important;font-weight:600!important}
+
+
+/* NOVYRA corrective layout pass — stable plot overlay and floating home dock */
+.nv-finance .nv-ref-spending-page .nv-spend-chart>.nv-spend-plot{
+  grid-column:2!important;grid-row:1!important;position:relative!important;
+  width:100%!important;height:250px!important;min-width:0!important;
+  overflow:visible!important;direction:ltr!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-chart>.nv-spend-plot>svg{
+  display:block!important;width:100%!important;height:100%!important;
+  min-width:0!important;overflow:hidden!important;touch-action:pan-y!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot .nv-spend-dot{
+  position:absolute!important;z-index:2!important;display:block!important;
+  width:10px!important;height:10px!important;border:2px solid #fff!important;
+  border-radius:50%!important;background:#269b69!important;
+  box-shadow:0 1px 6px rgba(25,100,70,.28)!important;
+  transform:translate(-50%,-50%)!important;pointer-events:none!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot .nv-spend-bubble{
+  position:absolute!important;z-index:3!important;display:block!important;
+  max-width:calc(100% - 12px)!important;padding:5px 9px!important;
+  border:1px solid #55b98a!important;border-radius:9px!important;
+  background:#effcf5!important;color:#278b62!important;
+  font:600 11px/1.4 inherit!important;white-space:nowrap!important;
+  direction:rtl!important;transform:translate(-50%,calc(-100% - 9px))!important;
+  box-shadow:0 3px 10px rgba(25,100,70,.10)!important;pointer-events:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock{
+  position:fixed!important;left:12px!important;right:12px!important;
+  bottom:calc(12px + env(safe-area-inset-bottom))!important;
+  width:auto!important;max-width:calc(100vw - 24px)!important;
+  height:76px!important;min-height:76px!important;box-sizing:border-box!important;
+  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  align-items:center!important;justify-items:stretch!important;gap:4px!important;
+  padding:8px 10px!important;border:1px solid rgba(255,255,255,.9)!important;
+  border-radius:28px!important;background:rgba(255,255,255,.88)!important;
+  box-shadow:0 8px 28px rgba(39,73,96,.15)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.2)!important;
+  backdrop-filter:blur(18px) saturate(1.2)!important;
+  overflow:visible!important;isolation:isolate!important;transform:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock::before{
+  content:none!important;display:none!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button{
+  position:relative!important;left:auto!important;right:auto!important;top:auto!important;
+  transform:none!important;z-index:1!important;width:100%!important;min-width:0!important;
+  height:54px!important;min-height:54px!important;margin:0!important;padding:0!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center{
+  position:absolute!important;left:50%!important;right:auto!important;top:-24px!important;
+  transform:translateX(-50%)!important;width:56px!important;height:56px!important;
+  min-width:56px!important;min-height:56px!important;margin:0!important;padding:0!important;
+  z-index:4!important;border-radius:50%!important;overflow:hidden!important;
+}
+.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center .nf-dock-icon{
+  display:grid!important;place-items:center!important;width:100%!important;height:100%!important;
+  margin:0!important;padding:0!important;background:transparent!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nf-main{
+  padding-bottom:calc(120px + env(safe-area-inset-bottom))!important;
+}
