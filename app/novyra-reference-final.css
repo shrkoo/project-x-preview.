@@ -3239,3 +3239,211 @@
   .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-chart-card{flex-basis:31%!important;width:31%!important}
   .nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock{padding-inline:6px!important}
 }
+
+
+/* NOVYRA follow-up: RTL progress, chart fidelity, typography and page-edge rails */
+.nv-finance[lang="fa"] .nv-home-active,
+.nv-finance[lang="fa"] .nf-main,
+.nv-finance[lang="fa"] .nv-ref-spending-page,
+.nv-finance[lang="fa"] .nv-income-page{
+  color:#111820!important;
+  font-weight:450!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nf-main{
+  padding-left:18px!important;padding-right:18px!important;
+  padding-bottom:calc(112px + env(safe-area-inset-bottom))!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-value-row>strong,
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-amount{
+  color:#111820!important;font-weight:600!important;
+  font-family:Tahoma,Arial,sans-serif!important;
+  font-variant-numeric:lining-nums tabular-nums!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-chart-card .nv-ref-chart-amount{
+  font-size:12px!important;line-height:1.4!important;min-height:17px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight-arrow{
+  flex:0 0 20px!important;width:20px!important;height:20px!important;
+  min-width:20px!important;min-height:20px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight-arrow svg{
+  width:13px!important;height:13px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight>div>b{font-weight:500!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-insight p{font-weight:450!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-section-head h2{font-weight:500!important}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-balance-head>div>small{font-weight:450!important}
+
+/* Goals: the fill and its percentage marker both advance from the RTL right edge */
+.nv-finance .nv-income-page .nv-goal-progress{
+  direction:rtl!important;position:relative!important;
+  height:34px!important;min-height:34px!important;margin:0 0 9px!important;
+  padding:0!important;overflow:visible!important;
+}
+.nv-finance .nv-income-page .nv-goal-track{
+  direction:rtl!important;display:flex!important;justify-content:flex-start!important;
+  position:absolute!important;left:0!important;right:0!important;top:19px!important;
+  width:100%!important;height:4px!important;min-height:4px!important;
+  border-radius:99px!important;overflow:visible!important;
+  background:rgba(207,220,226,.7)!important;
+}
+.nv-finance .nv-income-page .nv-goal-track>i{
+  position:relative!important;display:block!important;flex:0 0 auto!important;
+  height:4px!important;min-height:4px!important;margin:0!important;
+  border-radius:99px!important;
+}
+.nv-finance .nv-income-page .nv-goal-track>i::after{
+  content:""!important;position:absolute!important;right:0!important;top:-3px!important;
+  width:2px!important;height:10px!important;border-radius:2px!important;
+  background:#148d4c!important;
+}
+.nv-finance .nv-income-page .nv-goal-track.yellow>i::after{background:#d5b61a!important}
+.nv-finance .nv-income-page .nv-goal-percent-badge{
+  position:absolute!important;top:0!important;left:auto!important;
+  right:var(--goal-progress,0%)!important;transform:translateX(50%)!important;
+  padding:3px 8px!important;border-radius:12px!important;
+  font-size:9px!important;line-height:1.1!important;font-weight:600!important;
+  white-space:nowrap!important;z-index:3!important;
+}
+.nv-finance .nv-income-page .nv-goal-monthly{
+  color:#4388c1!important;font-size:11px!important;font-weight:450!important;
+}
+.nv-finance .nv-income-page .nv-goal-monthly span,
+.nv-finance .nv-income-page .nv-goal-monthly b{
+  color:#4388c1!important;font-weight:450!important;
+}
+.nv-finance .nv-income-page .nv-goal-arrow{
+  flex:0 0 28px!important;width:28px!important;height:28px!important;
+  min-width:28px!important;min-height:28px!important;max-width:28px!important;
+  display:grid!important;place-items:center!important;position:static!important;
+  overflow:visible!important;color:#3b8cc6!important;
+}
+.nv-finance .nv-income-page .nv-goal-arrow svg{
+  width:16px!important;height:16px!important;stroke-width:1.7!important;
+  transform:none!important;
+}
+.nv-finance .nv-income-page .nv-goal-actions{
+  flex:0 0 auto!important;min-width:0!important;gap:5px!important;
+}
+.nv-finance .nv-income-page .nv-income-card{
+  overflow:visible!important;position:relative!important;
+}
+.nv-finance .nv-income-page .nv-income-amount{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:10px!important;min-width:0!important;overflow:visible!important;
+}
+.nv-finance .nv-income-page .nv-income-amount h2{
+  min-width:0!important;flex:1 1 auto!important;color:#111820!important;
+  font-weight:550!important;overflow-wrap:anywhere!important;
+}
+.nv-finance .nv-income-page .nv-income-arrow{
+  position:static!important;inset:auto!important;transform:none!important;
+  display:grid!important;place-items:center!important;flex:0 0 30px!important;
+  width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;
+  margin:0!important;overflow:visible!important;
+}
+
+/* Spending chart: full-width, evenly spaced day labels, horizontal-only grid and fine daily points */
+.nv-finance .nv-ref-spending-page .nv-spend-total{
+  margin-left:18px!important;margin-right:18px!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-total-head small{
+  color:#667782!important;font-size:11px!important;font-weight:450!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-total-head h2{
+  color:#111820!important;font-weight:550!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-chart{
+  grid-template-columns:78px minmax(0,1fr)!important;
+  grid-template-rows:190px auto!important;gap:0 7px!important;
+  align-items:stretch!important;overflow:visible!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot{
+  grid-column:2!important;grid-row:1!important;position:relative!important;
+  min-width:0!important;width:100%!important;overflow:visible!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot>svg{
+  display:block!important;width:100%!important;height:190px!important;
+  min-width:0!important;overflow:visible!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot>svg line{
+  stroke-opacity:.15!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot>svg line[x1][x2]:not([y1="26"]){
+  display:none!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot>svg path:nth-of-type(2){
+  stroke-width:1.9!important;stroke-linecap:round!important;stroke-linejoin:round!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot>svg circle{
+  display:block!important;vector-effect:non-scaling-stroke!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-axis{
+  display:flex!important;direction:ltr!important;justify-content:space-between!important;
+  width:calc(100% - 85px)!important;margin:7px 0 0 85px!important;
+  padding:0!important;box-sizing:border-box!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-axis span{
+  flex:0 0 auto!important;text-align:center!important;
+  font-size:10px!important;font-weight:450!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-plot .nv-spend-bubble{
+  left:clamp(35%,var(--spend-bubble-x,50%),65%)!important;
+  max-width:calc(100% - 16px)!important;padding:5px 8px!important;
+  white-space:nowrap!important;overflow:visible!important;
+  font-size:10px!important;transform:translate(-50%,calc(-100% - 8px))!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights{
+  width:calc(100% + 36px)!important;margin:0 -18px!important;
+  padding:2px 18px 10px!important;box-sizing:border-box!important;
+  scroll-padding-inline:18px!important;overflow-x:auto!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article{
+  flex:0 0 calc(50% - 5px)!important;min-width:0!important;
+  box-sizing:border-box!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article small{
+  font-size:10px!important;font-weight:500!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article.high small,
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article.high small svg,
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article.high em{color:#df5960!important}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article.low small,
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article.low small svg,
+.nv-finance .nv-ref-spending-page .nv-spend-highlights>article.low em{color:#279b6a!important}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights article i{
+  display:inline-flex!important;align-items:center!important;
+  font-size:10px!important;font-style:normal!important;font-weight:650!important;
+  white-space:nowrap!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights article i.up{color:#df5960!important}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights article i.down{color:#279b6a!important}
+.nv-finance .nv-ref-spending-page .nv-spend-highlights article em{
+  display:block!important;font-size:10px!important;font-weight:500!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-quick{
+  width:calc(100% + 36px)!important;margin:0 -18px!important;
+  padding:0 18px!important;box-sizing:border-box!important;
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:9px!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-quick>button{
+  min-width:0!important;min-height:60px!important;padding:8px 10px!important;
+  border-radius:16px!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-quick>button .nv-quick-chevron{
+  display:block!important;flex:0 0 auto!important;color:#77909f!important;
+  font-size:22px!important;font-weight:400!important;line-height:1!important;
+}
+.nv-finance .nv-ref-spending-page .nv-spend-heading{
+  margin:17px 18px 9px!important;font-size:14px!important;
+  font-weight:500!important;color:#475e6a!important;
+}
+.nv-finance .nv-ref-spending-page{padding-bottom:calc(125px + env(safe-area-inset-bottom))!important}
+.nv-finance .nv-income-page{padding-bottom:calc(120px + env(safe-area-inset-bottom))!important}
+.nv-finance .nf-main{padding-bottom:calc(120px + env(safe-area-inset-bottom))!important}
+@media(max-width:390px){
+  .nv-finance .nv-ref-spending-page .nv-spend-chart{grid-template-columns:72px minmax(0,1fr)!important;gap:0 7px!important}
+  .nv-finance .nv-ref-spending-page .nv-spend-axis{width:calc(100% - 79px)!important;margin-left:79px!important}
+  .nv-finance .nv-ref-spending-page .nv-spend-highlights>article{flex-basis:calc(50% - 5px)!important}
+}
