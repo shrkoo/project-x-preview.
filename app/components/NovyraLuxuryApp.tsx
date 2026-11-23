@@ -45,7 +45,8 @@ const diningChange=priorWeeklyDiningExpense?Math.round((weeklyDiningExpense-prio
 const future=balance+Math.max(0,Number(saving)||0)*Math.max(1,Number(months)||1);
 function logEvent(name:string,meta:Record<string,unknown>={}){try{const key="novyra-events:"+account.id;const list=JSON.parse(localStorage.getItem(key)||"[]");list.push({name,at:new Date().toISOString(),...meta});localStorage.setItem(key,JSON.stringify(list.slice(-500)))}catch{}} function openPaywall(reason="feature"){logEvent(reason==="limit"?"limit_reached":"upgrade_clicked",{reason});setPaywall(true)} function add(e:FormEvent){e.preventDefault();const amount=Math.round(Number(form.amount));if(!form.title.trim()||!Number.isFinite(amount)||amount<=0){setMsg(t.required);return}if(plan==="free"&&monthItems.length>=50){openPaywall("limit");return}const item={id:crypto.randomUUID(),title:form.title.trim(),amount,kind:form.kind,category:form.category,date:form.date,note:form.note};setItems(a=>[item,...a]);if(form.recurring){const next=[...repeatItems,{id:crypto.randomUUID(),title:item.title,amount,kind:item.kind,category:item.category,note:item.note,frequency:form.frequency,createdAt:today(),lastGenerated:today()}];setRepeatItems(next);localStorage.setItem("novyra-recurring:"+account.id,JSON.stringify(next))}logEvent("transaction_created",{kind:item.kind});if(items.length===0)logEvent("first_transaction");setForm({title:"",amount:"",kind:"expense",category:"عمومی",date:today(),note:"",recurring:false,frequency:"monthly"});setShow(false);setMsg(t.saved)}
 function del(id:string){if(confirm(t.confirm))setItems(a=>a.filter(x=>x.id!==id))}
-function exportCsv(){if(plan!=="pro"){openPaywall("csv");return}const rows=[["date","title","type","category","amount","currency","note"],...sorted.map(x=>[x.date,x.title,x.kind,x.category,String(x.amount),currency,x.note||""])];const csv="\uFEFF"+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n");const u=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=u;a.download="novyra-finance.csv";a.click();URL.revokeObjectURL(u)}
+function exportCsv(){if(plan!=="pro"){openPaywall("csv");return}const rows=[["date","title","type","category","amount","currency","note"],...sorted.map(x=>[x.date,x.title,x.kind,x.category,String(x.amount),currency,x.note||""])];const csv="\uFEFF"+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("
+");const u=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=u;a.download="novyra-finance.csv";a.click();URL.revokeObjectURL(u)}
 async function logout(){if(!window.confirm(language==="en"?"Are you sure you want to sign out?":"برای خروج از حساب مطمئنی؟"))return;try{await apiRequest("/auth/logout",{method:"POST"})}catch{}clearSession();onLogout()}
 const nav:[Tab,any,string][]=[["overview",LayoutDashboard,homeT.overview],["spending",ChartNoAxesCombined,tab==="overview"?"هزینه‌ها":language==="en"?"Spending":"هزینه‌ها"],["income",Target,tab==="overview"?"درآمد و اهداف":language==="en"?"Income & goals":"درآمد و اهداف"],["timeline",CalendarClock,tab==="overview"?homeT.timeline:t.timeline],["settings",Settings,tab==="overview"?homeT.settings:t.settings]];
 if(!ready)return <main className="nv-finance-loading">NOVYRA</main>;
@@ -146,7 +147,8 @@ const hasData=chartValues.some(v=>v>0);
 const points=chartValues.map((v,i)=>({x:i*600/(chartValues.length-1),y:176-(Math.min(v,max)/max)*150,v,day:i+1}));
 const line=points.map((p,i)=>{if(i===0)return `M ${p.x} ${p.y}`;const prev=points[i-1],mid=(prev.x+p.x)/2;return ` C ${mid} ${prev.y}, ${mid} ${p.y}, ${p.x} ${p.y}`}).join("");
 const area=line+" L 600 184 L 0 184 Z";
-const lastDataIndex=points.reduce((last,p,i)=>p.v>0?i:last,-1);\nconst selected=activeDay===null?(lastDataIndex>=0?points[lastDataIndex]:null):points[Math.min(points.length-1,Math.max(0,Math.round((activeDay-1)*(points.length-1)/29)))];
+const lastDataIndex=points.reduce((last,p,i)=>p.v>0?i:last,-1);
+const selected=activeDay===null?(lastDataIndex>=0?points[lastDataIndex]:null):points[Math.min(points.length-1,Math.max(0,Math.round((activeDay-1)*(points.length-1)/29)))];
 const yLabels=[10_000_000,8_000_000,6_000_000,4_000_000,2_000_000,0];
 const fmt=(n:number)=>new Intl.NumberFormat("fa-IR",{maximumFractionDigits:0}).format(n).replace(/,/g,"٬");
 const demoTotal=6_650_000,demoPrevious=6_354_860;
@@ -166,7 +168,8 @@ return <div className="nv-ref-spending-page">
 {yLabels.map((v,i)=><line key={"h"+v} x1="0" x2="600" y1={26+i*30} y2={26+i*30} stroke="#64748B" strokeOpacity=".12" strokeWidth="1" strokeDasharray="3 5"/>)}
 
 <path d={area} fill="url(#spendFill)" opacity={isDemo ? 0.72 : 1}/>
-<path d={line} fill="none" stroke="#22A06B" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>\n{hasData&&selected&&<><line x1={selected.x} x2={selected.x} y1={selected.y} y2="184" stroke="#22A06B" strokeWidth="1"/><circle cx={selected.x} cy={selected.y} r="5" fill="#fff" stroke="#22A06B" strokeWidth="2"/></>}
+<path d={line} fill="none" stroke="#22A06B" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+{hasData&&selected&&<><line x1={selected.x} x2={selected.x} y1={selected.y} y2="184" stroke="#22A06B" strokeWidth="1"/><circle cx={selected.x} cy={selected.y} r="5" fill="#fff" stroke="#22A06B" strokeWidth="2"/></>}
 </svg>
 {hasData&&selected&&<>
 <i className="nv-spend-dot" style={{right:`${selected.x/600*100}%`,top:`${selected.y/190*100}%`}}/>
