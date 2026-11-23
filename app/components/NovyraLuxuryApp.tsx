@@ -98,7 +98,7 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active":"")} da
     const displaySeries=hasCategoryData?chartSeries:[];
     const barHeights=categoryBarHeights(displaySeries,hasCategoryData);
     const amount=demoMode?demoByTone[c.tone].total:total;
-    const categoryBudget=Number(prefs.categoryBudgets[c.name]||0);
+    const categoryBudget=Number(c.keys.map(key=>Number(prefs.categoryBudgets[key]||0)).find(value=>value>0)||0);
     const status=demoMode?demoByTone[c.tone].status:(categoryBudget>0&&total>categoryBudget?"بیش از سقف":categoryBudget>0&&total>=categoryBudget*.8?"متعادل":total>0?"عادی":"بدون داده");
     return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category nv-ref-chart-card "+c.tone+(hasCategoryData?" has-data":" is-empty")}>
       <div className="nv-ref-category-top"><small>{c.name}</small></div>
