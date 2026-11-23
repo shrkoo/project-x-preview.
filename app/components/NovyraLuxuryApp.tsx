@@ -149,17 +149,18 @@ const demoTotal=6_650_000,demoPrevious=6_354_860;
 const displayTotal=isDemo?demoTotal:currentTotal;
 const displayPrevious=isDemo?demoPrevious:prevTotal;
 const trend=displayPrevious?((displayTotal-displayPrevious)/displayPrevious*100):0;
+const fmtPercent=(n:number)=>new Intl.NumberFormat("fa-IR",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
 return <div className="nv-ref-spending-page">
 {categoryFilter&&<div className="nv-spend-filter"><span>{en?"Category: ":"دسته: "}{categoryFilter}</span><button onClick={clearCategory}>{en?"Clear filter":"حذف فیلتر"}</button></div>}
 <section className="nf-panel nv-spend-total">
-<div className="nv-spend-total-head"><div><small>مجموع هزینه ماهانه</small><h2>{cash(displayTotal,"IRR",loc,"fa")}</h2>{displayPrevious>0&&<span className={"nv-spend-change "+(trend>0?"up":"down")}>{(trend>0?"▲ ":"▼ ")+fmt(Math.abs(trend))+"٪ نسبت به ماه قبل"}</span>}{isDemo&&<small className="nv-spend-demo-tag">نمونه</small>}</div><button onClick={()=>setTab("reports")} aria-label="گزارش کامل"><ChevronRight size={19}/></button></div>
+<div className="nv-spend-total-head"><div><small>مجموع هزینه ماهانه</small><h2>{cash(displayTotal,"IRR",loc,"fa")}</h2>{displayPrevious>0&&<span className={"nv-spend-change "+(trend>0?"up":"down")}>{(trend>0?"▲ ":"▼ ")+fmtPercent(Math.abs(trend))+"٪ نسبت به ماه قبل"}</span>}{isDemo&&<small className="nv-spend-demo-tag">نمونه</small>}</div><button onClick={()=>setTab("reports")} aria-label="گزارش کامل"><ChevronRight size={19}/></button></div>
 <div className="nv-spend-chart">
 <div className="nv-spend-y">{yLabels.map(v=><span key={v}>{v===0?"۰":fmt(v/1_000_000)+"م"}</span>)}</div>
 <svg viewBox="0 0 600 190" preserveAspectRatio="none" role="img" aria-label="نمودار ناحیه‌ای هزینه‌های روزانه ماه" onPointerDown={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)) )}} onPointerMove={e=>{if(e.pointerType==="mouse"||e.buttons>0){const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)) )}}} onPointerLeave={e=>{if(e.pointerType==="mouse")setActiveDay(null)}} onClick={e=>{const r=e.currentTarget.getBoundingClientRect();setActiveDay(Math.max(1,Math.min(30,Math.round((e.clientX-r.left)/r.width*29)+1)) )}}>
 <defs><linearGradient id="spendFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#48b88a" stopOpacity=".22"/><stop offset="100%" stopColor="#48b88a" stopOpacity=".015"/></linearGradient></defs>
 {yLabels.map((v,i)=><line key={"h"+v} x1="0" x2="600" y1={26+i*30} y2={26+i*30} stroke="#8ca6b5" strokeOpacity=".16" strokeWidth="1"/>)}
 {[0,5,10,15,20,25,29].map(d=><line key={"v"+d} x1={d*600/29} x2={d*600/29} y1="26" y2="184" stroke="#8ca6b5" strokeOpacity=".10" strokeWidth="1"/>)}
-<path d={area} fill="url(#spendFill)" opacity={isDemo?.72:1}/>
+<path d={area} fill="url(#spendFill)" opacity={isDemo ? 0.72 : 1}/>
 <path d={line} fill="none" stroke="#23a36d" strokeWidth={2.8} strokeOpacity={isDemo?.68:1} strokeLinecap="round" strokeLinejoin="round"/>
 
 {hasData&&selected&&<><line x1={selected.x} x2={selected.x} y1="18" y2="184" stroke="#269b69" strokeDasharray="4 4" strokeOpacity=".8"/><circle cx={selected.x} cy={selected.y} r="5" fill="#269b69" stroke="#fff" strokeWidth="2"/><g><rect x={Math.max(5,Math.min(495,selected.x-58))} y={Math.max(2,selected.y-31)} width="116" height="23" rx="8" fill="#effcf5" stroke="#55b98a" strokeWidth="1.2"/><text x={Math.max(63,Math.min(537,selected.x))} y={Math.max(18,selected.y-15)} textAnchor="middle" fill="#278b62" fontSize="12" fontWeight="600">{fmt(selected.v)} ریال</text></g></>}
@@ -171,8 +172,8 @@ return <div className="nv-ref-spending-page">
 </section>
 <h2 className="nv-spend-heading">برجسته‌های این هفته</h2>
 <div className="nv-spend-highlights">
-<article className="high"><small><TrendingUp size={15} aria-hidden="true"/> بیشترین هزینه</small><div className="nv-spend-highlight-value"><b>{isDemo?cash(1850000,"IRR",loc,"fa"):high?cash(high.amount,"IRR",loc,"fa"):"۰ ریال"}</b><i className="up">▲ ۴٫۶۵٪</i></div><em>{isDemo?"خرید و نیازهای روزمره":high?.title||"—"}</em><p>ماه قبل هزینه‌ی شما {cash(displayPrevious,"IRR",loc,"fa")} بود</p></article>
-<article className="low"><small><TrendingDown size={15} aria-hidden="true"/> کمترین هزینه</small><div className="nv-spend-highlight-value"><b>{isDemo?cash(125000,"IRR",loc,"fa"):low?cash(low.amount,"IRR",loc,"fa"):"۰ ریال"}</b><i className="down">▼ ۲٫۴۳٪</i></div><em>{isDemo?"هزینه‌های متفرقه":low?.title||"—"}</em><p>ماه قبل هزینه‌ی شما {cash(displayPrevious,"IRR",loc,"fa")} بود</p></article>
+<article className="high"><small><TrendingUp size={15} aria-hidden="true"/> بیشترین هزینه</small><div className="nv-spend-highlight-value"><b>{isDemo?cash(1850000,"IRR",loc,"fa"):high?cash(high.amount,"IRR",loc,"fa"):"۰ ریال"}</b><i className={trend>0?"up":"down"}>{trend>0?"▲ ":"▼ "}{fmtPercent(Math.abs(trend))}٪</i></div><em>{isDemo?"خرید و نیازهای روزمره":high?.title||"—"}</em><p>ماه قبل هزینه‌ی شما {cash(displayPrevious,"IRR",loc,"fa")} بود</p></article>
+<article className="low"><small><TrendingDown size={15} aria-hidden="true"/> کمترین هزینه</small><div className="nv-spend-highlight-value"><b>{isDemo?cash(125000,"IRR",loc,"fa"):low?cash(low.amount,"IRR",loc,"fa"):"۰ ریال"}</b><i className={trend>0?"up":"down"}>{trend>0?"▲ ":"▼ "}{fmtPercent(Math.abs(trend))}٪</i></div><em>{isDemo?"هزینه‌های متفرقه":low?.title||"—"}</em><p>ماه قبل هزینه‌ی شما {cash(displayPrevious,"IRR",loc,"fa")} بود</p></article>
 </div>
 <h2 className="nv-spend-heading">اقدام‌های سریع</h2>
 <div className="nv-spend-quick"><button onClick={()=>setTab("reports")}><span><b>بررسی بودجه ماهانه</b><small>نمای کلی ماه</small></span><ChevronRight/></button><button onClick={()=>setTab("transactions")}><span><b>به‌روزرسانی دسته‌بندی هزینه‌ها</b><small>مدیریت تراکنش‌ها</small></span><ChevronRight/></button></div>
