@@ -798,3 +798,26 @@
  .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{gap:9px!important;padding-inline-start:16px!important;padding-inline-end:6px!important}
  .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category{flex-basis:31%!important;min-width:0!important}
 }
+
+
+/* NOVYRA home-only: show approximately 30% of the fourth category card */
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{
+  gap:8px!important;
+  padding:4px!important;
+}
+.nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category{
+  flex:0 0 27%!important;
+  width:27%!important;
+  min-width:0!important;
+}
+@media(max-width:380px){
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid{
+    gap:8px!important;
+    padding-inline-start:4px!important;
+    padding-inline-end:4px!important;
+  }
+  .nv-finance.nv-home-active[lang="fa"] .nv-ref-category-grid>.nv-ref-category{
+    flex-basis:27%!important;
+    width:27%!important;
+  }
+}
