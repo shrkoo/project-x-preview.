@@ -24,8 +24,10 @@ const categoryDisplayLabel=(c:string,en:boolean)=>en?({"عمومی":"General","�
 
 export default function NovyraLuxuryApp({account,language,notice,onClearNotice,onLanguageChange,onLogout}:Props){
 const t=words[language],homeT=words.fa,dir=language==="en"?"ltr":"rtl",loc="en-US";
+const [demoMode,setDemoMode]=useState(false);
 const [tab,setTab]=useState<Tab>("overview"),[items,setItems]=useState<Tx[]>([]),[ready,setReady]=useState(false),[show,setShow]=useState(false),[msg,setMsg]=useState(notice||""),[query,setQuery]=useState(""),[kindFilter,setKindFilter]=useState("all"),[currency,setCurrency]=useState(language==="en"?"USD":"IRR"),[saving,setSaving]=useState("500000"),[months,setMonths]=useState("12"),[theme,setTheme]=useState<"light"|"dark"|"auto">("light"),[showBalance,setShowBalance]=useState(true),[noticeOpen,setNoticeOpen]=useState(false),[spendCategory,setSpendCategory]=useState(""),[prefs,setPrefs]=useState<Preferences>(defaultPreferences); const viewItems=items; const viewCurrency=currency;
 const [form,setForm]=useState({title:"",amount:"",kind:"expense" as "income"|"expense",category:"عمومی",date:today(),note:"",recurring:false,frequency:"monthly" as "monthly"|"weekly"}); const [plan,setPlan]=useState<"free"|"pro">("free"); const [paywall,setPaywall]=useState(false); const [smsText,setSmsText]=useState(""); const [repeatItems,setRepeatItems]=useState<any[]>([]);
+useEffect(()=>{try{setDemoMode(new URLSearchParams(window.location.search).get("demo")==="1")}catch{setDemoMode(false)}},[]);
 useEffect(()=>{try{const raw=localStorage.getItem("novyra-finance-transactions-v1");if(raw){const d=JSON.parse(raw);if(Array.isArray(d))setItems(d)}}catch{}const c=localStorage.getItem("novyra-finance-currency");if(c)setCurrency(c);const savedTheme=localStorage.getItem("novyra-theme");if(savedTheme==="dark"||savedTheme==="auto"||savedTheme==="light")setTheme(savedTheme);try{const p=localStorage.getItem("novyra-preferences-v1");if(p){const parsed=JSON.parse(p);setPrefs({...defaultPreferences,...parsed,reminders:{...defaultPreferences.reminders,...parsed.reminders},categoryBudgets:parsed.categoryBudgets||{},categories:Array.isArray(parsed.categories)&&parsed.categories.length?parsed.categories:defaultPreferences.categories});if(parsed.hideAmounts)setShowBalance(false)}}catch{}try{const p=localStorage.getItem("novyra-plan:"+account.id);if(p==="pro")setPlan(localStorage.getItem("novyra-trial-expiry:"+account.id)&&Number(localStorage.getItem("novyra-trial-expiry:"+account.id))>Date.now()?"pro":"free");const r=JSON.parse(localStorage.getItem("novyra-recurring:"+account.id)||"[]");if(Array.isArray(r))setRepeatItems(r)}catch{}setReady(true)},[]);
 useEffect(()=>{if(ready){localStorage.setItem("novyra-finance-transactions-v1",JSON.stringify(items));localStorage.setItem("novyra-finance-currency",currency);localStorage.setItem("novyra-theme",theme);localStorage.setItem("novyra-preferences-v1",JSON.stringify({...prefs,theme}))}},[items,currency,theme,prefs,ready]);
 useEffect(()=>{if(!ready||!repeatItems.length)return;const now=new Date();const next=repeatItems.map(x=>({...x}));const generated:Tx[]=[];let changed=false;for(const r of next){let cursor=new Date((r.lastGenerated||r.createdAt||today())+"T12:00:00");let guard=0;while(guard++<24){if(r.frequency==="weekly")cursor.setDate(cursor.getDate()+7);else cursor.setMonth(cursor.getMonth()+1);if(cursor>now)break;generated.push({id:crypto.randomUUID(),title:r.title,amount:r.amount,kind:r.kind,category:r.category,date:cursor.toISOString().slice(0,10),note:r.note||"تراکنش تکرارشونده"});r.lastGenerated=cursor.toISOString().slice(0,10);changed=true}}if(changed){setItems(a=>[...generated,...a]);setRepeatItems(next);localStorage.setItem("novyra-recurring:"+account.id,JSON.stringify(next))}},[ready,repeatItems]);useEffect(()=>{if(notice)setMsg(notice)},[notice]);
@@ -55,8 +57,8 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
  <div className="nv-ref-balance-head">
   <div>
    <small>موجودی کل</small>
-   <div className="nv-ref-balance-value-row"><strong>{showBalance?dashboardCash(45764960):"••••••"}</strong><button className="nv-ref-eye" onClick={()=>setShowBalance(v=>!v)} aria-label={showBalance?"مخفی کردن موجودی":"نمایش موجودی"}>{showBalance?<EyeOff size={19}/>:<Eye size={19}/>}</button></div>
-   <div className="nv-ref-net-row"><span className="nv-ref-net-chip"><TrendingUp size={13}/>{dashboardCash(954230)}</span><span className="nv-ref-cheer-text">آفرین! این ماه پس‌انداز کرده‌اید.</span></div>
+   <div className="nv-ref-balance-value-row"><strong>{showBalance?dashboardCash(demoMode?45764960:balance):"••••••"}</strong><button className="nv-ref-eye" onClick={()=>setShowBalance(v=>!v)} aria-label={showBalance?"مخفی کردن موجودی":"نمایش موجودی"}>{showBalance?<EyeOff size={19}/>:<Eye size={19}/>}</button></div>
+   <div className="nv-ref-net-row"><span className="nv-ref-net-chip"><TrendingUp size={13}/><span>خالص این ماه: {dashboardCash(demoMode?954230:mi-me)}</span></span><span className="nv-ref-cheer-text">آفرین! این ماه پس‌انداز کردی</span></div>
   </div>
  </div>
  <div className="nv-ref-actions">
@@ -73,18 +75,31 @@ return <main className="nv-finance" data-theme={theme} dir={tab==="overview"?"rt
 <section className="nv-ref-section">
  <div className="nv-ref-section-head"><h2>سطح هزینه‌های ماهانه</h2><button onClick={()=>{setSpendCategory("");setTab("spending")}}>جزئیات بیشتر ←</button></div>
  <div className="nv-ref-category-grid">
-  {[{name:"خرید",keys:["Shop"+"ping","خرید"],tone:"shopping"},{name:"رفت",keys:["حمل‌ونقل","Tra"+"vel","رفت‌وآمد"],tone:"travel"},{name:"خوراک",keys:["خوراک","Fo"+"od","غذا"],tone:"food"}].map(c=>{
+  {[
+   {name:"خرید",keys:["Shopping","خرید"],tone:"shopping"},
+   {name:"رفت",keys:["حمل‌ونقل","Travel","رفت‌وآمد"],tone:"travel"},
+   {name:"خوراک",keys:["خوراک","Food","غذا"],tone:"food"},
+   {name:"سایر",keys:["سایر","Other","عمومی"],tone:"other"}
+  ].map(c=>{
     const demoByTone:Record<string,{total:number;status:string;series:number[]}>={
       food:{total:205760,status:"متوسط",series:[2,3,4,3,6,5,7,4,8,6,7,5,9,7,8,6,10,8,9,7,11,8,10,7,12,9,11,8]},
       travel:{total:653120,status:"بیش",series:[2,4,3,6,5,8,6,9,7,11,8,12,9,14,10,13,11,16,12,15,13,18,14,17,15,19,16,20]},
-      shopping:{total:185430,status:"عادی",series:[3,4,3,5,4,5,4,6,5,6,4,7,5,6,5,7,6,8,6,7,5,8,6,7,6,9,7,8]}
+      shopping:{total:185430,status:"عادی",series:[3,4,3,5,4,5,4,6,5,6,4,7,5,6,5,7,6,8,6,7,5,8,6,7,6,9,7,8]},
+      other:{total:82400,status:"عادی",series:[2,3,2,4,3,4,3,5,4,5,3,6,4,5,4,6,5,7,5,6,4,7,5,6,5,7,6,7]}
     };
-    const demo=demoByTone[c.tone];const chartSeries=demo.series;const chartMax=Math.max(...chartSeries,1);
-   return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category nv-ref-chart-card "+c.tone}>
-    <div className="nv-ref-category-top"><small>{c.name}</small></div>
-    <div className="nv-ref-wave nv-ref-area nv-ref-category-chart" role="img" aria-label={"نمودار روند هزینه "+c.name}><svg viewBox="0 0 100 46" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-area-fill" d={smoothWavePath(chartSeries)+" L98 44 L2 44 Z"}/><path className="nv-ref-area-line" d={smoothWavePath(chartSeries)}/></svg></div>
-    <strong className="nv-ref-chart-amount">{dashboardCash(demo.total)}</strong><span className="nv-ref-chart-caption">{demo.status}</span>
-   </article>
+    const matches=(x:Tx)=>x.kind==="expense"&&c.keys.includes(x.category);
+    const total=monthItems.filter(matches).reduce((n,x)=>n+x.amount,0);
+    const chartSeries=demoMode?demoByTone[c.tone].series:Array.from({length:14},(_,i)=>{
+      const day=new Date();day.setHours(0,0,0,0);day.setDate(day.getDate()-(13-i));
+      return viewItems.filter(x=>matches(x)&&x.date===day.toISOString().slice(0,10)).reduce((n,x)=>n+x.amount,0);
+    });
+    const amount=demoMode?demoByTone[c.tone].total:total;
+    const status=demoMode?demoByTone[c.tone].status:(total>0?"ثبت‌شده":"بدون داده");
+    return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category nv-ref-chart-card "+c.tone}>
+      <div className="nv-ref-category-top"><small>{c.name}</small></div>
+      <div className="nv-ref-wave nv-ref-area nv-ref-category-chart" role="img" aria-label={"نمودار روند هزینه "+c.name}><svg viewBox="0 0 100 46" preserveAspectRatio="none" aria-hidden="true"><path className="nv-ref-area-fill" d={smoothWavePath(chartSeries)+" L98 44 L2 44 Z"}/><path className="nv-ref-area-line" d={smoothWavePath(chartSeries)}/></svg></div>
+      <strong className="nv-ref-chart-amount">{dashboardCash(amount)}</strong><span className="nv-ref-chart-caption">{status}</span>
+    </article>
   })}
  </div>
 </section>
