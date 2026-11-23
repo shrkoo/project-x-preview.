@@ -135,7 +135,7 @@ const days=Array.from({length:30},(_,i)=>{const d=new Date(now.getFullYear(),now
 const max=10_000_000,weekStart=new Date(now);weekStart.setDate(now.getDate()-6);
 const recentExpenses=expenses.filter(x=>new Date(x.date+"T12:00:00")>=weekStart);
 const high=recentExpenses.reduce<Tx|null>((a,x)=>!a||x.amount>a.amount?x:a,null),low=recentExpenses.reduce<Tx|null>((a,x)=>!a||x.amount<a.amount?x:a,null);
-const isDemo=expenses.length===0;
+const isDemo=days.every(v=>v===0);
 const demo=[4_200_000,3_800_000,4_600_000,5_100_000,5_000_000,6_200_000,5_900_000,7_400_000,6_100_000,4_800_000,5_200_000,5_000_000,5_400_000,6_600_000,5_800_000,5_100_000,4_400_000,4_900_000,4_100_000,3_564_620];
 const chartValues=isDemo?demo:days;
 const hasData=chartValues.some(v=>v>0);
