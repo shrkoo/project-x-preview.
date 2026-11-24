@@ -80,3 +80,13 @@ export function weekStart(value: Date | string | number, firstDay: RegionalPrefe
   date.setDate(date.getDate() - ((day - target + 7) % 7));
   return date;
 }
+
+export function defaultDateFormat(language: string, country: string): string {
+  if (country === "IR") return "YYYY/MM/DD";
+  const order = new Intl.DateTimeFormat(language || "en", { year: "numeric", month: "2-digit", day: "2-digit" })
+    .formatToParts(new Date(2025, 10, 24))
+    .filter(part => part.type === "year" || part.type === "month" || part.type === "day")
+    .map(part => part.type === "year" ? "YYYY" : part.type === "month" ? "MM" : "DD");
+  const dotCountries = new Set(["DE","AT","CH","DK","FI","NO","SE","IT","ES","FR","NL","BE","PL","CZ","SK","HU","RO","BG","HR","SI","EE","LV","LT"]);
+  return order.join(dotCountries.has(country) ? "." : "/");
+}
