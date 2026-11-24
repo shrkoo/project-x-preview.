@@ -155,6 +155,7 @@ const demoTotal=6_650_000,demoPrevious=6_354_860;
 const displayTotal=isDemo?demoTotal:currentTotal;
 const displayPrevious=isDemo?demoPrevious:prevTotal;
 const trend=displayPrevious?((displayTotal-displayPrevious)/displayPrevious*100):0;
+const spendFmt=(n:number)=>Math.round(n).toLocaleString("fa-IR").replace(/,/g,"٬");
 const pct=(n:number)=>`${n>0?"+":n<0?"−":""}٪${spendFmt(Math.abs(n))}`;
 return <div className="nv-ref-spending-page an-screen">
 {categoryFilter&&<div className="nv-spend-filter"><span>{en?"Category: ":"دسته: "}{categoryFilter}</span><button onClick={clearCategory}>{en?"Clear filter":"حذف فیلتر"}</button></div>}
