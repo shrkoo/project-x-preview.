@@ -1,0 +1,1 @@
+export function StepProgress({step,label}:{step:number;label:string}){return <div className="nv-progress"><div className="nv-progress-copy"><span>{label}</span><strong>{step}/4</strong></div><div className="nv-progress-track"><i style={{width:`${step*25}%`}}/></div></div>;}
