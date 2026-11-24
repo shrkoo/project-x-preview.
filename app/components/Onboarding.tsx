@@ -168,6 +168,8 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         setUser(data.user);
         setEmail(data.user.email);
         if (googleNew === "1") {
+          const googleLanguage=(data.user.profile?.language || "en") as Language;
+          if(languageByCode.has(googleLanguage)){setLanguage(googleLanguage);document.documentElement.lang=googleLanguage;document.documentElement.dir=languageByCode.get(googleLanguage)?.rtl?"rtl":"ltr";}
           const names=(data.user.displayName||"").trim().split(/\s+/);
           setFirstName(data.user.profile?.firstName || names[0] || "");
           setLastName(data.user.profile?.lastName || names.slice(1).join(" "));
