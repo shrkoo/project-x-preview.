@@ -21,8 +21,8 @@ for (const prefs of cases) {
 }
 assert.match(formatMoney(150000, {...cases[0], currency:"IRT"}), /تومان/);
 assert.match(formatNumber(1234, cases[0]), /[۰-۹]/);
-assert.match(formatDate(new Date("2026-11-24T12:00:00Z"), cases[0]), /\\//, "Iran date format uses configured slash pattern");
-assert.match(formatDate(new Date("2026-11-24T12:00:00Z"), cases[1]), /\\//, "US date format uses configured slash pattern");
+assert.match(formatDate(new Date("2026-11-24T12:00:00Z"), cases[0]), /\//, "Iran date format uses configured slash pattern");
+assert.match(formatDate(new Date("2026-11-24T12:00:00Z"), cases[1]), /\//, "US date format uses configured slash pattern");
 assert.equal(defaultDateFormat("fa","IR"),"YYYY/MM/DD");
 assert.equal(defaultDateFormat("en","US"),"MM/DD/YYYY");
 assert.equal(defaultDateFormat("de","DE"),"DD.MM.YYYY");
