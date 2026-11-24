@@ -156,7 +156,7 @@ export default function Home() {
     onLanguageChange={changeLanguage}
     directionOverride={directionOverride}
     accountType={account?.profile?.accountType || (typeof window !== "undefined" ? localStorage.getItem("projectx-account-type") as "personal"|"business" : null) || "personal"}
-    onAccountTypeChange={async (nextType) => { try { await apiRequest("/auth/profile",{method:"PATCH",body:JSON.stringify({accountType:nextType})}); localStorage.setItem("projectx-account-type",nextType); setAccount(current => current ? {...current,profile:{...current.profile,accountType:nextType}} : current); } catch(error) { setNotice(error instanceof Error?error.message:"Could not update account type."); } }}
+    onAccountTypeChange={async (nextType) => { try { if(nextType==="business") { await apiRequest("/workspaces",{method:"POST",body:JSON.stringify({type:"business",companyName:localStorage.getItem("novyra-business-name")||"Business",currency:localStorage.getItem("novyra-finance-currency")||"USD"})}); } else { await apiRequest("/workspaces",{method:"POST",body:JSON.stringify({type:"personal",name:"Personal",currency:localStorage.getItem("novyra-finance-currency")||"USD"})}); } await apiRequest("/auth/profile",{method:"PATCH",body:JSON.stringify({accountType:nextType})}); localStorage.setItem("projectx-account-type",nextType); setAccount(current => current ? {...current,profile:{...current.profile,accountType:nextType}} : current); } catch(error) { setNotice(error instanceof Error?error.message:"Could not update account type."); } }}
     onLogout={logoutComplete}
   />;
 }
