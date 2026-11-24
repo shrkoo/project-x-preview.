@@ -6,7 +6,7 @@ import {countries} from "../data/countries";
 import {currencies} from "../data/currencies";
 import {languages,languageByCode} from "../data/languages";
 import {calendars,type CalendarCode} from "../data/calendars";
-import {numberSystems,formatNumberSystem,type NumberSystemCode} from "../data/number-systems";
+import {numberSystems,type NumberSystemCode} from "../data/number-systems";
 import {weekdays,type WeekStartCode} from "../data/weekdays";
 import {formatDate,formatMoney,formatNumber,localeForPreferences,readRegionalPreferences,saveRegionalPreferences,weekStart as getWeekStart,type RegionalPreferences} from "../lib/regional-preferences";
 const regionalFallback:RegionalPreferences={country:"IR",language:"fa",direction:"rtl",currency:"IRR",calendar:"persian",dateFormat:"YYYY/MM/DD",numberSystem:"arabext",firstDay:"saturday"};
@@ -29,7 +29,7 @@ ckb:{overview:"پوختە",transactions:"مامەڵەکان",accounts:"هەژم�
 };
 const today=()=>new Date().toISOString().slice(0,10);
 
-const dashboardCash=(n:number,digits:NumberSystemCode="arabext")=><bdi dir="ltr">{fmt(n,digits)} ریال</bdi>;
+const dashboardCash=(n:number,digits:NumberSystemCode="arabext")=><bdi dir="ltr">{formatMoney(n,{...readRegionalPreferences(regionalFallback),numberSystem:digits})}</bdi>;
 function categoryBarHeights(values:number[],hasData:boolean,seed:number=0){const count=40;const phase=seed*.71;const wave=Array.from({length:count},(_,i)=>.53+.20*Math.sin(i*.31+phase)+.13*Math.sin(i*.13+phase*1.7)+.09*Math.cos(i*.57+phase*.6)+.045*Math.sin(i*.91+phase*2));if(!hasData)return Array(count).fill(4);const src=values.length?values:[0];const sampled=Array.from({length:count},(_,i)=>{const p=i*(src.length-1)/(count-1),lo=Math.floor(p),hi=Math.min(src.length-1,Math.ceil(p)),t=p-lo;return (src[lo]||0)*(1-t)+(src[hi]||0)*t});const smoothed=sampled.map((_,i)=>{const at=(j:number)=>sampled[Math.max(0,Math.min(count-1,j))];return (at(i-2)+2*at(i-1)+3*at(i)+2*at(i+1)+at(i+2))/9});const min=Math.min(...smoothed),max=Math.max(...smoothed);return smoothed.map((v,i)=>{const base=max===min?96:52+((v-min)/(max-min))*88;return Math.max(42,Math.min(140,base*(1+.055*Math.sin(i*.37+phase)+.025*Math.cos(i*.19+phase*1.7))))})}
 const cash=(n:number,c:string,l:string,digits:NumberSystemCode="latn")=><bdi dir="ltr">{formatMoney(n,{...readRegionalPreferences(regionalFallback),language:l,currency:c,numberSystem:digits})}</bdi>;
 function smoothWavePath(values:number[]){if(!values.length)return "";const source=values.map(v=>Math.max(0,v));const smoothed=source.map((_,i)=>{const at=(j:number)=>source[Math.max(0,Math.min(source.length-1,j))];return (at(i-2)+2*at(i-1)+3*at(i)+2*at(i+1)+at(i+2))/9});const count=Math.min(10,smoothed.length);const sampled=Array.from({length:count},(_,i)=>{const pos=i*(smoothed.length-1)/Math.max(1,count-1),lo=Math.floor(pos),hi=Math.ceil(pos),mix=pos-lo;return smoothed[lo]*(1-mix)+smoothed[hi]*mix});const max=Math.max(...sampled,1);const pts=sampled.map((v,i)=>({x:2+i*96/Math.max(1,sampled.length-1),y:27-Math.sqrt(v/max)*21}));if(pts.length===1)return `M ${pts[0].x} ${pts[0].y}`;let d=`M ${pts[0].x} ${pts[0].y}`;for(let i=0;i<pts.length-1;i++){const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)],dx=p2.x-p1.x;const tension=.72,c1x=p1.x+dx*tension/3,c1y=p1.y+(p2.y-p0.y)*tension/6,c2x=p2.x-dx*tension/3,c2y=p2.y-(p3.y-p1.y)*tension/6;d+=` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`}return d}
