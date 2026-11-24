@@ -60,7 +60,7 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active home-scr
   <div>
    <small>موجودی کل</small>
    <div className="nv-ref-balance-value-row"><strong className="home-balance-value hm-balance-amount">{showBalance?<><bdi dir="ltr">{fmt(homeDemoMode?45764960:balance)}</bdi><small className="hm-balance-currency"> ریال</small></>:"••••••"}</strong><button className="nv-ref-eye hm-eye" onClick={()=>setShowBalance(v=>!v)} aria-label={showBalance?"مخفی کردن موجودی":"نمایش موجودی"}>{showBalance?<EyeOff size={22}/>:<Eye size={22}/>}</button></div>
-   {(homeDemoMode?954230:mi-me)>0&&<div className="nv-ref-net-row"><span className="nv-ref-net-chip home-saving-badge hm-saving-chip"><svg className="hm-saving-trend-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg><span><bdi dir="ltr">{fmt(homeDemoMode?954230:mi-me)} ریال</bdi></span></span><span className="nv-ref-cheer-text hm-cheer-text">آفرین! این ماه پس‌انداز کردی</span></div>}
+   {(homeDemoMode?954230:mi-me)>0&&<div className="nv-ref-net-row"><span className="nv-ref-net-chip home-saving-badge hm-saving-chip"><svg className="hm-saving-trend-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg><span><bdi dir="ltr">{fmt(homeDemoMode?954230:mi-me,"fa")} ریال</bdi></span></span><span className="nv-ref-cheer-text hm-cheer-text">آفرین! این ماه پس‌انداز کردی</span></div>}
   </div>
  </div>
  <div className="nv-ref-actions">

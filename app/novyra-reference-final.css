@@ -4450,3 +4450,32 @@
 .nv-finance nav.nf-mobile-dock.nv-ref-dock { scrollbar-width:none!important; }
 .nv-finance .nf-main::-webkit-scrollbar,.nv-finance .an-screen::-webkit-scrollbar,.nv-finance .nv-spend-highlights::-webkit-scrollbar,
 .nv-finance .nv-spend-quick::-webkit-scrollbar,.nv-finance nav.nf-mobile-dock.nv-ref-dock::-webkit-scrollbar { display:none!important; }
+
+
+/* Cascade repair — final winning rules for Home balance and shared bottom dock. */
+/* More specific than the legacy .nv-ref-balance-value-row>strong and all .hm-balance-amount rules. */
+main.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .nv-ref-balance-value-row>strong.hm-balance-amount,
+main.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .nv-ref-balance-value-row>strong.hm-balance-amount>bdi {
+  font-size:36px!important;
+  font-weight:800!important;
+  line-height:1.1!important;
+}
+main.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .nv-ref-balance-value-row>strong.hm-balance-amount .hm-balance-currency {
+  font-size:14px!important;
+  font-weight:600!important;
+  line-height:1.1!important;
+  color:#64748B!important;
+}
+
+/* Higher-specificity final override: wins over the earlier Home/Analytics nav rules. */
+main.nv-finance.nv-home-active.home-screen[lang="fa"] nav.nf-mobile-dock.nv-ref-dock,
+main.nv-finance.an-screen-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock,
+main.nv-finance[lang="fa"] nav.nf-mobile-dock.nv-ref-dock {
+  height:72px!important;
+  min-height:72px!important;
+  border-radius:28px!important;
+  background:rgba(255,255,255,.65)!important;
+  border:1px solid rgba(255,255,255,.75)!important;
+  backdrop-filter:blur(16px)!important;
+  -webkit-backdrop-filter:blur(16px)!important;
+}

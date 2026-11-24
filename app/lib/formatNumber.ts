@@ -7,7 +7,7 @@ export type NumberFormatOptions = {
 };
 
 const PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
-const PERSIAN_GROUP_SEPARATOR = "\u066C";
+const GROUP_SEPARATOR = ",";
 const PERSIAN_DECIMAL_SEPARATOR = "٫";
 
 /** The single number formatter used throughout NOVYRA. Persian output always uses U+066C and U+066B. */
@@ -50,7 +50,7 @@ export function formatNumber(input: number, options: NumberFormatOptions = {}): 
   if (fraction.length < minDigits) fraction = fraction.padEnd(minDigits, "0");
 
   if (options.grouping !== false) {
-    const separator = digits === "fa" ? PERSIAN_GROUP_SEPARATOR : ",";
+    const separator = GROUP_SEPARATOR;
     whole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
   }
   const decimalSeparator = digits === "fa" ? PERSIAN_DECIMAL_SEPARATOR : ".";
