@@ -415,6 +415,7 @@ export default {
     return json({ok:true,message:"ایمیل با موفقیت تأیید شد."});
    }
    if (path === "/auth/forgot-password" && request.method === "POST") {
+    const ip=request.headers.get("CF-Connecting-IP")||"unknown";if(!await hitAuthLimit(db,"forgot-password:"+ip,5,3600000))return fail("Too many reset requests. Try again later.",429);
     if(!hasMailProvider(env)) return fail("سرویس ارسال ایمیل هنوز تنظیم نشده است.",503);
     const body=await readBody(request), email=cleanEmail(body?.email);
     if(!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
@@ -443,6 +444,7 @@ export default {
     return json({ok:true,message:"رمز عبور تغییر کرد؛ دوباره وارد شو."});
    }
    if (path === "/auth/login" && request.method === "POST") {
+    const ip=request.headers.get("CF-Connecting-IP")||"unknown";if(!await hitAuthLimit(db,"login:"+ip,12,900000))return fail("Too many login attempts. Try again later.",429);
     const body = await readBody(request), email = cleanEmail(body?.email), suppliedHash = String(body?.passwordHash || "");
     const user = await db.prepare("SELECT * FROM users WHERE email=?").bind(email).first();
     if (!user) return fail("ایمیل یا رمز عبور اشتباه است.",401);
