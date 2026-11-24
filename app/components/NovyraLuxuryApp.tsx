@@ -67,8 +67,8 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active home-scr
  <div className="nv-ref-balance-head">
   <div>
    <small>موجودی کل</small>
-   <div className="nv-ref-balance-value-row"><strong className="home-balance-value">{showBalance?<><bdi dir="ltr">{fmt(homeDemoMode?45764960:balance)}</bdi><small> ریال</small></>:"••••••"}</strong><button className="nv-ref-eye" onClick={()=>setShowBalance(v=>!v)} aria-label={showBalance?"مخفی کردن موجودی":"نمایش موجودی"}>{showBalance?<EyeOff size={19}/>:<Eye size={19}/>}</button></div>
-   {(homeDemoMode?954230:mi-me)>0&&<div className="nv-ref-net-row"><span className="nv-ref-net-chip home-saving-badge"><TrendingUp size={13}/><span>{dashboardCash(homeDemoMode?954230:mi-me,"fa")}</span></span><span className="nv-ref-cheer-text">آفرین! این ماه پس‌انداز کردی</span></div>}
+   <div className="nv-ref-balance-value-row"><strong className="home-balance-value hm-balance-amount">{showBalance?<><bdi dir="ltr">{fmt(homeDemoMode?45764960:balance)}</bdi><small className="hm-balance-currency"> ریال</small></>:"••••••"}</strong><button className="nv-ref-eye hm-eye" onClick={()=>setShowBalance(v=>!v)} aria-label={showBalance?"مخفی کردن موجودی":"نمایش موجودی"}>{showBalance?<EyeOff size={22}/>:<Eye size={22}/>}</button></div>
+   {(homeDemoMode?954230:mi-me)>0&&<div className="nv-ref-net-row"><span className="nv-ref-net-chip home-saving-badge hm-saving-chip"><svg className="hm-saving-trend-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg><span>{dashboardCash(homeDemoMode?954230:mi-me,"fa")}</span></span><span className="nv-ref-cheer-text hm-cheer-text">آفرین! این ماه پس‌انداز کردی</span></div>}
   </div>
  </div>
  <div className="nv-ref-actions">
@@ -78,8 +78,8 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active home-scr
  </div>
 </section>
 <section className="nv-ref-insight" onClick={()=>setTab("reports")}>
- <div><b className="home-ai-title"><Sparkles size={17}/> بینش مالی</b>
-  <p className="nv-insight-rtl home-ai-body">{!viewItems.some(x=>x.kind==="expense")?"اولین هزینه‌ات را ثبت کن تا بینش بگیری":diningChange!==null?<>هزینه خوراک نسبت به هفته قبل <strong className="nv-insight-highlight">{diningChange>0?"+":""}{diningChange}%</strong></>:"هزینه‌هایت را ثبت کن تا بینش دقیق‌تری بگیری"}</p>
+ <div><b className="home-ai-title hm-insight-title"><Sparkles size={17}/> بینش مالی</b>
+  <p className="nv-insight-rtl home-ai-body hm-insight-body">{!viewItems.some(x=>x.kind==="expense")?"اولین هزینه‌ات را ثبت کن تا بینش بگیری":diningChange!==null?<>هزینه خوراک نسبت به هفته قبل <strong className="nv-insight-highlight">{diningChange>0?"+":""}{diningChange}%</strong></>:"هزینه‌هایت را ثبت کن تا بینش دقیق‌تری بگیری"}</p>
  </div>
  <button type="button" className="nv-ref-insight-arrow" aria-label="مشاهده گزارش مالی" onClick={e=>{e.stopPropagation();setTab("reports")}}><ArrowLeft size={18}/></button>
 </section>
@@ -113,7 +113,7 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active home-scr
     return <article key={c.name} role="button" tabIndex={0} onClick={()=>{setSpendCategory(c.name);setTab("spending")}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){setSpendCategory(c.name);setTab("spending")}}} className={"nv-ref-category nv-ref-chart-card home-status-"+statusKey+" "+c.tone+(hasCategoryData?" has-data":" is-empty")}>
       <div className="nv-ref-category-top"><small>{c.name}</small></div>
       <div className="nv-ref-wave nv-ref-category-chart" role="img" aria-label={"نمودار میله‌ای هزینه "+c.name}><svg className="nv-category-wave nv-category-bars" viewBox="0 0 180 150" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id={"novyra-bars-"+c.tone} x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="currentColor" stopOpacity="1"/><stop offset="42%" stopColor="currentColor" stopOpacity=".55"/><stop offset="100%" stopColor="currentColor" stopOpacity="0"/></linearGradient></defs>{categoryBarHeights(displaySeries,hasCategoryData,c.tone==="food"?11:c.tone==="travel"?23:c.tone==="shopping"?37:49).map((h,i)=><rect key={i} x={i*4.5+.5} y={150-h} width="3.5" height={h} rx="1" fill={"url(#novyra-bars-"+c.tone+")"}/>)}</svg></div>
-      <strong className="nv-ref-chart-amount home-category-amount"><bdi dir="ltr">{fmt(amount)}</bdi><small> ریال</small></strong><span className="nv-ref-chart-caption home-status-label">{statusLabel}</span>
+      <strong className="nv-ref-chart-amount home-category-amount hm-category-amount"><bdi dir="ltr">{fmt(amount)}</bdi><small> ریال</small></strong><span className="nv-ref-chart-caption home-status-label hm-category-status">{statusLabel}</span>
     </article>
   })}
  </div>
