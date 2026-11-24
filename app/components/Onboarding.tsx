@@ -519,18 +519,19 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <div className="px-eyebrow">NOVYRA / YOUR REGION</div>
           <button className="px-back-link" onClick={()=>setStage("email")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 4/7</div><h1>{t("country")}</h1>
           <p className="px-stage-subtitle">{t("countrySub")}</p>
-          <input aria-label={t("searchCountry")} value={countrySearch} onChange={e => setCountrySearch(e.target.value)} placeholder={t("searchCountry")} style={{width:"100%",padding:"12px 14px",borderRadius:12,border:"1px solid rgba(120,130,150,.28)",background:"rgba(255,255,255,.72)",marginBottom:10}} />
-          <div role="listbox" aria-label={t("country")} style={{maxHeight:190,overflowY:"auto",display:"grid",gap:6,textAlign:"start"}}>
-            {countries.filter(item => [item.name,item.nativeName,item.code].some(value => value.toLowerCase().includes(countrySearch.trim().toLowerCase()))).map(item =>
-              <button type="button" key={item.code} onClick={() => applyCountry(item.code)} aria-selected={countryCode===item.code} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:10,border:countryCode===item.code?"1px solid #5776a5":"1px solid rgba(120,130,150,.18)",background:countryCode===item.code?"rgba(87,118,165,.12)":"rgba(255,255,255,.35)",textAlign:"start",cursor:"pointer"}}>
-                <span style={{fontSize:20}}>{item.flag}</span><span style={{flex:1}}>{item.name} · {item.code}</span>{countryCode===item.code?"✓":""}
-              </button>
-            )}
+          <div className="px-country-search"><input aria-label={t("searchCountry")} value={countrySearch} onChange={e => setCountrySearch(e.target.value)} placeholder={t("searchCountry")} /><button type="button" aria-label={t("searchClear")} onClick={()=>setCountrySearch("")} hidden={!countrySearch}>×</button></div>
+          <div role="listbox" aria-label={t("country")} className="px-country-list">
+            {countries.filter(item => [item.name,item.nativeName,item.code,localizedCountryName(item.code,item.name)].some(value => value.toLocaleLowerCase().includes(countrySearch.trim().toLocaleLowerCase()))).map(item => {
+              const localName = localizedCountryName(item.code,item.name);
+              return <button type="button" key={item.code} onClick={() => applyCountry(item.code)} aria-selected={countryCode===item.code} className={"px-country-option"+(countryCode===item.code?" is-selected":"")}>
+                <span className="px-country-flag">{item.flag}</span><span className="px-country-names"><strong>{localName}</strong><small>{item.nativeName}</small></span>{countryCode===item.code&&<span className="px-country-check" aria-label="Selected">✓</span>}
+              </button>;
+            })}
+            {!countries.some(item => [item.name,item.nativeName,item.code,localizedCountryName(item.code,item.name)].some(value => value.toLocaleLowerCase().includes(countrySearch.trim().toLocaleLowerCase()))) && <p>{t("noCountries")}</p>}
           </div>
           <div style={{marginTop:16,padding:14,borderRadius:14,border:"1px solid rgba(120,130,150,.24)",background:"rgba(255,255,255,.42)",display:"grid",gap:10}}>
             <strong>{language === "fa" ? "پیش‌نمایش تنظیمات" : "Editable preferences preview"}</strong>
             <label>{t("language")} <select value={language} onChange={e=>chooseLanguage(e.target.value as Language)} style={{width:"100%"}}>{languages.map(item=><option key={item.code} value={item.code}>{item.nativeName} · {item.name}</option>)}</select></label>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}><span>{t("direction")}: <b>{dir.toUpperCase()}</b></span><button type="button" onClick={()=>setDirectionOverride(dir==="rtl"?"ltr":"rtl")} aria-label={t("direction")}>{t("directionToggle")}</button></div>
             
             <label>{t("currency")} <select value={regional.currency} onChange={e=>setRegional(v=>({...v,currency:e.target.value}))} style={{width:"100%"}}>{currencies.map(item=><option key={item.code} value={item.code}>{item.code} — {item.name}</option>)}</select></label>
             <label>{t("calendar")} <select value={regional.calendar} onChange={e=>setRegional(v=>({...v,calendar:e.target.value}))} style={{width:"100%"}}>{calendars.map(item=><option key={item.code} value={item.code}>{item.name}</option>)}</select></label>
