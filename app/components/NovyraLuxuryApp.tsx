@@ -133,13 +133,13 @@ main.nv-goals-screen .nv-goal-remaining{height:22px!important;padding:0 8px!impo
 main.nv-goals-screen .nv-goal-card .nv-goal-arrow{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;padding:0!important;border:0!important;background:transparent!important;display:grid!important;place-items:center!important;position:relative!important}
 main.nv-goals-screen .nv-goal-card .nv-goal-arrow svg{width:12px!important;height:12px!important;color:#9dc5e8!important;stroke-width:1.7!important;z-index:1!important}
 main.nv-goals-screen .nv-goal-card .nv-goal-arrow:before{content:""!important;position:absolute!important;width:20px!important;height:20px!important;border-radius:50%!important;background:#fff!important}
-main.nv-goals-screen .nv-goal-progress{position:relative!important;margin-top:14px!important;height:26px!important;padding-top:20px!important;overflow:visible!important}
+main.nv-goals-screen .nv-goal-progress{position:relative!important;margin-top:14px!important;height:32px!important;padding-top:26px!important;overflow:visible!important}
 main.nv-goals-screen .nv-goal-track{position:relative!important;height:6px!important;border-radius:999px!important;background:rgba(255,255,255,.8)!important;overflow:hidden!important;width:100%!important}
 main.nv-goals-screen .nv-goal-track:after{display:none!important}
 main.nv-goals-screen .nv-goal-track>i{height:6px!important;border-radius:999px!important;background:linear-gradient(90deg,#86efac,#16a34a)!important}
 main.nv-goals-screen .nv-goal-track.yellow>i{background:linear-gradient(90deg,#fde68a,#eab308)!important}
 main.nv-goals-screen .nv-goal-percent-badge{position:absolute!important;top:0!important;left:0!important;right:auto!important;transform:none!important;height:18px!important;min-height:18px!important;padding:0 8px!important;border-radius:999px!important;font-size:10px!important;line-height:18px!important;font-weight:700!important;white-space:nowrap!important;background:#0a8a2a!important;color:#fff!important}
-main.nv-goals-screen .nv-goal-percent-badge:after{content:""!important;position:absolute!important;left:50%!important;top:100%!important;transform:translateX(-50%)!important;width:1px!important;height:6px!important;background:#0a8a2a!important}
+main.nv-goals-screen .nv-goal-percent-badge:after{content:""!important;position:absolute!important;left:50%!important;top:calc(100% + 2px)!important;transform:translateX(-50%)!important;width:1px!important;height:6px!important;background:#0a8a2a!important}
 main.nv-goals-screen .nv-goal-percent-badge.yellow{background:#facc15!important;color:#3b2f00!important}
 main.nv-goals-screen .nv-goal-percent-badge.yellow:after{background:#a16207!important}
 main.nv-goals-screen .nv-goal-meta{display:flex!important;justify-content:space-between!important;align-items:center!important;margin:10px 0 0!important;font-size:11px!important;line-height:14px!important;font-weight:400!important;color:#111!important}
