@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Onboarding from "./components/Onboarding";
 import NovyraLuxuryApp from "./components/NovyraLuxuryApp";
-import { apiRequest, clearSession } from "./lib/api";
+import { apiRequest, clearSession, derivePasswordHash } from "./lib/api";
 import { languages, languageByCode } from "./data/languages";
 
 type Language = (typeof languages)[number]["code"];
@@ -104,8 +104,7 @@ export default function Home() {
     try {
       const method = localStorage.getItem("projectx-app-lock-type") || "none";
       if (method === "pin" || method === "pattern") {
-        const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(lockInput));
-        const actual = Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,"0")).join("");
+        const actual = await derivePasswordHash(lockInput, account?.email || "");
         if (actual !== localStorage.getItem("projectx-app-lock-hash")) throw new Error("Incorrect app lock.");
       } else if (method === "biometric") {
         const encoded = localStorage.getItem("projectx-app-lock-credential") || "";
