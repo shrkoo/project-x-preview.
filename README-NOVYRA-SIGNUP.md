@@ -1,35 +1,28 @@
-# Novyra signup redesign
+# Novyra onboarding and workspace implementation
 
-The root onboarding route now uses the four-step Novyra flow. The existing API worker remains the authentication authority.
+See the root README for setup, validation and Cloudflare Pages deployment instructions.
 
-## Requirements
-- Node.js 20+
-- npm
+## Implemented UI
+- Responsive Novyra welcome screen, rounded-square N mark, slogan, language selector and three-phone visual preview.
+- Single-page account form with names, email, country, password, confirmation, strength meter and inline validation.
+- Four-step progress flow: account details, app lock, workspace selection and success.
+- PIN keypad, pattern lock, and platform biometric enrollment prompt.
+- Personal / Business workspace selector, currency selection and conditional company-name field.
+- Profile settings include the reusable Personal / Business mode switcher.
+- Localized interface for Persian, English, Arabic, Turkish and German; RTL for Persian and Arabic.
+- Reusable Button, Input, Card, StepProgress, CountrySelect, PinPad, PatternLock and ModeSwitcher components.
 
-## Run locally
+## Integration boundaries
+- Email/password registration and login use the existing Worker routes.
+- Google sign-in is a localized placeholder until OAuth is configured.
+- Company name is device-local; the current Worker schema has no company/workspace persistence field.
+- The finance UI currently stores data in browser local storage. Multi-device business bookkeeping requires workspace-scoped D1 tables and server-side authorization.
+- Demo dashboard figures are placeholders, not account balances.
+
+## Local validation
 ```bash
 npm install
-npm run dev
-```
-Open http://localhost:3000.
-
-## Validate and build
-```bash
+npm run test:auth-translations
 npm run typecheck
 npm run build
 ```
-
-## Cloudflare Pages
-Use the repository's existing Cloudflare Pages project and preview branch. Build command: `npm run build`. Output follows the existing Next.js static-export configuration. Set `NEXT_PUBLIC_API_BASE` to the intended API Worker URL for the environment. Keep preview and production API/database bindings separate.
-
-## Authentication notes
-- Registration uses the existing `POST /auth/register` contract and stores the returned session token.
-- Login uses `GET /auth/password-salt` followed by `POST /auth/login`.
-- Google sign-in redirects to the existing `/auth/google/start` route; provider credentials and callback configuration remain an environment/backend responsibility.
-- PIN/pattern hashes are device-local app-lock credentials; biometric enrollment uses WebAuthn on supported devices.
-- The selected workspace is stored as `accountType` and in `projectx-account-type`. A single user account is retained.
-
-## Assumptions
-- Existing Worker supports the current registration payload fields (email, name, country, currency, language, accountType, appLockType, appLockHash, salt, passwordHash).
-- Business workspace metadata can be extended server-side; `companyName` is sent with registration but must be persisted by the Worker schema before it can be treated as authoritative.
-- Dashboard routing remains owned by the existing authenticated app.
