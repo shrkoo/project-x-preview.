@@ -1,0 +1,41 @@
+/* NOVYRA local-first completion pass */
+.nv-finance{padding-bottom:calc(180px + env(safe-area-inset-bottom))!important}
+.nv-finance .nf-main,.nv-finance .nf-shell,.nv-finance .nf-settings{padding-bottom:calc(180px + env(safe-area-inset-bottom))!important}
+.nv-finance button,.nv-finance [role="button"],.nv-finance label.nf-file-label{cursor:pointer!important;-webkit-tap-highlight-color:transparent}
+.nv-finance button{min-height:44px}
+.nv-finance button:active,.nv-finance [role="button"]:active{transform:scale(.975);filter:brightness(.97)}
+.nv-finance input:not([type=checkbox]),.nv-finance select,.nv-finance textarea{min-height:44px!important;border:1px solid #dcebf4!important;border-radius:13px!important;background:rgba(255,255,255,.88)!important;color:#29485b!important;box-shadow:inset 0 1px 2px #6b9ab00a!important;padding:10px 12px!important;outline:none!important}
+.nv-finance input:focus,.nv-finance select:focus,.nv-finance textarea:focus{border-color:#72b8df!important;box-shadow:0 0 0 3px #73bce322!important}
+.nv-finance input[type=checkbox]{appearance:none!important;-webkit-appearance:none!important;width:46px!important;min-width:46px!important;height:27px!important;min-height:27px!important;border:1px solid #c6dce9!important;border-radius:20px!important;background:#dce8ef!important;position:relative!important;cursor:pointer!important;transition:background .2s,border-color .2s!important;padding:0!important}
+.nv-finance input[type=checkbox]::after{content:""!important;position:absolute!important;top:3px!important;left:3px!important;width:19px!important;height:19px!important;border-radius:50%!important;background:#fff!important;box-shadow:0 1px 4px #34566a35!important;transition:transform .2s!important}
+.nv-finance[dir=rtl] input[type=checkbox]::after{left:auto!important;right:3px!important}
+.nv-finance input[type=checkbox]:checked{background:#3996d2!important;border-color:#3996d2!important}
+.nv-finance input[type=checkbox]:checked::after{transform:translateX(19px)!important}
+.nv-finance[dir=rtl] input[type=checkbox]:checked::after{transform:translateX(-19px)!important}
+.nv-finance .nf-switch-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:15px!important;padding:10px 0!important}
+.nv-finance .nf-file-label{display:flex!important;align-items:center!important;gap:10px!important;padding:12px!important;border:1px solid #dcebf4!important;border-radius:14px!important;background:#fff!important;color:#376d8a!important}
+.nv-finance .nf-file-label input[type=file]{max-width:100%!important;background:transparent!important;border:0!important;padding:4px!important}
+.nv-finance .nv-spend-filter{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:9px 12px!important;margin:0 0 12px!important;border:1px solid #d6eaf6!important;border-radius:13px!important;background:#eff8fd!important;color:#31566d!important;font-size:12px!important}
+.nv-finance .nv-spend-filter button{min-height:36px!important;padding:0 14px!important;border:0!important;border-radius:10px!important;background:#258bd0!important;color:#fff!important;font-size:11px!important;font-weight:700!important}
+.nv-finance .nf-category-list{display:flex!important;flex-wrap:wrap!important;gap:6px!important}
+.nv-finance .nf-category-list>div{display:flex!important;align-items:center!important;gap:5px!important;min-height:30px!important;padding:3px 7px 3px 5px!important;border:1px solid #e0edf4!important;border-radius:20px!important;background:#f5fbfe!important;color:#42657a!important;font-size:11px!important}
+.nv-finance .nf-category-list button{width:20px!important;min-width:20px!important;height:20px!important;min-height:20px!important;padding:0!important;border:0!important;border-radius:50%!important;background:transparent!important;color:#6c8fa3!important;font-size:14px!important;line-height:1!important}
+.nv-finance .nf-logout{display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;width:100%!important;min-height:48px!important;margin:14px 0 20px!important;padding:10px 16px!important;border:1px solid #dcebf4!important;border-radius:14px!important;background:#fff!important;color:#b64e58!important}
+.nv-finance .nf-setting-section{border-radius:18px!important}
+.nv-finance .nf-setting-section .nf-plan-card{background:linear-gradient(135deg,#e9f7ff,#fff)!important;border:1px solid #dcecf5!important;border-radius:16px!important}
+.nv-finance .nf-plan-options{display:grid!important;grid-template-columns:1fr!important;gap:9px!important;margin:16px 0!important}
+.nv-finance .nf-plan-options article{display:grid!important;grid-template-columns:1fr auto!important;gap:5px 10px!important;padding:13px!important;border:1px solid #dcebf4!important;border-radius:14px!important;background:#f7fbfe!important;color:#34556a!important}
+.nv-finance .nf-plan-options article em{font-style:normal!important;color:#21865d!important;font-size:11px!important}
+.nv-finance .nf-plan-options article strong{grid-column:1/-1!important;font-size:11px!important;color:#78909e!important}
+.nv-finance .nf-trial-note{padding:12px!important;border-radius:12px!important;background:#eaf7ff!important;color:#386e8b!important;font-size:12px!important}
+.nv-finance .nf-pay-start{width:100%!important;margin-top:12px!important}
+.nv-finance .nf-paywall>small{display:block!important;margin-top:9px!important;text-align:center!important;color:#8196a2!important}
+.nv-finance .nf-sms-label textarea{width:100%!important;min-height:90px!important;resize:vertical!important}
+.nv-finance .nf-report-actions{display:flex!important;justify-content:flex-end!important;margin:10px 0!important}
+.nv-finance .nf-report-actions button{min-height:44px!important}
+@media print{
+ body{background:#fff!important}
+ .nv-finance .nf-topbar,.nv-finance .nf-mobile-dock,.nv-finance .nf-sidebar,.nv-finance .nf-report-actions,.nv-finance button{display:none!important}
+ .nv-finance,.nv-finance .nf-shell,.nv-finance .nf-main{padding:0!important;background:#fff!important;max-width:none!important}
+ .nv-finance .nf-panel,.nv-finance .nf-metrics article{break-inside:avoid!important;box-shadow:none!important}
+}

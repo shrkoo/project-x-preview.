@@ -1,6 +1,7 @@
 "use client";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { apiRequest } from "../lib/api";
+import { formatNumber } from "../lib/formatNumber";
 import { Copy, Link2, Share2, Trash2, Upload, Video, FileText } from "lucide-react";
 
 type ShareItem={id:string;kind:"text"|"video";content?:string;createdAt:string};
@@ -26,7 +27,7 @@ export default function PublicShareCreator(){
   <div className="nv-public-share-tabs"><button type="button" className={kind==="text"?"selected":""} onClick={()=>setKind("text")}><FileText size={16}/> متن</button><button type="button" className={kind==="video"?"selected":""} onClick={()=>setKind("video")}><Video size={16}/> ویدیو</button></div>
   <form onSubmit={create}>
    {kind==="text"?<><input ref={textInputRef} type="file" accept=".txt,text/plain" hidden onChange={chooseTextFile}/><button type="button" className="nv-public-share-file nv-public-share-text-file" onClick={()=>textInputRef.current?.click()}><Upload size={17}/> بارگذاری فایل متنی TXT</button><textarea value={content} onChange={e=>setContent(e.target.value)} maxLength={20000} rows={6} placeholder="متن موردنظر را اینجا بنویس یا جای‌گذاری کن…"/></>:
-    <><input ref={inputRef} type="file" accept="video/mp4,video/webm,video/quicktime" hidden onChange={chooseFile}/><button type="button" className="nv-public-share-file" onClick={()=>inputRef.current?.click()}><Upload size={18}/><span>{file?file.name:"انتخاب ویدیو (حداکثر ۲۰ مگابایت)"}</span></button>{file&&<small>{(file.size/1024/1024).toFixed(2)} MB</small>}</>}
+    <><input ref={inputRef} type="file" accept="video/mp4,video/webm,video/quicktime" hidden onChange={chooseFile}/><button type="button" className="nv-public-share-file" onClick={()=>inputRef.current?.click()}><Upload size={18}/><span>{file?file.name:"انتخاب ویدیو (حداکثر ۲۰ مگابایت)"}</span></button>{file&&<small>{formatNumber(file.size/1024/1024,{digits:"en",minimumFractionDigits:2,maximumFractionDigits:2,grouping:false})} MB</small>}</>}
    <button className="nv-public-share-submit" type="submit" disabled={busy}>{busy?"در حال ساخت لینک…":"ساخت لینک عمومی"}</button>
   </form>
   {createdLink&&<div className="nv-public-share-result"><label>لینک آماده است</label><input readOnly value={createdLink} dir="ltr" onFocus={e=>e.currentTarget.select()}/><div><button type="button" onClick={()=>void copyLink()}><Copy size={16}/> کپی لینک</button><button type="button" onClick={()=>void shareLink()}><Share2 size={16}/> اشتراک‌گذاری</button></div></div>}

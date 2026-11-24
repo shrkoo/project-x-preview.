@@ -1,0 +1,73 @@
+name: Build and deploy NOVYRA preview
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm install
+      - name: Audit dependency vulnerabilities
+        run: |
+          npm audit --json > /tmp/npm-audit.json || true
+          node -e "const a=require('/tmp/npm-audit.json'); console.log(JSON.stringify(a.vulnerabilities || {}, null, 2))"
+      - name: Type check
+        run: npm run typecheck
+      - name: Check Worker JavaScript syntax
+        run: node --check workers/api/index.js
+      - name: Validate additive D1 migration
+        run: |
+          python3 - <<'PY'
+          import sqlite3
+          from pathlib import Path
+          db = sqlite3.connect(":memory:")
+          db.execute("PRAGMA foreign_keys = ON")
+          db.execute("CREATE TABLE users (id TEXT PRIMARY KEY)")
+          db.executescript(Path("workers/api/migrations/0001_social_core.sql").read_text())
+          db.executescript(Path("workers/api/migrations/0002_explore_profiles.sql").read_text())
+          expected = {"social_posts", "social_post_likes", "social_post_comments", "social_follows", "ai_daily_usage", "social_search_history"}
+          actual = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+          assert expected.issubset(actual), f"Missing tables: {expected - actual}"
+          columns = {row[1] for row in db.execute("PRAGMA table_info(social_posts)")}
+          assert "view_count" in columns, "Missing social_posts.view_count"
+          print("D1 social + Explore migrations syntax and schema: OK")
+          PY
+      - name: Build static site
+        run: npm run build
+      - name: Add GitHub Pages marker
+        run: touch out/.nojekyll
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

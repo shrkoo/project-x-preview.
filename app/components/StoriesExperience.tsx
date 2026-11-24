@@ -1,11 +1,12 @@
 "use client";
 import { ChangeEvent, TouchEvent, useEffect, useMemo, useRef, useState } from "react";
 import { API_BASE, apiRequest } from "../lib/api";
+import { formatNumber } from "../lib/formatNumber";
 import { Plus, X, Heart, Send } from "lucide-react";
 
 type Story={id:string;userId:string;mediaUrl:string;type:"image"|"video";createdAt:string;expiresAt:string;displayName:string;username?:string|null;avatarUrl?:string|null;viewedByMe:boolean;reactedByMe?:boolean};
 type Group={userId:string;displayName:string;username?:string|null;avatarUrl?:string|null;stories:Story[];seen:boolean};
-function ago(value:string){const n=Math.max(0,Date.now()-new Date(value).getTime()),m=Math.floor(n/60000);if(m<1)return "همین حالا";if(m<60)return new Intl.NumberFormat("fa-IR").format(m)+" دقیقه پیش";const h=Math.floor(m/60);return h<24?new Intl.NumberFormat("fa-IR").format(h)+" ساعت پیش":new Intl.NumberFormat("fa-IR").format(Math.floor(h/24))+" روز پیش";}
+function ago(value:string){const n=Math.max(0,Date.now()-new Date(value).getTime()),m=Math.floor(n/60000);if(m<1)return "همین حالا";if(m<60)return formatNumber(m)+" دقیقه پیش";const h=Math.floor(m/60);return h<24?formatNumber(h)+" ساعت پیش":formatNumber(Math.floor(h/24))+" روز پیش";}
 async function imageBlob(file:File):Promise<Blob>{const bitmap=await createImageBitmap(file);const scale=Math.min(1,1200/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));const ctx=canvas.getContext("2d");if(!ctx)throw new Error("پردازش تصویر ممکن نیست.");ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();for(const quality of [.9,.82,.75,.68,.6,.52,.44,.36]){const blob=await new Promise<Blob|null>(resolve=>canvas.toBlob(resolve,"image/webp",quality));if(blob&&blob.size<=5*1024*1024)return blob;}throw new Error("حجم عکس پس از فشرده‌سازی WebP هنوز بیشتر از ۵ مگابایت است. عکس دیگری انتخاب کن.");}
 export default function StoriesExperience({userId,displayName,onError}:{userId:string;displayName:string;onError:(message:string)=>void}){
  const [stories,setStories]=useState<Story[]>([]),[loading,setLoading]=useState(true),[uploading,setUploading]=useState(false),[groupIndex,setGroupIndex]=useState<number|null>(null),[storyIndex,setStoryIndex]=useState(0),[paused,setPaused]=useState(false),[duration,setDuration]=useState(5000),[elapsed,setElapsed]=useState(0),[message,setMessage]=useState(""),[liked,setLiked]=useState(false),[touchY,setTouchY]=useState<number|null>(null);

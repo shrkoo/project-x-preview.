@@ -4211,3 +4211,442 @@
   right:auto!important;transform:translate(-50%,-50%)!important;width:10px!important;height:10px!important;
   border:2px solid #22A06B!important;border-radius:50%!important;background:#fff!important;z-index:4!important;
 }
+
+
+/* PART 1 — Home tab refinements; all selectors stay inside .home-root */
+.nv-finance .home-root .hm-balance-amount {
+  display:inline-flex!important; align-items:baseline!important; flex-wrap:nowrap!important;
+  white-space:nowrap!important; gap:6px!important; color:#0F172A!important;
+  font-size:36px!important; font-weight:800!important; line-height:1.1!important;
+}
+.nv-finance .home-root .hm-balance-amount>bdi {
+  white-space:nowrap!important; font-size:inherit!important; font-weight:inherit!important; color:inherit!important;
+}
+.nv-finance .home-root .hm-balance-currency {
+  display:inline!important; flex:0 0 auto!important; white-space:nowrap!important;
+  color:#64748B!important; font-size:14px!important; font-weight:600!important; line-height:1!important;
+}
+.nv-finance .home-root .hm-eye {
+  display:inline-flex!important; flex:0 0 44px!important; align-items:center!important; justify-content:center!important;
+  width:44px!important; min-width:44px!important; height:44px!important; min-height:44px!important;
+  padding:0!important; border:0!important; border-radius:0!important; background:transparent!important;
+  box-shadow:none!important; color:#334155!important;
+}
+.nv-finance .home-root .hm-eye svg {
+  width:22px!important; height:22px!important; color:#334155!important; stroke:currentColor!important;
+}
+.nv-finance .home-root .hm-saving-chip {
+  display:inline-flex!important; flex-wrap:nowrap!important; align-items:center!important; justify-content:center!important;
+  gap:6px!important; padding:6px 12px!important; border:0!important; border-radius:999px!important;
+  background:#DCFCE7!important; color:#16A34A!important; font-size:13px!important; font-weight:600!important;
+  line-height:1.3!important; white-space:nowrap!important;
+}
+.nv-finance .home-root .hm-saving-chip>span,
+.nv-finance .home-root .hm-saving-chip bdi {
+  color:inherit!important; font-size:inherit!important; font-weight:inherit!important; white-space:nowrap!important;
+}
+.nv-finance .home-root .hm-saving-trend-icon {
+  display:block!important; flex:0 0 14px!important; width:14px!important; height:14px!important; color:currentColor!important;
+}
+.nv-finance .home-root .hm-cheer-text {
+  color:#64748B!important; font-size:13px!important; font-weight:500!important;
+}
+.nv-finance .home-root .hm-category-amount {
+  display:flex!important; align-items:baseline!important; justify-content:center!important; flex-wrap:nowrap!important;
+  gap:4px!important; width:100%!important; direction:rtl!important; white-space:nowrap!important;
+  text-align:center!important; font-size:17px!important; font-weight:800!important; line-height:1.4!important;
+}
+.nv-finance .home-root .hm-category-amount>bdi {
+  color:inherit!important; font-size:17px!important; font-weight:800!important; white-space:nowrap!important;
+}
+.nv-finance .home-root .hm-category-amount>small {
+  flex:0 0 auto!important; color:#64748B!important; font-size:12px!important; font-weight:500!important; white-space:nowrap!important;
+}
+.nv-finance .home-root .hm-category-status {
+  display:block!important; width:100%!important; margin-top:5px!important; text-align:center!important;
+  font-size:13px!important; font-weight:600!important; line-height:1.4!important;
+}
+.nv-finance .home-root .hm-insight-title {
+  display:inline-flex!important; align-items:center!important; gap:6px!important; color:#3B82F6!important;
+  font-size:13px!important; font-weight:600!important; line-height:1.4!important;
+}
+.nv-finance .home-root .hm-insight-title svg {
+  width:17px!important; height:17px!important; color:#3B82F6!important; stroke:currentColor!important; stroke-width:1.8!important;
+}
+.nv-finance .home-root .hm-insight-body {
+  font-size:15px!important; font-weight:600!important; line-height:1.65!important;
+}
+.nv-finance .home-root .hm-category-amount,
+.nv-finance .home-root .hm-category-status { text-align:center!important; }
+.nv-finance .home-root { padding-bottom:calc(16px + env(safe-area-inset-bottom))!important; }
+.nv-finance .home-root .nv-ref-category-grid { margin-bottom:16px!important; }
+
+
+/* PART 1 follow-up — enforce Home balance and eye sizing above legacy selectors */
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .hm-balance-amount,
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .hm-balance-amount>bdi {
+  font-size:36px!important;
+  font-weight:800!important;
+  line-height:1.1!important;
+}
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .hm-eye {
+  display:inline-flex!important;
+  flex:0 0 44px!important;
+  width:44px!important;
+  min-width:44px!important;
+  height:44px!important;
+  min-height:44px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  appearance:none!important;
+  color:#334155!important;
+}
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .hm-eye svg {
+  width:22px!important;
+  height:22px!important;
+  stroke:currentColor!important;
+}
+
+
+/* PART 1 follow-up — final Home balance computed-size guard */
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root strong.hm-balance-amount,
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root strong.hm-balance-amount>bdi {
+  font-size:36px!important;
+  font-weight:800!important;
+  line-height:1.1!important;
+}
+
+
+/* Follow-up pass — final, high-specificity Home and Spending overrides. */
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root strong.hm-balance-amount,
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root strong.hm-balance-amount>bdi {
+  display:inline-flex!important;align-items:baseline!important;flex-wrap:nowrap!important;white-space:nowrap!important;
+  font-size:36px!important;font-weight:800!important;line-height:1.1!important;
+}
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root strong.hm-balance-amount .hm-balance-currency {
+  display:inline!important;flex:0 0 auto!important;white-space:nowrap!important;
+  font-size:14px!important;font-weight:600!important;line-height:1.1!important;color:#64748B!important;
+}
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .hm-saving-chip {
+  display:inline-flex!important;align-items:center!important;flex-wrap:nowrap!important;white-space:nowrap!important;
+}
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .hm-saving-trend-icon {
+  display:block!important;flex:0 0 14px!important;width:14px!important;height:14px!important;
+}
+.nv-finance.an-screen-active[lang="fa"] #profileBtn.an-profile-pill {
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;
+  width:auto!important;min-width:0!important;height:48px!important;min-height:48px!important;padding:0 16px!important;
+  border:1px solid rgba(255,255,255,.75)!important;border-radius:999px!important;background:rgba(255,255,255,.62)!important;
+  color:#0F172A!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;
+  box-shadow:0 6px 18px rgba(59,130,246,.1)!important;
+}
+.nv-finance.an-screen-active[lang="fa"] #profileBtn.an-profile-pill svg {
+  display:block!important;flex:0 0 18px!important;width:18px!important;height:18px!important;
+}
+.nv-finance.an-screen-active[lang="fa"] #profileBtn.an-profile-pill span {
+  display:inline!important;font-size:14px!important;color:#0F172A!important;
+}
+/* Override the legacy display:none rule for .nv-spend-tooltip. */
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-chart-tooltip.nv-spend-tooltip {
+  position:absolute!important;z-index:8!important;display:block!important;width:max-content!important;max-width:calc(100% - 16px)!important;
+  padding:4px 10px!important;border:1px solid #22A06B!important;border-radius:999px!important;background:#fff!important;
+  color:#16A34A!important;font-size:12px!important;font-weight:700!important;line-height:1.4!important;white-space:nowrap!important;
+  direction:rtl!important;text-align:center!important;transform:translate(-50%,calc(-100% - 8px))!important;
+  box-shadow:none!important;pointer-events:none!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-chart-tooltip.nv-spend-tooltip.below {
+  transform:translate(-50%,8px)!important;
+}
+/* Spending highlight cards: glass surface, inline values and number-safe notes. */
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-highlight-card {
+  height:auto!important;min-height:128px!important;max-height:none!important;padding:12px!important;
+  background:rgba(255,255,255,.62)!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;
+  border:1px solid rgba(255,255,255,.75)!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-highlight-value {
+  display:flex!important;align-items:baseline!important;flex-wrap:wrap!important;gap:6px!important;margin:6px 0 0!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-highlight-value>b {
+  display:inline-flex!important;align-items:baseline!important;flex:0 0 auto!important;gap:4px!important;margin:0!important;
+  font-size:24px!important;font-weight:800!important;line-height:1.2!important;white-space:nowrap!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-highlight-value>b bdi {
+  white-space:nowrap!important;font-size:24px!important;font-weight:800!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-highlight-value>b small {
+  flex:0 0 auto!important;white-space:nowrap!important;font-size:13px!important;font-weight:600!important;color:#64748B!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-highlight-value>i {
+  position:static!important;flex:0 0 auto!important;margin:0!important;font-size:11px!important;font-weight:600!important;
+  font-style:normal!important;white-space:nowrap!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-highlight-value>i.up { color:#EF4444!important; }
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-highlight-value>i.down { color:#16A34A!important; }
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-highlight-subtitle {
+  display:flex!important;align-items:center!important;gap:4px!important;min-width:0!important;margin:7px 0 0!important;
+  overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;font-size:12px!important;
+  line-height:1.4!important;color:#64748B!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-highlight-subtitle>span:first-child {
+  flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-highlight-subtitle>bdi {
+  display:inline-block!important;flex:0 0 auto!important;white-space:nowrap!important;unicode-bidi:isolate!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-highlight-subtitle>span:last-child {
+  flex:0 0 auto!important;white-space:nowrap!important;
+}
+/* Quick actions: two complete title lines, a one-line subtitle and matching arrows. */
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-quick-card b {
+  display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;
+  font-size:15px!important;font-weight:700!important;line-height:1.45!important;white-space:normal!important;
+  overflow-wrap:normal!important;word-break:normal!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-quick-card small {
+  display:block!important;font-size:12px!important;color:#64748B!important;white-space:nowrap!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;
+}
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-quick-card .nv-quick-chevron,
+.nv-finance.an-screen-active[lang="fa"] .an-screen .an-quick-card .nv-quick-chevron svg {
+  color:#3B82F6!important;stroke:#3B82F6!important;
+}
+/* Keep the complete Spending section clear of the fixed navigation. */
+.nv-finance.an-screen-active[lang="fa"] .nf-main,
+.nv-finance.an-screen-active[lang="fa"] .an-screen {
+  padding-bottom:calc(140px + env(safe-area-inset-bottom))!important;
+}
+/* Shared glass navigation across all tabs. */
+.nv-finance nav.nf-mobile-dock.nv-ref-dock {
+  position:fixed!important;z-index:800!important;left:16px!important;right:16px!important;
+  bottom:calc(12px + env(safe-area-inset-bottom))!important;width:auto!important;height:72px!important;min-height:72px!important;
+  margin:0!important;padding:5px 12px!important;display:flex!important;align-items:center!important;justify-content:space-around!important;
+  gap:0!important;border:1px solid rgba(255,255,255,.75)!important;border-radius:28px!important;
+  background:rgba(255,255,255,.65)!important;box-shadow:0 8px 24px rgba(59,130,246,.10)!important;
+  backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;
+}
+.nv-finance nav.nf-mobile-dock.nv-ref-dock>button {
+  flex:1 1 0!important;min-width:0!important;height:56px!important;min-height:56px!important;padding:0!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;border:0!important;border-radius:18px!important;
+  background:transparent!important;color:#64748B!important;box-shadow:none!important;
+}
+.nv-finance nav.nf-mobile-dock.nv-ref-dock>button.active { color:#3B82F6!important; }
+.nv-finance nav.nf-mobile-dock.nv-ref-dock>button svg { width:24px!important;height:24px!important; }
+.nv-finance nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center {
+  position:relative!important;z-index:2!important;flex:0 0 56px!important;width:56px!important;height:56px!important;min-width:56px!important;
+  min-height:56px!important;margin:0!important;padding:0!important;transform:translateY(-8px)!important;border:0!important;
+  border-radius:50%!important;background:conic-gradient(from 200deg,#FB923C,#EF4444,#3B82F6,#4ADE80,#FB923C)!important;
+  color:#fff!important;box-shadow:0 6px 16px rgba(59,130,246,.18)!important;
+}
+.nv-finance nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center .nf-dock-icon {
+  width:56px!important;height:56px!important;margin:0!important;border:0!important;border-radius:50%!important;
+  background:transparent!important;color:#fff!important;box-shadow:none!important;
+}
+.nv-finance nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center svg { color:#fff!important;stroke:#fff!important; }
+/* Hide scrollbars without disabling scrolling. */
+.nv-finance .nf-main,.nv-finance .an-screen,.nv-finance .nv-spend-highlights,.nv-finance .nv-spend-quick,
+.nv-finance nav.nf-mobile-dock.nv-ref-dock { scrollbar-width:none!important; }
+.nv-finance .nf-main::-webkit-scrollbar,.nv-finance .an-screen::-webkit-scrollbar,.nv-finance .nv-spend-highlights::-webkit-scrollbar,
+.nv-finance .nv-spend-quick::-webkit-scrollbar,.nv-finance nav.nf-mobile-dock.nv-ref-dock::-webkit-scrollbar { display:none!important; }
+
+
+/* Cascade repair — final winning rules for Home balance and shared bottom dock. */
+/* More specific than the legacy .nv-ref-balance-value-row>strong and all .hm-balance-amount rules. */
+main.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .nv-ref-balance-value-row>strong.hm-balance-amount,
+main.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .nv-ref-balance-value-row>strong.hm-balance-amount>bdi {
+  font-size:36px!important;
+  font-weight:800!important;
+  line-height:1.1!important;
+}
+main.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .nv-ref-balance-value-row>strong.hm-balance-amount .hm-balance-currency {
+  font-size:14px!important;
+  font-weight:600!important;
+  line-height:1.1!important;
+  color:#64748B!important;
+}
+
+/* Higher-specificity final override: wins over the earlier Home/Analytics nav rules. */
+main.nv-finance.nv-home-active.home-screen[lang="fa"] nav.nf-mobile-dock.nv-ref-dock,
+main.nv-finance.an-screen-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock,
+main.nv-finance[lang="fa"] nav.nf-mobile-dock.nv-ref-dock {
+  height:72px!important;
+  min-height:72px!important;
+  border-radius:28px!important;
+  background:rgba(255,255,255,.65)!important;
+  border:1px solid rgba(255,255,255,.75)!important;
+  backdrop-filter:blur(16px)!important;
+  -webkit-backdrop-filter:blur(16px)!important;
+}
+
+
+/* Spending + dock regression repair: final, high-specificity cascade. */
+/* The SVG plot is LTR: never mirror its x-axis in Persian layouts. */
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .nv-spend-plot>svg {
+  direction:ltr!important;
+  transform:none!important;
+  transform-origin:center!important;
+}
+/* Keep the selected point and tooltip in the same unmirrored plot coordinate space. */
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-chart-plot .an-chart-point {
+  z-index:20!important;
+}
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-chart-plot .nv-spend-tooltip.an-chart-tooltip {
+  display:block!important;
+  position:absolute!important;
+  z-index:30!important;
+  width:max-content!important;
+  max-width:calc(100% - 12px)!important;
+  padding:4px 10px!important;
+  border:1px solid #22A06B!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  color:#16A34A!important;
+  font-size:12px!important;
+  font-weight:700!important;
+  line-height:1.4!important;
+  white-space:nowrap!important;
+  direction:rtl!important;
+  text-align:center!important;
+  transform:translate(-50%,calc(-100% - 8px))!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+}
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-chart-plot .nv-spend-tooltip.an-chart-tooltip.below {
+  transform:translate(-50%,calc(-100% - 8px))!important;
+}
+/* The text line never breaks between the number and currency; spacing stays outside the BDI. */
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-subtitle {
+  white-space:normal!important;
+  word-break:normal!important;
+  overflow-wrap:normal!important;
+}
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-subtitle bdi {
+  white-space:nowrap!important;
+  display:inline-block!important;
+}
+/* Amount, currency and signed percentage remain one baseline-aligned row. */
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-value {
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:nowrap!important;
+  align-items:baseline!important;
+  gap:6px!important;
+  min-width:0!important;
+  white-space:nowrap!important;
+}
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-value>b {
+  display:flex!important;
+  flex:0 1 auto!important;
+  flex-direction:row!important;
+  align-items:baseline!important;
+  flex-wrap:nowrap!important;
+  gap:4px!important;
+  min-width:0!important;
+  margin:0!important;
+  font-size:24px!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+}
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-value>b bdi {
+  white-space:nowrap!important;
+}
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-value>b small {
+  flex:0 0 auto!important;
+  font-size:13px!important;
+  white-space:nowrap!important;
+}
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-value>i {
+  flex:0 0 auto!important;
+  font-size:11px!important;
+  white-space:nowrap!important;
+}
+@media(max-width:380px) {
+  main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-value>b {
+    font-size:22px!important;
+  }
+}
+/* Prevent later legacy blue-tinted card rules from replacing the glass treatment. */
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlights>.an-highlight-card {
+  background:rgba(255,255,255,.62)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+  backdrop-filter:blur(14px)!important;
+  border:1px solid rgba(255,255,255,.75)!important;
+}
+/* One fixed containing block for the dock on every finance tab. */
+main.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock,
+main.nv-finance.an-screen-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock,
+main.nv-finance[lang="fa"] nav.nf-mobile-dock.nv-ref-dock {
+  position:fixed!important;
+  left:16px!important;
+  right:16px!important;
+  bottom:calc(12px + env(safe-area-inset-bottom))!important;
+  width:auto!important;
+  height:72px!important;
+  min-height:72px!important;
+  margin:0!important;
+  padding:5px 12px!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  align-items:center!important;
+  justify-items:stretch!important;
+  gap:0!important;
+  box-sizing:border-box!important;
+  transform:none!important;
+  overflow:visible!important;
+  isolation:isolate!important;
+}
+/* Explicitly reserve the center grid track for the floating action button. */
+main.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(1),
+main.nv-finance.an-screen-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(1),
+main.nv-finance[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(1) { grid-column:1!important; }
+main.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(2),
+main.nv-finance.an-screen-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(2),
+main.nv-finance[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(2) { grid-column:2!important; }
+main.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(4),
+main.nv-finance.an-screen-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(4),
+main.nv-finance[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(4) { grid-column:4!important; }
+main.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(5),
+main.nv-finance.an-screen-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(5),
+main.nv-finance[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button:nth-child(5) { grid-column:5!important; }
+main.nv-finance.nv-home-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center,
+main.nv-finance.an-screen-active[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center,
+main.nv-finance[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center {
+  position:absolute!important;
+  left:50%!important;
+  right:auto!important;
+  top:-8px!important;
+  transform:translateX(-50%)!important;
+  flex:none!important;
+  width:56px!important;
+  height:56px!important;
+  min-width:56px!important;
+  min-height:56px!important;
+  margin:0!important;
+  padding:0!important;
+  z-index:10!important;
+  border-radius:50%!important;
+}
+
+
+/* Preserve literal word spacing: this subtitle is inline text, not a flex row. */
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-subtitle {
+  display:block!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-subtitle>span {
+  display:inline!important;
+  flex:none!important;
+  min-width:0!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  white-space:normal!important;
+}
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-subtitle>bdi {
+  display:inline-block!important;
+  flex:none!important;
+  white-space:nowrap!important;
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { formatNumber } from "../lib/formatNumber";
 import { Bookmark, Heart, MessageCircle, MoreHorizontal, Plus, Repeat2, Send, Volume2, VolumeX, ArrowRight, X } from "lucide-react";
 
 export type SocialMediaPost = {
@@ -12,14 +13,8 @@ export type SocialMediaPost = {
 export type SocialMediaPerson = { id: string; displayName: string; username?: string; followedByMe?: boolean };
 export type SocialMediaComment = { id: string; body: string; createdAt: string; authorId: string; authorName: string };
 
-const faDigits = (value: string | number) => String(value).replace(/[0-9]/g, digit => "۰۱۲۳۴۵۶۷۸۹"[Number(digit)]);
 export function formatSocialCount(value: number | undefined) {
-  const count = Math.max(0, Number(value) || 0);
-  if (count < 10000) return faDigits(Math.floor(count).toLocaleString("en-US").replace(/,/g, "٬"));
-  const unit = count < 1000000 ? 1000 : 1000000;
-  const suffix = count < 1000000 ? " هزار" : " میلیون";
-  const rounded = Math.round((count / unit) * 10) / 10;
-  return faDigits(String(rounded).replace(".", "٫")) + suffix;
+  return formatNumber(Math.max(0, Number(value) || 0), {digits:"fa",compact:true});
 }
 const initials = (name: string) => name.trim().slice(0, 1).toLocaleUpperCase() || "N";
 
