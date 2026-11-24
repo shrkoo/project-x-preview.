@@ -287,7 +287,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       if (mode === "signup") {
         const salt = createPasswordSalt();
         const passwordHash = await derivePasswordHash(password, salt);
-        lockHash = lockType === "none" ? null : Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(lockSecret)))).map(b=>b.toString(16).padStart(2,"0")).join("");
+        lockHash = lockType === "none" ? null : await derivePasswordHash(lockSecret, cleanEmail);
         const country = countries.find(item => item.code === countryCode);
         credentials = { email: cleanEmail, name: [firstName.trim(),lastName.trim()].join(" "), firstName:firstName.trim(), lastName:lastName.trim(), country:countryCode, currency:regional.currency, calendar:regional.calendar, numberFormat:country?.defaultNumberFormat || "1,234.56", weekStart:regional.weekStart, language, accountType, appLockType:lockType, appLockHash:lockHash, salt, passwordHash };
       } else {
@@ -497,7 +497,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <div className="px-lock-options">{(["none","pin","pattern","biometric"] as const).map(value=><button type="button" key={value} className={lockType===value?"is-selected":""} onClick={()=>{setLockType(value);setLockSecret("");}}>{t(value==="none"?"noLock":value)}</button>)}</div>
           {(lockType==="pin"||lockType==="pattern")&&<label className="px-field"><span>{t("lockSecret")}</span><input type={lockType==="pin"?"password":"text"} inputMode={lockType==="pin"?"numeric":"text"} value={lockSecret} onChange={e=>setLockSecret(e.target.value)} autoComplete="off" /></label>}
           {lockType==="biometric"&&<><p role="status">{lockSecret?t("biometric"):t("biometricUnsupported")}</p><button type="button" className="px-skip-action" disabled={busy} onClick={registerBiometric}>{busy?"…":t("biometric")}</button></>}
-          <button className="px-primary-action" onClick={()=>{if(lockType==="biometric"&&!lockSecret){setNotice(t("biometricUnsupported"));return;}if(lockType!=="none"&&lockSecret.length<4){setNotice(t("lockRequired"));return;}setNotice("");setStage("accountType");}}>{t("next")} ↗</button>
+          <button className="px-primary-action" onClick={()=>{if(lockType==="biometric"&&!lockSecret){setNotice(t("biometricUnsupported"));return;}if(lockType==="pin"&&lockSecret.length<6){setNotice(t("lockRequired"));return;}if(lockType==="pattern"&&lockSecret.length<4){setNotice(t("lockRequired"));return;}setNotice("");setStage("accountType");}}>{t("next")} ↗</button>
           <button className="px-skip-action" onClick={()=>{setLockType("none");setLockSecret("");setStage("accountType");}}>{t("skip")}</button>
         </div>}
         {stage === "accountType" && <div className="px-glass-panel px-auth-panel">
