@@ -22,16 +22,20 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: npm install 2>&1 | tee -a ci-build.log
+        shell: bash
+        run: set -o pipefail; npm install 2>&1 | tee -a ci-build.log
 
       - name: Check language autonyms
-        run: npm run test:language-autonyms 2>&1 | tee -a ci-build.log
+        shell: bash
+        run: set -o pipefail; npm run test:language-autonyms 2>&1 | tee -a ci-build.log
 
       - name: Type-check
-        run: npx tsc --noEmit 2>&1 | tee -a ci-build.log
+        shell: bash
+        run: set -o pipefail; npx tsc --noEmit 2>&1 | tee -a ci-build.log
 
       - name: Build
-        run: npm run build 2>&1 | tee -a ci-build.log
+        shell: bash
+        run: set -o pipefail; npm run build 2>&1 | tee -a ci-build.log
 
       - name: Upload build log
         if: always()
