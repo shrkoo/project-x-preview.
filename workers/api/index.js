@@ -1,4 +1,4 @@
-import { countryCodes, currencyCodes, calendarCodes, languageCodes, numberFormatCodes } from "./data/catalog-validation.js";
+import { countryCodes, currencyCodes, calendarCodes, languageCodes, numberFormatCodes, numberSystemCodes } from "./data/catalog-validation.js";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,HEAD,POST,PATCH,DELETE,OPTIONS",
@@ -151,14 +151,15 @@ async function authenticate(request, db) {
   const token = request.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
   if (!token || token.length < 30) return null;
   const tokenHash = await digest(token);
-  return await db.prepare("SELECT u.id,u.email,u.display_name,u.xp,u.games_played,u.role,u.username,u.avatar_url,u.bio,u.first_name,u.last_name,u.country,u.currency,u.calendar,u.number_format,u.week_start,u.language,u.account_type,u.app_lock_type,u.app_lock_hash,u.app_lock_timeout,u.lock_failed_attempts,u.onboarding_completed FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
+  return await db.prepare("SELECT u.id,u.email,u.display_name,u.xp,u.games_played,u.role,u.username,u.avatar_url,u.bio,u.first_name,u.last_name,u.country,u.currency,u.calendar,u.number_format,u.number_system,u.date_format,u.text_direction,u.week_start,u.language,u.account_type,u.app_lock_type,u.app_lock_hash,u.app_lock_timeout,u.lock_failed_attempts,u.onboarding_completed FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
 }
 function cleanName(value) { return String(value || "").trim().replace(/[<>]/g, "").slice(0, 32); }
 function cleanEmail(value) { return String(value ?? "").normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g, "").replace(/\s+/g, "").toLowerCase().slice(0, 254); }
 
 const PROFILE_DEFAULTS = {
   first_name: "", last_name: "", country: "US", currency: "USD",
-  calendar: "gregory", number_format: "1,234.56", week_start: "monday",
+  calendar: "gregory", number_format: "1,234.56", number_system: "latn",
+  date_format: "YYYY-MM-DD", text_direction: "ltr", week_start: "monday",
   language: "en", account_type: "personal", app_lock_type: "none",
   app_lock_hash: null, app_lock_timeout: 300
 };
@@ -178,6 +179,9 @@ function normalizeProfile(input = {}, current = PROFILE_DEFAULTS) {
   const number_format = String(pick("number_format","numberFormat") ?? "").trim();
   const week_start = String(pick("week_start","weekStart") ?? "").trim().toLowerCase();
   const language = String(pick("language","language") ?? "").trim();
+  const number_system = String(input.number_system ?? input.numberSystem ?? input.digits ?? current.number_system ?? "latn").trim().toLowerCase();
+  const date_format = String(input.date_format ?? input.dateFormat ?? current.date_format ?? "YYYY-MM-DD").trim();
+  const text_direction = new Set(["ar","fa","ckb","he","ur","ps","sd","ug","yi"]).has(language) ? "rtl" : "ltr";
   const account_type = String(pick("account_type","accountType") ?? "").trim().toLowerCase();
   const app_lock_type = String(pick("app_lock_type","appLockType") ?? "").trim().toLowerCase();
   const rawHash = pick("app_lock_hash","appLockHash");
@@ -194,6 +198,8 @@ function normalizeProfile(input = {}, current = PROFILE_DEFAULTS) {
   if (!currencyCodes.has(currency)) return { error: "واحد پول انتخاب‌شده در فهرست ارزهای پشتیبانی‌شده وجود ندارد." };
   if (!calendarCodes.has(calendar)) return { error: "تقویم انتخاب‌شده پشتیبانی نمی‌شود." };
   if (!numberFormatCodes.has(number_format)) return { error: "قالب نمایش اعداد با کشور انتخاب‌شده سازگار نیست." };
+  if (!numberSystemCodes.has(number_system)) return { error: "سیستم ارقام انتخاب‌شده پشتیبانی نمی‌شود." };
+  if (!new Set(["DD/MM/YYYY","MM/DD/YYYY","YYYY-MM-DD","YYYY/MM/DD","DD.MM.YYYY","DD-MM-YYYY","YYYY.MM.DD"]).has(date_format)) return { error: "قالب تاریخ انتخاب‌شده معتبر نیست." };
   if (!PROFILE_ENUMS.week_start.has(week_start)) return { error: "روز شروع هفته معتبر نیست." };
   if (!/^[a-z]{2,3}$/.test(language) || !languageCodes.has(language)) return { error: "زبان انتخاب‌شده در فهرست ISO 639-1/639-3 وجود ندارد." };
   if (!PROFILE_ENUMS.account_type.has(account_type)) return { error: "نوع حساب باید شخصی یا تجاری باشد." };
@@ -201,7 +207,7 @@ function normalizeProfile(input = {}, current = PROFILE_DEFAULTS) {
   if (app_lock_hash !== null && !/^[a-f0-9]{64}$/i.test(app_lock_hash)) return { error: "مقدار رمز قفل معتبر نیست." };
   if (!Number.isInteger(app_lock_timeout) || app_lock_timeout < 0 || app_lock_timeout > 86400) return { error: "زمان قفل خودکار باید بین صفر تا ۸۶۴۰۰ ثانیه باشد." };
   if (app_lock_type !== "none" && !app_lock_hash) return { error: "برای فعال‌کردن قفل، ابتدا باید مقدار رمز قفل ثبت شود." };
-  return { value: { first_name,last_name,country,currency,calendar,number_format,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout } };
+  return { value: { first_name,last_name,country,currency,calendar,number_format,number_system,date_format,text_direction,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout } };
 }
 function profileComplete(profile) {
   return Boolean(String(profile.first_name||"").trim() && String(profile.last_name||"").trim()
@@ -213,7 +219,8 @@ function publicProfile(row) {
     firstName: row.first_name || "", lastName: row.last_name || "",
     country: row.country || "US", currency: row.currency || "USD",
     calendar: row.calendar || "gregory", numberFormat: row.number_format || "1,234.56",
-    weekStart: row.week_start || "monday", language: row.language || "en",
+    numberSystem: row.number_system || "latn", dateFormat: row.date_format || "YYYY-MM-DD",
+    direction: row.text_direction || "ltr", weekStart: row.week_start || "monday", language: row.language || "en",
     accountType: row.account_type || "personal", appLockType: row.app_lock_type || "none",
     appLockTimeout: Number(row.app_lock_timeout ?? 300),
     onboardingCompleted: Number(row.onboarding_completed || 0) === 1
@@ -317,7 +324,7 @@ export default {
     if (!salt || salt.length < 16 || salt.length > 128) return fail("داده امنیتی نمک رمز از صفحه دریافت نشد؛ صفحه را تازه‌سازی کن.");
     if (!/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("خروجی رمز عبور از صفحه ناقص است؛ صفحه را تازه‌سازی کن.");
     const id = crypto.randomUUID(), hash = suppliedHash;
-    try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,first_name,last_name,country,currency,calendar,number_format,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout,lock_failed_attempts,onboarding_completed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,profileComplete(profile)?1:0).run(); }
+    try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,first_name,last_name,country,currency,calendar,number_format,number_system,date_format,text_direction,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout,lock_failed_attempts,onboarding_completed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.number_system,profile.date_format,profile.text_direction,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,profileComplete(profile)?1:0).run(); }
     catch (insertError) {
       const existing=await db.prepare("SELECT id FROM users WHERE email=? LIMIT 1").bind(email).first();
       if(existing) return fail("برای این ایمیل حسابی وجود دارد. از ورود یا ورود با Google استفاده کن.",409);
@@ -336,7 +343,7 @@ export default {
       }
     }
     const session = await createSession(db,id);
-    return json({ token:session.token, expiresAt:session.expiresAt, user:{id,email,displayName,xp:0,gamesPlayed:0,role:email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile:{first_name:profile.first_name,last_name:profile.last_name,country:profile.country,currency:profile.currency,calendar:profile.calendar,number_format:profile.number_format,week_start:profile.week_start,language:profile.language,account_type:profile.account_type,app_lock_type:profile.app_lock_type,app_lock_timeout:profile.app_lock_timeout,onboardingCompleted:profileComplete(profile)}}, emailVerificationRequired:env.REQUIRE_EMAIL_VERIFICATION==="true", verificationSent, message:verificationSent?"لینک تأیید ارسال شد.":"حساب ساخته شد؛ تنظیمات ارسال ایمیل هنوز لازم است." },201);
+    return json({ token:session.token, expiresAt:session.expiresAt, user:{id,email,displayName,xp:0,gamesPlayed:0,role:email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile:{first_name:profile.first_name,last_name:profile.last_name,country:profile.country,currency:profile.currency,calendar:profile.calendar,number_format:profile.number_format,number_system:profile.number_system,date_format:profile.date_format,text_direction:profile.text_direction,week_start:profile.week_start,language:profile.language,account_type:profile.account_type,app_lock_type:profile.app_lock_type,app_lock_timeout:profile.app_lock_timeout,onboardingCompleted:profileComplete(profile)}}, emailVerificationRequired:env.REQUIRE_EMAIL_VERIFICATION==="true", verificationSent, message:verificationSent?"لینک تأیید ارسال شد.":"حساب ساخته شد؛ تنظیمات ارسال ایمیل هنوز لازم است." },201);
    }
 
    if (path === "/auth/verify-email" && request.method === "POST") {
@@ -524,8 +531,9 @@ export default {
       const current = {
         first_name:user.first_name||"", last_name:user.last_name||"", country:user.country||"US",
         currency:user.currency||"USD", calendar:user.calendar||"gregory",
-        number_format:user.number_format||"1,234.56", week_start:user.week_start||"monday",
-        language:user.language||"en", account_type:user.account_type||"personal",
+        number_format:user.number_format||"1,234.56", number_system:user.number_system||"latn",
+        date_format:user.date_format||"YYYY-MM-DD", text_direction:user.text_direction||"ltr",
+        week_start:user.week_start||"monday", language:user.language||"en", account_type:user.account_type||"personal",
         app_lock_type:user.app_lock_type||"none", app_lock_hash:user.app_lock_hash||null,
         app_lock_timeout:Number(user.app_lock_timeout??300)
       };
@@ -535,8 +543,8 @@ export default {
       const legacyName=Object.prototype.hasOwnProperty.call(body,"name")?cleanName(body.name):"";
       const displayName=[profile.first_name,profile.last_name].filter(Boolean).join(" ") || legacyName || user.display_name;
       const completed=profileComplete(profile) ? 1 : 0;
-      await db.prepare("UPDATE users SET display_name=?,first_name=?,last_name=?,country=?,currency=?,calendar=?,number_format=?,week_start=?,language=?,account_type=?,app_lock_type=?,app_lock_hash=?,app_lock_timeout=?,onboarding_completed=? WHERE id=?")
-        .bind(displayName,profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,completed,user.id).run();
+      await db.prepare("UPDATE users SET display_name=?,first_name=?,last_name=?,country=?,currency=?,calendar=?,number_format=?,number_system=?,date_format=?,text_direction=?,week_start=?,language=?,account_type=?,app_lock_type=?,app_lock_hash=?,app_lock_timeout=?,onboarding_completed=? WHERE id=?")
+        .bind(displayName,profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.number_system,profile.date_format,profile.text_direction,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,completed,user.id).run();
       return json({ok:true,name:displayName,profile:{...profile,app_lock_hash:undefined,onboardingCompleted:completed===1}});
     }
     if (path === "/auth/logout" && request.method === "POST") {
