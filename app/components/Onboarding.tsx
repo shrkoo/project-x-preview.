@@ -178,7 +178,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           const savedPrefs=(()=>{try{return JSON.parse(localStorage.getItem("novyra-preferences-v1")||"{}");}catch{return {};}})();
           const selectedCountry=countries.find(item=>item.code===savedCountry);
           setCountryCode(savedCountry);
-          setAccountType((localStorage.getItem("projectx-account-type") as "personal"|"business"|null) || data.user.profile?.accountType || "personal");
+          setAccountType(data.user.profile?.accountType || (localStorage.getItem("projectx-account-type") as "personal"|"business"|null) || "personal");
           setRegional({
             currency:localStorage.getItem("novyra-finance-currency") || data.user.profile?.currency || selectedCountry?.defaultCurrency || "USD",
             calendar:savedPrefs.calendar || data.user.profile?.calendar || selectedCountry?.defaultCalendar || "gregory",
