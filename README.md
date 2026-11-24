@@ -47,10 +47,10 @@ Reusable components include Button, Input, Card, StepProgress, CountrySelect, Pi
 ## Important integration boundaries
 - Email/password registration and login use the existing Cloudflare Worker routes. The Worker remains the authentication authority.
 - Google sign-in is intentionally a placeholder until OAuth client credentials, callback URLs and provider configuration are set. The button displays a localized setup notice; OAuth is not active.
-- Company name is currently retained on the device during onboarding. The current Worker profile schema does not persist a company/workspace record; add a D1 migration and authenticated API contract before relying on it across devices.
+- Company name is persisted in an owner-scoped Business workspace in the preview D1 database. Each account has at most one Personal and one Business workspace.
 - PIN and pattern secrets are device-local app-lock settings, not account passwords. Biometric setup requires a secure context and a platform authenticator.
-- The current finance UI persists transaction and preference data in browser local storage. Before production multi-device bookkeeping, move financial records to authenticated, workspace-scoped Worker/D1 tables and enforce workspace ownership server-side. A client-side mode switch alone is not a security boundary.
-- Dashboard figures are demonstration values until real financial records are connected.
+- Finance transactions are synchronized through authenticated, workspace-scoped Worker/D1 endpoints; local storage is used as an offline cache. The Worker verifies workspace ownership before reading or replacing transaction data.
+- Empty-state dashboard figures are illustrative until the user records real transactions. The app must not present them as bank-linked balances.
 
 ## Safety and deployment assumptions
 - This branch is a preview implementation; it does not change the production branch or production database.
