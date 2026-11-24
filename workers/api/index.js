@@ -384,7 +384,7 @@ export default {
     if(env.REQUIRE_EMAIL_VERIFICATION==="true" && !user.verified_at) return fail("ابتدا ایمیل خود را تأیید کن.",403);
     if (!/^[a-f0-9]{64}$/.test(suppliedHash) || suppliedHash !== user.password_hash) return fail("ایمیل یا رمز عبور اشتباه است.",401);
     const session = await createSession(db,user.id);
-    return json({ token:session.token, expiresAt:session.expiresAt, user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role} });
+    return json({ token:session.token, expiresAt:session.expiresAt, user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role,profile:publicProfile(user)} });
    }
 
    const wsMatch=path.match(/^\/rooms\/([A-Z0-9]+)\/live$/);
