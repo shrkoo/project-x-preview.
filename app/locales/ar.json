@@ -61,5 +61,13 @@
   "overview": "نظرة عامة",
   "recent": "النشاط الأخير",
   "profile": "الملف الشخصي",
-  "createBusiness": "إضافة مساحة أعمال"
+  "createBusiness": "إضافة مساحة أعمال",
+  "getStarted": "ابدأ الآن",
+  "financialClarity": "وضوح مالي بتجربة جديدة",
+  "language": "اللغة",
+  "hidePassword": "إخفاء كلمة المرور",
+  "showPassword": "إظهار كلمة المرور",
+  "dismiss": "إغلاق",
+  "timeout": "انتهت مهلة الطلب. حاول مجدداً.",
+  "noResults": "لا توجد نتائج"
 }
