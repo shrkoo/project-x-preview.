@@ -15,8 +15,8 @@ See the root README for setup, validation and Cloudflare Pages deployment instru
 ## Integration boundaries
 - Email/password registration and login use the existing Worker routes.
 - Google sign-in is a localized placeholder until OAuth is configured.
-- Company name is device-local; the current Worker schema has no company/workspace persistence field.
-- The finance UI currently stores data in browser local storage. Multi-device business bookkeeping requires workspace-scoped D1 tables and server-side authorization.
+- Company name is persisted in the Business workspace in the isolated preview D1 database.
+- Finance transactions sync to workspace-scoped D1 tables through authenticated Worker routes; local storage is an offline cache.
 - Demo dashboard figures are placeholders, not account balances.
 
 ## Local validation
