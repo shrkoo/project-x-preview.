@@ -3,14 +3,14 @@ import {useEffect,useMemo,useState,type FormEvent} from "react";
 import {Activity,ArrowDownLeft,ArrowUpRight,QrCode,Home,CalendarClock,ChartNoAxesCombined,ChartLine,Download,LayoutDashboard,LogOut,Plus,Search,Settings,ShieldCheck,Sparkles,Wallet,X,Sun,Moon,Bell,Eye,EyeOff,Target,ChevronRight,ArrowRight,TrendingUp,TrendingDown,User,ArrowLeft} from "lucide-react";
 import {apiRequest,clearSession} from "../lib/api";
 const USE_LATIN_DIGITS = false;
+const THOUSANDS_SEPARATOR = "\u066C";
 const fmt=(n:number,digits:"fa"|"en"="fa")=>{
  const value=Number.isFinite(n)?Math.round(Math.abs(n)*100)/100:0;
  const [whole,decimal]=String(value).split(".");
- const grouped=whole.replace(/\B(?=(\d{3})+(?!\d))/g,"٬");
+ const grouped=whole.replace(/\B(?=(\d{3})+(?!\d))/g,THOUSANDS_SEPARATOR);
  const persian=(grouped+(decimal?"٫"+decimal:"")).replace(/[0-9]/g,d=>"۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
  return (n<0?"−":"")+persian;
 };
-const faNumber=(n:number,digits:"fa"|"en"="fa")=>fmt(n,digits);
 function rng(seed:number){let s=seed;return()=>(s=(s*16807)%2147483647)/2147483647}
 function makeSeries(kind:"rising"|"plateau"|"falling",seed:number,n=40){const r=rng(seed),out:number[]=[];for(let i=0;i<n;i++){const t=i/(n-1);let b;if(kind==="rising")b=0.2+0.75*Math.pow(t,1.5);else if(kind==="plateau")b=0.55+0.22*Math.sin(t*6.5)+0.1*Math.sin(t*17);else b=0.72-0.3*t+0.16*Math.sin(t*9);out.push(Math.max(0.14,Math.min(1,b+(r()-0.5)*0.2)))}return out}
 type Language="fa"|"en"|"ar"|"ku";
@@ -28,7 +28,6 @@ ku:{overview:"پوختە",transactions:"مامەڵەکان",accounts:"هەژما
 };
 const today=()=>new Date().toISOString().slice(0,10);
 
-const dashboardCash=(n:number,digits:"fa"|"en"="fa")=><bdi dir="ltr">{fmt(n,digits)} ریال</bdi>;
 function categoryBarHeights(values:number[],hasData:boolean,seed:number=0){const count=40;const phase=seed*.71;const wave=Array.from({length:count},(_,i)=>.53+.20*Math.sin(i*.31+phase)+.13*Math.sin(i*.13+phase*1.7)+.09*Math.cos(i*.57+phase*.6)+.045*Math.sin(i*.91+phase*2));if(!hasData)return Array(count).fill(4);const src=values.length?values:[0];const sampled=Array.from({length:count},(_,i)=>{const p=i*(src.length-1)/(count-1),lo=Math.floor(p),hi=Math.min(src.length-1,Math.ceil(p)),t=p-lo;return (src[lo]||0)*(1-t)+(src[hi]||0)*t});const smoothed=sampled.map((_,i)=>{const at=(j:number)=>sampled[Math.max(0,Math.min(count-1,j))];return (at(i-2)+2*at(i-1)+3*at(i)+2*at(i+1)+at(i+2))/9});const min=Math.min(...smoothed),max=Math.max(...smoothed);return smoothed.map((v,i)=>{const base=max===min?96:52+((v-min)/(max-min))*88;return Math.max(42,Math.min(140,base*(1+.055*Math.sin(i*.37+phase)+.025*Math.cos(i*.19+phase*1.7))))})}
 const cash=(n:number,c:string,l:string,digits:"fa"|"en"="en")=><bdi dir="ltr">{fmt(n,digits)} {c==="IRR"?"ریال":c}</bdi>;
 function smoothWavePath(values:number[]){if(!values.length)return "";const source=values.map(v=>Math.max(0,v));const smoothed=source.map((_,i)=>{const at=(j:number)=>source[Math.max(0,Math.min(source.length-1,j))];return (at(i-2)+2*at(i-1)+3*at(i)+2*at(i+1)+at(i+2))/9});const count=Math.min(10,smoothed.length);const sampled=Array.from({length:count},(_,i)=>{const pos=i*(smoothed.length-1)/Math.max(1,count-1),lo=Math.floor(pos),hi=Math.ceil(pos),mix=pos-lo;return smoothed[lo]*(1-mix)+smoothed[hi]*mix});const max=Math.max(...sampled,1);const pts=sampled.map((v,i)=>({x:2+i*96/Math.max(1,sampled.length-1),y:27-Math.sqrt(v/max)*21}));if(pts.length===1)return `M ${pts[0].x} ${pts[0].y}`;let d=`M ${pts[0].x} ${pts[0].y}`;for(let i=0;i<pts.length-1;i++){const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)],dx=p2.x-p1.x;const tension=.72,c1x=p1.x+dx*tension/3,c1y=p1.y+(p2.y-p0.y)*tension/6,c2x=p2.x-dx*tension/3,c2y=p2.y-(p3.y-p1.y)*tension/6;d+=` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`}return d}
@@ -68,7 +67,7 @@ return <main className={"nv-finance "+(tab==="overview"?"nv-home-active home-scr
   <div>
    <small>موجودی کل</small>
    <div className="nv-ref-balance-value-row"><strong className="home-balance-value hm-balance-amount">{showBalance?<><bdi dir="ltr">{fmt(homeDemoMode?45764960:balance)}</bdi><small className="hm-balance-currency"> ریال</small></>:"••••••"}</strong><button className="nv-ref-eye hm-eye" onClick={()=>setShowBalance(v=>!v)} aria-label={showBalance?"مخفی کردن موجودی":"نمایش موجودی"}>{showBalance?<EyeOff size={22}/>:<Eye size={22}/>}</button></div>
-   {(homeDemoMode?954230:mi-me)>0&&<div className="nv-ref-net-row"><span className="nv-ref-net-chip home-saving-badge hm-saving-chip"><svg className="hm-saving-trend-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg><span>{dashboardCash(homeDemoMode?954230:mi-me,"fa")}</span></span><span className="nv-ref-cheer-text hm-cheer-text">آفرین! این ماه پس‌انداز کردی</span></div>}
+   {(homeDemoMode?954230:mi-me)>0&&<div className="nv-ref-net-row"><span className="nv-ref-net-chip home-saving-badge hm-saving-chip"><svg className="hm-saving-trend-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg><span><bdi dir="ltr">{fmt(homeDemoMode?954230:mi-me,"fa")} ریال</bdi></span></span><span className="nv-ref-cheer-text hm-cheer-text">آفرین! این ماه پس‌انداز کردی</span></div>}
   </div>
  </div>
  <div className="nv-ref-actions">

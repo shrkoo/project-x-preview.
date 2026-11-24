@@ -4217,7 +4217,7 @@
 .nv-finance .home-root .hm-balance-amount {
   display:inline-flex!important; align-items:baseline!important; flex-wrap:nowrap!important;
   white-space:nowrap!important; gap:6px!important; color:#0F172A!important;
-  font-size:36px!important; font-weight:800!important; line-height:1.15!important;
+  font-size:36px!important; font-weight:800!important; line-height:1.1!important;
 }
 .nv-finance .home-root .hm-balance-amount>bdi {
   white-space:nowrap!important; font-size:inherit!important; font-weight:inherit!important; color:inherit!important;
@@ -4280,3 +4280,32 @@
 .nv-finance .home-root .hm-category-status { text-align:center!important; }
 .nv-finance .home-root { padding-bottom:calc(16px + env(safe-area-inset-bottom))!important; }
 .nv-finance .home-root .nv-ref-category-grid { margin-bottom:16px!important; }
+
+
+/* PART 1 follow-up — enforce Home balance and eye sizing above legacy selectors */
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .hm-balance-amount,
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .hm-balance-amount>bdi {
+  font-size:36px!important;
+  font-weight:800!important;
+  line-height:1.1!important;
+}
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .hm-eye {
+  display:inline-flex!important;
+  flex:0 0 44px!important;
+  width:44px!important;
+  min-width:44px!important;
+  height:44px!important;
+  min-height:44px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  appearance:none!important;
+  color:#334155!important;
+}
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root .hm-eye svg {
+  width:22px!important;
+  height:22px!important;
+  stroke:currentColor!important;
+}
