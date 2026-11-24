@@ -64,7 +64,10 @@ export function formatMoney(value: number, prefs: RegionalPreferences, options: 
 export function formatDate(value: Date | string | number, prefs: RegionalPreferences, options: Intl.DateTimeFormatOptions = {}): string {
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) throw new RangeError("Invalid date");
-  return new Intl.DateTimeFormat(localeForPreferences(prefs), { year: "numeric", month: "short", day: "numeric", ...options }).format(date);
+  const formatter = new Intl.DateTimeFormat(localeForPreferences(prefs), { year: "numeric", month: "2-digit", day: "2-digit", ...options });
+  const parts = Object.fromEntries(formatter.formatToParts(date).map(part => [part.type, part.value]));
+  const pattern = prefs.dateFormat || "YYYY-MM-DD";
+  return pattern.replace(/YYYY|MM|DD/g, token => token === "YYYY" ? (parts.year || "") : token === "MM" ? (parts.month || "") : (parts.day || ""));
 }
 
 export function weekStart(value: Date | string | number, firstDay: RegionalPreferences["firstDay"]): Date {
