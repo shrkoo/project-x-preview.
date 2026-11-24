@@ -195,7 +195,7 @@ function normalizeProfile(input = {}, current = PROFILE_DEFAULTS) {
   if (!calendarCodes.has(calendar)) return { error: "تقویم انتخاب‌شده پشتیبانی نمی‌شود." };
   if (!numberFormatCodes.has(number_format)) return { error: "قالب نمایش اعداد با کشور انتخاب‌شده سازگار نیست." };
   if (!PROFILE_ENUMS.week_start.has(week_start)) return { error: "روز شروع هفته معتبر نیست." };
-  if (!/^[a-z]{2}$/.test(language) || !languageCodes.has(language)) return { error: "زبان انتخاب‌شده در فهرست ISO 639-1 وجود ندارد." };
+  if (!/^[a-z]{2,3}$/.test(language) || !languageCodes.has(language)) return { error: "زبان انتخاب‌شده در فهرست ISO 639-1/639-3 وجود ندارد." };
   if (!PROFILE_ENUMS.account_type.has(account_type)) return { error: "نوع حساب باید شخصی یا تجاری باشد." };
   if (!PROFILE_ENUMS.app_lock_type.has(app_lock_type)) return { error: "نوع قفل برنامه معتبر نیست." };
   if (app_lock_hash !== null && !/^[a-f0-9]{64}$/i.test(app_lock_hash)) return { error: "مقدار رمز قفل معتبر نیست." };
