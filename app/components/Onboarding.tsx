@@ -175,7 +175,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
   useEffect(() => {
     const storedLanguage = localStorage.getItem("projectx-language");
     const saved = (storedLanguage === "ku" ? "ckb" : storedLanguage) as Language | null;
-    if (storedLanguage === "ku") localStorage.setItem("projectx-language", "ckb");
+    if (storedLanguage === "ku") { localStorage.setItem("projectx-language-legacy", "ku"); localStorage.setItem("projectx-language", "ckb"); }
     const savedCountry = localStorage.getItem("projectx-country") || "IR";
     const savedPrefs = (() => { try { return JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}"); } catch { return {}; } })();
     const selectedCountry = countries.find(item => item.code === savedCountry);
@@ -227,7 +227,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     finally { setBusy(false); }
   }
 
-  function chooseLanguage(next: Language) { setLanguage(next); setDirectionOverride(null); }
+  function chooseLanguage(next: Language) { setLanguage(next); setDirectionOverride(null); document.documentElement.lang=next; document.documentElement.dir=languageByCode.get(next)?.rtl?"rtl":"ltr"; }
   function getDateFormat(locale: string, country: string) {
     if (country === "IR") return "YYYY/MM/DD";
     const parts = new Intl.DateTimeFormat(locale || "en", { year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(2025, 10, 24));
@@ -248,15 +248,6 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       weekStart: selected.weekStart
     };
     setRegional(nextRegional);
-    localStorage.setItem("projectx-country", nextCode);
-    localStorage.setItem("projectx-language", nextLanguage);
-    localStorage.setItem("novyra-finance-currency", nextRegional.currency);
-    localStorage.setItem("novyra-date-format", nextRegional.dateFormat);
-    const previous = (() => { try { return JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}"); } catch { return {}; } })();
-    localStorage.setItem("novyra-preferences-v1", JSON.stringify({
-      ...previous, country: nextCode, calendar: nextRegional.calendar, digits: nextRegional.digits,
-      firstDay: nextRegional.weekStart, dateFormat: nextRegional.dateFormat
-    }));
     document.documentElement.lang = nextLanguage;
     document.documentElement.dir = languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr";
   }
