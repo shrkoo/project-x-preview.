@@ -33,11 +33,12 @@ jobs:
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PREVIEW_D1_DATABASE_ID: ${{ vars.PREVIEW_D1_DATABASE_ID }}
+          PRODUCTION_D1_DATABASE_ID: ${{ vars.PRODUCTION_D1_DATABASE_ID }}
           PREVIEW_R2_BUCKET_NAME: ${{ vars.PREVIEW_R2_BUCKET_NAME }}
           PREVIEW_WORKER_URL: https://novyra-api-preview.${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}.workers.dev
           PREVIEW_EMAIL_FROM: ${{ vars.PREVIEW_EMAIL_FROM }}
         run: |
-          node -e "const fs=require('fs');let p=fs.readFileSync('workers/api/wrangler.preview.toml','utf8');for(const [k,v] of Object.entries({__PREVIEW_ACCOUNT_ID__:process.env.CLOUDFLARE_ACCOUNT_ID,__PREVIEW_D1_DATABASE_ID__:process.env.PREVIEW_D1_DATABASE_ID,__PREVIEW_R2_BUCKET_NAME__:process.env.PREVIEW_R2_BUCKET_NAME,__PREVIEW_WORKER_URL__:process.env.PREVIEW_WORKER_URL,__PREVIEW_EMAIL_FROM__:process.env.PREVIEW_EMAIL_FROM})){if(!v)throw new Error('Missing '+k);p=p.replaceAll(k,v)}fs.writeFileSync('workers/api/wrangler.preview.toml',p)"
+          node -e "const fs=require('fs');if(!process.env.PRODUCTION_D1_DATABASE_ID)throw new Error('Set PRODUCTION_D1_DATABASE_ID as a safety guard');if(process.env.PREVIEW_D1_DATABASE_ID===process.env.PRODUCTION_D1_DATABASE_ID)throw new Error('Refusing to run migrations: preview D1 ID equals production D1 ID');let p=fs.readFileSync('workers/api/wrangler.preview.toml','utf8');for(const [k,v] of Object.entries({__PREVIEW_ACCOUNT_ID__:process.env.CLOUDFLARE_ACCOUNT_ID,__PREVIEW_D1_DATABASE_ID__:process.env.PREVIEW_D1_DATABASE_ID,__PREVIEW_R2_BUCKET_NAME__:process.env.PREVIEW_R2_BUCKET_NAME,__PREVIEW_WORKER_URL__:process.env.PREVIEW_WORKER_URL,__PREVIEW_EMAIL_FROM__:process.env.PREVIEW_EMAIL_FROM})){if(!v)throw new Error('Missing '+k);p=p.replaceAll(k,v)}fs.writeFileSync('workers/api/wrangler.preview.toml',p)"
 
       - name: Apply migrations to PREVIEW D1 only
         working-directory: workers/api
