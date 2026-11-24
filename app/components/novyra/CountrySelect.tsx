@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect,useMemo,useRef,useState} from "react";
+import {useEffect,useMemo,useRef,useState,type KeyboardEvent} from "react";
 import {countries} from "../../data/countries";
 import type {Locale} from "./i18n";
 
@@ -22,7 +22,7 @@ export function CountrySelect({value,onChange,locale,label,placeholder}:Props){
  useEffect(()=>{if(open){setQuery("");setActive(0);requestAnimationFrame(()=>search.current?.focus());}},[open]);
  useEffect(()=>{function outside(e:PointerEvent){if(!root.current?.contains(e.target as Node))setOpen(false)};document.addEventListener("pointerdown",outside);return()=>document.removeEventListener("pointerdown",outside)},[]);
  function choose(code:string){onChange(code);setOpen(false);setQuery("");}
- function keyDown(e:React.KeyboardEvent){if(e.key==="ArrowDown"){e.preventDefault();setActive(v=>Math.min(v+1,items.length-1));}else if(e.key==="ArrowUp"){e.preventDefault();setActive(v=>Math.max(v-1,0));}else if(e.key==="Enter"&&open&&items[active]){e.preventDefault();choose(items[active].code)}else if(e.key==="Escape"){e.preventDefault();setOpen(false)}}
+ function keyDown(e:KeyboardEvent){if(e.key==="ArrowDown"){e.preventDefault();setActive(v=>Math.min(v+1,items.length-1));}else if(e.key==="ArrowUp"){e.preventDefault();setActive(v=>Math.max(v-1,0));}else if(e.key==="Enter"&&open&&items[active]){e.preventDefault();choose(items[active].code)}else if(e.key==="Escape"){e.preventDefault();setOpen(false)}}
  return <div className="nv-field nv-country-field" ref={root}>
   <span>{label}</span>
   <button type="button" className="nv-country-trigger" role="combobox" aria-label={label} aria-expanded={open} aria-controls={listId} aria-haspopup="listbox" onClick={()=>setOpen(v=>!v)} onKeyDown={keyDown}>
@@ -30,7 +30,7 @@ export function CountrySelect({value,onChange,locale,label,placeholder}:Props){
    <span className="nv-country-chevron" aria-hidden="true">⌄</span>
   </button>
   {open&&<div className="nv-country-popover" onKeyDown={keyDown}>
-   <input ref={search} className="nv-country-search" value={query} onChange={e=>{setQuery(e.target.value);setActive(0)}} placeholder={placeholder} role="searchbox" aria-label={placeholder} autoComplete="off" />
+   <input ref={search} className="nv-country-search" value={query} onChange={e=>{setQuery(e.target.value);setActive(0)}} placeholder={placeholder} role="searchbox" aria-label={placeholder} aria-activedescendant={items[active]?`nv-country-${items[active].code}`:undefined} autoComplete="off" />
    <ul id={listId} role="listbox" aria-label={label} className="nv-country-list">
     {items.length===0?<li className="nv-country-empty" role="option" aria-selected="false">{locale==="fa"?"نتیجه‌ای پیدا نشد":locale==="ar"?"لا توجد نتائج":locale==="tr"?"Sonuç bulunamadı":locale==="de"?"Keine Ergebnisse":"No results"}</li>:items.map((c,i)=><li key={c.code} id={`nv-country-${c.code}`} role="option" aria-selected={value===c.code} className={i===active?"active":""}><button type="button" onMouseEnter={()=>setActive(i)} onClick={()=>choose(c.code)}><span>{c.flag}</span><span>{c.localized}</span><small>{c.code}</small></button></li>)}
    </ul>
