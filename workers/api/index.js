@@ -328,7 +328,7 @@ export default {
       }
     }
     const session = await createSession(db,id);
-    return json({ token:session.token, expiresAt:session.expiresAt, user:{id,email,displayName,xp:0,gamesPlayed:0,role:email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile:{...profile,onboardingCompleted:profileComplete(profile)}}, emailVerificationRequired:env.REQUIRE_EMAIL_VERIFICATION==="true", verificationSent, message:verificationSent?"لینک تأیید ارسال شد.":"حساب ساخته شد؛ تنظیمات ارسال ایمیل هنوز لازم است." },201);
+    return json({ token:session.token, expiresAt:session.expiresAt, user:{id,email,displayName,xp:0,gamesPlayed:0,role:email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile:{first_name:profile.first_name,last_name:profile.last_name,country:profile.country,currency:profile.currency,calendar:profile.calendar,number_format:profile.number_format,week_start:profile.week_start,language:profile.language,account_type:profile.account_type,app_lock_type:profile.app_lock_type,app_lock_timeout:profile.app_lock_timeout,onboardingCompleted:profileComplete(profile)}}, emailVerificationRequired:env.REQUIRE_EMAIL_VERIFICATION==="true", verificationSent, message:verificationSent?"لینک تأیید ارسال شد.":"حساب ساخته شد؛ تنظیمات ارسال ایمیل هنوز لازم است." },201);
    }
 
    if (path === "/auth/verify-email" && request.method === "POST") {
