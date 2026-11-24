@@ -379,6 +379,9 @@ export default {
     if (displayName.length < 2) return fail("نام نمایشی باید حداقل ۲ حرف باشد.");
     if (!salt || salt.length < 16 || salt.length > 128) return fail("داده امنیتی نمک رمز از صفحه دریافت نشد؛ صفحه را تازه‌سازی کن.");
     if (!/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("خروجی رمز عبور از صفحه ناقص است؛ صفحه را تازه‌سازی کن.");
+    const ip=request.headers.get("CF-Connecting-IP")||"unknown";
+    if(!await hitAuthLimit(db,"register:"+ip,5,3600000))return fail("Too many registration attempts. Try again later.",429);
+    if(!await verifyTurnstile(body?.turnstileToken,request,env))return fail("Complete the security check.",403);
     const id = crypto.randomUUID(), hash = suppliedHash;
     try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,first_name,last_name,country,currency,calendar,number_format,number_system,date_format,text_direction,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout,lock_failed_attempts,onboarding_completed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.number_system,profile.date_format,profile.text_direction,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,profileComplete(profile)?1:0).run(); }
     catch (insertError) {
@@ -391,9 +394,6 @@ export default {
     const initialWorkspaceType=profile.account_type;
     const initialWorkspaceName=initialWorkspaceType==="business"?String(body?.companyName||"").trim().replace(/[<>]/g,"").slice(0,100)||"Business":"Personal";
     await db.prepare("INSERT INTO workspaces (id,owner_id,type,name,currency) VALUES (?,?,?,?,?)").bind(initialWorkspaceId,id,initialWorkspaceType,initialWorkspaceName,profile.currency).run();
-    const ip=request.headers.get("CF-Connecting-IP")||"unknown";
-    if(!await hitAuthLimit(db,"register:"+ip,5,3600000))return fail("Too many registration attempts. Try again later.",429);
-    if(!await verifyTurnstile(body?.turnstileToken,request,env))return fail("Complete the security check.",403);
     if(!hasMailProvider(env)){await db.prepare("DELETE FROM users WHERE id=?").bind(id).run();return fail("Email delivery is not configured.",503);}
     try{
       const code=await createSignupCode(db,id);
