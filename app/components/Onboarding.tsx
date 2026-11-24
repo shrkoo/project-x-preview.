@@ -121,6 +121,7 @@ function EyeMark({ visible }: { visible: boolean }) {
 
 export default function Onboarding({ onComplete, initialNotice }: Props) {
   const [language, setLanguage] = useState<Language>("fa");
+  const [directionOverride,setDirectionOverride] = useState<"rtl"|"ltr"|null>(null);
   const [countryCode, setCountryCode] = useState("IR");
   const [countrySearch, setCountrySearch] = useState("");
   const [regional, setRegional] = useState({ currency: "IRR", calendar: "persian", digits: "arabext", dateFormat: "YYYY/MM/DD", weekStart: "saturday" as "saturday" | "sunday" | "monday" });
@@ -147,7 +148,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
   const [resetTokenMode, setResetTokenMode] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const t = (key: string) => flowCopy[language]?.[key] || flowCopy.en?.[key] || copy[language]?.[key] || copy.en?.[key] || key;
-  const dir = languageByCode.get(language)?.rtl ? "rtl" : "ltr";
+  const dir = directionOverride || (languageByCode.get(language)?.rtl ? "rtl" : "ltr");
   const translationAvailable = Boolean(copy[language]);
 
   useEffect(() => { if (initialNotice) setNotice(initialNotice); }, [initialNotice]);
@@ -179,6 +180,8 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     const savedPrefs = (() => { try { return JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}"); } catch { return {}; } })();
     const selectedCountry = countries.find(item => item.code === savedCountry);
     if (saved && languageByCode.has(saved)) setLanguage(saved);
+    const savedDirection=localStorage.getItem("novyra-text-direction");
+    if(savedDirection==="rtl"||savedDirection==="ltr")setDirectionOverride(savedDirection);
     setCountryCode(savedCountry);
     if (selectedCountry) {
       setRegional({
@@ -224,9 +227,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     finally { setBusy(false); }
   }
 
-  function chooseLanguage(next: Language) {
-    setLanguage(next);
-  }
+  function chooseLanguage(next: Language) { setLanguage(next); setDirectionOverride(null); }
   function getDateFormat(locale: string, country: string) {
     if (country === "IR") return "YYYY/MM/DD";
     const parts = new Intl.DateTimeFormat(locale || "en", { year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(2025, 10, 24));
@@ -238,6 +239,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     const nextLanguage = languageByCode.has(selected.defaultLanguage) ? selected.defaultLanguage as Language : "en";
     setCountryCode(nextCode);
     setLanguage(nextLanguage);
+    setDirectionOverride(null);
     const nextRegional = {
       currency: selected.defaultCurrency || "USD",
       calendar: selected.defaultCalendar,
@@ -261,6 +263,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
   function persistRegionalPreferences() {
     localStorage.setItem("projectx-country", countryCode);
     localStorage.setItem("projectx-language", language);
+    if(directionOverride)localStorage.setItem("novyra-text-direction",directionOverride);else localStorage.removeItem("novyra-text-direction");
     localStorage.setItem("novyra-finance-currency", regional.currency);
     localStorage.setItem("novyra-date-format", regional.dateFormat);
     const previous = (() => { try { return JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}"); } catch { return {}; } })();
@@ -470,7 +473,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <div style={{marginTop:16,padding:14,borderRadius:14,border:"1px solid rgba(120,130,150,.24)",background:"rgba(255,255,255,.42)",display:"grid",gap:10}}>
             <strong>{language === "fa" ? "پیش‌نمایش تنظیمات" : "Editable preferences preview"}</strong>
             <label>{t("language")} <select value={language} onChange={e=>chooseLanguage(e.target.value as Language)} style={{width:"100%"}}>{languages.map(item=><option key={item.code} value={item.code}>{item.nativeName} · {item.name}</option>)}</select></label>
-            <div>{t("direction")}: <b>{dir.toUpperCase()}</b></div>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}><span>{t("direction")}: <b>{dir.toUpperCase()}</b></span><button type="button" onClick={()=>setDirectionOverride(dir==="rtl"?"ltr":"rtl")} aria-label={t("direction")}>RTL ↔ LTR</button></div>
             {!translationAvailable && <small role="status">Translation not available yet — English fallback is active.</small>}
             <label>{t("currency")} <select value={regional.currency} onChange={e=>setRegional(v=>({...v,currency:e.target.value}))} style={{width:"100%"}}>{currencies.map(item=><option key={item.code} value={item.code}>{item.code} — {item.name}</option>)}</select></label>
             <label>{t("calendar")} <select value={regional.calendar} onChange={e=>setRegional(v=>({...v,calendar:e.target.value}))} style={{width:"100%"}}>{calendars.map(item=><option key={item.code} value={item.code}>{item.name}</option>)}</select></label>
