@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Onboarding from "./components/Onboarding";
+import NovyraSignupFlow from "./components/NovyraSignupFlow";
 import NovyraLuxuryApp from "./components/NovyraLuxuryApp";
 import { apiRequest, clearSession, derivePasswordHash } from "./lib/api";
 import { languages, languageByCode } from "./data/languages";
@@ -146,7 +146,7 @@ export default function Home() {
 
   if (!startupReady) return <main className="social-startup" aria-label="NOVYRA"><span className="social-startup-mark">N</span><span>NOVYRA</span></main>;
 
-  if (!account) return <Onboarding onComplete={completeOnboarding} initialNotice={notice} />;
+  if (!account) return <NovyraSignupFlow onComplete={completeOnboarding} initialNotice={notice} />;
 
   return <NovyraLuxuryApp
     account={account}
