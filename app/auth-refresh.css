@@ -69,7 +69,7 @@
 .px-signup-one-page .px-signup-preferences{display:grid;gap:12px;padding:14px;border:1px solid rgba(120,130,150,.24);border-radius:14px;background:rgba(255,255,255,.42)}
 .px-signup-one-page .px-signup-preferences label{display:grid;gap:6px}
 .px-signup-one-page .px-signup-preferences select{width:100%;min-height:44px}
-.px-signup-one-page .px-country-list-inline{max-height:260px;overflow-y:auto;overscroll-behavior:contain}
+.px-signup-one-page .px-country-list-inline{max-height:none;overflow:visible;overscroll-behavior:auto}
 .px-onboarding:has(.px-signup-one-page){min-height:100dvh;height:auto;overflow-y:auto;overflow-x:hidden}
 .px-onboarding:has(.px-signup-one-page) .px-onboarding-stage{min-height:0;overflow:visible;align-items:start;padding-bottom:28px}
 .px-onboarding:has(.px-signup-one-page) .px-signup-one-page>.px-primary-action{position:sticky;bottom:max(12px,env(safe-area-inset-bottom));z-index:5;box-shadow:0 8px 28px rgba(20,55,100,.2)}
