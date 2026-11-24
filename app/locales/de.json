@@ -69,5 +69,12 @@
   "showPassword": "Passwort anzeigen",
   "dismiss": "Schließen",
   "timeout": "Zeitüberschreitung. Bitte erneut versuchen.",
-  "noResults": "Keine Ergebnisse"
+  "noResults": "Keine Ergebnisse",
+  "verificationSent": "Ein 6-stelliger Bestätigungscode wurde an Ihre E-Mail gesendet.",
+  "verificationCode": "Bestätigungscode",
+  "verifyCode": "E-Mail bestätigen",
+  "resendCode": "Code erneut senden",
+  "codeInvalid": "Bitte den 6-stelligen Code eingeben.",
+  "codeResent": "Falls das Konto noch nicht bestätigt ist, wird ein neuer Code gesendet.",
+  "captchaSetup": "Für die Sicherheitsprüfung ist der öffentliche Turnstile-Site-Key erforderlich."
 }
