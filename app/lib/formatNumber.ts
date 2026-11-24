@@ -10,7 +10,7 @@ const PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
 const GROUP_SEPARATOR = ",";
 const PERSIAN_DECIMAL_SEPARATOR = "٫";
 
-/** The single number formatter used throughout NOVYRA. Persian output always uses U+066C and U+066B. */
+/** The single number formatter used throughout NOVYRA. Persian output uses U+002C for grouping and U+066B for decimals. */
 export function formatNumber(input: number, options: NumberFormatOptions = {}): string {
   const digits = options.digits ?? "fa";
   const finite = Number.isFinite(input) ? input : 0;
