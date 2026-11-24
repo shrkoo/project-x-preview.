@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS users (
   avatar_url TEXT,
   bio TEXT,
   verified_at TEXT,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  first_name TEXT NOT NULL DEFAULT '', last_name TEXT NOT NULL DEFAULT '', country TEXT NOT NULL DEFAULT 'US', currency TEXT NOT NULL DEFAULT 'USD', calendar TEXT NOT NULL DEFAULT 'gregory', number_format TEXT NOT NULL DEFAULT '1,234.56', number_system TEXT NOT NULL DEFAULT 'latn', date_format TEXT NOT NULL DEFAULT 'YYYY-MM-DD', text_direction TEXT NOT NULL DEFAULT 'ltr', week_start TEXT NOT NULL DEFAULT 'monday', language TEXT NOT NULL DEFAULT 'en', account_type TEXT NOT NULL DEFAULT 'personal', app_lock_type TEXT NOT NULL DEFAULT 'none', app_lock_hash TEXT, app_lock_timeout INTEGER NOT NULL DEFAULT 300, lock_failed_attempts INTEGER NOT NULL DEFAULT 0, onboarding_completed INTEGER NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS sessions (
   token_hash TEXT PRIMARY KEY,
