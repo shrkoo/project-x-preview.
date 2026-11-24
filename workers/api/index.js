@@ -186,8 +186,8 @@ function normalizeProfile(input = {}, current = PROFILE_DEFAULTS) {
   const app_lock_timeout = Number(rawTimeout);
   const hasFirstName = Object.prototype.hasOwnProperty.call(input,"first_name") || Object.prototype.hasOwnProperty.call(input,"firstName");
   const hasLastName = Object.prototype.hasOwnProperty.call(input,"last_name") || Object.prototype.hasOwnProperty.call(input,"lastName");
-  if ((hasFirstName && (!first_name || first_name.length > 60 || /[\\u0000-\\u001F\\u007F]/.test(first_name))) ||
-      (hasLastName && (!last_name || last_name.length > 60 || /[\\u0000-\\u001F\\u007F]/.test(last_name)))) {
+  if ((hasFirstName && (!first_name || first_name.length > 60 || /[\u0000-\u001F\u007F]/.test(first_name))) ||
+      (hasLastName && (!last_name || last_name.length > 60 || /[\u0000-\u001F\u007F]/.test(last_name)))) {
     return { error: "نام و نام خانوادگی باید بین ۱ تا ۶۰ نویسه معتبر باشند." };
   }
   if (!countryCodes.has(country)) return { error: "کشور انتخاب‌شده در فهرست ISO 3166-1 وجود ندارد." };
