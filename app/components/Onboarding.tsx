@@ -208,8 +208,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     const savedPrefs = (() => { try { return JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}"); } catch { return {}; } })();
     const selectedCountry = countries.find(item => item.code === savedCountry);
     if (saved && languageByCode.has(saved)) setLanguage(saved);
-    const savedDirection=localStorage.getItem("novyra-text-direction");
-    if(savedDirection==="rtl"||savedDirection==="ltr")setDirectionOverride(savedDirection);
+    localStorage.removeItem("novyra-text-direction");
     setCountryCode(savedCountry);
     if (selectedCountry) {
       setRegional({
