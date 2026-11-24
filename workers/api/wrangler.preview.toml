@@ -7,7 +7,7 @@ account_id = "__PREVIEW_ACCOUNT_ID__"
 [vars]
 APP_URL = "https://feature-homa-auth-part1.novyra-preview.pages.dev"
 REQUIRE_EMAIL_VERIFICATION = "false"
-EMAIL_FROM = "NOVYRA Preview <noreply@novyra.app>"
+EMAIL_FROM = "__PREVIEW_EMAIL_FROM__"
 GOOGLE_REDIRECT_URI = "__PREVIEW_WORKER_URL__/auth/google/callback"
 
 [[d1_databases]]
