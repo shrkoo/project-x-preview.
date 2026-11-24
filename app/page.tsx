@@ -76,9 +76,10 @@ export default function Home() {
     setLanguage(nextLanguage);
     localStorage.setItem("projectx-language", nextLanguage);
     document.documentElement.lang = nextLanguage;
-    localStorage.removeItem("novyra-text-direction");
-    setDirectionOverride(null);
-    document.documentElement.dir = languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr";
+    const savedDirection=localStorage.getItem("novyra-text-direction");
+    const direction=savedDirection==="rtl"||savedDirection==="ltr"?savedDirection:null;
+    setDirectionOverride(direction);
+    document.documentElement.dir = direction || (languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr");
     if (user) {
       setAccount(user);
       const deviceLock = localStorage.getItem("projectx-app-lock-type");
@@ -102,6 +103,8 @@ export default function Home() {
   function changeLanguage(nextLanguage: Language) {
     setLanguage(nextLanguage);
     localStorage.setItem("projectx-language", nextLanguage);
+    localStorage.removeItem("novyra-text-direction");
+    setDirectionOverride(null);
     document.documentElement.lang = nextLanguage;
     document.documentElement.dir = languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr";
   }
