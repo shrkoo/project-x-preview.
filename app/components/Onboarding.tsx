@@ -241,6 +241,8 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     setCountryCode(nextCode);
     setLanguage(nextLanguage);
     setDirectionOverride(null);
+    document.documentElement.lang=nextLanguage;
+    document.documentElement.dir=languageByCode.get(nextLanguage)?.rtl?"rtl":"ltr";
     const nextRegional = {
       currency: selected.defaultCurrency || "USD",
       calendar: selected.defaultCalendar,
@@ -266,7 +268,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     document.documentElement.lang = language;
     document.documentElement.dir = dir;
   }
-  function continueCountry() { persistRegionalPreferences(); setStage("password"); }
+  function continueCountry() { setStage("password"); }
   async function submitAuth() {
     if (busy) return;
     const cleanEmail = email.trim().toLowerCase();
@@ -300,6 +302,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         body: JSON.stringify(credentials)
       });
       setSession(data.token);
+      if (mode === "signup") persistRegionalPreferences();
       const signedInUser = { ...data.user, displayName: data.user.displayName || [firstName,lastName].filter(Boolean).join(" ") };
       if (mode === "signup") {
         localStorage.setItem("projectx-app-lock-type",lockType);
