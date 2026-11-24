@@ -295,8 +295,8 @@ export default {
 
    if (path === "/auth/password-salt" && request.method === "GET") {
     const email=cleanEmail(url.searchParams.get("email"));
-    const user=await db.prepare("SELECT password_salt FROM users WHERE email=?").bind(email).first();
-    return json({salt:user?.password_salt || "AAAAAAAAAAAAAAAAAAAAAA"});
+    const user=await db.prepare("SELECT id,password_salt FROM users WHERE email=?").bind(email).first();
+    return json({salt:user?.password_salt || "AAAAAAAAAAAAAAAAAAAAAA",exists:Boolean(user)});
    }
 
    if (path === "/auth/register" && request.method === "POST") {
