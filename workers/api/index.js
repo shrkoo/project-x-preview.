@@ -150,10 +150,69 @@ async function authenticate(request, db) {
   const token = request.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
   if (!token || token.length < 30) return null;
   const tokenHash = await digest(token);
-  return await db.prepare("SELECT u.id,u.email,u.display_name,u.xp,u.games_played,u.role,u.username,u.avatar_url,u.bio FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
+  return await db.prepare("SELECT u.id,u.email,u.display_name,u.xp,u.games_played,u.role,u.username,u.avatar_url,u.bio,u.first_name,u.last_name,u.country,u.currency,u.calendar,u.number_format,u.week_start,u.language,u.account_type,u.app_lock_type,u.app_lock_hash,u.app_lock_timeout,u.lock_failed_attempts,u.onboarding_completed FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
 }
 function cleanName(value) { return String(value || "").trim().replace(/[<>]/g, "").slice(0, 32); }
 function cleanEmail(value) { return String(value ?? "").normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g, "").replace(/\s+/g, "").toLowerCase().slice(0, 254); }
+
+const PROFILE_DEFAULTS = {
+  first_name: "", last_name: "", country: "US", currency: "USD",
+  calendar: "gregory", number_format: "1,234.56", week_start: "monday",
+  language: "en", account_type: "personal", app_lock_type: "none",
+  app_lock_hash: null, app_lock_timeout: 300
+};
+const PROFILE_ENUMS = {
+  calendar: new Set(["gregory","persian","islamic","hebrew","buddhist","japanese","iso8601"]),
+  number_format: new Set(["1,234.56","1.234,56","1 234,56","1٬234٫56"]),
+  week_start: new Set(["monday","sunday","saturday"]),
+  account_type: new Set(["personal","business"]),
+  app_lock_type: new Set(["none","pin","pattern","biometric"])
+};
+function normalizeProfile(input = {}, current = PROFILE_DEFAULTS) {
+  const pick = (snake, camel) => Object.prototype.hasOwnProperty.call(input, snake)
+    ? input[snake] : Object.prototype.hasOwnProperty.call(input, camel) ? input[camel] : current[snake];
+  const first_name = String(pick("first_name","firstName") ?? "").trim().replace(/[<>]/g,"").slice(0,60);
+  const last_name = String(pick("last_name","lastName") ?? "").trim().replace(/[<>]/g,"").slice(0,60);
+  const country = String(pick("country","country") ?? "").trim().toUpperCase();
+  const currency = String(pick("currency","currency") ?? "").trim().toUpperCase();
+  const calendar = String(pick("calendar","calendar") ?? "").trim().toLowerCase();
+  const number_format = String(pick("number_format","numberFormat") ?? "").trim();
+  const week_start = String(pick("week_start","weekStart") ?? "").trim().toLowerCase();
+  const language = String(pick("language","language") ?? "").trim();
+  const account_type = String(pick("account_type","accountType") ?? "").trim().toLowerCase();
+  const app_lock_type = String(pick("app_lock_type","appLockType") ?? "").trim().toLowerCase();
+  const rawHash = pick("app_lock_hash","appLockHash");
+  const app_lock_hash = rawHash === null || rawHash === "" ? null : String(rawHash);
+  const rawTimeout = pick("app_lock_timeout","appLockTimeout");
+  const app_lock_timeout = Number(rawTimeout);
+  if (!/^[A-Z]{2}$/.test(country)) return { error: "کد کشور باید یک کد دوحرفی معتبر باشد." };
+  if (!/^[A-Z]{3}$/.test(currency)) return { error: "کد ارز باید سه حرف انگلیسی باشد." };
+  if (!PROFILE_ENUMS.calendar.has(calendar)) return { error: "تقویم انتخاب‌شده پشتیبانی نمی‌شود." };
+  if (!PROFILE_ENUMS.number_format.has(number_format)) return { error: "قالب نمایش اعداد معتبر نیست." };
+  if (!PROFILE_ENUMS.week_start.has(week_start)) return { error: "روز شروع هفته معتبر نیست." };
+  if (!/^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test(language)) return { error: "زبان انتخاب‌شده معتبر نیست." };
+  if (!PROFILE_ENUMS.account_type.has(account_type)) return { error: "نوع حساب باید شخصی یا تجاری باشد." };
+  if (!PROFILE_ENUMS.app_lock_type.has(app_lock_type)) return { error: "نوع قفل برنامه معتبر نیست." };
+  if (app_lock_hash !== null && !/^[a-f0-9]{64}$/i.test(app_lock_hash)) return { error: "مقدار رمز قفل معتبر نیست." };
+  if (!Number.isInteger(app_lock_timeout) || app_lock_timeout < 0 || app_lock_timeout > 86400) return { error: "زمان قفل خودکار باید بین صفر تا ۸۶۴۰۰ ثانیه باشد." };
+  if (app_lock_type !== "none" && !app_lock_hash) return { error: "برای فعال‌کردن قفل، ابتدا باید مقدار رمز قفل ثبت شود." };
+  return { value: { first_name,last_name,country,currency,calendar,number_format,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout } };
+}
+function profileComplete(profile) {
+  return Boolean(String(profile.first_name||"").trim() && String(profile.last_name||"").trim()
+    && /^[A-Z]{2}$/.test(String(profile.country||"")) && ["personal","business"].includes(profile.account_type));
+}
+function publicProfile(row) {
+  return {
+    firstName: row.first_name || "", lastName: row.last_name || "",
+    country: row.country || "US", currency: row.currency || "USD",
+    calendar: row.calendar || "gregory", numberFormat: row.number_format || "1,234.56",
+    weekStart: row.week_start || "monday", language: row.language || "en",
+    accountType: row.account_type || "personal", appLockType: row.app_lock_type || "none",
+    appLockTimeout: Number(row.app_lock_timeout ?? 300),
+    onboardingCompleted: Number(row.onboarding_completed || 0) === 1
+  };
+}
 
 const isoDate = value => {
   const raw=String(value||"");
@@ -236,7 +295,13 @@ export default {
 
    if (path === "/auth/register" && request.method === "POST") {
     const body = await readBody(request);
-    const email = cleanEmail(body?.email ?? body?.emailAddress), displayName = cleanName(body?.name ?? body?.displayName);
+    const email = cleanEmail(body?.email ?? body?.emailAddress);
+    const legacyName = cleanName(body?.name ?? body?.displayName);
+    const profileResult = normalizeProfile(body || {});
+    if (profileResult.error) return fail(profileResult.error);
+    const profile = profileResult.value;
+    if (!profile.first_name && legacyName) profile.first_name = legacyName;
+    const displayName = [profile.first_name,profile.last_name].filter(Boolean).join(" ") || legacyName;
     const salt=String(body?.salt ?? body?.passwordSalt ?? body?.password_salt ?? "");
     const suppliedHash=String(body?.passwordHash ?? body?.password_hash ?? body?.hash ?? "");
     if (!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
@@ -244,7 +309,7 @@ export default {
     if (!salt || salt.length < 16 || salt.length > 128) return fail("داده امنیتی نمک رمز از صفحه دریافت نشد؛ صفحه را تازه‌سازی کن.");
     if (!/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("خروجی رمز عبور از صفحه ناقص است؛ صفحه را تازه‌سازی کن.");
     const id = crypto.randomUUID(), hash = suppliedHash;
-    try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role) VALUES (?,?,?,?,?,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user").run(); }
+    try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,first_name,last_name,country,currency,calendar,number_format,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout,lock_failed_attempts,onboarding_completed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,profileComplete(profile)?1:0).run(); }
     catch (insertError) {
       const existing=await db.prepare("SELECT id FROM users WHERE email=? LIMIT 1").bind(email).first();
       if(existing) return fail("برای این ایمیل حسابی وجود دارد. از ورود یا ورود با Google استفاده کن.",409);
@@ -263,7 +328,7 @@ export default {
       }
     }
     const session = await createSession(db,id);
-    return json({ token:session.token, expiresAt:session.expiresAt, user:{id,email,displayName,xp:0,gamesPlayed:0,role:email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user"}, emailVerificationRequired:env.REQUIRE_EMAIL_VERIFICATION==="true", verificationSent, message:verificationSent?"لینک تأیید ارسال شد.":"حساب ساخته شد؛ تنظیمات ارسال ایمیل هنوز لازم است." },201);
+    return json({ token:session.token, expiresAt:session.expiresAt, user:{id,email,displayName,xp:0,gamesPlayed:0,role:email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile:{...profile,onboardingCompleted:profileComplete(profile)}}, emailVerificationRequired:env.REQUIRE_EMAIL_VERIFICATION==="true", verificationSent, message:verificationSent?"لینک تأیید ارسال شد.":"حساب ساخته شد؛ تنظیمات ارسال ایمیل هنوز لازم است." },201);
    }
 
    if (path === "/auth/verify-email" && request.method === "POST") {
@@ -433,7 +498,7 @@ export default {
       await db.prepare("UPDATE users SET password_hash=?,password_salt=? WHERE id=?").bind(suppliedHash,salt,user.id).run();
       return json({ok:true,message:"رمز عبور با موفقیت تنظیم شد."});
     }
-    if (path === "/auth/me" && request.method === "GET") return json({user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role}});
+    if (path === "/auth/me" && request.method === "GET") return json({user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role,profile:publicProfile(user)}});
     if (path === "/auth/resend-verification" && request.method === "POST") {
       if(!hasMailProvider(env)) return fail("سرویس ارسال ایمیل هنوز تنظیم نشده است.",503);
       const target=await db.prepare("SELECT email,verified_at FROM users WHERE id=?").bind(user.id).first();
@@ -446,10 +511,25 @@ export default {
       return json({ok:true,message:"لینک تأیید دوباره ارسال شد."});
     }
     if (path === "/auth/profile" && request.method === "PATCH") {
-      const body=await readBody(request), name=cleanName(body?.name);
-      if(name.length<2) return fail("نام نمایشی معتبر نیست.");
-      await db.prepare("UPDATE users SET display_name=? WHERE id=?").bind(name,user.id).run();
-      return json({ok:true,name});
+      const body=await readBody(request);
+      if (!body || typeof body !== "object" || Array.isArray(body)) return fail("اطلاعات پروفایل معتبر نیست.");
+      const current = {
+        first_name:user.first_name||"", last_name:user.last_name||"", country:user.country||"US",
+        currency:user.currency||"USD", calendar:user.calendar||"gregory",
+        number_format:user.number_format||"1,234.56", week_start:user.week_start||"monday",
+        language:user.language||"en", account_type:user.account_type||"personal",
+        app_lock_type:user.app_lock_type||"none", app_lock_hash:user.app_lock_hash||null,
+        app_lock_timeout:Number(user.app_lock_timeout??300)
+      };
+      const result=normalizeProfile(body,current);
+      if(result.error) return fail(result.error);
+      const profile=result.value;
+      const legacyName=Object.prototype.hasOwnProperty.call(body,"name")?cleanName(body.name):"";
+      const displayName=[profile.first_name,profile.last_name].filter(Boolean).join(" ") || legacyName || user.display_name;
+      const completed=profileComplete(profile)?1:0;
+      await db.prepare("UPDATE users SET display_name=?,first_name=?,last_name=?,country=?,currency=?,calendar=?,number_format=?,week_start=?,language=?,account_type=?,app_lock_type=?,app_lock_hash=?,app_lock_timeout=?,onboarding_completed=? WHERE id=?")
+        .bind(displayName,profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,completed,user.id).run();
+      return json({ok:true,name:displayName,profile:{...profile,app_lock_hash:undefined,onboardingCompleted:completed===1}});
     }
     if (path === "/auth/logout" && request.method === "POST") {
       const token=request.headers.get("Authorization")?.replace(/^Bearer\s+/i,"");
