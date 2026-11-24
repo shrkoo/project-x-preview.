@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import Onboarding from "./components/Onboarding";
 import NovyraLuxuryApp from "./components/NovyraLuxuryApp";
 import { apiRequest, clearSession } from "./lib/api";
+import { languages, languageByCode } from "./data/languages";
 
-type Language = "en" | "fa" | "ar" | "ku";
+type Language = (typeof languages)[number]["code"];
 type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string };
 
-const allowedLanguages: Language[] = ["fa", "en", "ar", "ku"];
+const allowedLanguages = new Set(languages.map(item => item.code));
 
 export default function Home() {
   const [account, setAccount] = useState<Account | null>(null);
@@ -19,10 +20,10 @@ export default function Home() {
   useEffect(() => {
     let alive = true;
     const savedLanguage = localStorage.getItem("projectx-language") as Language | null;
-    const nextLanguage = savedLanguage && allowedLanguages.includes(savedLanguage) ? savedLanguage : "fa";
+    const nextLanguage = savedLanguage && allowedLanguages.has(savedLanguage) ? savedLanguage : "fa";
     setLanguage(nextLanguage);
     document.documentElement.lang = nextLanguage;
-    document.documentElement.dir = nextLanguage === "en" ? "ltr" : "rtl";
+    document.documentElement.dir = languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr";
 
     const currentUrl = new URL(window.location.href);
     const verificationToken = currentUrl.searchParams.get("verify");
@@ -64,7 +65,7 @@ export default function Home() {
     setLanguage(nextLanguage);
     localStorage.setItem("projectx-language", nextLanguage);
     document.documentElement.lang = nextLanguage;
-    document.documentElement.dir = nextLanguage === "en" ? "ltr" : "rtl";
+    document.documentElement.dir = languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr";
     if (user) {
       setAccount(user);
       localStorage.setItem("projectx-account", JSON.stringify({ name: user.displayName, email: user.email }));
