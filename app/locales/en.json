@@ -76,5 +76,10 @@
   "resendCode": "Resend code",
   "codeInvalid": "Enter the 6-digit code.",
   "codeResent": "A new code has been sent if your account is pending.",
-  "captchaSetup": "Security verification needs the public Turnstile site key."
+  "captchaSetup": "Security verification needs the public Turnstile site key.",
+  "accountExists": "This email already has an account.",
+  "googleAccountExists": "This email is registered with Google. Use Continue with Google.",
+  "forgotPassword": "Forgot password?",
+  "forgotSent": "If an account exists, password reset instructions have been sent.",
+  "captchaAgain": "Please complete the security check again to continue."
 }
