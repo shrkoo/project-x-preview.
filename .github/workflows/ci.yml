@@ -5,6 +5,7 @@ on:
     branches:
       - feature/homa-auth-part1
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
