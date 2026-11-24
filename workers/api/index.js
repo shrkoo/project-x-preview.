@@ -1,7 +1,4 @@
-import { countryCodes } from "../../app/data/countries.ts";
-import { currencyCodes } from "../../app/data/currencies.ts";
-import { calendarCodes } from "../../app/data/calendars.ts";
-import { languageCodes } from "../../app/data/languages.ts";
+import { countryCodes, currencyCodes, calendarCodes, languageCodes } from "./data/catalog-validation.js";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,HEAD,POST,PATCH,DELETE,OPTIONS",
