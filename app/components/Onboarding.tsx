@@ -10,7 +10,7 @@ import { numberSystems } from "../data/number-systems";
 import { weekdays } from "../data/weekdays";
 
 type Language = (typeof languages)[number]["code"];
-type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string; profile?: { firstName?:string; lastName?:string; language?:Language; accountType?:"personal"|"business"; appLockType?:"none"|"pin"|"pattern"|"biometric"; onboardingCompleted?:boolean } };
+type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string; profile?: { firstName?:string; lastName?:string; country?:string; currency?:string; calendar?:string; numberFormat?:string; weekStart?:"saturday"|"sunday"|"monday"; language?:Language; accountType?:"personal"|"business"; appLockType?:"none"|"pin"|"pattern"|"biometric"; onboardingCompleted?:boolean } };
 type Props = { onComplete: (user: User | null, language: Language) => void; initialNotice?: string };
 type Stage = "welcome" | "firstName" | "lastName" | "email" | "country" | "password" | "appLock" | "accountType" | "login" | "profile" | "passwordSetup";
 type Mode = "login" | "signup";
@@ -145,6 +145,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
   const [avatar, setAvatar] = useState("✦");
   const [photo, setPhoto] = useState("");
   const [user, setUser] = useState<User | null>(null);
+  const [googlePending,setGooglePending]=useState(false);
   const [recoveryMode, setRecoveryMode] = useState(false);
   const [resetTokenMode, setResetTokenMode] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -159,12 +160,30 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
     const googleToken = hash.get("google_token");
     const googleError = hash.get("google_error");
+    const googleNew = hash.get("google_new");
     if (googleToken) {
       setSession(googleToken);
       window.history.replaceState({}, "", window.location.pathname + window.location.search);
       apiRequest<{user:User}>("/auth/me").then(data => {
         setUser(data.user);
         setEmail(data.user.email);
+        if (googleNew === "1") {
+          const names=(data.user.displayName||"").trim().split(/\\s+/);
+          setFirstName(data.user.profile?.firstName || names[0] || "");
+          setLastName(data.user.profile?.lastName || names.slice(1).join(" "));
+          setCountryCode(data.user.profile?.country || "US");
+          setRegional({
+            currency:data.user.profile?.currency || "USD",
+            calendar:data.user.profile?.calendar || "gregory",
+            digits:"latn",
+            dateFormat:getDateFormat(data.user.profile?.language || "en",data.user.profile?.country || "US"),
+            weekStart:data.user.profile?.weekStart || "monday"
+          });
+          setGooglePending(true);
+          setMode("signup");
+          setStage("firstName");
+          return;
+        }
         const preferredLanguage = (localStorage.getItem("projectx-language") || data.user.profile?.language || language) as Language;
         onComplete(data.user, languageByCode.has(preferredLanguage) ? preferredLanguage : language);
       }).catch(() => { localStorage.removeItem("projectx-token"); setNotice(t("googleFailed")); });
@@ -269,7 +288,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     document.documentElement.lang = language;
     document.documentElement.dir = dir;
   }
-  function continueCountry() { setStage("password"); }
+  function continueCountry() { setStage(googlePending ? "appLock" : "password"); }
   async function submitAuth() {
     if (busy) return;
     const cleanEmail = email.trim().toLowerCase();
@@ -353,6 +372,31 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     if (user && localStorage.getItem("projectx-profile-complete:" + user.id) === "1") onComplete(user, language);
     else setStage("profile");
   }
+  async function finishGoogleOnboarding() {
+    if(!user)return;
+    if(!firstName.trim()||!lastName.trim()){setNotice(t("missingName"));return;}
+    setBusy(true);setNotice("");
+    try {
+      const lockHash=lockType==="none"?null:await derivePasswordHash(lockSecret,email.trim().toLowerCase());
+      await apiRequest("/auth/profile",{method:"PATCH",body:JSON.stringify({
+        firstName:firstName.trim(),lastName:lastName.trim(),country:countryCode,currency:regional.currency,
+        calendar:regional.calendar,numberFormat:countries.find(item=>item.code===countryCode)?.defaultNumberFormat||"1,234.56",
+        weekStart:regional.weekStart,language,accountType,appLockType:lockType,appLockHash:lockHash
+      })});
+      persistRegionalPreferences();
+      localStorage.setItem("projectx-account-type",accountType);
+      localStorage.setItem("projectx-app-lock-type",lockType);
+      localStorage.setItem("projectx-app-lock-user",user.id);
+      if(lockHash)localStorage.setItem("projectx-app-lock-hash",lockHash);
+      else{localStorage.removeItem("projectx-app-lock-hash");localStorage.removeItem("projectx-app-lock-credential");}
+      const refreshed=await apiRequest<{user:User}>("/auth/me");
+      localStorage.setItem("projectx-first-run-complete","1");
+      localStorage.setItem("projectx-account",JSON.stringify({name:refreshed.user.displayName,email:refreshed.user.email}));
+      onComplete(refreshed.user,language);
+    }catch(error){setNotice(error instanceof Error?error.message:t("authError"));}
+    finally{setBusy(false);}
+  }
+
   async function requestRecovery() {
     if (busy) return;
     const recoveryEmail = email.normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g, "").replace(/\s+/g, "").trim().toLowerCase();
@@ -505,7 +549,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <button className="px-back-link" onClick={()=>setStage("appLock")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 7/7</div>
           <h1>{t("accountType")}</h1>
           <div className="px-lock-options"><button type="button" className={accountType==="personal"?"is-selected":""} onClick={()=>setAccountType("personal")}>{t("personal")}</button><button type="button" className={accountType==="business"?"is-selected":""} onClick={()=>setAccountType("business")}>{t("business")}</button></div>
-          <button className="px-primary-action" disabled={busy} onClick={submitAuth}>{busy?t("emailCheck"):t("createAccount")} ↗</button>
+          <button className="px-primary-action" disabled={busy} onClick={googlePending?finishGoogleOnboarding:submitAuth}>{busy?t("emailCheck"):t("createAccount")} ↗</button>
         </div>}
         {stage === "login" && <div className="px-glass-panel px-auth-panel">
           <div className="px-auth-emblem" aria-label="NOVYRA"><NovyraMark /></div>
