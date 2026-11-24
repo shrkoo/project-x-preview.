@@ -81,5 +81,8 @@
   "googleAccountExists": "This email is registered with Google. Use Continue with Google.",
   "forgotPassword": "Forgot password?",
   "forgotSent": "If an account exists, password reset instructions have been sent.",
-  "captchaAgain": "Please complete the security check again to continue."
+  "captchaAgain": "Please complete the security check again to continue.",
+  "resetPasswordTitle": "Choose a new password",
+  "resetPassword": "Reset password",
+  "passwordResetDone": "Your password was reset. Log in with your new password."
 }
