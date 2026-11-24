@@ -7,7 +7,7 @@ import { apiRequest, clearSession } from "./lib/api";
 import { languages, languageByCode } from "./data/languages";
 
 type Language = (typeof languages)[number]["code"];
-type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string };
+type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string; profile?: { accountType?: "personal" | "business" } };
 
 const allowedLanguages = new Set(languages.map(item => item.code));
 
@@ -90,7 +90,7 @@ export default function Home() {
     setLanguage(nextLanguage);
     localStorage.setItem("projectx-language", nextLanguage);
     document.documentElement.lang = nextLanguage;
-    document.documentElement.dir = nextLanguage === "en" ? "ltr" : "rtl";
+    document.documentElement.dir = languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr";
   }
 
   function logoutComplete() {
