@@ -501,23 +501,23 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <button type="button" className="px-social-button px-google-button" onClick={socialUnavailable}><GoogleMark/><span>{t("google")}</span></button>
         </div>}
         {stage === "firstName" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("welcome")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 1/7</div>
+          <button className="px-back-link" onClick={()=>setStage("welcome")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
           <h1>{t("firstName")}</h1><label className="px-field"><span>{t("firstName")}</span><input autoComplete="given-name" value={firstName} onChange={e=>setFirstName(e.target.value)} /></label>
           <button className="px-primary-action" onClick={()=>{if(!firstName.trim()){setNotice(t("firstRequired"));return;}setNotice("");setStage("lastName");}}>{t("next")} ↗</button>
         </div>}
         {stage === "lastName" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("firstName")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 2/7</div>
+          <button className="px-back-link" onClick={()=>setStage("firstName")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
           <h1>{t("lastName")}</h1><label className="px-field"><span>{t("lastName")}</span><input autoComplete="family-name" value={lastName} onChange={e=>setLastName(e.target.value)} /></label>
           <button className="px-primary-action" onClick={()=>{if(!lastName.trim()){setNotice(t("lastRequired"));return;}setNotice("");setStage("email");}}>{t("next")} ↗</button>
         </div>}
         {stage === "email" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("lastName")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 3/7</div>
+          <button className="px-back-link" onClick={()=>setStage("lastName")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
           <h1>{t("email")}</h1><label className="px-field"><span>{t("email")}</span><input type="email" autoComplete="email" dir="ltr" value={email} onChange={e=>setEmail(e.target.value)} /></label>
           <button className="px-primary-action" disabled={busy} onClick={async()=>{const value=email.trim().toLowerCase();if(!/^\S+@\S+\.\S+$/.test(value)){setNotice(t("emailInvalid"));return;}setBusy(true);setNotice(t("emailCheck"));try{const result=await apiRequest<{salt:string;exists?:boolean}>("/auth/password-salt?email="+encodeURIComponent(value));if(result.exists){setNotice(t("emailUsed"));return;}setNotice("");setStage("country");}catch(error){setNotice(error instanceof Error?error.message:t("authError"));}finally{setBusy(false);}}}>{busy?t("emailCheck"):t("next")} ↗</button>
         </div>}
         {stage === "country" && <div className="px-glass-panel px-language-panel">
           <div className="px-eyebrow">NOVYRA / YOUR REGION</div>
-          <button className="px-back-link" onClick={()=>setStage("email")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 4/7</div><h1>{t("country")}</h1>
+          <button className="px-back-link" onClick={()=>setStage("email")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div><h1>{t("country")}</h1>
           <p className="px-stage-subtitle">{t("countrySub")}</p>
           <div className="px-country-search"><input aria-label={t("searchCountry")} value={countrySearch} onChange={e => setCountrySearch(e.target.value)} placeholder={t("searchCountry")} /><button type="button" aria-label={t("searchClear")} onClick={()=>setCountrySearch("")} hidden={!countrySearch}>×</button></div>
           <div role="listbox" aria-label={t("country")} className="px-country-list">
@@ -545,16 +545,21 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         
 
         {stage === "password" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("country")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 5/7</div>
+          <button className="px-back-link" onClick={()=>setStage("country")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
           <h1>{t("password")}</h1>
           <label className="px-field"><span>{t("password")}</span><span className="px-password-wrap"><input type={showPassword?"text":"password"} autoComplete="new-password" value={password} onChange={e=>setPassword(e.target.value)} /><button type="button" onClick={()=>setShowPassword(v=>!v)} aria-label={showPassword?"Hide password":"Show password"}><EyeMark visible={showPassword}/></button></span></label>
           <div className="px-password-strength"><span>{t("passwordStrength")}: </span><b>{passwordStrengthScore<3?t("weak"):passwordStrengthScore<4?t("medium"):t("strong")}</b><div style={{height:5,borderRadius:8,background:"rgba(120,130,150,.22)",overflow:"hidden",marginTop:6}}><div style={{height:"100%",width:(passwordStrengthScore*20)+"%",background:passwordStrengthScore<3?"#c45d5d":passwordStrengthScore<4?"#c39a42":"#39956b",transition:"width .2s"}}/></div></div>
-          <label className="px-field"><span>{t("confirm")}</span><span className="px-password-wrap"><input type={showConfirm?"text":"password"} autoComplete="new-password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} /><button type="button" onClick={()=>setShowConfirm(v=>!v)} aria-label={showConfirm?"Hide password":"Show password"}><EyeMark visible={showConfirm}/></button></span></label>
+          <button className="px-primary-action" onClick={()=>{if(password.length<10){setNotice(t("weakPassword"));return;}setNotice("");setStage("confirmPassword");}}>{t("next")} ↗</button>
+        </div>}
+        {stage === "confirmPassword" && <div className="px-glass-panel px-auth-panel">
+          <button className="px-back-link" onClick={()=>setStage("password")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
+          <h1>{t("confirm")}</h1>
+          <label className="px-field"><span>{t("confirm")}</span><span className="px-password-wrap"><input type={showConfirm?"text":"password"} autoComplete="new-password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} /><button type="button" onClick={()=>setShowConfirm(v=>!v)} aria-label={showConfirm?t("hidePassword"):t("showPassword")}><EyeMark visible={showConfirm}/></button></span></label>
           {confirmPassword&&password!==confirmPassword&&<small role="alert">{t("passwordMismatch")}</small>}
-          <button className="px-primary-action" onClick={()=>{if(password.length<10){setNotice(t("weakPassword"));return;}if(password!==confirmPassword){setNotice(t("passwordMismatch"));return;}setNotice("");setStage("appLock");}}>{t("next")} ↗</button>
+          <button className="px-primary-action" onClick={()=>{if(password!==confirmPassword){setNotice(t("passwordMismatch"));return;}setNotice("");setStage("appLock");}}>{t("next")} ↗</button>
         </div>}
         {stage === "appLock" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("password")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 6/7</div>
+          <button className="px-back-link" onClick={()=>setStage("confirmPassword")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
           <h1>{t("lockTitle")}</h1><p className="px-stage-subtitle">{t("lockExplain")}</p>
           <div className="px-lock-options">{(["none","pin","pattern","biometric"] as const).map(value=><button type="button" key={value} className={lockType===value?"is-selected":""} onClick={()=>{setLockType(value);setLockSecret("");setLockTouched(true);}}>{t(value==="none"?"noLock":value)}</button>)}</div>
           {lockType==="pin"&&<label className="px-field"><span>{t("lockSecret")}</span><input type="password" inputMode="numeric" value={lockSecret} onChange={e=>setLockSecret(e.target.value.replace(/[^0-9]/g,"").slice(0,12))} autoComplete="off" /></label>}{lockType==="pattern"&&<div className="px-lock-grid" role="group" aria-label={t("pattern")}>{Array.from({length:9},(_,i)=>String(i+1)).map(point=><button type="button" key={point} aria-pressed={lockSecret.includes(point)} className={lockSecret.includes(point)?"is-selected":""} onClick={()=>setLockSecret(value=>value.includes(point)?value:value+point)}>{lockSecret.includes(point)?"●":"○"}</button>)}<button type="button" className="px-pattern-clear" onClick={()=>setLockSecret("")}>{t("clearPattern")}</button></div>}
@@ -563,7 +568,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <button className="px-skip-action" onClick={()=>{setLockType("none");setLockSecret("");setLockTouched(true);setStage("accountType");}}>{t("skip")}</button>
         </div>}
         {stage === "accountType" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("appLock")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 7/7</div>
+          <button className="px-back-link" onClick={()=>setStage("appLock")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
           <h1>{t("accountType")}</h1>
           <div className="px-lock-options"><button type="button" className={accountType==="personal"?"is-selected":""} onClick={()=>setAccountType("personal")}>{t("personal")}</button><button type="button" className={accountType==="business"?"is-selected":""} onClick={()=>setAccountType("business")}>{t("business")}</button></div>
           <button className="px-primary-action" disabled={busy} onClick={googlePending?finishGoogleOnboarding:submitAuth}>{busy?t("emailCheck"):t("createAccount")} ↗</button>
