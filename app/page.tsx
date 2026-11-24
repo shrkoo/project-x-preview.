@@ -19,7 +19,9 @@ export default function Home() {
 
   useEffect(() => {
     let alive = true;
-    const savedLanguage = localStorage.getItem("projectx-language") as Language | null;
+    const storedLanguage = localStorage.getItem("projectx-language");
+    const savedLanguage = (storedLanguage === "ku" ? "ckb" : storedLanguage) as Language | null;
+    if (storedLanguage === "ku") localStorage.setItem("projectx-language", "ckb");
     const nextLanguage = savedLanguage && allowedLanguages.has(savedLanguage) ? savedLanguage : "fa";
     setLanguage(nextLanguage);
     document.documentElement.lang = nextLanguage;
