@@ -61,5 +61,13 @@
   "overview": "Genel bakış",
   "recent": "Son işlemler",
   "profile": "Profil",
-  "createBusiness": "İşletme alanı ekle"
+  "createBusiness": "İşletme alanı ekle",
+  "getStarted": "BAŞLAYIN",
+  "financialClarity": "FİNANSAL NETLİK, YENİDEN TASARLANDI",
+  "language": "Dil",
+  "hidePassword": "Şifreyi gizle",
+  "showPassword": "Şifreyi göster",
+  "dismiss": "Kapat",
+  "timeout": "İstek zaman aşımına uğradı. Tekrar deneyin.",
+  "noResults": "Sonuç bulunamadı"
 }
