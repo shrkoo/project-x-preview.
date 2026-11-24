@@ -24,7 +24,7 @@ export default function Home() {
     let alive = true;
     const storedLanguage = localStorage.getItem("projectx-language");
     const savedLanguage = (storedLanguage === "ku" ? "ckb" : storedLanguage) as Language | null;
-    if (storedLanguage === "ku") localStorage.setItem("projectx-language", "ckb");
+    if (storedLanguage === "ku") { localStorage.setItem("projectx-language-legacy", "ku"); localStorage.setItem("projectx-language", "ckb"); }
     const nextLanguage = savedLanguage && allowedLanguages.has(savedLanguage) ? savedLanguage : "fa";
     setLanguage(nextLanguage);
     document.documentElement.lang = nextLanguage;
