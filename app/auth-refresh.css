@@ -42,3 +42,21 @@
 .px-flow-progress-track{background:#29445c}.px-language-panel>div[style*="marginTop"]{background:#102238!important;border-color:#35536b!important;color:#e6f1fa!important}
 .px-primary-action{background:linear-gradient(105deg,#3b9bd6,#246db7)!important}.px-onboarding-notice{background:#132b41!important;border-color:#35536b!important;color:#e6f1fa!important}.px-auth-emblem,.px-logo{background:#102238!important;border-color:#35536b!important;color:#8dd3ff!important}
 }
+
+/* Signup navigation and language chips */
+.px-onboarding{min-height:100vh;min-height:100dvh}
+.px-onboarding[data-step="1"] .px-glass-panel>.px-back-link,
+.px-onboarding[data-step="2"] .px-glass-panel>.px-back-link,
+.px-onboarding[data-step="3"] .px-glass-panel>.px-back-link,
+.px-onboarding[data-step="4"] .px-glass-panel>.px-back-link,
+.px-onboarding[data-step="5"] .px-glass-panel>.px-back-link,
+.px-onboarding[data-step="6"] .px-glass-panel>.px-back-link,
+.px-onboarding[data-step="7"] .px-glass-panel>.px-back-link,
+.px-onboarding[data-step="8"] .px-glass-panel>.px-back-link{display:none!important}
+.px-language-option{display:flex!important;align-items:center!important;justify-content:center!important;min-height:52px!important;padding:10px 14px!important;border:1px solid #d6eaf7!important;border-radius:16px!important;background:#fff!important;color:#244d6c!important;font-size:12px!important;font-weight:700!important;box-shadow:0 5px 14px rgba(40,110,150,.06)!important}
+.px-language-option.is-selected{border-color:#3598d5!important;background:#eef8fe!important;color:#1b5e91!important;box-shadow:inset 0 0 0 1px #3598d533!important}
+.px-lock-grid{display:grid!important;grid-template-columns:repeat(3,minmax(44px,1fr))!important;gap:9px!important;margin:14px auto!important;max-width:230px!important}
+.px-lock-grid button{min-height:48px!important;border-radius:14px!important;background:#fff!important;color:#2e7cad!important;font-size:16px!important}
+.px-lock-grid .px-pattern-clear{grid-column:1/-1!important;min-height:40px!important;font-size:11px!important}
+.px-language-panel select option{background:#fff;color:#20364b}
+@media(prefers-color-scheme:dark){.px-language-option,.px-lock-grid button,.px-language-panel select option{background:#102238!important;color:#e4f2fd!important;border-color:#35536b!important}.px-language-option.is-selected{background:#183a56!important;border-color:#4aa9e2!important}}
