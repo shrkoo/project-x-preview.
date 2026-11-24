@@ -602,15 +602,23 @@ export default {
     const workspace=await db.prepare("SELECT id FROM workspaces WHERE id=? AND owner_id=?").bind(workspaceId,user.id).first();
     if(!workspace) return fail("فضای کاری پیدا نشد یا دسترسی ندارید.",404);
     if(!Array.isArray(body.items)||body.items.length>500) return fail("فهرست تراکنش‌ها معتبر نیست.");
-    const statements=[db.prepare("DELETE FROM finance_transactions WHERE workspace_id=? AND owner_id=?").bind(workspaceId,user.id)];
+    const statements=[];
     for(const item of body.items) {
       const id=String(item?.id||"").slice(0,80),title=String(item?.title||"").trim().slice(0,120),category=String(item?.category||"Other").trim().slice(0,80);
       const amount=Number(item?.amount),kind=String(item?.kind||""),date=String(item?.date||""),note=String(item?.note||"").slice(0,500);
       if(!id||!title||!Number.isFinite(amount)||amount<=0||amount>1e12||!["income","expense"].includes(kind)||!/^\d{4}-\d{2}-\d{2}$/.test(date)) return fail("یکی از تراکنش‌ها اطلاعات نامعتبر دارد.");
-      statements.push(db.prepare("INSERT INTO finance_transactions (id,workspace_id,owner_id,title,category,amount,kind,transaction_date,note) VALUES (?,?,?,?,?,?,?,?,?)").bind(id,workspaceId,user.id,title,category,amount,kind,date,note));
+      statements.push(db.prepare("INSERT INTO finance_transactions (id,workspace_id,owner_id,title,category,amount,kind,transaction_date,note) VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET title=excluded.title,category=excluded.category,amount=excluded.amount,kind=excluded.kind,transaction_date=excluded.transaction_date,note=excluded.note,updated_at=CURRENT_TIMESTAMP WHERE finance_transactions.owner_id=excluded.owner_id").bind(id,workspaceId,user.id,title,category,amount,kind,date,note));
     }
-    await db.batch(statements);
+    for(let i=0;i<statements.length;i+=90) await db.batch(statements.slice(i,i+90));
     return json({ok:true,saved:body.items.length});
+   }
+   const transactionDeleteMatch=path.match(/^\/finance\/transactions\/([^/]+)$/);
+   if(transactionDeleteMatch && request.method==="DELETE") {
+    const workspaceId=String(url.searchParams.get("workspaceId")||"");
+    const workspace=await db.prepare("SELECT id FROM workspaces WHERE id=? AND owner_id=?").bind(workspaceId,user.id).first();
+    if(!workspace) return fail("فضای کاری پیدا نشد یا دسترسی ندارید.",404);
+    await db.prepare("DELETE FROM finance_transactions WHERE id=? AND workspace_id=? AND owner_id=?").bind(decodeURIComponent(transactionDeleteMatch[1]),workspaceId,user.id).run();
+    return json({ok:true});
    }
 
    if(path==="/social/stories" && request.method==="GET") {
