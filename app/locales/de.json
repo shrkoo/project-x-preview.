@@ -61,5 +61,13 @@
   "overview": "Übersicht",
   "recent": "Letzte Aktivitäten",
   "profile": "Profil",
-  "createBusiness": "Geschäftsbereich hinzufügen"
+  "createBusiness": "Geschäftsbereich hinzufügen",
+  "getStarted": "LOSLEGEN",
+  "financialClarity": "FINANZÜBERSICHT, NEU GEDACHT",
+  "language": "Sprache",
+  "hidePassword": "Passwort ausblenden",
+  "showPassword": "Passwort anzeigen",
+  "dismiss": "Schließen",
+  "timeout": "Zeitüberschreitung. Bitte erneut versuchen.",
+  "noResults": "Keine Ergebnisse"
 }
