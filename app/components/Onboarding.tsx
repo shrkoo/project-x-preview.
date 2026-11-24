@@ -478,6 +478,18 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
   const progressStep = signupStages.indexOf(stage) + 1;
   const previousStage: Partial<Record<Stage,Stage>> = { firstName:"welcome", lastName:"firstName", email:"lastName", country:"email", password:"country", confirmPassword:"password", appLock:"confirmPassword", accountType:"appLock" };
   const localizedCountryName = (code:string, fallback:string) => { try { return new Intl.DisplayNames([language], {type:"region"}).of(code) || fallback; } catch { return fallback; } };
+  const localizedCurrencyName = (code:string, fallback:string) => { if(code==="IRT")return language==="fa"?"تومان":language==="ar"?"التومان":language==="ckb"?"تومان":"Toman"; try { return new Intl.DisplayNames([language], {type:"currency"}).of(code) || fallback; } catch { return fallback; } };
+  const calendarNames:Record<string,Record<string,string>> = {
+    fa:{gregory:"میلادی",persian:"هجری شمسی",islamic:"هجری قمری",hebrew:"عبری",buddhist:"بودایی",chinese:"چینی",japanese:"ژاپنی",indian:"ملی هند (ساکا)",ethiopic:"اتیوپیایی",coptic:"قبطی"},
+    ar:{gregory:"الميلادي",persian:"الفارسي",islamic:"الهجري",hebrew:"العبري",buddhist:"البوذي",chinese:"الصيني",japanese:"الياباني",indian:"الهندي",ethiopic:"الإثيوبي",coptic:"القبطي"},
+    ckb:{gregory:"زایینی",persian:"کۆچیی خۆری",islamic:"کۆچیی مانگی",hebrew:"عیبری",buddhist:"بۆدایی",chinese:"چینی",japanese:"ژاپۆنی",indian:"هیندی",ethiopic:"ئەسیۆپی",coptic:"قیبتی"}
+  };
+  const numberNames:Record<string,Record<string,string>> = {
+    fa:{latn:"لاتین",arab:"عربی",arabext:"فارسی",deva:"دواناگری",beng:"بنگالی"},
+    ar:{latn:"لاتينية",arab:"هندية عربية",arabext:"فارسية",deva:"ديفاناغاري",beng:"بنغالية"},
+    ckb:{latn:"لاتینی",arab:"عەرەبی",arabext:"فارسی",deva:"دەڤاناگری",beng:"بەنگالی"}
+  };
+  const localizedWeekday = (code:string, fallback:string) => { const day=({saturday:6,sunday:0,monday:1} as Record<string,number>)[code]??1; return new Intl.DateTimeFormat(language,{weekday:"long"}).format(new Date(2024,0,day===0?7:day)); };
 
   return (
     <main data-step={progressStep} className={"px-onboarding" + (stage === "welcome" ? " px-language-screen" : "")} dir={dir} lang={language}>
@@ -528,11 +540,11 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
             <strong>{language === "fa" ? "پیش‌نمایش تنظیمات" : "Editable preferences preview"}</strong>
             <label>{t("language")} <select value={language} onChange={e=>chooseLanguage(e.target.value as Language)} style={{width:"100%"}}>{languages.map(item=><option key={item.code} value={item.code}>{item.nativeName} · {item.name}</option>)}</select></label>
             
-            <label>{t("currency")} <select value={regional.currency} onChange={e=>setRegional(v=>({...v,currency:e.target.value}))} style={{width:"100%"}}>{currencies.map(item=><option key={item.code} value={item.code}>{item.code} — {item.name}</option>)}</select></label>
+            <label>{t("currency")} <select value={regional.currency} onChange={e=>setRegional(v=>({...v,currency:e.target.value}))} style={{width:"100%"}}>{currencies.map(item=><option key={item.code} value={item.code}>{item.code} — {localizedCurrencyName(item.code,item.name)}</option>)}</select></label>
             <label>{t("calendar")} <select value={regional.calendar} onChange={e=>setRegional(v=>({...v,calendar:e.target.value}))} style={{width:"100%"}}>{calendars.map(item=><option key={item.code} value={item.code}>{item.name}</option>)}</select></label>
-            <label>{t("numberSystem")} <select value={regional.digits} onChange={e=>setRegional(v=>({...v,digits:e.target.value}))} style={{width:"100%"}}>{numberSystems.map(item=><option key={item.code} value={item.code}>{item.name}</option>)}</select></label>
+            <label>{t("numberSystem")} <select value={regional.digits} onChange={e=>setRegional(v=>({...v,digits:e.target.value}))} style={{width:"100%"}}>{numberSystems.map(item=><option key={item.code} value={item.code}>{numberNames[language]?.[item.code] || item.nativeName || item.name}</option>)}</select></label>
             <label>{t("dateFormat")} <select value={regional.dateFormat} onChange={e=>setRegional(v=>({...v,dateFormat:e.target.value}))} style={{width:"100%"}}>{["DD/MM/YYYY","MM/DD/YYYY","YYYY-MM-DD","YYYY/MM/DD"].map(item=><option key={item}>{item}</option>)}</select></label>
-            <label>{t("weekStart")} <select value={regional.weekStart} onChange={e=>setRegional(v=>({...v,weekStart:e.target.value as "saturday"|"sunday"|"monday"}))} style={{width:"100%"}}>{weekdays.map(item=><option key={item.code} value={item.code}>{item.name}</option>)}</select></label>
+            <label>{t("weekStart")} <select value={regional.weekStart} onChange={e=>setRegional(v=>({...v,weekStart:e.target.value as "saturday"|"sunday"|"monday"}))} style={{width:"100%"}}>{weekdays.map(item=><option key={item.code} value={item.code}>{localizedWeekday(item.code,item.name)}</option>)}</select></label>
           </div>
           <button className="px-primary-action" onClick={continueCountry}>{t("next")} <span>↗</span></button>
           <p className="px-footnote">{t("languageNote")}</p>
