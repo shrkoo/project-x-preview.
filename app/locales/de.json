@@ -1,15 +1,5 @@
 {
-  "slogan": "Jeder Moment zählt.",
-  "welcome": "Finanzen einfach im Blick",
-  "create": "Konto erstellen",
-  "login": "Anmelden",
-  "step1Title": "Kontodaten",
-  "step2Title": "App-Sicherheit",
-  "step3Title": "Ihr Arbeitsbereich",
-  "step4Title": "Alles bereit",
-  "personal": "Privat",
-  "business": "Geschäftlich",
-  "personalDesc": "Einnahmen, Ausgaben und finanzielle Ziele verwalten.",
-  "businessDesc": "Buchhaltung, Verkäufe, Einkäufe und Geschäftsberichte.",
-  "switchNote": "Sie können jederzeit im Profilmenü zwischen Privat und Geschäft wechseln."
+  "label": "Deutsch",
+  "dir": "ltr",
+  "tag": "de"
 }
