@@ -168,7 +168,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         setUser(data.user);
         setEmail(data.user.email);
         if (googleNew === "1") {
-          const names=(data.user.displayName||"").trim().split(/\\s+/);
+          const names=(data.user.displayName||"").trim().split(/\s+/);
           setFirstName(data.user.profile?.firstName || names[0] || "");
           setLastName(data.user.profile?.lastName || names.slice(1).join(" "));
           setCountryCode(data.user.profile?.country || "US");
