@@ -391,20 +391,15 @@ export default {
     const initialWorkspaceType=profile.account_type;
     const initialWorkspaceName=initialWorkspaceType==="business"?String(body?.companyName||"").trim().replace(/[<>]/g,"").slice(0,100)||"Business":"Personal";
     await db.prepare("INSERT INTO workspaces (id,owner_id,type,name,currency) VALUES (?,?,?,?,?)").bind(initialWorkspaceId,id,initialWorkspaceType,initialWorkspaceName,profile.currency).run();
-    let verificationSent=false;
-    if(hasMailProvider(env)) {
-      try {
-        const token=await issueEmailToken(db,id,"verify",24*60*60*1000);
-        const link=(env.APP_URL || "https://novyra.pages.dev") + "/?verify=" + encodeURIComponent(token);
-        await sendMail(env,email,"تأیید ایمیل NOVYRA",renderNovyraEmail({eyebrow:"WELCOME TO NOVYRA",title:"به NOVYRA خوش آمدی",intro:"برای فعال‌سازی حساب و تأیید نشانی ایمیل خود، دکمه زیر را انتخاب کن.",actionLabel:"تأیید ایمیل",actionUrl:link,notice:"این لینک تا ۲۴ ساعت معتبر است.",footerNote:"اگر این حساب را ایجاد نکرده‌اید، این پیام را نادیده بگیرید."}));
-        verificationSent=true;
-      } catch (mailError) {
-        console.error("project-x-verification-email-error",mailError);
-      }
-    }
-    const session = await createSession(db,id);
-    return json({ token:session.token, expiresAt:session.expiresAt, user:{id,email,displayName,xp:0,gamesPlayed:0,role:email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile:{first_name:profile.first_name,last_name:profile.last_name,country:profile.country,currency:profile.currency,calendar:profile.calendar,number_format:profile.number_format,number_system:profile.number_system,date_format:profile.date_format,text_direction:profile.text_direction,week_start:profile.week_start,language:profile.language,account_type:profile.account_type,app_lock_type:profile.app_lock_type,app_lock_timeout:profile.app_lock_timeout,onboardingCompleted:profileComplete(profile)}}, emailVerificationRequired:env.REQUIRE_EMAIL_VERIFICATION==="true", verificationSent, message:verificationSent?"لینک تأیید ارسال شد.":"حساب ساخته شد؛ تنظیمات ارسال ایمیل هنوز لازم است." },201);
-   }
+    const ip=request.headers.get("CF-Connecting-IP")||"unknown";
+    if(!await hitAuthLimit(db,"register:"+ip,5,3600000))return fail("Too many registration attempts. Try again later.",429);
+    if(!await verifyTurnstile(body?.turnstileToken,request,env))return fail("Complete the security check.",403);
+    if(!hasMailProvider(env)){await db.prepare("DELETE FROM users WHERE id=?").bind(id).run();return fail("Email delivery is not configured.",503);}
+    try{
+      const code=await createSignupCode(db,id);
+      await sendMail(env,email,"Your NOVYRA verification code",renderNovyraEmail({eyebrow:"ACCOUNT VERIFICATION",title:"Your verification code",intro:"Enter this 6-digit code in Novyra to activate your account.",actionLabel:code,actionUrl:env.APP_URL||"https://novyra.pages.dev",notice:"This code expires in 10 minutes. Maximum 5 attempts.",footerNote:"If you did not create this account, ignore this email."}));
+    }catch(mailError){console.error("novyra-signup-code-delivery",mailError);await db.prepare("DELETE FROM users WHERE id=?").bind(id).run();return fail("Could not send the verification code. Try again later.",503);}
+    return json({verificationRequired:true,email,expiresInSeconds:600,resendCooldownSeconds:60,message:"Enter the 6-digit code sent to your email."},202);
 
    if (path === "/auth/verify-email" && request.method === "POST") {
     const body=await readBody(request), token=String(body?.token||"");
@@ -424,9 +419,9 @@ export default {
     if(!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
     const target=await db.prepare("SELECT id,email FROM users WHERE email=?").bind(email).first();
     if(target) {
-      const pending=await db.prepare("SELECT COUNT(*) AS total FROM email_tokens WHERE user_id=? AND kind='password_reset' AND expires_at>? AND used_at IS NULL").bind(target.id,Date.now()).first();
+      const pending=await db.prepare("SELECT COUNT(*) AS total FROM email_tokens WHERE user_id=? AND kind='reset' AND expires_at>? AND used_at IS NULL").bind(target.id,Date.now()).first();
       if((pending?.total||0)<3) {
-        const token=await issueEmailToken(db,target.id,"password_reset",60*60*1000);
+        const token=await issueEmailToken(db,target.id,"reset",60*60*1000);
         const link=(env.APP_URL || "https://novyra.pages.dev") + "/?reset=" + encodeURIComponent(token);
         await sendMail(env,target.email,"بازیابی رمز عبور NOVYRA",renderNovyraEmail({eyebrow:"ACCOUNT SECURITY",title:"بازیابی رمز عبور",intro:"درخواست انتخاب رمز عبور جدید برای حساب NOVYRA شما ثبت شده است. برای ادامه، دکمه زیر را انتخاب کنید.",actionLabel:"تغییر رمز عبور",actionUrl:link,notice:"این لینک فقط تا یک ساعت معتبر است و پس از آن منقضی می‌شود.",footerNote:"اگر شما این درخواست را ثبت نکرده‌اید، این ایمیل را نادیده بگیرید؛ رمز عبور حساب شما تغییر نخواهد کرد."}));
       }
