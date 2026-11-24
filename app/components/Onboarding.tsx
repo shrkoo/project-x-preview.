@@ -479,11 +479,17 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     } finally { setBusy(false); }
   }
 
+  const signupStages: Stage[] = ["firstName","lastName","email","country","password","confirmPassword","appLock","accountType"];
+  const progressStep = signupStages.indexOf(stage) + 1;
+  const previousStage: Partial<Record<Stage,Stage>> = { firstName:"welcome", lastName:"firstName", email:"lastName", country:"email", password:"country", confirmPassword:"password", appLock:"confirmPassword", accountType:"appLock" };
+  const localizedCountryName = (code:string, fallback:string) => { try { return new Intl.DisplayNames([language], {type:"region"}).of(code) || fallback; } catch { return fallback; } };
+
   return (
-    <main className={"px-onboarding" + (stage === "welcome" ? " px-language-screen" : "")} dir={dir} lang={language}>
+    <main data-step={progressStep} className={"px-onboarding" + (stage === "welcome" ? " px-language-screen" : "")} dir={dir} lang={language}>
       <div className="px-ambient px-ambient-one" /><div className="px-ambient px-ambient-two" />
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
       <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">NOVYRA</span></header>
+      {progressStep > 0 && <div className="px-flow-progress"><button type="button" aria-label={t("back")} onClick={()=>setStage(previousStage[stage] || "welcome")}>←</button><div className="px-flow-progress-main"><div className="px-flow-progress-label"><span>{t("step")} {progressStep} {t("of")} 8</span><span>{Math.round(progressStep/8*100)}%</span></div><div className="px-flow-progress-track"><i style={{width:(progressStep/8*100)+"%"}} /></div></div></div>}
       <section className="px-onboarding-stage">
         {!translationAvailable&&<p role="status" className="px-translation-note">{t("translationMissing")}</p>}
 
