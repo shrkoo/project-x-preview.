@@ -10,7 +10,7 @@ const PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
 const PERSIAN_GROUP_SEPARATOR = "\u066C";
 const PERSIAN_DECIMAL_SEPARATOR = "٫";
 
-/** The single number formatter used throughout NOVYRA. Persian output always uses U+066C. */
+/** The single number formatter used throughout NOVYRA. Persian output always uses U+066C and U+066B. */
 export function formatNumber(input: number, options: NumberFormatOptions = {}): string {
   const digits = options.digits ?? "fa";
   const finite = Number.isFinite(input) ? input : 0;
@@ -39,9 +39,11 @@ export function formatNumber(input: number, options: NumberFormatOptions = {}): 
   const maxDigits = Math.max(0, Math.min(20, maximumFractionDigits));
   const minDigits = Math.max(0, Math.min(maxDigits, minimumFractionDigits));
   const factor = 10 ** maxDigits;
-  const rounded = Math.round(value * factor) / factor;
-  const fixed = rounded.toFixed(maxDigits);
-  let [whole, fraction = ""] = fixed.split(".");
+  const scaled = Math.round(value * factor + Number.EPSILON);
+  const wholeValue = Math.floor(scaled / factor);
+  let whole = String(wholeValue);
+  let fraction = maxDigits ? String(scaled % factor).padStart(maxDigits, "0") : "";
+
   while (fraction.length > minDigits && fraction.endsWith("0")) {
     fraction = fraction.slice(0, -1);
   }
