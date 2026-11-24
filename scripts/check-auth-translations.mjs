@@ -40,4 +40,8 @@ for (const language of languages) {
 for (const key of ["country","passwordStrength","step","of","searchClear","noCountries"]) {
   assert.ok(flow.fa.has(key) && flow.ar.has(key) && flow.ckb.has(key) && flow.en.has(key), "Missing required translated key: " + key);
 }
-console.log("PASS: auth translations exist in English, Persian, Arabic and Sorani");
+const englishAvailable = new Set([...base.en,...flow.en]);
+const usedKeys = [...source.matchAll(/\\bt\\("([A-Za-z][A-Za-z0-9]*)"\\)/g)].map(match=>match[1]);
+const missingUsed = [...new Set(usedKeys)].filter(key=>!englishAvailable.has(key));
+assert.deepEqual(missingUsed, [], "A translation lookup can render a raw key");
+console.log("PASS: auth translations exist in English, Persian, Arabic and Sorani; no unresolved t() keys");
