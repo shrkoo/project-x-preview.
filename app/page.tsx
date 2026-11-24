@@ -20,6 +20,8 @@ export default function Home() {
   const [locked, setLocked] = useState(false);
   const [lockInput, setLockInput] = useState("");
   const [lockError, setLockError] = useState("");
+  const lockText=language==="fa"?{title:"قفل برنامه",description:"برای محافظت از اطلاعات خصوصی، قفل را باز کنید.",placeholder:"رمز یا الگو",verify:"تأیید با زیست‌سنجی",unlock:"بازکردن قفل"}:language==="ar"?{title:"التطبيق مقفل",description:"افتح القفل لحماية معلوماتك الخاصة.",placeholder:"PIN أو النمط",verify:"التحقق بالبصمة",unlock:"فتح القفل"}:language==="ckb"?{title:"ئەپ قوفڵە",description:"بۆ پاراستنی زانیارییە تایبەتییەکانت قوفڵەکە بکەرەوە.",placeholder:"PIN یان شێوە",verify:"پشتڕاستکردنەوە بە پەنجەمۆر",unlock:"کردنەوەی قوفڵ"}:{title:"App locked",description:"Unlock to protect your private information.",placeholder:"PIN or pattern",verify:"Verify with biometrics",unlock:"Unlock"};
+
 
   useEffect(() => {
     let alive = true;
@@ -134,11 +136,11 @@ export default function Home() {
 
   if (locked) return <main className="px-onboarding" dir={languageByCode.get(language)?.rtl?"rtl":"ltr"} lang={language}>
     <section className="px-onboarding-stage"><div className="px-glass-panel px-auth-panel">
-      <div className="px-auth-emblem">🔒</div><h1>{language==="fa"?"قفل برنامه":"App locked"}</h1>
-      <p className="px-stage-subtitle">{language==="fa"?"برای محافظت از اطلاعات خصوصی، قفل را باز کنید.":"Unlock to protect your private information."}</p>
-      {(localStorage.getItem("projectx-app-lock-type")==="pin"||localStorage.getItem("projectx-app-lock-type")==="pattern")&&<input type="password" autoComplete="off" value={lockInput} onChange={e=>setLockInput(e.target.value)} placeholder={language==="fa"?"رمز یا الگو":"PIN or pattern"} />}
+      <div className="px-auth-emblem">🔒</div><h1>{lockText.title}</h1>
+      <p className="px-stage-subtitle">{lockText.description}</p>
+      {(localStorage.getItem("projectx-app-lock-type")==="pin"||localStorage.getItem("projectx-app-lock-type")==="pattern")&&<input type="password" autoComplete="off" value={lockInput} onChange={e=>setLockInput(e.target.value)} placeholder={lockText.placeholder} />}
       {lockError&&<p role="alert">{lockError}</p>}
-      <button className="px-primary-action" onClick={unlockApp}>{localStorage.getItem("projectx-app-lock-type")==="biometric"?(language==="fa"?"تأیید با زیست‌سنجی":"Verify with biometrics"):(language==="fa"?"بازکردن قفل":"Unlock")}</button>
+      <button className="px-primary-action" onClick={unlockApp}>{localStorage.getItem("projectx-app-lock-type")==="biometric"?lockText.verify:lockText.unlock}</button>
     </div></section>
   </main>;
 
