@@ -13,7 +13,7 @@ import { defaultDateFormat, saveRegionalPreferences } from "../lib/regional-pref
 type Language = (typeof languages)[number]["code"];
 type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string; profile?: { firstName?:string; lastName?:string; country?:string; currency?:string; calendar?:string; numberFormat?:string; weekStart?:"saturday"|"sunday"|"monday"; language?:Language; accountType?:"personal"|"business"; appLockType?:"none"|"pin"|"pattern"|"biometric"; onboardingCompleted?:boolean } };
 type Props = { onComplete: (user: User | null, language: Language) => void; initialNotice?: string };
-type Stage = "welcome" | "firstName" | "lastName" | "email" | "country" | "password" | "confirmPassword" | "appLock" | "accountType" | "login" | "profile" | "passwordSetup";
+type Stage = "welcome" | "signupAll" | "firstName" | "lastName" | "email" | "country" | "password" | "confirmPassword" | "appLock" | "accountType" | "login" | "profile" | "passwordSetup";
 type Mode = "login" | "signup";
 
 const copy: Partial<Record<Language, Record<string, string>>> = {
@@ -188,7 +188,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           });
           setGooglePending(true);
           setMode("signup");
-          setStage("firstName");
+          setStage("signupAll");
           return;
         }
         const preferredLanguage = (localStorage.getItem("projectx-language") || data.user.profile?.language || language) as Language;
@@ -469,7 +469,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     } finally { setBusy(false); }
   }
 
-  const signupStages: Stage[] = ["firstName","lastName","email","country","password","confirmPassword","appLock","accountType"];
+  const signupStages: Stage[] = [];
   const progressStep = signupStages.indexOf(stage) + 1;
   const previousStage: Partial<Record<Stage,Stage>> = { firstName:"welcome", lastName:"firstName", email:"lastName", country:"email", password:"country", confirmPassword:"password", appLock:"confirmPassword", accountType:"appLock" };
   const localizedCountryName = (code:string, fallback:string) => { try { return new Intl.DisplayNames([language], {type:"region"}).of(code) || fallback; } catch { return fallback; } };
@@ -491,7 +491,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       <div className="px-ambient px-ambient-one" /><div className="px-ambient px-ambient-two" />
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
       <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">NOVYRA</span></header>
-      {progressStep > 0 && <div className="px-flow-progress"><button type="button" aria-label={t("back")} onClick={()=>setStage(previousStage[stage] || "welcome")}>{dir==="rtl"?"→":"←"}</button><div className="px-flow-progress-main"><div className="px-flow-progress-label"><span>{t("step")} {progressStep} {t("of")} 8</span><span>{Math.round(progressStep/8*100)}%</span></div><div className="px-flow-progress-track"><i style={{width:(progressStep/8*100)+"%"}} /></div></div></div>}
+      {progressStep > 0 && stage !== "signupAll" && <div className="px-flow-progress"><button type="button" aria-label={t("back")} onClick={()=>setStage(previousStage[stage] || "welcome")}>{dir==="rtl"?"→":"←"}</button><div className="px-flow-progress-main"><div className="px-flow-progress-label"><span>{t("step")} {progressStep} {t("of")} 8</span><span>{Math.round(progressStep/8*100)}%</span></div><div className="px-flow-progress-track"><i style={{width:(progressStep/8*100)+"%"}} /></div></div></div>}
       <section className="px-onboarding-stage">
         {!translationAvailable&&<p role="status" className="px-translation-note">{t("translationMissing")}</p>}
 
@@ -501,6 +501,52 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <button type="button" className="px-primary-action" onClick={()=>{setMode("signup");setStage("firstName");setNotice("");}}>{t("signUp")} <span>↗</span></button>
           <button type="button" className="px-social-button" onClick={()=>{setMode("login");setStage("login");setNotice("");}}>{t("logIn")}</button>
           <button type="button" className="px-social-button px-google-button" onClick={socialUnavailable}><GoogleMark/><span>{t("google")}</span></button>
+        </div>}
+        {stage === "signupAll" && <div className="px-glass-panel px-language-panel px-signup-one-page">
+          <div className="px-eyebrow">NOVYRA / CREATE ACCOUNT</div>
+          <h1>{t("signupTitle")}</h1><p className="px-stage-subtitle">{t("signupSub")}</p>
+          <div className="px-signup-section">
+            <h2>{language==="fa"?"اطلاعات شخصی":t("firstName")+" & "+t("lastName")}</h2>
+            <label className="px-field"><span>{t("firstName")}</span><input autoComplete="given-name" value={firstName} onChange={e=>setFirstName(e.target.value)} /></label>
+            <label className="px-field"><span>{t("lastName")}</span><input autoComplete="family-name" value={lastName} onChange={e=>setLastName(e.target.value)} /></label>
+            <label className="px-field"><span>{t("email")}</span><input type="email" autoComplete="email" inputMode="email" dir="ltr" value={email} onChange={e=>setEmail(e.target.value)} /></label>
+          </div>
+          <div className="px-signup-section">
+            <h2>{t("country")}</h2><p className="px-stage-subtitle">{t("countrySub")}</p>
+            <div className="px-country-search"><input aria-label={t("searchCountry")} value={countrySearch} onChange={e=>setCountrySearch(e.target.value)} placeholder={t("searchCountry")} /><button type="button" aria-label={t("searchClear")} onClick={()=>setCountrySearch("")} hidden={!countrySearch}>×</button></div>
+            <div role="listbox" aria-label={t("country")} className="px-country-list px-country-list-inline">
+              {countries.filter(item=>[item.name,item.nativeName,item.code,localizedCountryName(item.code,item.name)].some(value=>value.toLocaleLowerCase().includes(countrySearch.trim().toLocaleLowerCase()))).map(item=><button type="button" key={item.code} onClick={()=>applyCountry(item.code)} aria-selected={countryCode===item.code} className={"px-country-option"+(countryCode===item.code?" is-selected":"")}><span className="px-country-flag">{item.flag}</span><span className="px-country-names"><strong>{localizedCountryName(item.code,item.name)}</strong><small>{item.nativeName}</small></span>{countryCode===item.code&&<span className="px-country-check">✓</span>}</button>)}
+              {!countries.some(item=>[item.name,item.nativeName,item.code,localizedCountryName(item.code,item.name)].some(value=>value.toLocaleLowerCase().includes(countrySearch.trim().toLocaleLowerCase())))&&<p>{t("noCountries")}</p>}
+            </div>
+            <div className="px-signup-preferences">
+              <strong>{language==="fa"?"پیش‌نمایش تنظیمات منطقه‌ای":"Regional preferences"}</strong>
+              <label>{t("language")}<select value={language} onChange={e=>chooseLanguage(e.target.value as Language)}>{languages.map(item=><option key={item.code} value={item.code}>{item.nativeName} · {item.name}</option>)}</select></label>
+              <label>{t("currency")}<select value={regional.currency} onChange={e=>setRegional(v=>({...v,currency:e.target.value}))}>{currencies.map(item=><option key={item.code} value={item.code}>{item.code} — {localizedCurrencyName(item.code,item.name)}</option>)}</select></label>
+              <label>{t("calendar")}<select value={regional.calendar} onChange={e=>setRegional(v=>({...v,calendar:e.target.value}))}>{calendars.map(item=><option key={item.code} value={item.code}>{calendarNames[language]?.[item.code]||item.nativeName||item.name}</option>)}</select></label>
+              <label>{t("numberSystem")}<select value={regional.digits} onChange={e=>setRegional(v=>({...v,digits:e.target.value}))}>{numberSystems.map(item=><option key={item.code} value={item.code}>{numberNames[language]?.[item.code]||item.nativeName||item.name}</option>)}</select></label>
+              <label>{t("dateFormat")}<select value={regional.dateFormat} onChange={e=>setRegional(v=>({...v,dateFormat:e.target.value}))}>{["DD/MM/YYYY","MM/DD/YYYY","YYYY-MM-DD","YYYY/MM/DD","DD.MM.YYYY"].map(item=><option key={item}>{item}</option>)}</select></label>
+              <label>{t("weekStart")}<select value={regional.weekStart} onChange={e=>setRegional(v=>({...v,weekStart:e.target.value as "saturday"|"sunday"|"monday"}))}>{weekdays.map(item=><option key={item.code} value={item.code}>{localizedWeekday(item.code,item.name)}</option>)}</select></label>
+            </div>
+          </div>
+          <div className="px-signup-section">
+            <h2>{t("password")}</h2>
+            <label className="px-field"><span>{t("password")}</span><span className="px-password-wrap"><input type={showPassword?"text":"password"} autoComplete="new-password" value={password} onChange={e=>setPassword(e.target.value)} /><button type="button" onClick={()=>setShowPassword(v=>!v)} aria-label={showPassword?t("hidePassword"):t("showPassword")}><EyeMark visible={showPassword}/></button></span></label>
+            <div className="px-password-strength"><span>{t("passwordStrength")}: </span><b>{passwordStrengthScore<3?t("weak"):passwordStrengthScore<4?t("medium"):t("strong")}</b><div style={{height:5,borderRadius:8,background:"rgba(120,130,150,.22)",overflow:"hidden",marginTop:6}}><div style={{height:"100%",width:(passwordStrengthScore*20)+"%",background:passwordStrengthScore<3?"#c45d5d":passwordStrengthScore<4?"#c39a42":"#39956b",transition:"width .2s"}}/></div></div>
+            <label className="px-field"><span>{t("confirm")}</span><span className="px-password-wrap"><input type={showConfirm?"text":"password"} autoComplete="new-password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} /><button type="button" onClick={()=>setShowConfirm(v=>!v)} aria-label={showConfirm?t("hidePassword"):t("showPassword")}><EyeMark visible={showConfirm}/></button></span></label>
+            {confirmPassword&&password!==confirmPassword&&<small role="alert">{t("passwordMismatch")}</small>}
+          </div>
+          <div className="px-signup-section">
+            <h2>{t("lockTitle")}</h2><p className="px-stage-subtitle">{t("lockExplain")}</p>
+            <div className="px-lock-options">{(["none","pin","pattern","biometric"] as const).map(value=><button type="button" key={value} className={lockType===value?"is-selected":""} onClick={()=>{setLockType(value);setLockSecret("");setLockTouched(true);}}>{t(value==="none"?"noLock":value)}</button>)}</div>
+            {lockType==="pin"&&<label className="px-field"><span>{t("lockSecret")}</span><input type="password" inputMode="numeric" value={lockSecret} onChange={e=>setLockSecret(e.target.value.replace(/[^0-9]/g,"").slice(0,12))} autoComplete="off" /></label>}
+            {lockType==="pattern"&&<div className="px-lock-grid" role="group" aria-label={t("pattern")}>{Array.from({length:9},(_,i)=>String(i+1)).map(point=><button type="button" key={point} aria-pressed={lockSecret.includes(point)} className={lockSecret.includes(point)?"is-selected":""} onClick={()=>setLockSecret(value=>value.includes(point)?value:value+point)}>{lockSecret.includes(point)?"●":"○"}</button>)}<button type="button" className="px-pattern-clear" onClick={()=>setLockSecret("")}>{t("clearPattern")}</button></div>}
+            {lockType==="biometric"&&<><p role="status">{lockSecret?t("biometric"):t("biometricUnsupported")}</p><button type="button" className="px-skip-action" disabled={busy} onClick={registerBiometric}>{busy?"…":t("biometric")}</button></>}
+          </div>
+          <div className="px-signup-section">
+            <h2>{t("accountType")}</h2><div className="px-lock-options"><button type="button" className={accountType==="personal"?"is-selected":""} onClick={()=>setAccountType("personal")}>{t("personal")}</button><button type="button" className={accountType==="business"?"is-selected":""} onClick={()=>setAccountType("business")}>{t("business")}</button></div>
+          </div>
+          <button className="px-primary-action" disabled={busy} onClick={async()=>{if(!firstName.trim()){setNotice(t("firstRequired"));return;}if(!lastName.trim()){setNotice(t("lastRequired"));return;}if(!/^\S+@\S+\.\S+$/.test(email.trim())){setNotice(t("emailInvalid"));return;}if(password.length<10){setNotice(t("weakPassword"));return;}if(password!==confirmPassword){setNotice(t("passwordMismatch"));return;}if(lockType==="pin"&&lockSecret.length<6||lockType==="pattern"&&lockSecret.length<4){setNotice(t("lockRequired"));return;}if(lockType==="biometric"&&!lockSecret){setNotice(t("biometricUnsupported"));return;}if(googlePending){await finishGoogleOnboarding();return;}setMode("signup");await submitAuth();}}>{busy?t("emailCheck"):t("createAccount")} ↗</button>
+          <button type="button" className="px-switch-mode" onClick={()=>{setMode("login");setStage("login");setNotice("");}}>{t("haveAccount")} {t("loginLink")}</button>
         </div>}
         {stage === "firstName" && <div className="px-glass-panel px-auth-panel">
           <button className="px-back-link" onClick={()=>setStage("welcome")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
