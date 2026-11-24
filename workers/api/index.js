@@ -433,7 +433,7 @@ export default {
     const body=await readBody(request), token=String(body?.token||""), salt=String(body?.salt||""), suppliedHash=String(body?.passwordHash||"");
     if(!/^(?:[A-Za-z0-9_-]{22}|[a-f0-9]{32})$/.test(salt) || !/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("اطلاعات رمز جدید معتبر نیست.");
     const tokenHash=await digest(token);
-    const record=await db.prepare("SELECT id,user_id FROM email_tokens WHERE token_hash=? AND kind='password_reset' AND expires_at>? AND used_at IS NULL").bind(tokenHash,Date.now()).first();
+    const record=await db.prepare("SELECT id,user_id FROM email_tokens WHERE token_hash=? AND kind='reset' AND expires_at>? AND used_at IS NULL").bind(tokenHash,Date.now()).first();
     if(!record) return fail("لینک بازیابی معتبر نیست یا منقضی شده است.",410);
     await db.batch([
       db.prepare("UPDATE users SET password_hash=?,password_salt=? WHERE id=?").bind(suppliedHash,salt,record.user_id),
