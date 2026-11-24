@@ -168,18 +168,22 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         setUser(data.user);
         setEmail(data.user.email);
         if (googleNew === "1") {
-          const googleLanguage=(data.user.profile?.language || "en") as Language;
-          if(languageByCode.has(googleLanguage)){setLanguage(googleLanguage);document.documentElement.lang=googleLanguage;document.documentElement.dir=languageByCode.get(googleLanguage)?.rtl?"rtl":"ltr";}
+          const savedLanguage=(localStorage.getItem("projectx-language") || data.user.profile?.language || "en") as Language;
+          if(languageByCode.has(savedLanguage)){setLanguage(savedLanguage);document.documentElement.lang=savedLanguage;document.documentElement.dir=languageByCode.get(savedLanguage)?.rtl?"rtl":"ltr";}
           const names=(data.user.displayName||"").trim().split(/\s+/);
           setFirstName(data.user.profile?.firstName || names[0] || "");
           setLastName(data.user.profile?.lastName || names.slice(1).join(" "));
-          setCountryCode(data.user.profile?.country || "US");
+          const savedCountry=localStorage.getItem("projectx-country") || data.user.profile?.country || "US";
+          const savedPrefs=(()=>{try{return JSON.parse(localStorage.getItem("novyra-preferences-v1")||"{}");}catch{return {};}})();
+          const selectedCountry=countries.find(item=>item.code===savedCountry);
+          setCountryCode(savedCountry);
+          setAccountType((localStorage.getItem("projectx-account-type") as "personal"|"business"|null) || data.user.profile?.accountType || "personal");
           setRegional({
-            currency:data.user.profile?.currency || "USD",
-            calendar:data.user.profile?.calendar || "gregory",
-            digits:"latn",
-            dateFormat:getDateFormat(data.user.profile?.language || "en",data.user.profile?.country || "US"),
-            weekStart:data.user.profile?.weekStart || "monday"
+            currency:localStorage.getItem("novyra-finance-currency") || data.user.profile?.currency || selectedCountry?.defaultCurrency || "USD",
+            calendar:savedPrefs.calendar || data.user.profile?.calendar || selectedCountry?.defaultCalendar || "gregory",
+            digits:savedPrefs.digits || selectedCountry?.defaultNumberSystem || "latn",
+            dateFormat:localStorage.getItem("novyra-date-format") || savedPrefs.dateFormat || getDateFormat(savedLanguage,savedCountry),
+            weekStart:savedPrefs.firstDay || data.user.profile?.weekStart || selectedCountry?.weekStart || "monday"
           });
           setGooglePending(true);
           setMode("signup");
