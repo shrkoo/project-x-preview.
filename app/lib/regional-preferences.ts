@@ -65,6 +65,7 @@ export function formatDate(value: Date | string | number, prefs: RegionalPrefere
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) throw new RangeError("Invalid date");
   const formatter = new Intl.DateTimeFormat(localeForPreferences(prefs), { year: "numeric", month: "2-digit", day: "2-digit", ...options });
+  if (options.day === undefined && Object.keys(options).length > 0) return formatter.format(date);
   const parts = Object.fromEntries(formatter.formatToParts(date).map(part => [part.type, part.value]));
   const pattern = prefs.dateFormat || "YYYY-MM-DD";
   return pattern.replace(/YYYY|MM|DD/g, token => token === "YYYY" ? (parts.year || "") : token === "MM" ? (parts.month || "") : (parts.day || ""));
