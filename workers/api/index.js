@@ -156,6 +156,26 @@ async function authenticate(request, db) {
 function cleanName(value) { return String(value || "").trim().replace(/[<>]/g, "").slice(0, 32); }
 function cleanEmail(value) { return String(value ?? "").normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g, "").replace(/\s+/g, "").toLowerCase().slice(0, 254); }
 
+async function verifyTurnstile(token, request, env) {
+  if (!env.TURNSTILE_SECRET_KEY || !token) return false;
+  const form = new URLSearchParams({secret: env.TURNSTILE_SECRET_KEY, response: String(token)});
+  const ip = request.headers.get("CF-Connecting-IP"); if (ip) form.set("remoteip", ip);
+  const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {method:"POST", body:form});
+  if (!response.ok) return false;
+  const result = await response.json(); return result.success === true;
+}
+async function hitAuthLimit(db, key, max = 6, windowMs = 600000) {
+  const now=Date.now(),cutoff=now-windowMs;
+  const row=await db.prepare("INSERT INTO auth_rate_limits(rate_key,window_started_at,request_count) VALUES(?,?,1) ON CONFLICT(rate_key) DO UPDATE SET window_started_at=CASE WHEN auth_rate_limits.window_started_at<? THEN ? ELSE auth_rate_limits.window_started_at END,request_count=CASE WHEN auth_rate_limits.window_started_at<? THEN 1 ELSE auth_rate_limits.request_count+1 END RETURNING request_count").bind(key,now,cutoff,now,cutoff).first();
+  return Number(row?.request_count||0)<=max;
+}
+async function createSignupCode(db,userId) {
+  const code=String(crypto.getRandomValues(new Uint32Array(1))[0]%1000000).padStart(6,"0"),now=Date.now();
+  await db.prepare("UPDATE signup_verification_codes SET used_at=? WHERE user_id=? AND used_at IS NULL").bind(now,userId).run();
+  await db.prepare("INSERT INTO signup_verification_codes(id,user_id,code_hash,expires_at,attempts,sent_at) VALUES(?,?,?,?,0,?)").bind(crypto.randomUUID(),userId,await digest(userId+":"+code),now+600000,now).run();
+  return code;
+}
+
 const PROFILE_DEFAULTS = {
   first_name: "", last_name: "", country: "US", currency: "USD",
   calendar: "gregory", number_format: "1,234.56", number_system: "latn",
@@ -256,6 +276,42 @@ export default {
   const db = env.DB;
   try {
    if (path === "/health" && request.method === "GET") return json({ ok: true, service: "novyra-api", database: "connected", region: "EU" });
+   if(path==="/auth/email-check" && request.method==="POST"){
+    const body=await readBody(request),email=cleanEmail(body?.email);
+    if(!/^\\S+@\\S+\\.\\S+$/.test(email))return fail("Enter a valid email.");
+    const ip=request.headers.get("CF-Connecting-IP")||"unknown";
+    if(!await hitAuthLimit(db,"email-check:"+ip,8,600000))return fail("Too many checks. Try again later.",429);
+    if(!await verifyTurnstile(body?.turnstileToken,request,env))return fail("Complete the security check.",403);
+    const found=await db.prepare("SELECT auth_provider FROM users WHERE email=? LIMIT 1").bind(email).first();
+    return json({exists:Boolean(found),provider:found?.auth_provider==="google"?"google":found?"password":null});
+   }
+   if(path==="/auth/verify-code" && request.method==="POST"){
+    const body=await readBody(request),email=cleanEmail(body?.email),code=String(body?.code||"").replace(/\\D/g,"");
+    if(!/^\\d{6}$/.test(code))return fail("Enter the 6-digit code.");
+    const ip=request.headers.get("CF-Connecting-IP")||"unknown";
+    if(!await hitAuthLimit(db,"verify-code:"+ip,10,600000))return fail("Too many attempts.",429);
+    const user=await db.prepare("SELECT * FROM users WHERE email=?").bind(email).first();
+    if(!user)return fail("The code is invalid or expired.",410);
+    const row=await db.prepare("SELECT id,code_hash,expires_at,attempts FROM signup_verification_codes WHERE user_id=? AND used_at IS NULL ORDER BY sent_at DESC LIMIT 1").bind(user.id).first();
+    if(!row||Number(row.expires_at)<=Date.now()||Number(row.attempts)>=5)return fail("The code is invalid or expired.",410);
+    if(await digest(user.id+":"+code)!==row.code_hash){await db.prepare("UPDATE signup_verification_codes SET attempts=attempts+1 WHERE id=?").bind(row.id).run();return fail("The code is incorrect.");}
+    await db.batch([db.prepare("UPDATE signup_verification_codes SET used_at=? WHERE id=?").bind(Date.now(),row.id),db.prepare("UPDATE users SET verified_at=CURRENT_TIMESTAMP WHERE id=?").bind(user.id)]);
+    const session=await createSession(db,user.id);
+    return json({token:session.token,expiresAt:session.expiresAt,user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role,profile:publicProfile(user)}});
+   }
+   if(path==="/auth/resend-code" && request.method==="POST"){
+    const body=await readBody(request),email=cleanEmail(body?.email),ip=request.headers.get("CF-Connecting-IP")||"unknown";
+    if(!await hitAuthLimit(db,"resend-code:"+ip,4,900000))return fail("Resend limit reached.",429);
+    const user=await db.prepare("SELECT id,email,verified_at FROM users WHERE email=?").bind(email).first();
+    if(!user||user.verified_at)return json({ok:true});
+    const previous=await db.prepare("SELECT sent_at FROM signup_verification_codes WHERE user_id=? ORDER BY sent_at DESC LIMIT 1").bind(user.id).first();
+    if(previous&&Date.now()-Number(previous.sent_at)<60000)return fail("Wait before requesting another code.",429);
+    if(!hasMailProvider(env))return fail("Email delivery is not configured.",503);
+    const code=await createSignupCode(db,user.id);
+    await sendMail(env,email,"Your NOVYRA verification code",renderNovyraEmail({eyebrow:"ACCOUNT VERIFICATION",title:"Your verification code",intro:"Enter this 6-digit code in Novyra to activate your account.",actionLabel:code,actionUrl:env.APP_URL||"https://novyra.pages.dev",notice:"This code expires in 10 minutes. Maximum 5 attempts.",footerNote:"If you did not create this account, ignore this email."}));
+    return json({ok:true,cooldownSeconds:60});
+   }
+
 
    if (path === "/auth/google/start" && request.method === "GET") {
     if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) return fail("ورود با Google هنوز پیکربندی نشده است.",503);
