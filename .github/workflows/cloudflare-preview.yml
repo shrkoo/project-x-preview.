@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   deploy-preview:
+    if: vars.PREVIEW_DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
     environment: preview
     steps:
