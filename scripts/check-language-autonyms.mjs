@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 // Keep this allowlist limited to languages whose established endonym is
 // conventionally identical to their English label.
-const sameNameAutonyms = new Set(["af", "ak", "bi", "en", "eo", "ha", "ho", "ia", "ie", "io", "kl", "kr", "mg", "oc", "tw", "vo", "wo"]);
+const sameNameAutonyms = new Set(["af", "en", "eo"]);
 
 const source = readFileSync(new URL("../app/data/languages.ts", import.meta.url), "utf8");
 assert.match(source, /export const languages: LanguageOption\[\] = \[/, "languages.ts must be a TypeScript source file with a typed language array");
