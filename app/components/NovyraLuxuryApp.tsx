@@ -148,7 +148,7 @@ const points=chartValues.map((v,i)=>({x:i*600/(chartValues.length-1),y:176-(Math
 const line=points.map((p,i)=>{if(i===0)return `M ${p.x} ${p.y}`;const prev=points[i-1],dx=p.x-prev.x;return ` C ${prev.x+dx/3} ${prev.y}, ${p.x-dx/3} ${p.y}, ${p.x} ${p.y}`}).join("");
 const area=line+" L 600 184 L 0 184 Z";
 const lastDataIndex=points.reduce((last,p,i)=>p.v>0?i:last,-1);
-const selected=activeDay===null?(lastDataIndex>=0?points[lastDataIndex]:null):points[Math.min(points.length-1,Math.max(0,Math.round((activeDay-1)*(points.length-1)/29)))];
+const selected=activeDay===null?(lastDataIndex>=0?points[lastDataIndex]:null):points[Math.min(points.length-1,Math.max(0,activeDay-1))];
 const yLabels=[10_000_000,8_000_000,6_000_000,4_000_000,2_000_000,0];
 
 const demoTotal=6_650_000,demoPrevious=6_354_860;
@@ -174,7 +174,7 @@ return <div className="nv-ref-spending-page an-screen">
 {hasData&&selected&&<>
 <i className="nv-spend-dot an-chart-point" style={{left:`${(selected.x/600)*100}%`,top:`${selected.y/190*100}%`}}/>
 </>}
-{hasData&&selected&&<div className={"nv-spend-tooltip an-chart-tooltip"+(selected.y<44?" below":"")} style={{left:`clamp(72px, ${(selected.x/600)*100}%, calc(100% - 72px))`,top:`${selected.y/190*100}%`}} aria-live="polite">{fmt(selected.v)} ریال</div>}
+{hasData&&selected&&<div className="nv-spend-tooltip an-chart-tooltip" style={{left:`clamp(72px, ${(selected.x/600)*100}%, calc(100% - 72px))`,top:`${Math.max(38,selected.y)/190*100}%`}} aria-live="polite"><bdi dir="ltr">{fmt(selected.v)}</bdi>{" "}ریال</div>}
 </div>
 </div>
 {monthlyBudget&&<div className="nv-spend-budget">بودجه ماهانه: {cash(Number(monthlyBudget)||0,"IRR",loc,"fa")} · {Number(monthlyBudget)>0?Math.round(currentTotal/Number(monthlyBudget)*100)+"% used":"—"}</div>}
