@@ -81,5 +81,8 @@
   "googleAccountExists": "Bu e-posta Google ile kayıtlı. Google ile devam edin.",
   "forgotPassword": "Şifrenizi mi unuttunuz?",
   "forgotSent": "Hesap varsa şifre sıfırlama talimatları gönderildi.",
-  "captchaAgain": "Devam etmek için güvenlik kontrolünü tekrar tamamlayın."
+  "captchaAgain": "Devam etmek için güvenlik kontrolünü tekrar tamamlayın.",
+  "resetPasswordTitle": "Yeni bir şifre belirleyin",
+  "resetPassword": "Şifreyi sıfırla",
+  "passwordResetDone": "Şifreniz sıfırlandı. Yeni şifrenizle giriş yapın."
 }
