@@ -61,5 +61,13 @@
   "overview": "Overview",
   "recent": "Recent activity",
   "profile": "Profile",
-  "createBusiness": "Add business workspace"
+  "createBusiness": "Add business workspace",
+  "getStarted": "GET STARTED",
+  "financialClarity": "FINANCIAL CLARITY, REIMAGINED",
+  "language": "Language",
+  "hidePassword": "Hide password",
+  "showPassword": "Show password",
+  "dismiss": "Dismiss",
+  "timeout": "The request timed out. Please try again.",
+  "noResults": "No results"
 }
