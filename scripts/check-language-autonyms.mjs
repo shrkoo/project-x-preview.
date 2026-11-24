@@ -3,7 +3,25 @@ import assert from "node:assert/strict";
 
 // Keep this allowlist limited to languages whose established endonym is
 // conventionally identical to their English label.
-const sameNameAutonyms = new Set(["af", "en", "eo"]);
+const sameNameAutonyms = {
+  af: "Afrikaans",
+  en: "English",
+  eo: "Esperanto",
+  ak: "Akan",
+  bi: "Bislama",
+  ha: "Hausa",
+  ho: "Hiri Motu",
+  ia: "Interlingua",
+  ie: "Interlingue",
+  io: "Ido",
+  kl: "kalaallisut",
+  kr: "Kanuri",
+  mg: "Malagasy",
+  oc: "occitan",
+  tw: "Twi",
+  vo: "Volapük",
+  wo: "Wolof"
+};
 
 const source = readFileSync(new URL("../app/data/languages.ts", import.meta.url), "utf8");
 assert.match(source, /export const languages: LanguageOption\[\] = \[/, "languages.ts must be a TypeScript source file with a typed language array");
@@ -14,9 +32,12 @@ assert.ok(languages.length >= 180, "Expected the full language catalog");
 const failures = languages.filter(({ code, name, nativeName }) =>
   !nativeName || nativeName.trim() === "" ||
   nativeName.toLocaleLowerCase() === code.toLocaleLowerCase() ||
-  (nativeName.toLocaleLowerCase() === name.toLocaleLowerCase() && !sameNameAutonyms.has(code))
+  (nativeName.toLocaleLowerCase() === name.toLocaleLowerCase() && sameNameAutonyms[code] !== nativeName)
 );
 assert.deepEqual(failures, [], "Every language needs a real autonym; review equal-to-code/English entries");
+for (const [code, expected] of Object.entries(sameNameAutonyms)) {
+  assert.equal(languages.find(language => language.code === code)?.nativeName, expected, `Reviewed autonym for ${code}`);
+}
 
 const byCode = new Map(languages.map(language => [language.code, language]));
 assert.equal(byCode.get("ckb")?.rtl, true, "Sorani must be RTL");
