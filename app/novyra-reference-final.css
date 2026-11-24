@@ -4309,3 +4309,12 @@
   height:22px!important;
   stroke:currentColor!important;
 }
+
+
+/* PART 1 follow-up — final Home balance computed-size guard */
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root strong.hm-balance-amount,
+.nv-finance.nv-home-active.home-screen[lang="fa"] .home-root strong.hm-balance-amount>bdi {
+  font-size:36px!important;
+  font-weight:800!important;
+  line-height:1.1!important;
+}

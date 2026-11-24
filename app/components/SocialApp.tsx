@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { apiRequest, apiUpload, clearSession } from "../lib/api";
+import { formatNumber } from "../lib/formatNumber";
 import MobileBottomNav, { NavKey } from "./MobileBottomNav";
 import InstagramHomeReplica from "./InstagramHomeReplica";
 import AppIcon from "./AppIcon";
@@ -134,14 +135,7 @@ function initials(name: string) {
 }
 
 function formatExploreViews(value: number | undefined) {
-  const count = Math.max(0, Number(value) || 0);
-  const format = (number: number) => new Intl.NumberFormat("fa-IR", {
-    minimumFractionDigits: Number.isInteger(number) ? 0 : 1,
-    maximumFractionDigits: 1,
-  }).format(number).replace(/,/g, "٬").replace(/\./g, "٫");
-  if (count < 10000) return new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 0 }).format(Math.floor(count));
-  if (count < 1000000) return `${format(Math.round((count / 1000) * 10) / 10)} هزار`;
-  return `${format(Math.round((count / 1000000) * 10) / 10)} میلیون`;
+  return formatNumber(Math.max(0, Number(value) || 0), {digits:"fa",compact:true});
 }
 
 function formatPostAge(createdAt: string, language: Language) {
@@ -903,7 +897,7 @@ export default function SocialApp({ account, language, notice, onClearNotice, on
             {loading ? <p className="social-muted social-center">{t.loading}</p> : <>
               <div className="nv-profile-cover"><span className="nv-cover-status"/></div>
               <div className="nv-profile-hero"><div className="nv-avatar-wrap"><span className="nv-profile-avatar nv-profile-avatar-placeholder">{initials(profile?.displayName || account.displayName)}</span><button type="button" className="nv-camera-badge" aria-label="Change profile photo"><AppIcon icon={Camera}/></button></div><h2>{profile?.displayName || account.displayName}</h2><p>@{(profile?.displayName || account.displayName).toLowerCase().replace(/[^a-z0-9]/g,"") || "username"}</p><button type="button" className="nv-edit-pill" onClick={() => document.getElementById("nv-profile-name")?.focus()}>{t.editProfile}</button></div>
-              <div className="nv-profile-stats"><div><strong>{profile?.postCount ?? profilePosts.length}</strong><small>{t.postCount}</small></div><div><strong>{(profile?.followerCount ?? 0).toLocaleString(language==="fa"?"fa-IR":undefined)}</strong><small>{t.followers}</small></div><div><strong>{(profile?.followingCount ?? 0).toLocaleString(language==="fa"?"fa-IR":undefined)}</strong><small>{t.followingCount}</small></div><div><strong>{profilePosts.reduce((sum,post)=>sum+(post.likeCount||0),0).toLocaleString(language==="fa"?"fa-IR":undefined)}</strong><small>{language==="fa"?"پسندها":"Likes"}</small></div></div>
+              <div className="nv-profile-stats"><div><strong>{formatNumber(profile?.postCount ?? profilePosts.length,{digits:language==="fa"?"fa":"en"})}</strong><small>{t.postCount}</small></div><div><strong>{formatNumber(profile?.followerCount ?? 0,{digits:language==="fa"?"fa":"en"})}</strong><small>{t.followers}</small></div><div><strong>{formatNumber(profile?.followingCount ?? 0,{digits:language==="fa"?"fa":"en"})}</strong><small>{t.followingCount}</small></div><div><strong>{formatNumber(profilePosts.reduce((sum,post)=>sum+(post.likeCount||0),0),{digits:language==="fa"?"fa":"en"})}</strong><small>{language==="fa"?"پسندها":"Likes"}</small></div></div>
               <div className="nv-profile-tabs" role="tablist" aria-label="Profile content">{(["Photos","Videos","Saved"] as const).map(tab=><button key={tab} type="button" className={profileTab===tab?"is-active":""} onClick={() => {setProfileTab(tab);if(tab==="Saved")void loadSavedPosts();}}>{tab==="Saved" && <AppIcon icon={LockKeyhole}/>}<span>{tab}</span></button>)}</div>
               <div className="nv-profile-grid">{(profileTab==="Saved"?savedPosts:profilePosts.filter(post=>profileTab==="Photos"?post.mediaType==="image":post.mediaType==="video")).map(item=><button type="button" key={item.id} className="nv-profile-tile" onClick={()=>openMediaViewer(item,profileTab==="Saved"?savedPosts:profilePosts.filter(post=>profileTab==="Photos"?post.mediaType==="image":post.mediaType==="video"),"profile")}>{item.mediaType==="video"?<><video src={item.mediaUrl||undefined} muted playsInline preload="metadata"/><AppIcon icon={Play}/></>:item.mediaUrl?<img src={item.mediaUrl} alt="" loading="lazy"/>:<span className="nv-explore-text-tile">{item.body}</span>}</button>)}</div>
               <form className="social-profile-edit" onSubmit={saveProfile}><label>{t.editProfile}<input id="nv-profile-name" value={profileName} onChange={event => setProfileName(event.target.value)} maxLength={32}/></label><button type="submit" disabled={profileSaving || profileName.trim().length<2}>{profileSaving?"…":t.save}</button></form>
