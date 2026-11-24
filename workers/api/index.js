@@ -400,6 +400,7 @@ export default {
       await sendMail(env,email,"Your NOVYRA verification code",renderNovyraEmail({eyebrow:"ACCOUNT VERIFICATION",title:"Your verification code",intro:"Enter this 6-digit code in Novyra to activate your account.",actionLabel:code,actionUrl:env.APP_URL||"https://novyra.pages.dev",notice:"This code expires in 10 minutes. Maximum 5 attempts.",footerNote:"If you did not create this account, ignore this email."}));
     }catch(mailError){console.error("novyra-signup-code-delivery",mailError);await db.prepare("DELETE FROM users WHERE id=?").bind(id).run();return fail("Could not send the verification code. Try again later.",503);}
     return json({verificationRequired:true,email,expiresInSeconds:600,resendCooldownSeconds:60,message:"Enter the 6-digit code sent to your email."},202);
+   }
 
    if (path === "/auth/verify-email" && request.method === "POST") {
     const body=await readBody(request), token=String(body?.token||"");
