@@ -150,6 +150,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
   const t = (key: string) => flowCopy[language]?.[key] || flowCopy.en?.[key] || copy[language]?.[key] || copy.en?.[key] || key;
   const dir = directionOverride || (languageByCode.get(language)?.rtl ? "rtl" : "ltr");
   const translationAvailable = Boolean(copy[language]);
+  const passwordStrengthScore = [password.length>=10,/^[\s\S]*[a-z]/i.test(password),/[A-Z]/.test(password),/[0-9]/.test(password),/[^a-zA-Z0-9]/.test(password)].filter(Boolean).length;
 
   useEffect(() => { if (initialNotice) setNotice(initialNotice); }, [initialNotice]);
 
@@ -481,7 +482,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <button className="px-back-link" onClick={()=>setStage("country")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 5/7</div>
           <h1>{t("password")}</h1>
           <label className="px-field"><span>{t("password")}</span><span className="px-password-wrap"><input type={showPassword?"text":"password"} autoComplete="new-password" value={password} onChange={e=>setPassword(e.target.value)} /><button type="button" onClick={()=>setShowPassword(v=>!v)} aria-label={showPassword?"Hide password":"Show password"}><EyeMark visible={showPassword}/></button></span></label>
-          <div className="px-password-strength"><span>{t("passwordStrength")}: </span><b>{password.length<10?t("weak"):password.length<14?t("medium"):t("strong")}</b></div>
+          <div className="px-password-strength"><span>{t("passwordStrength")}: </span><b>{passwordStrengthScore<3?t("weak"):passwordStrengthScore<4?t("medium"):t("strong")}</b><div style={{height:5,borderRadius:8,background:"rgba(120,130,150,.22)",overflow:"hidden",marginTop:6}}><div style={{height:"100%",width:(passwordStrengthScore*20)+"%",background:passwordStrengthScore<3?"#c45d5d":passwordStrengthScore<4?"#c39a42":"#39956b",transition:"width .2s"}}/></div></div>
           <label className="px-field"><span>{t("confirm")}</span><span className="px-password-wrap"><input type={showConfirm?"text":"password"} autoComplete="new-password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} /><button type="button" onClick={()=>setShowConfirm(v=>!v)} aria-label={showConfirm?"Hide password":"Show password"}><EyeMark visible={showConfirm}/></button></span></label>
           {confirmPassword&&password!==confirmPassword&&<small role="alert">{t("passwordMismatch")}</small>}
           <button className="px-primary-action" onClick={()=>{if(password.length<10){setNotice(t("weakPassword"));return;}if(password!==confirmPassword){setNotice(t("passwordMismatch"));return;}setNotice("");setStage("appLock");}}>{t("next")} ↗</button>
