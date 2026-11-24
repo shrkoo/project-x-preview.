@@ -8,7 +8,7 @@ import { languages, languageByCode } from "../data/languages";
 import { calendars } from "../data/calendars";
 import { numberSystems } from "../data/number-systems";
 import { weekdays } from "../data/weekdays";
-import { saveRegionalPreferences } from "../lib/regional-preferences";
+import { defaultDateFormat, saveRegionalPreferences } from "../lib/regional-preferences";
 
 type Language = (typeof languages)[number]["code"];
 type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string; profile?: { firstName?:string; lastName?:string; country?:string; currency?:string; calendar?:string; numberFormat?:string; weekStart?:"saturday"|"sunday"|"monday"; language?:Language; accountType?:"personal"|"business"; appLockType?:"none"|"pin"|"pattern"|"biometric"; onboardingCompleted?:boolean } };
@@ -256,11 +256,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
   }
 
   function chooseLanguage(next: Language) { setLanguage(next); document.documentElement.lang=next; document.documentElement.dir=languageByCode.get(next)?.rtl?"rtl":"ltr"; }
-  function getDateFormat(locale: string, country: string) {
-    if (country === "IR") return "YYYY/MM/DD";
-    const parts = new Intl.DateTimeFormat(locale || "en", { year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(2025, 10, 24));
-    return parts.map(part => part.type === "year" ? "YYYY" : part.type === "month" ? "MM" : part.type === "day" ? "DD" : part.value).join("");
-  }
+  function getDateFormat(locale: string, country: string) { return defaultDateFormat(locale,country); }
   function applyCountry(nextCode: string) {
     const selected = countries.find(item => item.code === nextCode);
     if (!selected) return;
