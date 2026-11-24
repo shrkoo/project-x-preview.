@@ -188,7 +188,6 @@ return <div className="nv-ref-spending-page an-screen">
 </div>
 <h2 className="nv-spend-heading">اقدام‌های سریع</h2>
 <div className="nv-spend-quick an-quick-cards"><button className="an-quick-card" onClick={()=>setTab("reports")}><span><b>بررسی بودجه ماهانه</b></span><span className="nv-quick-chevron"><ArrowLeft size={16}/></span></button><button className="an-quick-card" onClick={()=>setTab("transactions")}><span><b>به‌روزرسانی دسته‌ها</b></span><span className="nv-quick-chevron"><ArrowLeft size={16}/></span></button></div>
-</div>
  <style jsx global>{`/* Analytics-only screen-local override */
 main#analytics-screen.nv-finance.an-screen-active{background:linear-gradient(180deg,#DCEEFF 0%,#F1F7FD 48%,#FCFDFE 100%)!important}
 main#analytics-screen.nv-finance.an-screen-active .nf-shell,main#analytics-screen.nv-finance.an-screen-active .nf-main,main#analytics-screen.nv-finance.an-screen-active .nf-topbar,main#analytics-screen.nv-finance.an-screen-active .nv-ref-spending-page{background:transparent!important}
