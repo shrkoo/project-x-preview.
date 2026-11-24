@@ -37,6 +37,24 @@ export default function Home() {
     document.documentElement.dir = direction || (languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr");
 
     const currentUrl = new URL(window.location.href);
+    const fragment = new URLSearchParams(currentUrl.hash.replace(/^#/, ""));
+    const googleToken = fragment.get("google_token");
+    if (googleToken) {
+      localStorage.setItem("projectx-token", googleToken);
+      currentUrl.hash = "";
+      window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search);
+      apiRequest<{user:Account}>("/auth/me").then(data => {
+        if (!alive) return;
+        setAccount(data.user);
+        localStorage.setItem("projectx-account", JSON.stringify({name:data.user.displayName,email:data.user.email}));
+        setStartupReady(true);
+      }).catch(() => {
+        if (!alive) return;
+        clearSession(); setAccount(null); setNotice("Google sign-in could not be completed. Please try again."); setStartupReady(true);
+      });
+      return () => { alive = false; };
+    }
+
     const verificationToken = currentUrl.searchParams.get("verify");
     if (verificationToken) {
       apiRequest<{ message?: string }>("/auth/verify-email", {
