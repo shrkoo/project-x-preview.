@@ -3,6 +3,7 @@ main = "index.js"
 compatibility_date = "2025-02-14"
 compatibility_flags = ["nodejs_compat"]
 account_id = "595c5761b6974e9f7ed15db0e5ffe3b8"
+previews = {}
 
 [vars]
 APP_URL = "https://feature-homa-auth-part1.novyra.pages.dev"
@@ -16,4 +17,3 @@ database_name = "novyra-preview-db"
 database_id = "51e14038-5b81-49f8-83a1-4c5ba1f05bd8"
 migrations_dir = "migrations-preview"
 
-previews = {}
