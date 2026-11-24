@@ -170,8 +170,8 @@ const PROFILE_ENUMS = {
 function normalizeProfile(input = {}, current = PROFILE_DEFAULTS) {
   const pick = (snake, camel) => Object.prototype.hasOwnProperty.call(input, snake)
     ? input[snake] : Object.prototype.hasOwnProperty.call(input, camel) ? input[camel] : current[snake];
-  const first_name = String(pick("first_name","firstName") ?? "").trim().replace(/[<>]/g,"").slice(0,60);
-  const last_name = String(pick("last_name","lastName") ?? "").trim().replace(/[<>]/g,"").slice(0,60);
+  const first_name = String(pick("first_name","firstName") ?? "").trim().replace(/[<>]/g,"");
+  const last_name = String(pick("last_name","lastName") ?? "").trim().replace(/[<>]/g,"");
   const country = String(pick("country","country") ?? "").trim().toUpperCase();
   const currency = String(pick("currency","currency") ?? "").trim().toUpperCase();
   const calendar = String(pick("calendar","calendar") ?? "").trim().toLowerCase();
@@ -184,6 +184,12 @@ function normalizeProfile(input = {}, current = PROFILE_DEFAULTS) {
   const app_lock_hash = rawHash === null || rawHash === "" ? null : String(rawHash);
   const rawTimeout = pick("app_lock_timeout","appLockTimeout");
   const app_lock_timeout = Number(rawTimeout);
+  const hasFirstName = Object.prototype.hasOwnProperty.call(input,"first_name") || Object.prototype.hasOwnProperty.call(input,"firstName");
+  const hasLastName = Object.prototype.hasOwnProperty.call(input,"last_name") || Object.prototype.hasOwnProperty.call(input,"lastName");
+  if ((hasFirstName && (!first_name || first_name.length > 60 || /[\\u0000-\\u001F\\u007F]/.test(first_name))) ||
+      (hasLastName && (!last_name || last_name.length > 60 || /[\\u0000-\\u001F\\u007F]/.test(last_name)))) {
+    return { error: "نام و نام خانوادگی باید بین ۱ تا ۶۰ نویسه معتبر باشند." };
+  }
   if (!countryCodes.has(country)) return { error: "کشور انتخاب‌شده در فهرست ISO 3166-1 وجود ندارد." };
   if (!currencyCodes.has(currency)) return { error: "واحد پول انتخاب‌شده در فهرست ارزهای پشتیبانی‌شده وجود ندارد." };
   if (!calendarCodes.has(calendar)) return { error: "تقویم انتخاب‌شده پشتیبانی نمی‌شود." };
