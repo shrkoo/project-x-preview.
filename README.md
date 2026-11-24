@@ -55,3 +55,43 @@ Reusable components include Button, Input, Card, StepProgress, CountrySelect, Pi
 ## Safety and deployment assumptions
 - This branch is a preview implementation; it does not change the production branch or production database.
 - Do not merge or promote it to production until OAuth, company/workspace persistence, server-side workspace isolation, and end-to-end registration/email verification have been configured and tested.
+## Existing Cloudflare Worker authentication (no Supabase/Firebase)
+
+The Worker remains the source of truth for password authentication and bearer sessions. No Supabase or Firebase migration is used.
+
+### Preview environment configuration
+
+Set these values on the **preview Worker** only:
+
+| Name | Type | Value / purpose |
+|---|---|---|
+| `APP_URL` | Worker variable | Exact Novyra Pages preview origin, e.g. `https://feature-homa-auth-part1.novyra.pages.dev` |
+| `REQUIRE_EMAIL_VERIFICATION` | Worker variable | `true` |
+| `EMAIL_FROM` | Worker variable | Verified sender, e.g. `Novyra <accounts@your-verified-domain.example>` |
+| `GOOGLE_CLIENT_ID` | Worker variable | Google OAuth web client ID |
+| `GOOGLE_REDIRECT_URI` | Worker variable | `https://YOUR-WORKER.workers.dev/auth/google/callback` |
+| `TURNSTILE_SECRET_KEY` | Worker secret | Cloudflare Turnstile secret key |
+| `RESEND_API_KEY` | Worker secret | Resend API key for verification and reset emails |
+| `GOOGLE_CLIENT_SECRET` | Worker secret | Google OAuth client secret |
+
+Set this on the **Cloudflare Pages preview build**:
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`: the public Turnstile site key for the preview hostname.
+
+If the existing email bridge is used instead of Resend, configure `EMAIL_BRIDGE_URL` as a Worker variable and `EMAIL_BRIDGE_SECRET` as a Worker secret; in that case `RESEND_API_KEY` is not required. Do not commit secret values.
+
+### Provider setup
+1. Create a Turnstile widget allowing the Pages preview hostname and add its site key to Pages plus its secret key to the preview Worker.
+2. Verify the sender domain in Resend, create an API key, and set `EMAIL_FROM` to an address on that verified domain.
+3. In Google Cloud Console create an OAuth 2.0 Web application. Add the exact Worker callback URL above as an authorized redirect URI. Add the Pages preview origin to authorized JavaScript origins.
+4. Apply `workers/api/migrations-preview/0002_auth_verification.sql` to the isolated preview D1 database before deploying the Worker. Deploy with `workers/api/wrangler.preview.toml`; keep the production database and Worker untouched.
+
+### Account lifecycle
+- Signup creates a pending account, emails a 6-digit code, and does not issue a session until the code is verified. Codes expire after 10 minutes and allow at most five attempts.
+- Resend is rate-limited per IP and enforces a 60-second per-account cooldown.
+- The email-exists endpoint requires a valid Turnstile token and is rate-limited per IP. Do not expose it without Turnstile.
+- Password reset uses the existing Worker reset-token flow; reset links are one-time and expire after one hour.
+- Google OAuth uses the existing Worker authorization-code callback and the client consumes the returned session token.
+- App-lock secrets remain device-local.
+
+### Data deletion
+Users must be able to request account deletion from the product's privacy/account settings. The deletion operation must authenticate the account owner, revoke sessions, and delete user-owned records and uploaded media according to the published retention policy. Do not treat browser-local logout as account deletion.
