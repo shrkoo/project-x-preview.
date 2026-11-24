@@ -134,6 +134,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
   const [accountType, setAccountType] = useState<"personal"|"business">("personal");
   const [lockType, setLockType] = useState<"none"|"pin"|"pattern"|"biometric">("none");
   const [lockSecret, setLockSecret] = useState("");
+  const [lockTouched,setLockTouched]=useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -248,6 +249,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       }});
       if (!credential) throw new Error("Biometric enrollment was cancelled.");
       setLockSecret(credential.id);
+      setLockTouched(true);
       localStorage.setItem("projectx-app-lock-credential",credential.id);
       setNotice("");
     } catch(error) { setNotice(error instanceof Error?error.message:t("biometricUnsupported")); }
@@ -384,17 +386,21 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     setBusy(true);setNotice("");
     try {
       const lockHash=lockType==="none"?null:await derivePasswordHash(lockSecret,email.trim().toLowerCase());
-      await apiRequest("/auth/profile",{method:"PATCH",body:JSON.stringify({
+      const profilePatch:Record<string,unknown>={
         firstName:firstName.trim(),lastName:lastName.trim(),country:countryCode,currency:regional.currency,
         calendar:regional.calendar,numberFormat:countries.find(item=>item.code===countryCode)?.defaultNumberFormat||"1,234.56",
-        weekStart:regional.weekStart,language,accountType,appLockType:lockType,appLockHash:lockHash
-      })});
+        weekStart:regional.weekStart,language,accountType
+      };
+      if(lockTouched){profilePatch.appLockType=lockType;profilePatch.appLockHash=lockHash;}
+      await apiRequest("/auth/profile",{method:"PATCH",body:JSON.stringify(profilePatch)});
       persistRegionalPreferences();
       localStorage.setItem("projectx-account-type",accountType);
-      localStorage.setItem("projectx-app-lock-type",lockType);
-      localStorage.setItem("projectx-app-lock-user",user.id);
-      if(lockHash)localStorage.setItem("projectx-app-lock-hash",lockHash);
-      else{localStorage.removeItem("projectx-app-lock-hash");localStorage.removeItem("projectx-app-lock-credential");}
+      if(lockTouched){
+        localStorage.setItem("projectx-app-lock-type",lockType);
+        localStorage.setItem("projectx-app-lock-user",user.id);
+        if(lockHash)localStorage.setItem("projectx-app-lock-hash",lockHash);
+        else{localStorage.removeItem("projectx-app-lock-hash");localStorage.removeItem("projectx-app-lock-credential");}
+      }
       const refreshed=await apiRequest<{user:User}>("/auth/me");
       localStorage.setItem("projectx-first-run-complete","1");
       localStorage.setItem("projectx-account",JSON.stringify({name:refreshed.user.displayName,email:refreshed.user.email}));
@@ -545,11 +551,11 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         {stage === "appLock" && <div className="px-glass-panel px-auth-panel">
           <button className="px-back-link" onClick={()=>setStage("password")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 6/7</div>
           <h1>{t("lockTitle")}</h1><p className="px-stage-subtitle">{t("lockExplain")}</p>
-          <div className="px-lock-options">{(["none","pin","pattern","biometric"] as const).map(value=><button type="button" key={value} className={lockType===value?"is-selected":""} onClick={()=>{setLockType(value);setLockSecret("");}}>{t(value==="none"?"noLock":value)}</button>)}</div>
+          <div className="px-lock-options">{(["none","pin","pattern","biometric"] as const).map(value=><button type="button" key={value} className={lockType===value?"is-selected":""} onClick={()=>{setLockType(value);setLockSecret("");setLockTouched(true);}}>{t(value==="none"?"noLock":value)}</button>)}</div>
           {lockType==="pin"&&<label className="px-field"><span>{t("lockSecret")}</span><input type="password" inputMode="numeric" value={lockSecret} onChange={e=>setLockSecret(e.target.value.replace(/[^0-9]/g,"").slice(0,12))} autoComplete="off" /></label>}{lockType==="pattern"&&<div className="px-lock-grid" role="group" aria-label={t("pattern")}>{Array.from({length:9},(_,i)=>String(i+1)).map(point=><button type="button" key={point} aria-pressed={lockSecret.includes(point)} className={lockSecret.includes(point)?"is-selected":""} onClick={()=>setLockSecret(value=>value.includes(point)?value:value+point)}>{lockSecret.includes(point)?"●":"○"}</button>)}<button type="button" className="px-pattern-clear" onClick={()=>setLockSecret("")}>{t("clearPattern")}</button></div>}
           {lockType==="biometric"&&<><p role="status">{lockSecret?t("biometric"):t("biometricUnsupported")}</p><button type="button" className="px-skip-action" disabled={busy} onClick={registerBiometric}>{busy?"…":t("biometric")}</button></>}
           <button className="px-primary-action" onClick={()=>{if(lockType==="biometric"&&!lockSecret){setNotice(t("biometricUnsupported"));return;}if(lockType==="pin"&&lockSecret.length<6){setNotice(t("lockRequired"));return;}if(lockType==="pattern"&&lockSecret.length<4){setNotice(t("lockRequired"));return;}setNotice("");setStage("accountType");}}>{t("next")} ↗</button>
-          <button className="px-skip-action" onClick={()=>{setLockType("none");setLockSecret("");setStage("accountType");}}>{t("skip")}</button>
+          <button className="px-skip-action" onClick={()=>{setLockType("none");setLockSecret("");setLockTouched(true);setStage("accountType");}}>{t("skip")}</button>
         </div>}
         {stage === "accountType" && <div className="px-glass-panel px-auth-panel">
           <button className="px-back-link" onClick={()=>setStage("appLock")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 7/7</div>
