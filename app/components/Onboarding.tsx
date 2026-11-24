@@ -430,6 +430,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
       <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">NOVYRA</span></header>
       <section className="px-onboarding-stage">
+        {!translationAvailable&&<p role="status" className="px-translation-note">{t("translationMissing")}</p>}
 
         {stage === "welcome" && <div className="px-glass-panel px-auth-panel">
           <div className="px-auth-emblem"><NovyraMark /></div><div className="px-eyebrow">NOVYRA / WELCOME</div>
