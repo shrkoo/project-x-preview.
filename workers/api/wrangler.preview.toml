@@ -1,32 +1,19 @@
-name = "novyra-api-preview"
+name = "novyra-preview-api"
 main = "index.js"
 compatibility_date = "2025-02-14"
 compatibility_flags = ["nodejs_compat"]
-account_id = "__PREVIEW_ACCOUNT_ID__"
+account_id = "595c5761b6974e9f7ed15db0e5ffe3b8"
 
 [vars]
-APP_URL = "https://feature-homa-auth-part1.novyra-preview.pages.dev"
+APP_URL = "https://feature-homa-auth-part1.novyra.pages.dev"
 REQUIRE_EMAIL_VERIFICATION = "false"
 EMAIL_FROM = "__PREVIEW_EMAIL_FROM__"
 GOOGLE_REDIRECT_URI = "__PREVIEW_WORKER_URL__/auth/google/callback"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "novyra-preview"
-database_id = "__PREVIEW_D1_DATABASE_ID__"
-migrations_dir = "migrations"
+database_name = "novyra-preview-db"
+database_id = "51e14038-5b81-49f8-83a1-4c5ba1f05bd8"
+migrations_dir = "migrations-preview"
 
-[[r2_buckets]]
-binding = "STORY_MEDIA"
-bucket_name = "__PREVIEW_R2_BUCKET_NAME__"
-
-[ai]
-binding = "AI"
-
-[[durable_objects.bindings]]
-name = "ROOM_HUB"
-class_name = "RoomHub"
-
-[[migrations]]
-tag = "v1"
-new_classes = ["RoomHub"]
+previews = {}
