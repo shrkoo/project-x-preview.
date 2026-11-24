@@ -197,13 +197,10 @@ function normalizeProfile(input = {}, current = PROFILE_DEFAULTS) {
   if (app_lock_type !== "none" && !app_lock_hash) return { error: "برای فعال‌کردن قفل، ابتدا باید مقدار رمز قفل ثبت شود." };
   return { value: { first_name,last_name,country,currency,calendar,number_format,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout } };
 }
-function profileComplete(profile, submitted = {}) {
-  const explicitlyProvided = key => Object.prototype.hasOwnProperty.call(submitted,key)
-    || Object.prototype.hasOwnProperty.call(submitted,({first_name:"firstName",last_name:"lastName",account_type:"accountType"})[key] || key);
-  return Boolean(explicitlyProvided("first_name") && explicitlyProvided("last_name")
-    && explicitlyProvided("country") && explicitlyProvided("account_type")
-    && String(profile.first_name||"").trim() && String(profile.last_name||"").trim()
-    && /^[A-Z]{2}$/.test(String(profile.country||"")) && ["personal","business"].includes(profile.account_type));
+function profileComplete(profile) {
+  return Boolean(String(profile.first_name||"").trim() && String(profile.last_name||"").trim()
+    && countryCodes.has(String(profile.country||"").toUpperCase())
+    && ["personal","business"].includes(profile.account_type));
 }
 function publicProfile(row) {
   return {
@@ -331,7 +328,7 @@ export default {
       }
     }
     const session = await createSession(db,id);
-    return json({ token:session.token, expiresAt:session.expiresAt, user:{id,email,displayName,xp:0,gamesPlayed:0,role:email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile:{first_name:profile.first_name,last_name:profile.last_name,country:profile.country,currency:profile.currency,calendar:profile.calendar,number_format:profile.number_format,week_start:profile.week_start,language:profile.language,account_type:profile.account_type,app_lock_type:profile.app_lock_type,app_lock_timeout:profile.app_lock_timeout,onboardingCompleted:profileComplete(profile,body)}}, emailVerificationRequired:env.REQUIRE_EMAIL_VERIFICATION==="true", verificationSent, message:verificationSent?"لینک تأیید ارسال شد.":"حساب ساخته شد؛ تنظیمات ارسال ایمیل هنوز لازم است." },201);
+    return json({ token:session.token, expiresAt:session.expiresAt, user:{id,email,displayName,xp:0,gamesPlayed:0,role:email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile:{first_name:profile.first_name,last_name:profile.last_name,country:profile.country,currency:profile.currency,calendar:profile.calendar,number_format:profile.number_format,week_start:profile.week_start,language:profile.language,account_type:profile.account_type,app_lock_type:profile.app_lock_type,app_lock_timeout:profile.app_lock_timeout,onboardingCompleted:profileComplete(profile)}}, emailVerificationRequired:env.REQUIRE_EMAIL_VERIFICATION==="true", verificationSent, message:verificationSent?"لینک تأیید ارسال شد.":"حساب ساخته شد؛ تنظیمات ارسال ایمیل هنوز لازم است." },201);
    }
 
    if (path === "/auth/verify-email" && request.method === "POST") {
@@ -529,7 +526,7 @@ export default {
       const profile=result.value;
       const legacyName=Object.prototype.hasOwnProperty.call(body,"name")?cleanName(body.name):"";
       const displayName=[profile.first_name,profile.last_name].filter(Boolean).join(" ") || legacyName || user.display_name;
-      const completed=Number(user.onboarding_completed||0)===1 || profileComplete(profile,body) ? 1 : 0;
+      const completed=profileComplete(profile) ? 1 : 0;
       await db.prepare("UPDATE users SET display_name=?,first_name=?,last_name=?,country=?,currency=?,calendar=?,number_format=?,week_start=?,language=?,account_type=?,app_lock_type=?,app_lock_hash=?,app_lock_timeout=?,onboarding_completed=? WHERE id=?")
         .bind(displayName,profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,completed,user.id).run();
       return json({ok:true,name:displayName,profile:{...profile,app_lock_hash:undefined,onboardingCompleted:completed===1}});
