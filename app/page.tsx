@@ -14,6 +14,7 @@ const allowedLanguages = new Set(languages.map(item => item.code));
 export default function Home() {
   const [account, setAccount] = useState<Account | null>(null);
   const [language, setLanguage] = useState<Language>("fa");
+  const [directionOverride,setDirectionOverride] = useState<"rtl"|"ltr"|null>(null);
   const [startupReady, setStartupReady] = useState(false);
   const [notice, setNotice] = useState("");
   const [locked, setLocked] = useState(false);
@@ -28,7 +29,10 @@ export default function Home() {
     const nextLanguage = savedLanguage && allowedLanguages.has(savedLanguage) ? savedLanguage : "fa";
     setLanguage(nextLanguage);
     document.documentElement.lang = nextLanguage;
-    document.documentElement.dir = languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr";
+    const savedDirection=localStorage.getItem("novyra-text-direction");
+    const direction=savedDirection==="rtl"||savedDirection==="ltr"?savedDirection:null;
+    setDirectionOverride(direction);
+    document.documentElement.dir = direction || (languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr");
 
     const currentUrl = new URL(window.location.href);
     const verificationToken = currentUrl.searchParams.get("verify");
@@ -72,6 +76,8 @@ export default function Home() {
     setLanguage(nextLanguage);
     localStorage.setItem("projectx-language", nextLanguage);
     document.documentElement.lang = nextLanguage;
+    localStorage.removeItem("novyra-text-direction");
+    setDirectionOverride(null);
     document.documentElement.dir = languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr";
     if (user) {
       setAccount(user);
@@ -143,6 +149,7 @@ export default function Home() {
     notice={notice}
     onClearNotice={() => setNotice("")}
     onLanguageChange={changeLanguage}
+    directionOverride={directionOverride}
     accountType={account?.profile?.accountType || (typeof window !== "undefined" ? localStorage.getItem("projectx-account-type") as "personal"|"business" : null) || "personal"}
     onAccountTypeChange={async (nextType) => { try { await apiRequest("/auth/profile",{method:"PATCH",body:JSON.stringify({accountType:nextType})}); localStorage.setItem("projectx-account-type",nextType); setAccount(current => current ? {...current,profile:{...current.profile,accountType:nextType}} : current); } catch(error) { setNotice(error instanceof Error?error.message:"Could not update account type."); } }}
     onLogout={logoutComplete}
