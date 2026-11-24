@@ -1,15 +1,5 @@
 {
-  "slogan": "Her an, kayıt altında.",
-  "welcome": "Finans yönetimi artık daha net",
-  "create": "Hesap oluştur",
-  "login": "Giriş yap",
-  "step1Title": "Hesap bilgileri",
-  "step2Title": "Uygulama güvenliği",
-  "step3Title": "Çalışma alanınız",
-  "step4Title": "Hazırsınız",
-  "personal": "Kişisel",
-  "business": "İşletme",
-  "personalDesc": "Gelir, gider ve finansal hedeflerinizi takip edin.",
-  "businessDesc": "Muhasebe, satış, satın alma ve işletme raporları.",
-  "switchNote": "Profil menüsünden Kişisel ve İşletme arasında istediğiniz zaman geçiş yapabilirsiniz."
+  "label": "Türkçe",
+  "dir": "ltr",
+  "tag": "tr"
 }
