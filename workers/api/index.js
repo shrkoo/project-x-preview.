@@ -279,19 +279,20 @@ export default {
     const now=Math.floor(Date.now()/1000);
     if(claims.aud!==env.GOOGLE_CLIENT_ID || !["accounts.google.com","https://accounts.google.com"].includes(claims.iss) || Number(claims.exp)<=now || claims.email_verified!=="true" || !claims.sub || !/^\S+@\S+\.\S+$/.test(claims.email||"")) return failRedirect("اطلاعات حساب Google معتبر یا تأییدشده نیست.");
     const email=cleanEmail(claims.email), displayName=cleanName(claims.name||claims.given_name||email.split("@")[0]);
-    let user=await db.prepare("SELECT id,email,display_name,xp,games_played,role FROM users WHERE email=?").bind(email).first();
+    let user=await db.prepare("SELECT id,email,display_name,xp,games_played,role,onboarding_completed FROM users WHERE email=?").bind(email).first();
     const isNewGoogleUser=!user;
     if(!user) {
       const id=crypto.randomUUID(), salt=randomToken(16), hash=await digest(randomToken(48));
       const role=email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user";
       await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,verified_at) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)").bind(id,email,displayName,hash,salt,role).run();
-      user={id,email,display_name:displayName,xp:0,games_played:0,role};
+      user={id,email,display_name:displayName,xp:0,games_played:0,role,onboarding_completed:0};
     } else {
       await db.prepare("UPDATE users SET verified_at=COALESCE(verified_at,CURRENT_TIMESTAMP) WHERE id=?").bind(user.id).run();
     }
+    const requiresGoogleOnboarding=isNewGoogleUser || Number(user.onboarding_completed||0)===0;
     const session=await createSession(db,user.id);
     const target=env.APP_URL || "https://novyra.pages.dev/";
-    return new Response(null,{status:302,headers:{"Location":`${target}#google_token=${encodeURIComponent(session.token)}${isNewGoogleUser?"&google_new=1":""}`,"Set-Cookie":"px_google_state=; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=0",...corsHeaders}});
+    return new Response(null,{status:302,headers:{"Location":`${target}#google_token=${encodeURIComponent(session.token)}${requiresGoogleOnboarding?"&google_new=1":""}`,"Set-Cookie":"px_google_state=; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=0",...corsHeaders}});
    }
 
    if (path === "/auth/password-salt" && request.method === "GET") {
