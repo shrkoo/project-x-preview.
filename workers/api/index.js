@@ -1,4 +1,4 @@
-import { countryCodes, currencyCodes, calendarCodes, languageCodes } from "./data/catalog-validation.js";
+import { countryCodes, currencyCodes, calendarCodes, languageCodes, numberFormatCodes } from "./data/catalog-validation.js";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,HEAD,POST,PATCH,DELETE,OPTIONS",
@@ -163,7 +163,6 @@ const PROFILE_DEFAULTS = {
   app_lock_hash: null, app_lock_timeout: 300
 };
 const PROFILE_ENUMS = {
-  number_format: new Set(["1,234.56","1.234,56","1 234,56","1٬234٫56"]),
   week_start: new Set(["monday","sunday","saturday"]),
   account_type: new Set(["personal","business"]),
   app_lock_type: new Set(["none","pin","pattern","biometric"])
@@ -188,7 +187,7 @@ function normalizeProfile(input = {}, current = PROFILE_DEFAULTS) {
   if (!countryCodes.has(country)) return { error: "کشور انتخاب‌شده در فهرست ISO 3166-1 وجود ندارد." };
   if (!currencyCodes.has(currency)) return { error: "واحد پول انتخاب‌شده در فهرست ارزهای پشتیبانی‌شده وجود ندارد." };
   if (!calendarCodes.has(calendar)) return { error: "تقویم انتخاب‌شده پشتیبانی نمی‌شود." };
-  if (!PROFILE_ENUMS.number_format.has(number_format)) return { error: "قالب نمایش اعداد معتبر نیست." };
+  if (!numberFormatCodes.has(number_format)) return { error: "قالب نمایش اعداد با کشور انتخاب‌شده سازگار نیست." };
   if (!PROFILE_ENUMS.week_start.has(week_start)) return { error: "روز شروع هفته معتبر نیست." };
   if (!/^[a-z]{2}$/.test(language) || !languageCodes.has(language)) return { error: "زبان انتخاب‌شده در فهرست ISO 639-1 وجود ندارد." };
   if (!PROFILE_ENUMS.account_type.has(account_type)) return { error: "نوع حساب باید شخصی یا تجاری باشد." };
