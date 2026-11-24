@@ -2,14 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import { API_BASE, apiRequest, setSession, createPasswordSalt, derivePasswordHash } from "../lib/api";
+import { countries } from "../data/countries";
+import { currencies } from "../data/currencies";
+import { languages, languageByCode } from "../data/languages";
+import { calendars } from "../data/calendars";
+import { numberSystems } from "../data/number-systems";
+import { weekdays } from "../data/weekdays";
 
-type Language = "en" | "fa" | "ar" | "ku";
+type Language = (typeof languages)[number]["code"];
 type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string };
 type Props = { onComplete: (user: User | null, language: Language) => void; initialNotice?: string };
-type Stage = "language" | "auth" | "profile" | "passwordSetup";
+type Stage = "country" | "auth" | "profile" | "passwordSetup";
 type Mode = "login" | "signup";
 
-const copy: Record<Language, Record<string, string>> = {
+const copy: Partial<Record<Language, Record<string, string>>> = {
   en: {
     choose: "Choose your language", chooseSub: "A calm, seamless experience across every part of NOVYRA.",
     continue: "Continue", languageNote: "You can change this anytime in Settings.",
@@ -67,7 +73,7 @@ const copy: Record<Language, Record<string, string>> = {
     invalidEmail: "أدخل بريداً إلكترونياً صالحاً.", weakPassword: "يجب أن تتكون كلمة المرور من ١٠ أحرف على الأقل.",
     missingName: "أدخل اسمك.", photoError: "اختر صورة يقل حجمها عن ٨ ميغابايت."
   },
-  ku: {
+  ckb: {
     choose: "زمانی خۆت هەڵبژێرە", chooseSub: "بۆ ئەزموونێکی ئارام و یەکگرتوو لە هەموو بەشەکانی NOVYRA.",
     continue: "بەردەوام بە", languageNote: "دەتوانیت دواتر لە ڕێکخستنەکان زمان بگۆڕیت.",
     welcome: "بەخێربێیت بۆ NOVYRA", welcomeSub: "هاوڕێکانت، ساتەکانت، جیهانی تۆ.",
@@ -109,7 +115,10 @@ function EyeMark({ visible }: { visible: boolean }) {
 
 export default function Onboarding({ onComplete, initialNotice }: Props) {
   const [language, setLanguage] = useState<Language>("fa");
-  const [stage, setStage] = useState<Stage>("language");
+  const [countryCode, setCountryCode] = useState("IR");
+  const [countrySearch, setCountrySearch] = useState("");
+  const [regional, setRegional] = useState({ currency: "IRR", calendar: "persian", digits: "arabext", dateFormat: "YYYY/MM/DD", weekStart: "saturday" as "saturday" | "sunday" | "monday" });
+  const [stage, setStage] = useState<Stage>("country");
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -126,8 +135,9 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
   const [recoveryMode, setRecoveryMode] = useState(false);
   const [resetTokenMode, setResetTokenMode] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
-  const t = (key: string) => copy[language][key] || key;
-  const dir = language === "en" ? "ltr" : "rtl";
+  const t = (key: string) => copy[language]?.[key] || copy.en?.[key] || key;
+  const dir = languageByCode.get(language)?.rtl ? "rtl" : "ltr";
+  const translationAvailable = Boolean(copy[language]);
 
   useEffect(() => { if (initialNotice) setNotice(initialNotice); }, [initialNotice]);
 
@@ -151,8 +161,20 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
 
   useEffect(() => {
     const saved = localStorage.getItem("projectx-language") as Language | null;
-    if (saved && copy[saved]) {
-      setLanguage(saved);
+    const savedCountry = localStorage.getItem("projectx-country") || "IR";
+    const savedPrefs = (() => { try { return JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}"); } catch { return {}; } })();
+    const selectedCountry = countries.find(item => item.code === savedCountry);
+    if (saved && languageByCode.has(saved)) setLanguage(saved);
+    setCountryCode(savedCountry);
+    if (selectedCountry) {
+      setRegional({
+        currency: localStorage.getItem("novyra-finance-currency") || selectedCountry.defaultCurrency || "USD",
+        calendar: savedPrefs.calendar || selectedCountry.defaultCalendar,
+        digits: savedPrefs.digits || selectedCountry.defaultNumberSystem,
+        dateFormat: savedPrefs.dateFormat || getDateFormat(selectedCountry.defaultLanguage, selectedCountry.code),
+        weekStart: savedPrefs.firstDay || selectedCountry.weekStart
+      });
+      if (!saved) setLanguage(selectedCountry.defaultLanguage as Language);
     }
     const reset = new URLSearchParams(window.location.search).get("reset");
     if (reset) {
@@ -162,18 +184,49 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       setRecoveryMode(true);
       setResetTokenMode(true);
     }
-    document.documentElement.lang = saved || "en";
-    document.documentElement.dir = saved === "en" ? "ltr" : "rtl";
+    const activeLanguage = saved && languageByCode.has(saved) ? saved : (selectedCountry?.defaultLanguage || "en");
+    document.documentElement.lang = activeLanguage;
+    document.documentElement.dir = languageByCode.get(activeLanguage)?.rtl ? "rtl" : "ltr";
   }, []);
 
   function chooseLanguage(next: Language) {
     setLanguage(next);
   }
-  function continueLanguage() {
+  function getDateFormat(locale: string, country: string) {
+    if (country === "IR") return "YYYY/MM/DD";
+    const parts = new Intl.DateTimeFormat(locale || "en", { year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(2025, 10, 24));
+    return parts.map(part => part.type === "year" ? "YYYY" : part.type === "month" ? "MM" : part.type === "day" ? "DD" : part.value).join("");
+  }
+  function applyCountry(nextCode: string) {
+    const selected = countries.find(item => item.code === nextCode);
+    if (!selected) return;
+    const nextLanguage = languageByCode.has(selected.defaultLanguage) ? selected.defaultLanguage as Language : "en";
+    setCountryCode(nextCode);
+    setLanguage(nextLanguage);
+    setRegional({
+      currency: selected.defaultCurrency || "USD",
+      calendar: selected.defaultCalendar,
+      digits: selected.defaultNumberSystem,
+      dateFormat: getDateFormat(nextLanguage, selected.code),
+      weekStart: selected.weekStart
+    });
+  }
+  function persistRegionalPreferences() {
+    localStorage.setItem("projectx-country", countryCode);
     localStorage.setItem("projectx-language", language);
-    localStorage.setItem("projectx-first-run-complete", "1");
+    localStorage.setItem("novyra-finance-currency", regional.currency);
+    localStorage.setItem("novyra-date-format", regional.dateFormat);
+    const previous = (() => { try { return JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}"); } catch { return {}; } })();
+    localStorage.setItem("novyra-preferences-v1", JSON.stringify({
+      ...previous, country: countryCode, calendar: regional.calendar, digits: regional.digits,
+      firstDay: regional.weekStart, dateFormat: regional.dateFormat
+    }));
     document.documentElement.lang = language;
-    document.documentElement.dir = language === "en" ? "ltr" : "rtl";
+    document.documentElement.dir = dir;
+  }
+  function continueCountry() {
+    persistRegionalPreferences();
+    localStorage.setItem("projectx-first-run-complete", "1");
     if (localStorage.getItem("projectx-token")) onComplete(null, language);
     else setStage("auth");
   }
@@ -323,24 +376,33 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
       <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">NOVYRA</span></header>
       <section className="px-onboarding-stage">
-        {stage === "language" && <div className="px-glass-panel px-language-panel">
-          <div className="px-eyebrow">NOVYRA / YOUR EXPERIENCE</div>
-          <div className="px-language-intro">{language === "fa" ? "یک جهان، به زبان تو" : language === "ku" ? "جیهانێک بە زمانی تۆ" : language === "ar" ? "عالمٌ بلغتك" : "A WORLD, IN YOUR LANGUAGE"}</div>
-          <h1>{t("choose")}</h1><p className="px-stage-subtitle">{t("chooseSub")}</p>
-          <div className="px-language-grid">
-            {([
-              ["en", "English"],
-              ["fa", "فارسی"],
-              ["ar", "العربية"],
-              ["ku", "کوردی"]
-            ] as [Language, string][]).map(([code, label]) => <button type="button" key={code} className={"px-language-option" + (language === code ? " is-selected" : "")} onClick={() => chooseLanguage(code)} aria-pressed={language === code}>
-              <span className="px-language-label">{label}</span><span className="px-radio">{language === code ? "✓" : ""}</span>
-            </button>)}
+        {stage === "country" && <div className="px-glass-panel px-language-panel">
+          <div className="px-eyebrow">NOVYRA / YOUR REGION</div>
+          <h1>{language === "fa" ? "کشور خود را انتخاب کنید" : "Choose your country"}</h1>
+          <p className="px-stage-subtitle">{language === "fa" ? "تنظیمات منطقه‌ای به‌صورت خودکار اعمال می‌شوند و می‌توانید پیش از ادامه آن‌ها را ویرایش کنید." : "Regional preferences apply instantly. Review and edit them before continuing."}</p>
+          <input aria-label="Search countries" value={countrySearch} onChange={e => setCountrySearch(e.target.value)} placeholder={language === "fa" ? "جست‌وجوی کشور..." : "Search countries..."} style={{width:"100%",padding:"12px 14px",borderRadius:12,border:"1px solid rgba(120,130,150,.28)",background:"rgba(255,255,255,.72)",marginBottom:10}} />
+          <div role="listbox" aria-label="Countries" style={{maxHeight:190,overflowY:"auto",display:"grid",gap:6,textAlign:"start"}}>
+            {countries.filter(item => [item.name,item.nativeName,item.code].some(value => value.toLowerCase().includes(countrySearch.trim().toLowerCase()))).map(item =>
+              <button type="button" key={item.code} onClick={() => applyCountry(item.code)} aria-selected={countryCode===item.code} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:10,border:countryCode===item.code?"1px solid #5776a5":"1px solid rgba(120,130,150,.18)",background:countryCode===item.code?"rgba(87,118,165,.12)":"rgba(255,255,255,.35)",textAlign:"start",cursor:"pointer"}}>
+                <span style={{fontSize:20}}>{item.flag}</span><span style={{flex:1}}>{item.name} · {item.code}</span>{countryCode===item.code?"✓":""}
+              </button>
+            )}
           </div>
-          <button className="px-primary-action" onClick={continueLanguage}>{t("continue")} <span>↗</span></button>
-          <p className="px-footnote">{t("languageNote")}</p>
+          <div style={{marginTop:16,padding:14,borderRadius:14,border:"1px solid rgba(120,130,150,.24)",background:"rgba(255,255,255,.42)",display:"grid",gap:10}}>
+            <strong>{language === "fa" ? "پیش‌نمایش تنظیمات" : "Editable preferences preview"}</strong>
+            <label>{language === "fa" ? "زبان" : "Language"} <select value={language} onChange={e=>chooseLanguage(e.target.value as Language)} style={{width:"100%"}}>{languages.map(item=><option key={item.code} value={item.code}>{item.nativeName} · {item.name}</option>)}</select></label>
+            <div>{language === "fa" ? "جهت نوشتار" : "Text direction"}: <b>{dir.toUpperCase()}</b></div>
+            {!translationAvailable && <small role="status">Translation not available yet — English fallback is active.</small>}
+            <label>{language === "fa" ? "واحد پول" : "Currency"} <select value={regional.currency} onChange={e=>setRegional(v=>({...v,currency:e.target.value}))} style={{width:"100%"}}>{currencies.map(item=><option key={item.code} value={item.code}>{item.code} — {item.name}</option>)}</select></label>
+            <label>{language === "fa" ? "تقویم" : "Calendar"} <select value={regional.calendar} onChange={e=>setRegional(v=>({...v,calendar:e.target.value}))} style={{width:"100%"}}>{calendars.map(item=><option key={item.code} value={item.code}>{item.name}</option>)}</select></label>
+            <label>{language === "fa" ? "نمایش ارقام" : "Number system"} <select value={regional.digits} onChange={e=>setRegional(v=>({...v,digits:e.target.value}))} style={{width:"100%"}}>{numberSystems.map(item=><option key={item.code} value={item.code}>{item.name}</option>)}</select></label>
+            <label>{language === "fa" ? "قالب تاریخ" : "Date format"} <select value={regional.dateFormat} onChange={e=>setRegional(v=>({...v,dateFormat:e.target.value}))} style={{width:"100%"}}>{["DD/MM/YYYY","MM/DD/YYYY","YYYY-MM-DD","YYYY/MM/DD"].map(item=><option key={item}>{item}</option>)}</select></label>
+            <label>{language === "fa" ? "اولین روز هفته" : "First day of week"} <select value={regional.weekStart} onChange={e=>setRegional(v=>({...v,weekStart:e.target.value as "saturday"|"sunday"|"monday"}))} style={{width:"100%"}}>{weekdays.map(item=><option key={item.code} value={item.code}>{item.name}</option>)}</select></label>
+          </div>
+          <button className="px-primary-action" onClick={continueCountry}>{language === "fa" ? "ادامه" : "Continue"} <span>↗</span></button>
+          <p className="px-footnote">{language === "fa" ? "هر زمان می‌توانید این موارد را در تنظیمات تغییر دهید." : "You can change these preferences anytime in Settings."}</p>
         </div>}
-
+        
         {stage === "auth" && <div className="px-glass-panel px-auth-panel">
           <div className="px-auth-emblem" aria-label="NOVYRA"><NovyraMark /></div>
           <div className="px-eyebrow">NOVYRA / {recoveryMode ? "ACCOUNT RECOVERY" : "YOUR SPACE"}</div>
@@ -359,7 +421,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <button type="button" className="px-primary-action" disabled={busy} onClick={recoveryMode ? (resetTokenMode ? resetPassword : requestRecovery) : submitAuth}>{busy ? "..." : recoveryMode ? (resetTokenMode ? t("updatePassword") : t("sendReset")) : mode === "login" ? t("signIn") : t("create")} <span>↗</span></button>
           {!recoveryMode && <div className="px-switch-mode"><span>{mode === "login" ? t("noAccount") : t("haveAccount")}</span><button onClick={() => { setMode(mode === "login" ? "signup" : "login"); setNotice(""); }}>{mode === "login" ? t("createLink") : t("loginLink")}</button></div>}
           {recoveryMode && <button className="px-switch-mode px-back-link" onClick={() => { setRecoveryMode(false); setResetTokenMode(false); setNotice(""); }}>{t("back")}</button>}
-          <p className="px-auth-security">{language === "en" ? "SECURE ACCESS · NOVYRA" : language === "ku" ? "چوونەژوورەوەی پارێزراو · NOVYRA" : language === "ar" ? "دخول آمن · NOVYRA" : "ورود امن · NOVYRA"}</p>
+          <p className="px-auth-security">{language === "en" ? "SECURE ACCESS · NOVYRA" : language === "ckb" ? "چوونەژوورەوەی پارێزراو · NOVYRA" : language === "ar" ? "دخول آمن · NOVYRA" : "ورود امن · NOVYRA"}</p>
         </div>}
 
         {false && stage === "passwordSetup" && <div className="px-glass-panel px-auth-panel">
