@@ -8,6 +8,7 @@ import { languages, languageByCode } from "../data/languages";
 import { calendars } from "../data/calendars";
 import { numberSystems } from "../data/number-systems";
 import { weekdays } from "../data/weekdays";
+import { saveRegionalPreferences } from "../lib/regional-preferences";
 
 type Language = (typeof languages)[number]["code"];
 type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string; profile?: { firstName?:string; lastName?:string; country?:string; currency?:string; calendar?:string; numberFormat?:string; weekStart?:"saturday"|"sunday"|"monday"; language?:Language; accountType?:"personal"|"business"; appLockType?:"none"|"pin"|"pattern"|"biometric"; onboardingCompleted?:boolean } };
@@ -281,18 +282,11 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     document.documentElement.dir = languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr";
   }
   function persistRegionalPreferences() {
-    localStorage.setItem("projectx-country", countryCode);
-    localStorage.setItem("projectx-language", language);
-    localStorage.removeItem("novyra-text-direction");
-    localStorage.setItem("novyra-finance-currency", regional.currency);
-    localStorage.setItem("novyra-date-format", regional.dateFormat);
-    const previous = (() => { try { return JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}"); } catch { return {}; } })();
-    localStorage.setItem("novyra-preferences-v1", JSON.stringify({
-      ...previous, country: countryCode, calendar: regional.calendar, digits: regional.digits,
-      firstDay: regional.weekStart, dateFormat: regional.dateFormat
-    }));
-    document.documentElement.lang = language;
-    document.documentElement.dir = dir;
+    saveRegionalPreferences({
+      country: countryCode, language, direction: dir, currency: regional.currency,
+      calendar: regional.calendar, dateFormat: regional.dateFormat,
+      numberSystem: regional.digits, firstDay: regional.weekStart
+    });
   }
   function continueCountry() { setStage(googlePending ? "appLock" : "password"); }
   async function submitAuth() {
@@ -313,7 +307,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         const passwordHash = await derivePasswordHash(password, salt);
         lockHash = lockType === "none" ? null : await derivePasswordHash(lockSecret, cleanEmail);
         const country = countries.find(item => item.code === countryCode);
-        credentials = { email: cleanEmail, name: [firstName.trim(),lastName.trim()].join(" "), firstName:firstName.trim(), lastName:lastName.trim(), country:countryCode, currency:regional.currency, calendar:regional.calendar, numberFormat:country?.defaultNumberFormat || "1,234.56", weekStart:regional.weekStart, language, accountType, appLockType:lockType, appLockHash:lockHash, salt, passwordHash };
+        credentials = { email: cleanEmail, name: [firstName.trim(),lastName.trim()].join(" "), firstName:firstName.trim(), lastName:lastName.trim(), country:countryCode, currency:regional.currency, calendar:regional.calendar, numberFormat:country?.defaultNumberFormat || "1,234.56", numberSystem:regional.digits, digits:regional.digits, dateFormat:regional.dateFormat, direction:dir, weekStart:regional.weekStart, language, accountType, appLockType:lockType, appLockHash:lockHash, salt, passwordHash };
       } else {
         const challenge = await apiRequest<{salt:string}>(`/auth/password-salt?email=${encodeURIComponent(cleanEmail)}`);
         if (challenge.salt === "AAAAAAAAAAAAAAAAAAAAAA") {
@@ -387,6 +381,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       const profilePatch:Record<string,unknown>={
         firstName:firstName.trim(),lastName:lastName.trim(),country:countryCode,currency:regional.currency,
         calendar:regional.calendar,numberFormat:countries.find(item=>item.code===countryCode)?.defaultNumberFormat||"1,234.56",
+        numberSystem:regional.digits,digits:regional.digits,dateFormat:regional.dateFormat,direction:dir,
         weekStart:regional.weekStart,language,accountType
       };
       if(lockTouched){profilePatch.appLockType=lockType;profilePatch.appLockHash=lockHash;}
