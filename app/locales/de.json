@@ -76,5 +76,10 @@
   "resendCode": "Code erneut senden",
   "codeInvalid": "Bitte den 6-stelligen Code eingeben.",
   "codeResent": "Falls das Konto noch nicht bestätigt ist, wird ein neuer Code gesendet.",
-  "captchaSetup": "Für die Sicherheitsprüfung ist der öffentliche Turnstile-Site-Key erforderlich."
+  "captchaSetup": "Für die Sicherheitsprüfung ist der öffentliche Turnstile-Site-Key erforderlich.",
+  "accountExists": "Für diese E-Mail-Adresse gibt es bereits ein Konto.",
+  "googleAccountExists": "Diese E-Mail ist bei Google registriert. Bitte mit Google fortfahren.",
+  "forgotPassword": "Passwort vergessen?",
+  "forgotSent": "Falls ein Konto existiert, wurden Anweisungen zum Zurücksetzen gesendet.",
+  "captchaAgain": "Bitte führen Sie die Sicherheitsprüfung erneut durch."
 }
