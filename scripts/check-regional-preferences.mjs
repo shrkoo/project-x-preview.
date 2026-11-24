@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { formatDate, formatMoney, formatNumber, weekStart } from "../app/lib/regional-preferences.ts";
+import { defaultDateFormat, formatDate, formatMoney, formatNumber, weekStart } from "../app/lib/regional-preferences.ts";
 
 const cases = [
   { country:"IR", language:"fa", direction:"rtl", currency:"IRR", calendar:"persian", dateFormat:"YYYY/MM/DD", numberSystem:"arabext", firstDay:"saturday" },
@@ -23,4 +23,8 @@ assert.match(formatMoney(150000, {...cases[0], currency:"IRT"}), /تومان/);
 assert.match(formatNumber(1234, cases[0]), /[۰-۹]/);
 assert.match(formatDate(new Date("2026-11-24T12:00:00Z"), cases[0]), /\\//, "Iran date format uses configured slash pattern");
 assert.match(formatDate(new Date("2026-11-24T12:00:00Z"), cases[1]), /\\//, "US date format uses configured slash pattern");
-console.log("PASS: regional formatters for IR, US, SA, DE, JP and IN");
+assert.equal(defaultDateFormat("fa","IR"),"YYYY/MM/DD");
+assert.equal(defaultDateFormat("en","US"),"MM/DD/YYYY");
+assert.equal(defaultDateFormat("de","DE"),"DD.MM.YYYY");
+assert.equal(defaultDateFormat("ja","JP"),"YYYY/MM/DD");
+console.log("PASS: regional formatters and country date defaults for IR, US, SA, DE, JP and IN");
