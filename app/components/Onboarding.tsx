@@ -283,10 +283,11 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     try {
       const endpoint = mode === "signup" ? "/auth/register" : "/auth/login";
       let credentials: Record<string, string>;
+      let lockHash: string | null = null;
       if (mode === "signup") {
         const salt = createPasswordSalt();
         const passwordHash = await derivePasswordHash(password, salt);
-        const lockHash = lockType === "none" ? null : Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(lockSecret)))).map(b=>b.toString(16).padStart(2,"0")).join("");
+        lockHash = lockType === "none" ? null : Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(lockSecret)))).map(b=>b.toString(16).padStart(2,"0")).join("");
         const country = countries.find(item => item.code === countryCode);
         credentials = { email: cleanEmail, name: [firstName.trim(),lastName.trim()].join(" "), firstName:firstName.trim(), lastName:lastName.trim(), country:countryCode, currency:regional.currency, calendar:regional.calendar, numberFormat:country?.defaultNumberFormat || "1,234.56", weekStart:regional.weekStart, language, accountType, appLockType:lockType, appLockHash:lockHash, salt, passwordHash };
       } else {
@@ -454,8 +455,8 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <div className="px-eyebrow">NOVYRA / YOUR REGION</div>
           <button className="px-back-link" onClick={()=>setStage("email")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP · 4/7</div><h1>{t("country")}</h1>
           <p className="px-stage-subtitle">{t("countrySub")}</p>
-          <input aria-label="Search countries" value={countrySearch} onChange={e => setCountrySearch(e.target.value)} placeholder={t("searchCountry")} style={{width:"100%",padding:"12px 14px",borderRadius:12,border:"1px solid rgba(120,130,150,.28)",background:"rgba(255,255,255,.72)",marginBottom:10}} />
-          <div role="listbox" aria-label="Countries" style={{maxHeight:190,overflowY:"auto",display:"grid",gap:6,textAlign:"start"}}>
+          <input aria-label={t("searchCountry")} value={countrySearch} onChange={e => setCountrySearch(e.target.value)} placeholder={t("searchCountry")} style={{width:"100%",padding:"12px 14px",borderRadius:12,border:"1px solid rgba(120,130,150,.28)",background:"rgba(255,255,255,.72)",marginBottom:10}} />
+          <div role="listbox" aria-label={t("country")} style={{maxHeight:190,overflowY:"auto",display:"grid",gap:6,textAlign:"start"}}>
             {countries.filter(item => [item.name,item.nativeName,item.code].some(value => value.toLowerCase().includes(countrySearch.trim().toLowerCase()))).map(item =>
               <button type="button" key={item.code} onClick={() => applyCountry(item.code)} aria-selected={countryCode===item.code} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:10,border:countryCode===item.code?"1px solid #5776a5":"1px solid rgba(120,130,150,.18)",background:countryCode===item.code?"rgba(87,118,165,.12)":"rgba(255,255,255,.35)",textAlign:"start",cursor:"pointer"}}>
                 <span style={{fontSize:20}}>{item.flag}</span><span style={{flex:1}}>{item.name} · {item.code}</span>{countryCode===item.code?"✓":""}
@@ -473,7 +474,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
             <label>{t("dateFormat")} <select value={regional.dateFormat} onChange={e=>setRegional(v=>({...v,dateFormat:e.target.value}))} style={{width:"100%"}}>{["DD/MM/YYYY","MM/DD/YYYY","YYYY-MM-DD","YYYY/MM/DD"].map(item=><option key={item}>{item}</option>)}</select></label>
             <label>{t("weekStart")} <select value={regional.weekStart} onChange={e=>setRegional(v=>({...v,weekStart:e.target.value as "saturday"|"sunday"|"monday"}))} style={{width:"100%"}}>{weekdays.map(item=><option key={item.code} value={item.code}>{item.name}</option>)}</select></label>
           </div>
-          <button className="px-primary-action" onClick={continueCountry}>{language === "fa" ? "ادامه" : "Continue"} <span>↗</span></button>
+          <button className="px-primary-action" onClick={continueCountry}>{t("next")} <span>↗</span></button>
           <p className="px-footnote">{language === "fa" ? "هر زمان می‌توانید این موارد را در تنظیمات تغییر دهید." : "You can change these preferences anytime in Settings."}</p>
         </div>}
         
