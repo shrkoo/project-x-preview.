@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./novyra-signup.css";
 import "./auth-refresh.css";
 import "./novyra-luxury.css";
 import "./novyra-completion.css";
