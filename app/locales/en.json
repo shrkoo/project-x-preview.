@@ -1,15 +1,5 @@
 {
-  "slogan": "Every moment, accounted for.",
-  "welcome": "Money management, made clear",
-  "create": "Create account",
-  "login": "Log in",
-  "step1Title": "Account details",
-  "step2Title": "App security",
-  "step3Title": "Your workspace",
-  "step4Title": "You're all set",
-  "personal": "Personal",
-  "business": "Business",
-  "personalDesc": "Track your income, expenses and financial goals.",
-  "businessDesc": "Bookkeeping, sales, purchases and business reports.",
-  "switchNote": "Switch between Personal and Business anytime from your profile menu."
+  "label": "English",
+  "dir": "ltr",
+  "tag": "en"
 }
