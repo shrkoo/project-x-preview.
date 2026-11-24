@@ -1,3 +1,7 @@
+import { countryCodes } from "../../app/data/countries.ts";
+import { currencyCodes } from "../../app/data/currencies.ts";
+import { calendarCodes } from "../../app/data/calendars.ts";
+import { languageCodes } from "../../app/data/languages.ts";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,HEAD,POST,PATCH,DELETE,OPTIONS",
@@ -162,7 +166,6 @@ const PROFILE_DEFAULTS = {
   app_lock_hash: null, app_lock_timeout: 300
 };
 const PROFILE_ENUMS = {
-  calendar: new Set(["gregory","persian","islamic","hebrew","buddhist","japanese","iso8601"]),
   number_format: new Set(["1,234.56","1.234,56","1 234,56","1٬234٫56"]),
   week_start: new Set(["monday","sunday","saturday"]),
   account_type: new Set(["personal","business"]),
@@ -185,12 +188,12 @@ function normalizeProfile(input = {}, current = PROFILE_DEFAULTS) {
   const app_lock_hash = rawHash === null || rawHash === "" ? null : String(rawHash);
   const rawTimeout = pick("app_lock_timeout","appLockTimeout");
   const app_lock_timeout = Number(rawTimeout);
-  if (!/^[A-Z]{2}$/.test(country)) return { error: "کد کشور باید یک کد دوحرفی معتبر باشد." };
-  if (!/^[A-Z]{3}$/.test(currency)) return { error: "کد ارز باید سه حرف انگلیسی باشد." };
-  if (!PROFILE_ENUMS.calendar.has(calendar)) return { error: "تقویم انتخاب‌شده پشتیبانی نمی‌شود." };
+  if (!countryCodes.has(country)) return { error: "کشور انتخاب‌شده در فهرست ISO 3166-1 وجود ندارد." };
+  if (!currencyCodes.has(currency)) return { error: "واحد پول انتخاب‌شده در فهرست ارزهای پشتیبانی‌شده وجود ندارد." };
+  if (!calendarCodes.has(calendar)) return { error: "تقویم انتخاب‌شده پشتیبانی نمی‌شود." };
   if (!PROFILE_ENUMS.number_format.has(number_format)) return { error: "قالب نمایش اعداد معتبر نیست." };
   if (!PROFILE_ENUMS.week_start.has(week_start)) return { error: "روز شروع هفته معتبر نیست." };
-  if (!/^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test(language)) return { error: "زبان انتخاب‌شده معتبر نیست." };
+  if (!/^[a-z]{2}$/.test(language) || !languageCodes.has(language)) return { error: "زبان انتخاب‌شده در فهرست ISO 639-1 وجود ندارد." };
   if (!PROFILE_ENUMS.account_type.has(account_type)) return { error: "نوع حساب باید شخصی یا تجاری باشد." };
   if (!PROFILE_ENUMS.app_lock_type.has(app_lock_type)) return { error: "نوع قفل برنامه معتبر نیست." };
   if (app_lock_hash !== null && !/^[a-f0-9]{64}$/i.test(app_lock_hash)) return { error: "مقدار رمز قفل معتبر نیست." };
