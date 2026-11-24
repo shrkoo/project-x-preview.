@@ -10,9 +10,9 @@ import { numberSystems } from "../data/number-systems";
 import { weekdays } from "../data/weekdays";
 
 type Language = (typeof languages)[number]["code"];
-type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string };
+type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string; profile?: { firstName?:string; lastName?:string; language?:Language; accountType?:"personal"|"business"; appLockType?:"none"|"pin"|"pattern"|"biometric"; onboardingCompleted?:boolean } };
 type Props = { onComplete: (user: User | null, language: Language) => void; initialNotice?: string };
-type Stage = "welcome" | "firstName" | "lastName" | "email" | "country" | "password" | "appLock" | "accountType" | "login";
+type Stage = "welcome" | "firstName" | "lastName" | "email" | "country" | "password" | "appLock" | "accountType" | "login" | "profile" | "passwordSetup";
 type Mode = "login" | "signup";
 
 const copy: Partial<Record<Language, Record<string, string>>> = {
@@ -162,7 +162,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       apiRequest<{user:User}>("/auth/me").then(data => {
         setUser(data.user);
         setEmail(data.user.email);
-        onComplete(data.user, language);
+        const preferredLanguage = (localStorage.getItem("projectx-language") || data.user.profile?.language || language) as Language;\n        onComplete(data.user, languageByCode.has(preferredLanguage) ? preferredLanguage : language);
       }).catch(() => { localStorage.removeItem("projectx-token"); setNotice("ورود با Google کامل نشد؛ دوباره تلاش کن."); });
     } else if (googleError) {
       window.history.replaceState({}, "", window.location.pathname + window.location.search);
@@ -304,12 +304,17 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         body: JSON.stringify(credentials)
       });
       setSession(data.token);
-      localStorage.setItem("projectx-app-lock-type",lockType);
-      localStorage.setItem("projectx-app-lock-user",data.user.id);
-      if (lockHash) localStorage.setItem("projectx-app-lock-hash",lockHash);
-      else { localStorage.removeItem("projectx-app-lock-hash"); localStorage.removeItem("projectx-app-lock-credential"); }
-      localStorage.setItem("projectx-account", JSON.stringify({ name: data.user.displayName || [firstName,lastName].filter(Boolean).join(" "), email: data.user.email }));
-      const signedInUser = { ...data.user, displayName: data.user.displayName || name.trim() };
+      const signedInUser = { ...data.user, displayName: data.user.displayName || [firstName,lastName].filter(Boolean).join(" ") };
+      if (mode === "signup") {
+        localStorage.setItem("projectx-app-lock-type",lockType);
+        localStorage.setItem("projectx-app-lock-user",signedInUser.id);
+        if (lockHash) localStorage.setItem("projectx-app-lock-hash",lockHash);
+        else { localStorage.removeItem("projectx-app-lock-hash"); localStorage.removeItem("projectx-app-lock-credential"); }
+        localStorage.setItem("projectx-account-type",accountType);
+      } else if (signedInUser.profile?.accountType) {
+        localStorage.setItem("projectx-account-type",signedInUser.profile.accountType);
+      }
+      localStorage.setItem("projectx-account", JSON.stringify({ name: signedInUser.displayName, email: signedInUser.email }));
       setUser(signedInUser);
       setProfileName(signedInUser.displayName);
       setEmail(signedInUser.email);
@@ -322,8 +327,6 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         localStorage.setItem("projectx-profile-complete:" + signedInUser.id, "1");
       }
       localStorage.setItem("projectx-first-run-complete", "1");
-      localStorage.setItem("projectx-account-type", accountType);
-      localStorage.setItem("projectx-app-lock-type", lockType);
       onComplete(signedInUser, language);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : t("authError"));
