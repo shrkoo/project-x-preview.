@@ -55,7 +55,7 @@ export default function Home() {
       if (!alive) return;
       setAccount(data.user);
       const deviceLock = localStorage.getItem("projectx-app-lock-type");
-      if (deviceLock && deviceLock !== "none" && localStorage.getItem("projectx-app-lock-hash")) setLocked(true);
+      if (deviceLock && deviceLock !== "none" && localStorage.getItem("projectx-app-lock-hash") && localStorage.getItem("projectx-app-lock-user") === data.user.id) setLocked(true);
       localStorage.setItem("projectx-account", JSON.stringify({ name: data.user.displayName, email: data.user.email }));
       setStartupReady(true);
     }).catch(() => {
@@ -76,7 +76,7 @@ export default function Home() {
     if (user) {
       setAccount(user);
       const deviceLock = localStorage.getItem("projectx-app-lock-type");
-      if (deviceLock && deviceLock !== "none" && localStorage.getItem("projectx-app-lock-hash")) setLocked(true);
+      if (deviceLock && deviceLock !== "none" && localStorage.getItem("projectx-app-lock-hash") && localStorage.getItem("projectx-app-lock-user") === user.id) setLocked(true);
       localStorage.setItem("projectx-account", JSON.stringify({ name: user.displayName, email: user.email }));
       setStartupReady(true);
       return;
@@ -144,6 +144,8 @@ export default function Home() {
     notice={notice}
     onClearNotice={() => setNotice("")}
     onLanguageChange={changeLanguage}
+    accountType={account?.profile?.accountType || (typeof window !== "undefined" ? localStorage.getItem("projectx-account-type") as "personal"|"business" : null) || "personal"}
+    onAccountTypeChange={async (nextType) => { try { await apiRequest("/auth/profile",{method:"PATCH",body:JSON.stringify({accountType:nextType})}); localStorage.setItem("projectx-account-type",nextType); setAccount(current => current ? {...current,profile:{...current.profile,accountType:nextType}} : current); } catch(error) { setNotice(error instanceof Error?error.message:"Could not update account type."); } }}
     onLogout={logoutComplete}
   />;
 }
