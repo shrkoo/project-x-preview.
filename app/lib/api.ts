@@ -1,4 +1,4 @@
-export const API_BASE = "https://project-x-api.projectx-novyratam.workers.dev";
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://project-x-api.projectx-novyratam.workers.dev";
 
 export function setSession(token: string) {
   localStorage.setItem("projectx-token", token);
