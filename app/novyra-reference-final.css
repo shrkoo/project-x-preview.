@@ -4628,3 +4628,25 @@ main.nv-finance[lang="fa"] nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-cen
   z-index:10!important;
   border-radius:50%!important;
 }
+
+
+/* Preserve literal word spacing: this subtitle is inline text, not a flex row. */
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-subtitle {
+  display:block!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-subtitle>span {
+  display:inline!important;
+  flex:none!important;
+  min-width:0!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  white-space:normal!important;
+}
+main.nv-finance.an-screen-active[lang="fa"] .nv-ref-spending-page.an-screen .an-highlight-subtitle>bdi {
+  display:inline-block!important;
+  flex:none!important;
+  white-space:nowrap!important;
+}
