@@ -81,5 +81,8 @@
   "googleAccountExists": "Diese E-Mail ist bei Google registriert. Bitte mit Google fortfahren.",
   "forgotPassword": "Passwort vergessen?",
   "forgotSent": "Falls ein Konto existiert, wurden Anweisungen zum Zurücksetzen gesendet.",
-  "captchaAgain": "Bitte führen Sie die Sicherheitsprüfung erneut durch."
+  "captchaAgain": "Bitte führen Sie die Sicherheitsprüfung erneut durch.",
+  "resetPasswordTitle": "Neues Passwort festlegen",
+  "resetPassword": "Passwort zurücksetzen",
+  "passwordResetDone": "Ihr Passwort wurde zurückgesetzt. Melden Sie sich mit dem neuen Passwort an."
 }
