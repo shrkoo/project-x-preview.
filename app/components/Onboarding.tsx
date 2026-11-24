@@ -202,6 +202,27 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     document.documentElement.dir = languageByCode.get(activeLanguage)?.rtl ? "rtl" : "ltr";
   }, []);
 
+  async function registerBiometric() {
+    if (!window.PublicKeyCredential || !navigator.credentials?.create) { setNotice(t("biometricUnsupported")); return; }
+    setBusy(true);setNotice("");
+    try {
+      const challenge=crypto.getRandomValues(new Uint8Array(32));
+      const userId=crypto.getRandomValues(new Uint8Array(16));
+      const credential=await navigator.credentials.create({publicKey:{
+        challenge,rp:{name:"NOVYRA",id:window.location.hostname},
+        user:{id:userId,name:email,displayName:firstName+" "+lastName},
+        pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],
+        authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},
+        timeout:60000,attestation:"none"
+      }});
+      if (!credential) throw new Error("Biometric enrollment was cancelled.");
+      setLockSecret(credential.id);
+      localStorage.setItem("projectx-app-lock-credential",credential.id);
+      setNotice("");
+    } catch(error) { setNotice(error instanceof Error?error.message:t("biometricUnsupported")); }
+    finally { setBusy(false); }
+  }
+
   function chooseLanguage(next: Language) {
     setLanguage(next);
   }
@@ -282,6 +303,10 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         body: JSON.stringify(credentials)
       });
       setSession(data.token);
+      localStorage.setItem("projectx-app-lock-type",lockType);
+      localStorage.setItem("projectx-app-lock-user",data.user.id);
+      if (lockHash) localStorage.setItem("projectx-app-lock-hash",lockHash);
+      else { localStorage.removeItem("projectx-app-lock-hash"); localStorage.removeItem("projectx-app-lock-credential"); }
       localStorage.setItem("projectx-account", JSON.stringify({ name: data.user.displayName || [firstName,lastName].filter(Boolean).join(" "), email: data.user.email }));
       const signedInUser = { ...data.user, displayName: data.user.displayName || name.trim() };
       setUser(signedInUser);
@@ -467,8 +492,8 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <h1>{t("lockTitle")}</h1><p className="px-stage-subtitle">{t("lockExplain")}</p>
           <div className="px-lock-options">{(["none","pin","pattern","biometric"] as const).map(value=><button type="button" key={value} className={lockType===value?"is-selected":""} onClick={()=>{setLockType(value);setLockSecret("");}}>{t(value==="none"?"noLock":value)}</button>)}</div>
           {(lockType==="pin"||lockType==="pattern")&&<label className="px-field"><span>{t("lockSecret")}</span><input type={lockType==="pin"?"password":"text"} inputMode={lockType==="pin"?"numeric":"text"} value={lockSecret} onChange={e=>setLockSecret(e.target.value)} autoComplete="off" /></label>}
-          {lockType==="biometric"&&<p role="status">{t("biometricUnsupported")}</p>}
-          <button className="px-primary-action" onClick={()=>{if(lockType==="biometric"){setNotice(t("biometricUnsupported"));return;}if(lockType!=="none"&&lockSecret.length<4){setNotice(t("lockRequired"));return;}setNotice("");setStage("accountType");}}>{t("next")} ↗</button>
+          {lockType==="biometric"&&<><p role="status">{lockSecret?t("biometric"):t("biometricUnsupported")}</p><button type="button" className="px-skip-action" disabled={busy} onClick={registerBiometric}>{busy?"…":t("biometric")}</button></>}
+          <button className="px-primary-action" onClick={()=>{if(lockType==="biometric"&&!lockSecret){setNotice(t("biometricUnsupported"));return;}if(lockType!=="none"&&lockSecret.length<4){setNotice(t("lockRequired"));return;}setNotice("");setStage("accountType");}}>{t("next")} ↗</button>
           <button className="px-skip-action" onClick={()=>{setLockType("none");setLockSecret("");setStage("accountType");}}>{t("skip")}</button>
         </div>}
         {stage === "accountType" && <div className="px-glass-panel px-auth-panel">
