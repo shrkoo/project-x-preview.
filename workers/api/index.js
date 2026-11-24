@@ -347,10 +347,10 @@ export default {
     if(!user) {
       const id=crypto.randomUUID(), salt=randomToken(16), hash=await digest(randomToken(48));
       const role=email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user";
-      await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,verified_at) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)").bind(id,email,displayName,hash,salt,role).run();
+      await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,verified_at,auth_provider) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP,'google')").bind(id,email,displayName,hash,salt,role).run();
       user={id,email,display_name:displayName,xp:0,games_played:0,role,onboarding_completed:0};
     } else {
-      await db.prepare("UPDATE users SET verified_at=COALESCE(verified_at,CURRENT_TIMESTAMP) WHERE id=?").bind(user.id).run();
+      await db.prepare("UPDATE users SET verified_at=COALESCE(verified_at,CURRENT_TIMESTAMP),auth_provider='google' WHERE id=?").bind(user.id).run();
     }
     const requiresGoogleOnboarding=isNewGoogleUser || Number(user.onboarding_completed||0)===0;
     const session=await createSession(db,user.id);
