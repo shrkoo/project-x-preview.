@@ -162,7 +162,8 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       apiRequest<{user:User}>("/auth/me").then(data => {
         setUser(data.user);
         setEmail(data.user.email);
-        const preferredLanguage = (localStorage.getItem("projectx-language") || data.user.profile?.language || language) as Language;\n        onComplete(data.user, languageByCode.has(preferredLanguage) ? preferredLanguage : language);
+        const preferredLanguage = (localStorage.getItem("projectx-language") || data.user.profile?.language || language) as Language;
+        onComplete(data.user, languageByCode.has(preferredLanguage) ? preferredLanguage : language);
       }).catch(() => { localStorage.removeItem("projectx-token"); setNotice("ورود با Google کامل نشد؛ دوباره تلاش کن."); });
     } else if (googleError) {
       window.history.replaceState({}, "", window.location.pathname + window.location.search);
