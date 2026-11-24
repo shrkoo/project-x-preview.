@@ -331,6 +331,10 @@ export default {
       console.error("project-x-register-insert-error",insertError);
       return fail("ساخت حساب در پایگاه‌داده ناموفق بود؛ مشکل از ایمیل تکراری نیست. لطفاً بعداً دوباره تلاش کن.",500);
     }
+    const initialWorkspaceId=crypto.randomUUID();
+    const initialWorkspaceType=profile.account_type;
+    const initialWorkspaceName=initialWorkspaceType==="business"?String(body?.companyName||"").trim().replace(/[<>]/g,"").slice(0,100)||"Business":"Personal";
+    await db.prepare("INSERT INTO workspaces (id,owner_id,type,name,currency) VALUES (?,?,?,?,?)").bind(initialWorkspaceId,id,initialWorkspaceType,initialWorkspaceName,profile.currency).run();
     let verificationSent=false;
     if(hasMailProvider(env)) {
       try {
@@ -560,6 +564,54 @@ export default {
     return json({ticket,expiresIn:60});
    }
    if (!user) return fail("برای استفاده از این بخش وارد حساب شو.",401);
+
+   if(path==="/workspaces" && request.method==="GET") {
+    const rows=await db.prepare("SELECT id,type,name,currency,created_at AS createdAt FROM workspaces WHERE owner_id=? ORDER BY CASE type WHEN 'personal' THEN 0 ELSE 1 END").bind(user.id).all();
+    return json({workspaces:rows.results||[]});
+   }
+   if(path==="/workspaces" && request.method==="POST") {
+    const body=await readBody(request)||{};
+    const type=String(body.type||"business");
+    if(type!=="personal"&&type!=="business") return fail("نوع فضای کاری معتبر نیست.");
+    const name=String(body.name||body.companyName||(type==="business"?"Business":"Personal")).trim().replace(/[<>]/g,"").slice(0,100);
+    const currency=String(body.currency||user.currency||"USD").toUpperCase();
+    if(!name) return fail("نام فضای کاری را وارد کن.");
+    if(!currencyCodes.has(currency)) return fail("واحد پول معتبر نیست.");
+    const existing=await db.prepare("SELECT id,type,name,currency,created_at AS createdAt FROM workspaces WHERE owner_id=? AND type=?").bind(user.id,type).first();
+    if(existing) {
+      if(type==="business" && body.name && existing.name!==name) {
+        await db.prepare("UPDATE workspaces SET name=?,currency=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND owner_id=?").bind(name,currency,existing.id,user.id).run();
+        return json({workspace:{...existing,name,currency}});
+      }
+      return json({workspace:existing});
+    }
+    const id=crypto.randomUUID();
+    await db.prepare("INSERT INTO workspaces (id,owner_id,type,name,currency) VALUES (?,?,?,?,?)").bind(id,user.id,type,name,currency).run();
+    return json({workspace:{id,type,name,currency}},201);
+   }
+   if(path==="/finance/transactions" && request.method==="GET") {
+    const workspaceId=String(url.searchParams.get("workspaceId")||"");
+    const workspace=await db.prepare("SELECT id FROM workspaces WHERE id=? AND owner_id=?").bind(workspaceId,user.id).first();
+    if(!workspace) return fail("فضای کاری پیدا نشد یا دسترسی ندارید.",404);
+    const rows=await db.prepare("SELECT id,title,category,amount,kind,transaction_date AS date,note FROM finance_transactions WHERE workspace_id=? AND owner_id=? ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,user.id).all();
+    return json({items:rows.results||[]});
+   }
+   if(path==="/finance/transactions" && request.method==="PUT") {
+    const body=await readBody(request)||{};
+    const workspaceId=String(body.workspaceId||"");
+    const workspace=await db.prepare("SELECT id FROM workspaces WHERE id=? AND owner_id=?").bind(workspaceId,user.id).first();
+    if(!workspace) return fail("فضای کاری پیدا نشد یا دسترسی ندارید.",404);
+    if(!Array.isArray(body.items)||body.items.length>500) return fail("فهرست تراکنش‌ها معتبر نیست.");
+    const statements=[db.prepare("DELETE FROM finance_transactions WHERE workspace_id=? AND owner_id=?").bind(workspaceId,user.id)];
+    for(const item of body.items) {
+      const id=String(item?.id||"").slice(0,80),title=String(item?.title||"").trim().slice(0,120),category=String(item?.category||"Other").trim().slice(0,80);
+      const amount=Number(item?.amount),kind=String(item?.kind||""),date=String(item?.date||""),note=String(item?.note||"").slice(0,500);
+      if(!id||!title||!Number.isFinite(amount)||amount<=0||amount>1e12||!["income","expense"].includes(kind)||!/^\d{4}-\d{2}-\d{2}$/.test(date)) return fail("یکی از تراکنش‌ها اطلاعات نامعتبر دارد.");
+      statements.push(db.prepare("INSERT INTO finance_transactions (id,workspace_id,owner_id,title,category,amount,kind,transaction_date,note) VALUES (?,?,?,?,?,?,?,?,?)").bind(id,workspaceId,user.id,title,category,amount,kind,date,note));
+    }
+    await db.batch(statements);
+    return json({ok:true,saved:body.items.length});
+   }
 
    if(path==="/social/stories" && request.method==="GET") {
     await cleanupExpiredStories(env,db);
