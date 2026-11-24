@@ -83,7 +83,7 @@ If the existing email bridge is used instead of Resend, configure `EMAIL_BRIDGE_
 1. Create a Turnstile widget allowing the Pages preview hostname and add its site key to Pages plus its secret key to the preview Worker.
 2. Verify the sender domain in Resend, create an API key, and set `EMAIL_FROM` to an address on that verified domain.
 3. In Google Cloud Console create an OAuth 2.0 Web application. Add the exact Worker callback URL above as an authorized redirect URI. Add the Pages preview origin to authorized JavaScript origins.
-4. Apply `workers/api/migrations-preview/0002_auth_verification.sql` to the isolated preview D1 database before deploying the Worker. Deploy with `workers/api/wrangler.preview.toml`; keep the production database and Worker untouched.
+4. Apply the preview migration with `npx wrangler d1 migrations apply novyra-preview-db --remote --config workers/api/wrangler.preview.toml` from `workers/api/` (or use the matching config-relative command from the repository root). Deploy with `npx wrangler deploy --config workers/api/wrangler.preview.toml`; keep the production database and Worker untouched.
 
 ### Account lifecycle
 - Signup creates a pending account, emails a 6-digit code, and does not issue a session until the code is verified. Codes expire after 10 minutes and allow at most five attempts.
@@ -95,3 +95,15 @@ If the existing email bridge is used instead of Resend, configure `EMAIL_BRIDGE_
 
 ### Data deletion
 Users must be able to request account deletion from the product's privacy/account settings. The deletion operation must authenticate the account owner, revoke sessions, and delete user-owned records and uploaded media according to the published retention policy. Do not treat browser-local logout as account deletion.
+
+### Manual authentication regression checklist
+- [ ] Register with a new email: no session is issued before code verification.
+- [ ] Register with an existing password account: inline password-account card appears; Log in and Forgot password work.
+- [ ] Register with an existing Google account: inline Google-account message and Continue with Google action appear.
+- [ ] Submit a wrong 6-digit code: attempt count increments; account remains inactive.
+- [ ] Submit an expired code: Worker rejects it; resend obeys the 60-second cooldown and IP limit.
+- [ ] Disable network during signup/login: user sees a recoverable error and can retry without losing form values.
+- [ ] Switch fa/ar and en/tr/de: labels and step numerals follow the selected locale and RTL/LTR direction.
+- [ ] Search for Persian `ایران`, English `Iran`, native name and ISO code `IR`; each resolves to one Iran option.
+- [ ] Verify autofill stays white with dark text in Chrome and Samsung Internet; test iOS Safari separately.
+- [ ] Test Google OAuth using the exact registered callback URL and confirm the client consumes the Worker-issued session.
