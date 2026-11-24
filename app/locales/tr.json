@@ -69,5 +69,12 @@
   "showPassword": "Şifreyi göster",
   "dismiss": "Kapat",
   "timeout": "İstek zaman aşımına uğradı. Tekrar deneyin.",
-  "noResults": "Sonuç bulunamadı"
+  "noResults": "Sonuç bulunamadı",
+  "verificationSent": "E-postanıza 6 haneli doğrulama kodu gönderildi.",
+  "verificationCode": "Doğrulama kodu",
+  "verifyCode": "E-postayı doğrula",
+  "resendCode": "Kodu yeniden gönder",
+  "codeInvalid": "6 haneli kodu girin.",
+  "codeResent": "Hesap beklemedeyse yeni kod gönderilir.",
+  "captchaSetup": "Güvenlik kontrolü için genel Turnstile site anahtarı gerekir."
 }
