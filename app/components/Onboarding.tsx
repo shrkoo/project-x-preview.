@@ -308,7 +308,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     setBusy(true); setNotice("");
     try {
       const endpoint = mode === "signup" ? "/auth/register" : "/auth/login";
-      let credentials: Record<string, string>;
+      let credentials: Record<string, string | null>;
       let lockHash: string | null = null;
       if (mode === "signup") {
         const salt = createPasswordSalt();
