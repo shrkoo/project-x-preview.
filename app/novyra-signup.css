@@ -108,3 +108,5 @@
 @media(max-width:520px){.nv-dashboard{padding:18px 14px}.nv-profile-menu{flex-direction:column;align-items:flex-end}.nv-dashboard-metrics{gap:9px}.nv-dashboard-metrics article{padding:14px}.nv-dashboard-balance{padding:20px}}
 
 .nv-brand-copy{display:grid;gap:1px;letter-spacing:0}.nv-brand-copy b{font-size:17px;letter-spacing:.17em}.nv-brand-copy small{font-size:9px;font-weight:500;letter-spacing:.015em;color:#6486a7}.nv-field input,.nv-field select{scroll-margin-bottom:180px}.nv-step{scroll-margin-bottom:180px}
+
+.nv-root[dir=rtl] .nv-progress-track{direction:rtl}.nv-root[dir=rtl] .nv-phone-front{left:auto;right:190px}.nv-root[dir=rtl] .nv-phone-back{left:auto;right:38px}
