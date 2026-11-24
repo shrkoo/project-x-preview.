@@ -160,7 +160,9 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
   }, [onComplete]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("projectx-language") as Language | null;
+    const storedLanguage = localStorage.getItem("projectx-language");
+    const saved = (storedLanguage === "ku" ? "ckb" : storedLanguage) as Language | null;
+    if (storedLanguage === "ku") localStorage.setItem("projectx-language", "ckb");
     const savedCountry = localStorage.getItem("projectx-country") || "IR";
     const savedPrefs = (() => { try { return JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}"); } catch { return {}; } })();
     const selectedCountry = countries.find(item => item.code === savedCountry);
@@ -203,13 +205,25 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     const nextLanguage = languageByCode.has(selected.defaultLanguage) ? selected.defaultLanguage as Language : "en";
     setCountryCode(nextCode);
     setLanguage(nextLanguage);
-    setRegional({
+    const nextRegional = {
       currency: selected.defaultCurrency || "USD",
       calendar: selected.defaultCalendar,
       digits: selected.defaultNumberSystem,
       dateFormat: getDateFormat(nextLanguage, selected.code),
       weekStart: selected.weekStart
-    });
+    };
+    setRegional(nextRegional);
+    localStorage.setItem("projectx-country", nextCode);
+    localStorage.setItem("projectx-language", nextLanguage);
+    localStorage.setItem("novyra-finance-currency", nextRegional.currency);
+    localStorage.setItem("novyra-date-format", nextRegional.dateFormat);
+    const previous = (() => { try { return JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}"); } catch { return {}; } })();
+    localStorage.setItem("novyra-preferences-v1", JSON.stringify({
+      ...previous, country: nextCode, calendar: nextRegional.calendar, digits: nextRegional.digits,
+      firstDay: nextRegional.weekStart, dateFormat: nextRegional.dateFormat
+    }));
+    document.documentElement.lang = nextLanguage;
+    document.documentElement.dir = languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr";
   }
   function persistRegionalPreferences() {
     localStorage.setItem("projectx-country", countryCode);
