@@ -12,7 +12,7 @@ import { weekdays } from "../data/weekdays";
 type Language = (typeof languages)[number]["code"];
 type User = { id: string; email: string; displayName: string; xp: number; gamesPlayed: number; role?: string };
 type Props = { onComplete: (user: User | null, language: Language) => void; initialNotice?: string };
-type Stage = "country" | "auth" | "profile" | "passwordSetup";
+type Stage = "welcome" | "firstName" | "lastName" | "email" | "country" | "password" | "appLock" | "accountType" | "login";
 type Mode = "login" | "signup";
 
 const copy: Partial<Record<Language, Record<string, string>>> = {
@@ -118,9 +118,14 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
   const [countryCode, setCountryCode] = useState("IR");
   const [countrySearch, setCountrySearch] = useState("");
   const [regional, setRegional] = useState({ currency: "IRR", calendar: "persian", digits: "arabext", dateFormat: "YYYY/MM/DD", weekStart: "saturday" as "saturday" | "sunday" | "monday" });
-  const [stage, setStage] = useState<Stage>("country");
+  const [stage, setStage] = useState<Stage>("welcome");
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [accountType, setAccountType] = useState<"personal"|"business">("personal");
+  const [lockType, setLockType] = useState<"none"|"pin"|"pattern"|"biometric">("none");
+  const [lockSecret, setLockSecret] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -181,7 +186,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     const reset = new URLSearchParams(window.location.search).get("reset");
     if (reset) {
       localStorage.setItem("projectx-reset-token", reset);
-      setStage("auth");
+      setStage("login");
       setMode("login");
       setRecoveryMode(true);
       setResetTokenMode(true);
@@ -249,7 +254,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     const cleanEmail = email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) { setNotice(t("invalidEmail")); return; }
     if (password.length < 10) { setNotice(t("weakPassword")); return; }
-    if (mode === "signup" && !name.trim()) { setNotice(t("missingName")); return; }
+    if (mode === "signup" && (!firstName.trim() || !lastName.trim())) { setNotice(t("missingName")); return; }
     if (mode === "signup" && password !== confirmPassword) { setNotice(t("passwordMismatch")); return; }
     setBusy(true); setNotice("");
     try {
@@ -258,7 +263,9 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       if (mode === "signup") {
         const salt = createPasswordSalt();
         const passwordHash = await derivePasswordHash(password, salt);
-        credentials = { email: cleanEmail, name: name.trim(), salt, passwordHash };
+        const lockHash = lockType === "none" ? null : Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(lockSecret)))).map(b=>b.toString(16).padStart(2,"0")).join("");
+        const country = countries.find(item => item.code === countryCode);
+        credentials = { email: cleanEmail, name: [firstName.trim(),lastName.trim()].join(" "), firstName:firstName.trim(), lastName:lastName.trim(), country:countryCode, currency:regional.currency, calendar:regional.calendar, numberFormat:country?.defaultNumberFormat || "1,234.56", weekStart:regional.weekStart, language, accountType, appLockType:lockType, appLockHash:lockHash, salt, passwordHash };
       } else {
         const challenge = await apiRequest<{salt:string}>(`/auth/password-salt?email=${encodeURIComponent(cleanEmail)}`);
         if (challenge.salt === "AAAAAAAAAAAAAAAAAAAAAA") {
@@ -273,7 +280,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         body: JSON.stringify(credentials)
       });
       setSession(data.token);
-      localStorage.setItem("projectx-account", JSON.stringify({ name: data.user.displayName || name.trim(), email: data.user.email }));
+      localStorage.setItem("projectx-account", JSON.stringify({ name: data.user.displayName || [firstName,lastName].filter(Boolean).join(" "), email: data.user.email }));
       const signedInUser = { ...data.user, displayName: data.user.displayName || name.trim() };
       setUser(signedInUser);
       setProfileName(signedInUser.displayName);
@@ -286,6 +293,9 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       } else {
         localStorage.setItem("projectx-profile-complete:" + signedInUser.id, "1");
       }
+      localStorage.setItem("projectx-first-run-complete", "1");
+      localStorage.setItem("projectx-account-type", accountType);
+      localStorage.setItem("projectx-app-lock-type", lockType);
       onComplete(signedInUser, language);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : t("authError"));
@@ -385,7 +395,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
   }
 
   return (
-    <main className={"px-onboarding" + (stage === "language" ? " px-language-screen" : "")} dir={dir} lang={language}>
+    <main className={"px-onboarding" + (stage === "welcome" ? " px-language-screen" : "")} dir={dir} lang={language}>
       <div className="px-ambient px-ambient-one" /><div className="px-ambient px-ambient-two" />
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
       <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">NOVYRA</span></header>
@@ -417,7 +427,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <p className="px-footnote">{language === "fa" ? "هر زمان می‌توانید این موارد را در تنظیمات تغییر دهید." : "You can change these preferences anytime in Settings."}</p>
         </div>}
         
-        {stage === "auth" && <div className="px-glass-panel px-auth-panel">
+        {stage === "login" && <div className="px-glass-panel px-auth-panel">
           <div className="px-auth-emblem" aria-label="NOVYRA"><NovyraMark /></div>
           <div className="px-eyebrow">NOVYRA / {recoveryMode ? "ACCOUNT RECOVERY" : "YOUR SPACE"}</div>
           <h1>{recoveryMode ? t("resetTitle") : mode === "login" ? t("loginTitle") : t("signupTitle")}</h1>
