@@ -359,9 +359,8 @@ export default {
    }
 
    if (path === "/auth/password-salt" && request.method === "GET") {
-    const email=cleanEmail(url.searchParams.get("email"));
-    const user=await db.prepare("SELECT id,password_salt FROM users WHERE email=?").bind(email).first();
-    return json({salt:user?.password_salt || "AAAAAAAAAAAAAAAAAAAAAA",exists:Boolean(user)});
+    // Legacy compatibility only: never reveal whether an address is registered.
+    return json({salt:"AAAAAAAAAAAAAAAAAAAAAA",exists:false});
    }
 
    if (path === "/auth/register" && request.method === "POST") {
@@ -445,13 +444,15 @@ export default {
    }
    if (path === "/auth/login" && request.method === "POST") {
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";if(!await hitAuthLimit(db,"login:"+ip,12,900000))return fail("Too many login attempts. Try again later.",429);
-    const body = await readBody(request), email = cleanEmail(body?.email), suppliedHash = String(body?.passwordHash || "");
-    const user = await db.prepare("SELECT * FROM users WHERE email=?").bind(email).first();
-    if (!user) return fail("ایمیل یا رمز عبور اشتباه است.",401);
-    if(env.REQUIRE_EMAIL_VERIFICATION==="true" && !user.verified_at) return fail("ابتدا ایمیل خود را تأیید کن.",403);
-    if (!/^[a-f0-9]{64}$/.test(suppliedHash) || suppliedHash !== user.password_hash) return fail("ایمیل یا رمز عبور اشتباه است.",401);
-    const session = await createSession(db,user.id);
-    return json({ token:session.token, expiresAt:session.expiresAt, user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role,profile:publicProfile(user)} });
+    const body=await readBody(request),email=cleanEmail(body?.email),password=String(body?.password||"");
+    const user=await db.prepare("SELECT * FROM users WHERE email=?").bind(email).first();
+    if(!user)return fail("Email or password is incorrect.",401);
+    if(env.REQUIRE_EMAIL_VERIFICATION==="true"&&!user.verified_at)return fail("Verify your email before logging in.",403);
+    if(password.length<1||password.length>1024)return fail("Email or password is incorrect.",401);
+    const suppliedHash=await passwordHash(password,user.password_salt);
+    if(suppliedHash!==user.password_hash)return fail("Email or password is incorrect.",401);
+    const session=await createSession(db,user.id);
+    return json({token:session.token,expiresAt:session.expiresAt,user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role,profile:publicProfile(user)}});
    }
 
    const wsMatch=path.match(/^\/rooms\/([A-Z0-9]+)\/live$/);
