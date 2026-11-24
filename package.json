@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test:language-autonyms": "node scripts/check-language-autonyms.mjs"
+    "test:language-autonyms": "node scripts/check-language-autonyms.mjs",
+    "test:regional-preferences": "node --experimental-strip-types scripts/check-regional-preferences.mjs",
+    "test:auth-translations": "node scripts/check-auth-translations.mjs"
   },
   "dependencies": {
     "next": "15.5.28",
