@@ -61,5 +61,13 @@
   "overview": "نمای کلی",
   "recent": "تراکنش‌های اخیر",
   "profile": "پروفایل",
-  "createBusiness": "افزودن فضای کسب‌وکار"
+  "createBusiness": "افزودن فضای کسب‌وکار",
+  "getStarted": "شروع کنید",
+  "financialClarity": "شفافیت مالی، از نو تعریف‌شده",
+  "language": "زبان",
+  "hidePassword": "پنهان‌کردن رمز عبور",
+  "showPassword": "نمایش رمز عبور",
+  "dismiss": "بستن",
+  "timeout": "زمان درخواست به پایان رسید. دوباره تلاش کنید.",
+  "noResults": "نتیجه‌ای پیدا نشد"
 }
