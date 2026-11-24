@@ -254,7 +254,8 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     if (busy) return;
     const cleanEmail = email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) { setNotice(t("invalidEmail")); return; }
-    if (password.length < 10) { setNotice(t("weakPassword")); return; }
+    if (mode === "signup" && password.length < 10) { setNotice(t("weakPassword")); return; }
+    if (mode === "login" && !password) { setNotice(t("weakPassword")); return; }
     if (mode === "signup" && (!firstName.trim() || !lastName.trim())) { setNotice(t("missingName")); return; }
     if (mode === "signup" && password !== confirmPassword) { setNotice(t("passwordMismatch")); return; }
     setBusy(true); setNotice("");
