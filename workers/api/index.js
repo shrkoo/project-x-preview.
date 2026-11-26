@@ -853,7 +853,7 @@ export default {
       if(!access||access.role!=="owner") return fail("فقط مالک فضای کسب‌وکار می‌تواند دعوت‌نامه ارسال کند.",403);
       if(!hasMailProvider(env)) return fail("برای دعوت واقعی اعضا، سرویس ایمیل Preview باید پیکربندی شود.",503);
       const email=cleanEmail(body.email),role=String(body.role||"viewer");
-      if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return fail("ایمیل معتبر وارد کنید.");
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("ایمیل معتبر وارد کنید.");
       if(!["manager","accountant","staff","viewer"].includes(role)) return fail("نقش انتخاب‌شده معتبر نیست.");
       if(email===cleanEmail(user.email)) return fail("مالک نمی‌تواند خودش را دعوت کند.");
       const existing=await db.prepare("SELECT user_id FROM workspace_members WHERE workspace_id=? AND email=? AND status='active'").bind(workspaceId,email).first();
@@ -883,7 +883,7 @@ export default {
       await writeBusinessAudit(db,invite.workspaceId,user.id,"team.joined","member",user.id,{role:invite.role});
       return json({ok:true,workspaceId:invite.workspaceId,role:invite.role});
     }
-    const teamMemberMatch=path.match(/^\\/business\\/team\\/members\\/([^/]+)$/);
+    const teamMemberMatch=path.match(/^\/business\/team\/members\/([^/]+)$/);
     if(teamMemberMatch && (request.method==="PATCH"||request.method==="DELETE")) {
       const body=request.method==="PATCH"?(await readBody(request)||{}):{},workspaceId=String(url.searchParams.get("workspaceId")||body.workspaceId||""),memberId=decodeURIComponent(teamMemberMatch[1]);
       const access=await getBusinessAccess(db,workspaceId,user.id);
@@ -952,7 +952,7 @@ export default {
       }
       if(!businessCan(access,"ledger:write")) return fail("نقش شما اجازه ثبت سند حسابداری را ندارد.",403);
       const date=String(body.date||""),description=String(body.description||"").trim().slice(0,300),reference=String(body.reference||"").slice(0,100),lines=body.lines;
-      if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)||!description||!Array.isArray(lines)||lines.length<2||lines.length>100) return fail("تاریخ، شرح و حداقل دو ردیف سند الزامی است.");
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!description||!Array.isArray(lines)||lines.length<2||lines.length>100) return fail("تاریخ، شرح و حداقل دو ردیف سند الزامی است.");
       let debit=0,credit=0;const normalized=[];
       for(const line of lines){const accountName=String(line?.accountName||"").trim().slice(0,120),accountCode=String(line?.accountCode||"").slice(0,30),d=Number(line?.debit||0),cr=Number(line?.credit||0);if(!accountName||!Number.isFinite(d)||!Number.isFinite(cr)||d<0||cr<0||d>1e12||cr>1e12||(d>0&&cr>0)||(d===0&&cr===0))return fail("هر ردیف باید فقط مبلغ بدهکار یا بستانکار داشته باشد.");debit+=d;credit+=cr;normalized.push({accountName,accountCode,debit:d,credit:cr});}
       if(debit<=0||Math.abs(debit-credit)>0.0001)return fail("جمع بدهکار و بستانکار باید برابر و بیشتر از صفر باشد.");
