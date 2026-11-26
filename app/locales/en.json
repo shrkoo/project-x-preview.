@@ -87,5 +87,6 @@
   "passwordResetDone": "Your password was reset. Log in with your new password.",
   "biometricUnavailable": "Biometric authentication is not available in this browser or on this device. Use a PIN or pattern instead.",
   "biometricCancelled": "Biometric authentication was cancelled or timed out. Please try again.",
-  "biometricFailed": "Biometric setup failed. Check your device lock settings and browser permissions."
+  "biometricFailed": "Biometric setup failed. Check your device lock settings and browser permissions.",
+  "biometricEmailRequired": "Enter a valid email on the account details step first."
 }
