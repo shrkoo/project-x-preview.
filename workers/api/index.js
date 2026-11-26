@@ -366,7 +366,7 @@ export default {
 
    if(path==="/auth/webauthn/register/options" && request.method==="POST") {
     const body=await readBody(request),email=cleanEmail(body?.email);
-    if(!/^\\S+@\\S+\\.\\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
+    if(!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     if(!await hitAuthLimit(db,"webauthn-options:"+ip,5,600000)) return fail("درخواست‌های زیاد؛ کمی بعد دوباره تلاش کن.",429);
     const existing=await db.prepare("SELECT id FROM users WHERE email=? LIMIT 1").bind(email).first();
@@ -392,7 +392,7 @@ export default {
 
    if(path==="/auth/webauthn/authenticate/options" && request.method==="POST") {
     const body=await readBody(request),email=cleanEmail(body?.email);
-    if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
+    if(!/^[^\\s@]+@[^\\s@]+\.[^\\s@]+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     if(!await hitAuthLimit(db,"webauthn-auth-options:"+ip,8,600000)) return fail("درخواست‌های زیاد؛ کمی بعد دوباره تلاش کن.",429);
     const user=await db.prepare("SELECT id,email,verified_at FROM users WHERE email=?").bind(email).first();
