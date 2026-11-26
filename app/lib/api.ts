@@ -34,15 +34,24 @@ export async function deriveAppLockHash(secret: string, salt: string) {
 
 
 export class ApiRequestError extends Error {
+  public readonly status: number;
+  public readonly code?: string;
+  public readonly requestId?: string;
+  public readonly retryAfterSeconds?: number;
+
   constructor(
     message: string,
-    public readonly status: number,
-    public readonly code?: string,
-    public readonly requestId?: string,
-    public readonly retryAfterSeconds?: number
+    status: number,
+    code?: string,
+    requestId?: string,
+    retryAfterSeconds?: number
   ) {
     super(message);
     this.name = "ApiRequestError";
+    this.status = status;
+    this.code = code;
+    this.requestId = requestId;
+    this.retryAfterSeconds = retryAfterSeconds;
   }
 }
 
