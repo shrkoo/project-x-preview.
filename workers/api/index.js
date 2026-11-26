@@ -360,8 +360,14 @@ export default {
       RESEND_API_KEY: Boolean(env.RESEND_API_KEY),
       EMAIL_BRIDGE_URL: Boolean(env.EMAIL_BRIDGE_URL),
       EMAIL_BRIDGE_SECRET: Boolean(env.EMAIL_BRIDGE_SECRET),
-      SESSION_SECRET: Boolean(env.SESSION_SECRET),
-      JWT_SECRET: Boolean(env.JWT_SECRET)
+      ADMIN_EMAIL: Boolean(env.ADMIN_EMAIL)
+    };
+    const configuration = {
+      APP_URL: Boolean(env.APP_URL),
+      GOOGLE_REDIRECT_URI: Boolean(env.GOOGLE_REDIRECT_URI),
+      WEBAUTHN_ORIGIN: Boolean(env.WEBAUTHN_ORIGIN),
+      EMAIL_FROM: Boolean(env.EMAIL_FROM),
+      REQUIRE_EMAIL_VERIFICATION: env.REQUIRE_EMAIL_VERIFICATION === "true" || env.REQUIRE_EMAIL_VERIFICATION === "false"
     };
     let tables = Object.fromEntries(requiredTables.map(name => [name, false]));
     let databaseOk = false;
@@ -374,7 +380,7 @@ export default {
         console.error("novyra-health-d1-check", { requestId, errorName: String(error?.name || "Error"), message: String(error?.message || "D1 check failed").slice(0,180) });
       }
     }
-    return json({ ok: Boolean(env.DB) && databaseOk, service: "novyra-api", database: databaseOk ? "connected" : "unavailable", region: "EU", requestId, bindings, secrets, tables, databaseOk });
+    return json({ ok: Boolean(env.DB) && databaseOk, service: "novyra-api", database: databaseOk ? "connected" : "unavailable", region: "EU", requestId, bindings, secrets, configuration, tables, databaseOk });
    }
    if(path==="/auth/email-check" && request.method==="POST"){
     const body=await readBody(request),email=cleanEmail(body?.email);
