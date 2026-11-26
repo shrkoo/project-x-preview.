@@ -41,6 +41,10 @@ jobs:
         shell: bash
         run: set -o pipefail; npm run test:regional-profile-schema 2>&1 | tee -a ci-build.log
 
+      - name: Check business preview APIs and multi-device sync
+        shell: bash
+        run: set -o pipefail; npm run test:business-preview 2>&1 | tee -a ci-build.log
+
       - name: Type-check
         shell: bash
         run: set -o pipefail; npx tsc --noEmit 2>&1 | tee -a ci-build.log
