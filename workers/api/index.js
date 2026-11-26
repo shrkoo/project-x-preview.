@@ -568,33 +568,38 @@ export default {
    }
 
    if (path === "/auth/register" && request.method === "POST") {
+    const authFail=(message,status=400)=>json({
+      code:status===429?"RATE_LIMITED":status===403?"FORBIDDEN":status===409?"ACCOUNT_EXISTS":status===410?"TOKEN_EXPIRED":status>=500?"INTERNAL_ERROR":"INVALID_INPUT",
+      message,requestId
+    },status);
+    try {
     const body = await readBody(request);
     const email = cleanEmail(body?.email ?? body?.emailAddress);
     const legacyName = cleanName(body?.name ?? body?.displayName);
     const profileResult = normalizeProfile(body || {});
-    if (profileResult.error) return fail(profileResult.error);
+    if (profileResult.error) return authFail(profileResult.error);
     const profile = profileResult.value;
     if (!profile.first_name && legacyName) profile.first_name = legacyName;
     const displayName = [profile.first_name,profile.last_name].filter(Boolean).join(" ") || legacyName;
     const salt=String(body?.salt ?? body?.passwordSalt ?? body?.password_salt ?? "");
     const suppliedHash=String(body?.passwordHash ?? body?.password_hash ?? body?.hash ?? "");
-    if (!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
-    if (displayName.length < 2) return fail("نام نمایشی باید حداقل ۲ حرف باشد.");
-    if (!/^[a-f0-9]{32}$/i.test(salt)) return fail("داده امنیتی نمک رمز از صفحه دریافت نشد؛ صفحه را تازه‌سازی کن.");
-    if (!isNewPasswordHash(suppliedHash, salt)) return fail("خروجی رمز عبور از صفحه ناقص است؛ صفحه را تازه‌سازی کن.");
+    if (!/^\S+@\S+\.\S+$/.test(email)) return authFail("ایمیل معتبر وارد کن.");
+    if (displayName.length < 2) return authFail("نام نمایشی باید حداقل ۲ حرف باشد.");
+    if (!/^[a-f0-9]{32}$/i.test(salt)) return authFail("داده امنیتی نمک رمز از صفحه دریافت نشد؛ صفحه را تازه‌سازی کن.");
+    if (!isNewPasswordHash(suppliedHash, salt)) return authFail("خروجی رمز عبور از صفحه ناقص است؛ صفحه را تازه‌سازی کن.");
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
-    if(!await hitAuthLimit(db,"register:"+ip,5,3600000))return fail("Too many registration attempts. Try again later.",429);
-    if(!await verifyTurnstile(body?.turnstileToken,request,env))return fail("Complete the security check.",403);
+    if(!await hitAuthLimit(db,"register:"+ip,5,3600000))return authFail("Too many registration attempts. Try again later.",429);
+    if(!await verifyTurnstile(body?.turnstileToken,request,env))return authFail("Complete the security check.",403);
     let verifiedBiometric=null;
     if(profile.app_lock_type==="biometric") {
-      if(!body?.webauthnRegistration) return fail("ثبت اثر انگشت یا تشخیص چهره کامل نشده است.",400);
+      if(!body?.webauthnRegistration) return authFail("ثبت اثر انگشت یا تشخیص چهره کامل نشده است.",400);
       const pending=await db.prepare("SELECT challenge,expires_at FROM webauthn_pending_challenges WHERE email=?").bind(email).first();
-      if(!pending || Number(pending.expires_at)<=Date.now()) return fail("درخواست ثبت اثر انگشت منقضی شده است؛ دوباره تلاش کن.",410);
+      if(!pending || Number(pending.expires_at)<=Date.now()) return authFail("درخواست ثبت اثر انگشت منقضی شده است؛ دوباره تلاش کن.",410);
       const appOrigin=String(env.WEBAUTHN_ORIGIN||env.APP_URL||"").trim();
-      if(!appOrigin) return fail("تنظیمات دامنه احراز هویت زیستی کامل نیست.",503);
+      if(!appOrigin) return authFail("تنظیمات دامنه احراز هویت زیستی کامل نیست.",503);
       const rpID=new URL(appOrigin).hostname;
       const consumed=await db.prepare("DELETE FROM webauthn_pending_challenges WHERE email=? AND challenge=? AND expires_at>? RETURNING email").bind(email,pending.challenge,Date.now()).first();
-      if(!consumed) return fail("درخواست ثبت اثر انگشت قبلاً استفاده شده یا منقضی شده است؛ دوباره تلاش کن.",410);
+      if(!consumed) return authFail("درخواست ثبت اثر انگشت قبلاً استفاده شده یا منقضی شده است؛ دوباره تلاش کن.",410);
       const verification=await verifyRegistrationResponse({
         response:body.webauthnRegistration,
         expectedChallenge:pending.challenge,
@@ -602,16 +607,20 @@ export default {
         expectedRPID:rpID,
         requireUserVerification:true
       });
-      if(!verification.verified || !verification.registrationInfo) return fail("ثبت امن اثر انگشت یا تشخیص چهره تأیید نشد.",400);
+      if(!verification.verified || !verification.registrationInfo) return authFail("ثبت امن اثر انگشت یا تشخیص چهره تأیید نشد.",400);
       verifiedBiometric=verification.registrationInfo;
     }
     const id = crypto.randomUUID(), hash = suppliedHash;
     try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,verified_at,first_name,last_name,country,currency,calendar,number_format,number_system,date_format,text_direction,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout,lock_failed_attempts,onboarding_completed) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.number_system,profile.date_format,profile.text_direction,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,profileComplete(profile)?1:0).run(); }
     catch (insertError) {
       const existing=await db.prepare("SELECT id FROM users WHERE email=? LIMIT 1").bind(email).first();
-      if(existing) return fail("برای این ایمیل حسابی وجود دارد. از ورود یا ورود با Google استفاده کن.",409);
-      console.error("project-x-register-insert-error",insertError);
-      return fail("ساخت حساب در پایگاه‌داده ناموفق بود؛ مشکل از ایمیل تکراری نیست. لطفاً بعداً دوباره تلاش کن.",500);
+      if(existing) return authFail("برای این ایمیل حسابی وجود دارد. از ورود یا ورود با Google استفاده کن.",409);
+      console.error("novyra-auth-register-insert-error", {
+        requestId, route: "/auth/register",
+        errorName: String(insertError?.name || "Error"),
+        message: String(insertError?.message || "D1 insert failed").slice(0,180)
+      });
+      return authFail("ساخت حساب در پایگاه‌داده ناموفق بود؛ مشکل از ایمیل تکراری نیست. لطفاً بعداً دوباره تلاش کن.",500);
     }
     if(verifiedBiometric) {
       const credential=verifiedBiometric.credential;
@@ -627,6 +636,14 @@ export default {
     const createdUser=await db.prepare("SELECT * FROM users WHERE id=?").bind(id).first();
     const session=await createSession(db,id);
     return json({token:session.token,expiresAt:session.expiresAt,user:{id,email,displayName,xp:0,gamesPlayed:0,role:createdUser?.role||"user",profile:createdUser?publicProfile(createdUser):null}});
+    } catch (error) {
+      console.error("novyra-auth-register-error", {
+        requestId, route: "/auth/register",
+        errorName: String(error?.name || "Error"),
+        message: String(error?.message || "Unknown signup failure").slice(0,180)
+      });
+      return json({code:"INTERNAL_ERROR",message:"Account creation failed. Please try again.",requestId},500);
+    }
    }
 
    if (path === "/auth/verify-email" && request.method === "POST") {
@@ -848,7 +865,7 @@ export default {
     const password=String(body.password||"");
     if(!password || password.length>1024) return fail("Enter your account password.",401);
     const passwordCheck=await verifyPassword(password,user.password_hash,user.password_salt);
-    if(passwordCheck.needsReset) return json({code:"NEEDS_RESET",message:"Reset your password before deleting this legacy account.",requestId});
+    if(passwordCheck.needsReset) return json({code:"NEEDS_RESET",message:"Reset your password before deleting this legacy account.",requestId},401);
     if(!passwordCheck.ok) return json({code:"INVALID_CREDENTIALS",message:"The account password is incorrect.",requestId},401);
     const tables=await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all();
     const statements=[];
