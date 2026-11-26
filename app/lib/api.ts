@@ -22,7 +22,14 @@ export async function derivePasswordHash(password: string, salt: string) {
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: new TextEncoder().encode(normalizedSalt), iterations: PASSWORD_ITERATIONS, hash: "SHA-256" }, key, 256);
   const hash = Array.from(new Uint8Array(bits), b => b.toString(16).padStart(2, "0")).join("");
-  return `pbkdf2${PASSWORD_ITERATIONS}${normalizedSalt}${hash}`;
+  return "pbkdf2$" + PASSWORD_ITERATIONS + "$" + normalizedSalt + "$" + hash;
+}
+
+/** Legacy profile digest for device-lock metadata; not used as the account password hash. */
+export async function deriveAppLockHash(secret: string, salt: string) {
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: new TextEncoder().encode(salt), iterations: PASSWORD_ITERATIONS, hash: "SHA-256" }, key, 256);
+  return Array.from(new Uint8Array(bits), b => b.toString(16).padStart(2, "0")).join("");
 }
 
 
