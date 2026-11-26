@@ -54,6 +54,7 @@ for (const language of ["fa", "en"] as const) {
         const navCount = await nav.count();
         expect(navCount).toBe(5);
         for (let i = 0; i < navCount; i++) {
+          if (i === 2) continue; // the center orb is tested separately below
           await nav.nth(i).click();
           await expect(page.locator(".nf-mobile-dock")).toBeVisible();
         }
