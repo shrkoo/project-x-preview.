@@ -96,3 +96,12 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Smoke-test deployed preview Pages site
+        env:
+          PREVIEW_PAGES_URL: https://feature-homa-auth-part1.novyra.pages.dev
+        run: |
+          set -euo pipefail
+          html="$(curl --fail --silent --show-error "$PREVIEW_PAGES_URL/")"
+          test -n "$html"
+          echo "Preview Pages returned a successful HTML response."
