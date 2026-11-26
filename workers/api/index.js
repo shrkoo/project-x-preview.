@@ -985,7 +985,8 @@ export default {
         const entries=await db.prepare("SELECT id,entry_date AS date,description,reference,created_at AS createdAt,created_by AS createdBy FROM business_journal_entries WHERE workspace_id=? ORDER BY entry_date DESC,created_at DESC LIMIT 500").bind(workspaceId).all();
         const lines=await db.prepare("SELECT l.id,l.entry_id AS entryId,l.account_code AS accountCode,l.account_name AS accountName,l.debit,l.credit FROM business_journal_lines l JOIN business_journal_entries e ON e.id=l.entry_id WHERE e.workspace_id=? ORDER BY e.created_at DESC").bind(workspaceId).all();
         const byEntry=new Map();for(const line of lines.results||[]){if(!byEntry.has(line.entryId))byEntry.set(line.entryId,[]);byEntry.get(line.entryId).push(line);}
-        return json({entries:(entries.results||[]).map(x=>({...x,lines:byEntry.get(x.id)||[]}))});
+        const accounts=await db.prepare("SELECT l.account_code AS accountCode,l.account_name AS accountName,SUM(l.debit) AS totalDebit,SUM(l.credit) AS totalCredit,SUM(l.debit)-SUM(l.credit) AS balance FROM business_journal_lines l JOIN business_journal_entries e ON e.id=l.entry_id WHERE e.workspace_id=? GROUP BY l.account_code,l.account_name ORDER BY l.account_name").bind(workspaceId).all();
+        return json({entries:(entries.results||[]).map(x=>({...x,lines:byEntry.get(x.id)||[]})),accounts:accounts.results||[]});
       }
       if(!businessCan(access,"ledger:write")) return fail("نقش شما اجازه ثبت سند حسابداری را ندارد.",403);
       const date=String(body.date||""),description=String(body.description||"").trim().slice(0,300),reference=String(body.reference||"").slice(0,100),lines=body.lines;
