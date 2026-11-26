@@ -1,0 +1,39 @@
+name: Novyra Android Preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/homa-auth-part1
+    paths:
+      - "android/novyra-preview/**"
+      - "app/components/NovyraBusinessOperations.tsx"
+      - ".github/workflows/android-preview.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-preview-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+      - name: Build debug Preview APK
+        run: gradle -p android/novyra-preview :app:assembleDebug
+      - name: Upload Preview APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: novyra-preview-android-apk
+          path: android/novyra-preview/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
