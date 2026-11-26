@@ -88,3 +88,21 @@
 .nbo-more-menu h4{margin:0 0 3px;color:#59748c;font-size:12px;font-weight:700}
 .nbo-more-menu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:48px;padding:10px 13px;border:1px solid rgba(255,255,255,.92);border-radius:14px;background:rgba(255,255,255,.82);color:#2F80ED;text-align:start;font:inherit;font-size:13px}
 .nbo-more-menu button.danger{color:#c74747}
+
+
+.nvr-root{display:grid;gap:14px;padding:14px 0 28px}
+.nvr-head{display:flex;align-items:end;justify-content:space-between;gap:12px}
+.nvr-head small{color:#7b9ab4;font-size:10px;letter-spacing:.12em}
+.nvr-head h2{margin:3px 0 0;color:#29465f;font-size:21px}
+.nvr-head label{display:grid;gap:5px;color:#607e97;font-size:11px}
+.nvr-head select{min-height:48px;max-width:150px;padding:8px 10px;border:1px solid #dce9f4;border-radius:13px;background:#fff;color:#29465f}
+.nvr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.nvr-grid article{min-width:0;padding:14px;border:1px solid rgba(255,255,255,.92);border-radius:18px;background:rgba(255,255,255,.82);box-shadow:0 7px 20px rgba(40,90,130,.05)}
+.nvr-grid article>small{display:block;color:#6a879f;font-size:11px;margin-bottom:10px}
+.nvr-grid article>strong{display:block;color:#2F80ED;font-size:19px;overflow-wrap:anywhere}
+.nvr-grid article>div{display:grid;gap:7px;margin-top:10px;color:#68839a;font-size:11px}
+.nvr-grid article>div span{display:flex;align-items:center;gap:5px}
+.nvr-category{display:flex!important;justify-content:space-between;gap:8px}
+.nvr-empty{padding:18px;border:1px dashed #c8dceb;border-radius:16px;color:#6c879e;text-align:center;font-size:12px}
+.nvr-export{display:flex;align-items:center;justify-content:center;gap:9px;min-height:50px;padding:12px 16px;border:0;border-radius:999px;background:linear-gradient(110deg,#66c5f3,#2F80ED);color:white;font-weight:700}
+@media(max-width:370px){.nvr-grid{gap:8px}.nvr-grid article{padding:11px}.nvr-grid article>strong{font-size:16px}}
