@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import NovyraSignupFlow from "./components/NovyraSignupFlow";
 import NovyraLuxuryApp from "./components/NovyraLuxuryApp";
-import { PatternLock } from "./components/novyra/PatternLock";
+import AppLockScreen from "./components/AppLockScreen";
 import { apiRequest, clearSession, derivePasswordHash } from "./lib/api";
 import { languages, languageByCode } from "./data/languages";
 
@@ -147,21 +147,42 @@ export default function Home() {
     } catch (error) { const message=error instanceof Error?error.message:"Unlock failed."; setLockError(language==="fa"?(message==="Incorrect app lock."?"الگو یا رمز اشتباه است.":message):message); }
   }
 
+
+  useEffect(() => {
+    if (!account) return;
+    let hiddenAt = 0;
+    const delay = () => {
+      const value = localStorage.getItem("projectx-app-lock-delay") || "immediate";
+      return value === "30s" ? 30000 : value === "1m" ? 60000 : value === "5m" ? 300000 : 0;
+    };
+    const lockIfConfigured = () => {
+      const type = localStorage.getItem("projectx-app-lock-type") || "none";
+      const owner = localStorage.getItem("projectx-app-lock-user");
+      if ((type === "pin" || type === "pattern") && owner === account.id && localStorage.getItem("projectx-app-lock-hash")) setLocked(true);
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") hiddenAt = Date.now();
+      else if (hiddenAt && Date.now() - hiddenAt >= delay()) lockIfConfigured();
+    };
+    const onPageHide = () => { hiddenAt = Date.now(); };
+    const onPageShow = () => { if (hiddenAt && Date.now() - hiddenAt >= delay()) lockIfConfigured(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("pageshow", onPageShow);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("pageshow", onPageShow);
+    };
+  }, [account?.id]);
+
   function logoutComplete() {
     clearSession();
     setAccount(null);
     setNotice("");
   }
 
-  if (locked) return <main className="px-onboarding" dir={languageByCode.get(language)?.rtl?"rtl":"ltr"} lang={language}>
-    <section className="px-onboarding-stage"><div className="px-glass-panel px-auth-panel">
-      <div className="px-auth-emblem">🔒</div><h1>{lockText.title}</h1>
-      <p className="px-stage-subtitle">{lockText.description}</p>
-      {localStorage.getItem("projectx-app-lock-type")==="pin"&&<input type="password" inputMode="numeric" autoComplete="off" value={lockInput} onChange={e=>setLockInput(e.target.value.replace(/\\D/g,"").slice(0,6))} placeholder={language==="fa"?"رمز ۶ رقمی":language==="en"?"6-digit PIN":lockText.placeholder} />}\n      {localStorage.getItem("projectx-app-lock-type")==="pattern"&&<><p className="px-stage-subtitle">{language==="fa"?"الگوی انتخاب‌شده را روی ۹ نقطه رسم کنید.":"Draw your saved pattern on the 9 dots."}</p><PatternLock value={lockInput} onChange={setLockInput}/></> }
-      {lockError&&<p role="alert">{lockError}</p>}
-      <button className="px-primary-action" onClick={unlockApp}>{localStorage.getItem("projectx-app-lock-type")==="biometric"?lockText.verify:lockText.unlock}</button>
-    </div></section>
-  </main>;
+  if (locked) return <AppLockScreen email={account?.email||""} name={account?.displayName||""} language={language} onUnlock={()=>{setLocked(false);setLockInput("");setLockError("");}} onLogout={logoutComplete}/>;
 
   if (!startupReady) return <main className="social-startup" aria-label="NOVYRA"><span className="social-startup-mark">N</span><span>NOVYRA</span></main>;
 
