@@ -1,3 +1,5 @@
+import { verifyLoginHash } from "./auth-password.mjs";
+
 export async function handlePasswordLogin({ request, env, db, requestId, helpers }) {
   const { cleanEmail, hitAuthLimit, createSession, publicProfile } = helpers;
   const json = (data, status = 200) => new Response(JSON.stringify(data), {
@@ -35,11 +37,21 @@ export async function handlePasswordLogin({ request, env, db, requestId, helpers
     if (env.REQUIRE_EMAIL_VERIFICATION === "true" && !user.verified_at) {
       return json({ code: "EMAIL_NOT_VERIFIED", message: "Verify your email before logging in.", requestId }, 403);
     }
-    if (!user.password_salt || !user.password_hash) {
+    if (!user.password_hash) {
       return json({ code: "INVALID_CREDENTIALS", message: "Email or password is incorrect.", requestId }, 401);
     }
     stage = "password-verify";
-    if (suppliedHash !== String(user.password_hash || "").toLowerCase()) {
+    const passwordResult = verifyLoginHash(suppliedHash, user.password_hash, user.password_salt);
+    if (passwordResult.needsReset) {
+      const preview = String(env.APP_URL || "").includes("feature-homa-auth-part1.novyra.pages.dev");
+      return json({
+        code: "NEEDS_RESET",
+        message: "This password uses an older security format. Reset your password to continue.",
+        requestId,
+        ...(preview ? { previewNote: "Preview test data only: create a new test account after resetting this account." } : {})
+      }, 401);
+    }
+    if (!passwordResult.ok) {
       return json({ code: "INVALID_CREDENTIALS", message: "Email or password is incorrect.", requestId }, 401);
     }
     stage = "session-create";
