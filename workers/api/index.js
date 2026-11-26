@@ -326,7 +326,7 @@ function shapeSocialPost(row) {
 }
 
 export default {
- async scheduled(controller, env, ctx) { ctx.waitUntil(cleanupExpiredStories(env,env.DB)); },
+ async scheduled(controller, env, ctx) { ctx.waitUntil(Promise.all([cleanupExpiredStories(env,env.DB),deliverBusinessReminders(env,env.DB)])); },
  async fetch(request, env) {
   const origin = request.headers.get("Origin");
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: { ...corsHeaders, ...(origin === "http://localhost:3000" ? { "Access-Control-Allow-Origin": origin } : {}) } });
@@ -837,25 +837,152 @@ export default {
     await db.prepare("INSERT INTO workspaces (id,owner_id,type,name,currency) VALUES (?,?,?,?,?)").bind(id,user.id,type,name,currency).run();
     return json({workspace:{id,type,name,currency}},201);
    }
-   if(path==="/business/records" && (request.method==="GET" || request.method==="PUT")) {
-     const body=request.method==="PUT"?(await readBody(request)||{}):{};
-     const workspaceId=String(url.searchParams.get("workspaceId") || body.workspaceId || "");
-     const workspace=await db.prepare("SELECT id FROM workspaces WHERE id=? AND owner_id=? AND type='business'").bind(workspaceId,user.id).first();
-     if(!workspace) return fail("فضای کسب‌وکار پیدا نشد یا دسترسی ندارید.",404);
-     await db.prepare("CREATE TABLE IF NOT EXISTS business_records (workspace_id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, payload TEXT NOT NULL, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
-     if(request.method==="GET") {
-      const row=await db.prepare("SELECT payload,updated_at AS updatedAt FROM business_records WHERE workspace_id=? AND owner_id=?").bind(workspaceId,user.id).first();
-      if(!row) return json({records:null,updatedAt:null});
-      try { return json({records:JSON.parse(row.payload),updatedAt:row.updatedAt}); } catch { return fail("اطلاعات فضای کسب‌وکار قابل خواندن نیست.",500); }
-     }
-     const records=body.records;
-     if(!records || typeof records!=="object" || Array.isArray(records)) return fail("ساختار اطلاعات کسب‌وکار معتبر نیست.");
-     const allowedArrays=["invoices","payables","customers","suppliers","products","transactions","cheques","loans","team","activity","trash","bankImports"]; const safeRecords={}; for(const [key,value] of Object.entries(records).slice(0,40)){ if(!/^[a-zA-Z][a-zA-Z0-9_]{0,39}$/.test(key) || ["__proto__","constructor","prototype"].includes(key)) continue; if(allowedArrays.includes(key)) safeRecords[key]=Array.isArray(value)?value.slice(0,2000):[]; else if(key==="settings" && value && typeof value==="object" && !Array.isArray(value)) safeRecords.settings=Object.fromEntries(Object.entries(value).slice(0,200).map(([k,v])=>[String(k).slice(0,100),String(v??"").slice(0,2000)])); } const previous=await db.prepare("SELECT payload FROM business_records WHERE workspace_id=? AND owner_id=?").bind(workspaceId,user.id).first(); let previousRecords={}; try { if(previous?.payload) previousRecords=JSON.parse(previous.payload)||{}; } catch {} const payload=JSON.stringify({...previousRecords,...safeRecords});
-     if(payload.length>200000) return fail("حجم اطلاعات کسب‌وکار بیش از حد مجاز است.",413);
-     await db.prepare("INSERT INTO business_records (workspace_id,owner_id,payload,updated_at) VALUES (?,?,?,CURRENT_TIMESTAMP) ON CONFLICT(workspace_id) DO UPDATE SET payload=excluded.payload,updated_at=CURRENT_TIMESTAMP WHERE business_records.owner_id=excluded.owner_id").bind(workspaceId,user.id,payload).run();
-     return json({ok:true,savedAt:new Date().toISOString()});
+   
+    if(path==="/business/team" && request.method==="GET") {
+      const workspaceId=String(url.searchParams.get("workspaceId")||"");
+      const access=await getBusinessAccess(db,workspaceId,user.id);
+      if(!access) return fail("فضای کسب‌وکار پیدا نشد یا دسترسی ندارید.",404);
+      const members=await db.prepare("SELECT m.user_id AS userId,m.email,m.role,m.status,m.created_at AS createdAt,m.joined_at AS joinedAt,u.display_name AS displayName FROM workspace_members m JOIN users u ON u.id=m.user_id WHERE m.workspace_id=? ORDER BY m.created_at").bind(workspaceId).all();
+      const owner=await db.prepare("SELECT id AS userId,email,display_name AS displayName FROM users WHERE id=?").bind(access.ownerId).first();
+      const invitations=access.role==="owner"||access.role==="manager"?(await db.prepare("SELECT id,email,role,expires_at AS expiresAt,created_at AS createdAt FROM business_invitations WHERE workspace_id=? AND accepted_at IS NULL AND revoked_at IS NULL AND expires_at>? ORDER BY created_at DESC").bind(workspaceId,Date.now()).all()).results||[]:[];
+      return json({team:[...(owner?[{...owner,role:"owner",status:"active"}]:[]),...(members.results||[])],invitations});
     }
-    if(path==="/finance/transactions" && request.method==="GET") {
+    if(path==="/business/team/invitations" && request.method==="POST") {
+      const body=await readBody(request)||{},workspaceId=String(body.workspaceId||"");
+      const access=await getBusinessAccess(db,workspaceId,user.id);
+      if(!access||access.role!=="owner") return fail("فقط مالک فضای کسب‌وکار می‌تواند دعوت‌نامه ارسال کند.",403);
+      if(!hasMailProvider(env)) return fail("برای دعوت واقعی اعضا، سرویس ایمیل Preview باید پیکربندی شود.",503);
+      const email=cleanEmail(body.email),role=String(body.role||"viewer");
+      if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return fail("ایمیل معتبر وارد کنید.");
+      if(!["manager","accountant","staff","viewer"].includes(role)) return fail("نقش انتخاب‌شده معتبر نیست.");
+      if(email===cleanEmail(user.email)) return fail("مالک نمی‌تواند خودش را دعوت کند.");
+      const existing=await db.prepare("SELECT user_id FROM workspace_members WHERE workspace_id=? AND email=? AND status='active'").bind(workspaceId,email).first();
+      if(existing) return fail("این کاربر از قبل عضو فضای کسب‌وکار است.",409);
+      const token=randomToken(32),tokenHash=await digest(token),id=crypto.randomUUID(),expires=Date.now()+7*86400000;
+      await db.prepare("UPDATE business_invitations SET revoked_at=CURRENT_TIMESTAMP WHERE workspace_id=? AND email=? AND accepted_at IS NULL AND revoked_at IS NULL").bind(workspaceId,email).run();
+      await db.prepare("INSERT INTO business_invitations (id,workspace_id,email,role,invited_by,token_hash,expires_at) VALUES (?,?,?,?,?,?,?)").bind(id,workspaceId,email,role,user.id,tokenHash,expires).run();
+      const inviteUrl=(env.APP_URL||"https://novyra.pages.dev")+"/business/invite?token="+encodeURIComponent(token);
+      try {
+        await sendMail(env,email,"دعوت به فضای کسب‌وکار NOVYRA",renderNovyraEmail({eyebrow:"BUSINESS WORKSPACE INVITATION",title:"دعوت به همکاری در NOVYRA",intro:"شما برای همکاری در فضای کسب‌وکار "+access.name+" دعوت شده‌اید. نقش شما: "+role,actionLabel:"پذیرش دعوت",actionUrl:inviteUrl,notice:"این دعوت‌نامه تا ۷ روز معتبر است و فقط با حساب همین نشانی ایمیل پذیرفته می‌شود.",footerNote:"اگر این دعوت را انتظار نداشتید، پیام را نادیده بگیرید."}));
+      } catch(error) {
+        await db.prepare("UPDATE business_invitations SET revoked_at=CURRENT_TIMESTAMP WHERE id=?").bind(id).run();
+        throw error;
+      }
+      await writeBusinessAudit(db,workspaceId,user.id,"team.invited","member",id,{email,role});
+      return json({ok:true,invitation:{id,email,role,expiresAt:expires}},201);
+    }
+    if(path==="/business/team/accept" && request.method==="POST") {
+      const body=await readBody(request)||{},token=String(body.token||"");
+      if(token.length<30||token.length>200) return fail("لینک دعوت معتبر نیست.",400);
+      const invite=await db.prepare("SELECT i.id,i.workspace_id AS workspaceId,i.email,i.role,i.expires_at AS expiresAt,w.owner_id AS ownerId FROM business_invitations i JOIN workspaces w ON w.id=i.workspace_id WHERE i.token_hash=? AND i.accepted_at IS NULL AND i.revoked_at IS NULL").bind(await digest(token)).first();
+      if(!invite||Number(invite.expiresAt)<=Date.now()) return fail("دعوت‌نامه منقضی یا لغو شده است.",410);
+      if(cleanEmail(invite.email)!==cleanEmail(user.email)) return fail("این دعوت‌نامه برای نشانی ایمیل حساب فعلی صادر نشده است.",403);
+      if(invite.ownerId===user.id) return fail("مالک از قبل به این فضا دسترسی دارد.");
+      await db.prepare("INSERT INTO workspace_members (workspace_id,user_id,email,role,status,invited_by,joined_at) VALUES (?,?,?,?,'active',?,CURRENT_TIMESTAMP) ON CONFLICT(workspace_id,user_id) DO UPDATE SET email=excluded.email,role=excluded.role,status='active',invited_by=excluded.invited_by,joined_at=CURRENT_TIMESTAMP").bind(invite.workspaceId,user.id,user.email,invite.role,invite.ownerId).run();
+      await db.prepare("UPDATE business_invitations SET accepted_at=CURRENT_TIMESTAMP WHERE id=?").bind(invite.id).run();
+      await writeBusinessAudit(db,invite.workspaceId,user.id,"team.joined","member",user.id,{role:invite.role});
+      return json({ok:true,workspaceId:invite.workspaceId,role:invite.role});
+    }
+    const teamMemberMatch=path.match(/^\\/business\\/team\\/members\\/([^/]+)$/);
+    if(teamMemberMatch && (request.method==="PATCH"||request.method==="DELETE")) {
+      const body=request.method==="PATCH"?(await readBody(request)||{}):{},workspaceId=String(url.searchParams.get("workspaceId")||body.workspaceId||""),memberId=decodeURIComponent(teamMemberMatch[1]);
+      const access=await getBusinessAccess(db,workspaceId,user.id);
+      if(!access||access.role!=="owner") return fail("فقط مالک می‌تواند دسترسی اعضا را تغییر دهد.",403);
+      if(memberId===access.ownerId) return fail("نقش مالک قابل تغییر یا حذف نیست.",400);
+      const member=await db.prepare("SELECT user_id AS userId FROM workspace_members WHERE workspace_id=? AND user_id=?").bind(workspaceId,memberId).first();
+      if(!member) return fail("عضو پیدا نشد.",404);
+      if(request.method==="DELETE") {
+        await db.prepare("DELETE FROM workspace_members WHERE workspace_id=? AND user_id=?").bind(workspaceId,memberId).run();
+        await writeBusinessAudit(db,workspaceId,user.id,"team.removed","member",memberId);
+        return json({ok:true});
+      }
+      const role=String(body.role||"");
+      if(!["manager","accountant","staff","viewer"].includes(role)) return fail("نقش انتخاب‌شده معتبر نیست.");
+      await db.prepare("UPDATE workspace_members SET role=? WHERE workspace_id=? AND user_id=?").bind(role,workspaceId,memberId).run();
+      await writeBusinessAudit(db,workspaceId,user.id,"team.role_changed","member",memberId,{role});
+      return json({ok:true,role});
+    }
+    if(path==="/business/records" && (request.method==="GET" || request.method==="PUT")) {
+      const body=request.method==="PUT"?(await readBody(request)||{}):{};
+      const workspaceId=String(url.searchParams.get("workspaceId") || body.workspaceId || "");
+      const access=await getBusinessAccess(db,workspaceId,user.id);
+      if(!access) return fail("فضای کسب‌وکار پیدا نشد یا دسترسی ندارید.",404);
+      if(request.method==="GET") {
+        if(!businessCan(access,"read")) return fail("اجازه مشاهده اطلاعات را ندارید.",403);
+        await db.prepare("CREATE TABLE IF NOT EXISTS business_records (workspace_id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, payload TEXT NOT NULL, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
+        const row=await db.prepare("SELECT payload,updated_at AS updatedAt FROM business_records WHERE workspace_id=? AND owner_id=?").bind(workspaceId,access.ownerId).first();
+        if(!row) return json({records:null,updatedAt:null,role:access.role});
+        try { return json({records:JSON.parse(row.payload),updatedAt:row.updatedAt,role:access.role}); } catch { return fail("اطلاعات فضای کسب‌وکار قابل خواندن نیست.",500); }
+      }
+      if(!businessCan(access,"records:write")) return fail("نقش شما اجازه ویرایش اطلاعات کسب‌وکار را ندارد.",403);
+      const records=body.records;
+      if(!records || typeof records!=="object" || Array.isArray(records)) return fail("ساختار اطلاعات کسب‌وکار معتبر نیست.");
+      const allowedArrays=["invoices","payables","customers","suppliers","products","transactions","cheques","loans","team","activity","trash","bankImports"];
+      const safeRecords={};
+      for(const [key,value] of Object.entries(records).slice(0,40)) {
+        if(!/^[a-zA-Z][a-zA-Z0-9_]{0,39}$/.test(key)||["__proto__","constructor","prototype"].includes(key)) continue;
+        if(allowedArrays.includes(key)) safeRecords[key]=Array.isArray(value)?value.slice(0,2000):[];
+        else if(key==="settings"&&value&&typeof value==="object"&&!Array.isArray(value)) safeRecords.settings=Object.fromEntries(Object.entries(value).slice(0,200).map(([k,v])=>[String(k).slice(0,100),String(v??"").slice(0,2000)]));
+      }
+      await db.prepare("CREATE TABLE IF NOT EXISTS business_records (workspace_id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, payload TEXT NOT NULL, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
+      const previous=await db.prepare("SELECT payload FROM business_records WHERE workspace_id=? AND owner_id=?").bind(workspaceId,access.ownerId).first();
+      let previousRecords={};try{if(previous?.payload)previousRecords=JSON.parse(previous.payload)||{};}catch{}
+      const payload=JSON.stringify({...previousRecords,...safeRecords});
+      if(payload.length>200000)return fail("حجم اطلاعات کسب‌وکار بیش از حد مجاز است.",413);
+      await db.prepare("INSERT INTO business_records (workspace_id,owner_id,payload,updated_at) VALUES (?,?,?,CURRENT_TIMESTAMP) ON CONFLICT(workspace_id) DO UPDATE SET payload=excluded.payload,updated_at=CURRENT_TIMESTAMP WHERE business_records.owner_id=excluded.owner_id").bind(workspaceId,access.ownerId,payload).run();
+      await syncBusinessDueReminders(db,workspaceId,access.ownerId,user.id,JSON.parse(payload));
+      await writeBusinessAudit(db,workspaceId,user.id,"records.updated","business_records",workspaceId,{keys:Object.keys(safeRecords)});
+      return json({ok:true,savedAt:new Date().toISOString(),actor:{id:user.id,displayName:user.display_name},role:access.role});
+    }
+    if(path==="/business/audit" && request.method==="GET") {
+      const workspaceId=String(url.searchParams.get("workspaceId")||""),access=await getBusinessAccess(db,workspaceId,user.id);
+      if(!access||!businessCan(access,"audit:read")) return fail("اجازه مشاهده تاریخچه را ندارید.",403);
+      const rows=await db.prepare("SELECT a.id,a.action,a.entity_type AS entityType,a.entity_id AS entityId,a.details_json AS details,a.created_at AS createdAt,u.id AS actorId,u.display_name AS actorName,u.email AS actorEmail FROM business_audit_log a LEFT JOIN users u ON u.id=a.actor_user_id WHERE a.workspace_id=? ORDER BY a.created_at DESC LIMIT 500").bind(workspaceId).all();
+      return json({events:(rows.results||[]).map(x=>({...x,details:(()=>{try{return x.details?JSON.parse(x.details):null}catch{return null}})()}))});
+    }
+    if(path==="/business/journal" && (request.method==="GET"||request.method==="POST")) {
+      const body=request.method==="POST"?(await readBody(request)||{}):{},workspaceId=String(url.searchParams.get("workspaceId")||body.workspaceId||""),access=await getBusinessAccess(db,workspaceId,user.id);
+      if(!access) return fail("فضای کسب‌وکار پیدا نشد یا دسترسی ندارید.",404);
+      if(request.method==="GET") {
+        if(!businessCan(access,"read")) return fail("اجازه مشاهده دفتر حساب را ندارید.",403);
+        const entries=await db.prepare("SELECT id,entry_date AS date,description,reference,created_at AS createdAt,created_by AS createdBy FROM business_journal_entries WHERE workspace_id=? ORDER BY entry_date DESC,created_at DESC LIMIT 500").bind(workspaceId).all();
+        const lines=await db.prepare("SELECT l.id,l.entry_id AS entryId,l.account_code AS accountCode,l.account_name AS accountName,l.debit,l.credit FROM business_journal_lines l JOIN business_journal_entries e ON e.id=l.entry_id WHERE e.workspace_id=? ORDER BY e.created_at DESC").bind(workspaceId).all();
+        const byEntry=new Map();for(const line of lines.results||[]){if(!byEntry.has(line.entryId))byEntry.set(line.entryId,[]);byEntry.get(line.entryId).push(line);}
+        return json({entries:(entries.results||[]).map(x=>({...x,lines:byEntry.get(x.id)||[]}))});
+      }
+      if(!businessCan(access,"ledger:write")) return fail("نقش شما اجازه ثبت سند حسابداری را ندارد.",403);
+      const date=String(body.date||""),description=String(body.description||"").trim().slice(0,300),reference=String(body.reference||"").slice(0,100),lines=body.lines;
+      if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)||!description||!Array.isArray(lines)||lines.length<2||lines.length>100) return fail("تاریخ، شرح و حداقل دو ردیف سند الزامی است.");
+      let debit=0,credit=0;const normalized=[];
+      for(const line of lines){const accountName=String(line?.accountName||"").trim().slice(0,120),accountCode=String(line?.accountCode||"").slice(0,30),d=Number(line?.debit||0),cr=Number(line?.credit||0);if(!accountName||!Number.isFinite(d)||!Number.isFinite(cr)||d<0||cr<0||d>1e12||cr>1e12||(d>0&&cr>0)||(d===0&&cr===0))return fail("هر ردیف باید فقط مبلغ بدهکار یا بستانکار داشته باشد.");debit+=d;credit+=cr;normalized.push({accountName,accountCode,debit:d,credit:cr});}
+      if(debit<=0||Math.abs(debit-credit)>0.0001)return fail("جمع بدهکار و بستانکار باید برابر و بیشتر از صفر باشد.");
+      const entryId=crypto.randomUUID(),statements=[db.prepare("INSERT INTO business_journal_entries (id,workspace_id,entry_date,description,reference,created_by) VALUES (?,?,?,?,?,?)").bind(entryId,workspaceId,date,description,reference,user.id),...normalized.map(x=>db.prepare("INSERT INTO business_journal_lines (id,entry_id,account_code,account_name,debit,credit) VALUES (?,?,?,?,?,?)").bind(crypto.randomUUID(),entryId,x.accountCode,x.accountName,x.debit,x.credit))];
+      await db.batch(statements);
+      await writeBusinessAudit(db,workspaceId,user.id,"journal.created","journal_entry",entryId,{debit,credit,lines:normalized.length});
+      return json({ok:true,entryId,debit,credit},201);
+    }
+    if(path==="/business/reminders" && (request.method==="GET"||request.method==="POST")) {
+      const body=request.method==="POST"?(await readBody(request)||{}):{},workspaceId=String(url.searchParams.get("workspaceId")||body.workspaceId||""),access=await getBusinessAccess(db,workspaceId,user.id);
+      if(!access) return fail("فضای کسب‌وکار پیدا نشد یا دسترسی ندارید.",404);
+      if(request.method==="GET") {
+        if(!businessCan(access,"reminders:read")) return fail("اجازه مشاهده یادآوری‌ها را ندارید.",403);
+        const rows=await db.prepare("SELECT id,reminder_type AS type,reference_id AS referenceId,title,due_at AS dueAt,remind_at AS remindAt,status,notified_at AS notifiedAt FROM business_reminders WHERE workspace_id=? ORDER BY remind_at LIMIT 500").bind(workspaceId).all();
+        return json({reminders:rows.results||[]});
+      }
+      if(!businessCan(access,"reminders:manage")) return fail("نقش شما اجازه مدیریت یادآوری‌ها را ندارد.",403);
+      const title=String(body.title||"").trim().slice(0,180),dueAt=Number(body.dueAt),remindAt=Number(body.remindAt??dueAt),type=String(body.type||"custom");
+      if(!title||!Number.isFinite(dueAt)||!Number.isFinite(remindAt)||dueAt<=0||remindAt>dueAt||!["custom","cheque","loan","invoice","installment"].includes(type)) return fail("اطلاعات یادآوری معتبر نیست.");
+      const id=crypto.randomUUID();await db.prepare("INSERT INTO business_reminders (id,workspace_id,owner_id,reminder_type,reference_id,title,due_at,remind_at,status,created_by) VALUES (?,?,?,?,?,?,?,?, 'pending',?)").bind(id,workspaceId,access.ownerId,type,String(body.referenceId||id).slice(0,80),title,dueAt,remindAt,user.id).run();
+      await writeBusinessAudit(db,workspaceId,user.id,"reminder.created","reminder",id,{title,dueAt,remindAt});
+      return json({ok:true,id},201);
+    }
+    if(path==="/business/team/invitations" && request.method==="GET") {
+      const workspaceId=String(url.searchParams.get("workspaceId")||""),access=await getBusinessAccess(db,workspaceId,user.id);
+      if(!access||!["owner","manager"].includes(access.role)) return fail("اجازه مشاهده دعوت‌نامه‌ها را ندارید.",403);
+      const rows=await db.prepare("SELECT id,email,role,expires_at AS expiresAt,created_at AS createdAt FROM business_invitations WHERE workspace_id=? AND accepted_at IS NULL AND revoked_at IS NULL ORDER BY created_at DESC LIMIT 100").bind(workspaceId).all();
+      return json({invitations:rows.results||[]});
+    }
+if(path==="/finance/transactions" && request.method==="GET") {
     const workspaceId=String(url.searchParams.get("workspaceId")||"");
     const workspace=await db.prepare("SELECT id FROM workspaces WHERE id=? AND owner_id=?").bind(workspaceId,user.id).first();
     if(!workspace) return fail("فضای کاری پیدا نشد یا دسترسی ندارید.",404);
