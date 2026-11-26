@@ -25,6 +25,17 @@ jobs:
         shell: bash
         run: set -o pipefail; npm install 2>&1 | tee -a ci-build.log
 
+      - name: Type-check
+        shell: bash
+        run: set -o pipefail; npx tsc --noEmit 2>&1 | tee -a ci-build.log
+
+      - name: Build static preview for browser tests
+        shell: bash
+        env:
+          DEPLOY_TARGET: cloudflare-pages
+          NEXT_PUBLIC_API_BASE: https://novyra-preview-api.projectx-novyratam.workers.dev
+        run: set -o pipefail; npm run build 2>&1 | tee -a ci-build.log
+
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
@@ -54,14 +65,6 @@ jobs:
       - name: Check business preview APIs and multi-device sync
         shell: bash
         run: set -o pipefail; npm run test:business-preview 2>&1 | tee -a ci-build.log
-
-      - name: Type-check
-        shell: bash
-        run: set -o pipefail; npx tsc --noEmit 2>&1 | tee -a ci-build.log
-
-      - name: Build
-        shell: bash
-        run: set -o pipefail; npm run build 2>&1 | tee -a ci-build.log
 
       - name: Upload build log
         if: always()
