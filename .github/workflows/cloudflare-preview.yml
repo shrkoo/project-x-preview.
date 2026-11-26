@@ -91,6 +91,7 @@ jobs:
         env:
           DEPLOY_TARGET: cloudflare-pages
           NEXT_PUBLIC_API_BASE: https://novyra-preview-api.projectx-novyratam.workers.dev
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: 0x4AAAAAAGT3YeW3V72DTsmj
 
       - name: Deploy Pages preview only
         run: npx wrangler pages deploy out --project-name novyra --branch feature-homa-auth-part1
