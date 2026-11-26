@@ -791,7 +791,7 @@ export default {
      }
      const records=body.records;
      if(!records || typeof records!=="object" || Array.isArray(records)) return fail("ساختار اطلاعات کسب‌وکار معتبر نیست.");
-     const payload=JSON.stringify({invoices:Array.isArray(records.invoices)?records.invoices.slice(0,2000):[],payables:Array.isArray(records.payables)?records.payables.slice(0,2000):[],customers:Array.isArray(records.customers)?records.customers.slice(0,2000):[],products:Array.isArray(records.products)?records.products.slice(0,2000):[]});
+     const allowedArrays=["invoices","payables","customers","suppliers","products","transactions","cheques","loans","team","activity","trash","bankImports"]; const safeRecords={}; for(const [key,value] of Object.entries(records).slice(0,40)){ if(!/^[a-zA-Z][a-zA-Z0-9_]{0,39}$/.test(key) || ["__proto__","constructor","prototype"].includes(key)) continue; if(allowedArrays.includes(key)) safeRecords[key]=Array.isArray(value)?value.slice(0,2000):[]; else if(key==="settings" && value && typeof value==="object" && !Array.isArray(value)) safeRecords.settings=Object.fromEntries(Object.entries(value).slice(0,200).map(([k,v])=>[String(k).slice(0,100),String(v??"").slice(0,2000)])); } const payload=JSON.stringify(safeRecords);
      if(payload.length>200000) return fail("حجم اطلاعات کسب‌وکار بیش از حد مجاز است.",413);
      await db.prepare("INSERT INTO business_records (workspace_id,owner_id,payload,updated_at) VALUES (?,?,?,CURRENT_TIMESTAMP) ON CONFLICT(workspace_id) DO UPDATE SET payload=excluded.payload,updated_at=CURRENT_TIMESTAMP WHERE business_records.owner_id=excluded.owner_id").bind(workspaceId,user.id,payload).run();
      return json({ok:true,savedAt:new Date().toISOString()});
