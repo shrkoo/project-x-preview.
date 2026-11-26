@@ -352,7 +352,7 @@ export default {
   try {
    if ((path === "/api/health" || path === "/health") && request.method === "GET") {
     const requiredTables = ["users","sessions","auth_rate_limits","signup_verification_codes"];
-    const bindings = { DB: Boolean(env.DB), ROOM_HUB: Boolean(env.ROOM_HUB), STORY_MEDIA: Boolean(env.STORY_MEDIA), AI: Boolean(env.AI) };
+    const bindings = { DB: Boolean(env.DB), ROOM_HUB: Boolean(env.ROOM_HUB), STORY_MEDIA_KV: Boolean(env.STORY_MEDIA), R2: Boolean(env.R2), AI: Boolean(env.AI) };
     const secrets = {
       GOOGLE_CLIENT_ID: Boolean(env.GOOGLE_CLIENT_ID),
       GOOGLE_CLIENT_SECRET: Boolean(env.GOOGLE_CLIENT_SECRET),
