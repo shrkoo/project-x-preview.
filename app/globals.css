@@ -3682,3 +3682,4 @@ body { font-family:Arial,Helvetica,sans-serif!important; }
 .nv-flow-card>.nv-toast button{width:28px!important;height:28px!important;flex-basis:28px!important;border:0!important;background:#fff!important;color:#b42318!important}
 
 html.novyra-app-obscured body>*{filter:blur(18px)!important;pointer-events:none!important;user-select:none!important}html.novyra-app-obscured{background:#eaf6ff!important}
+html.novyra-app-obscured body>*{filter:none!important;pointer-events:auto!important;user-select:auto!important}html.novyra-app-obscured .nv-finance{filter:blur(18px)!important;pointer-events:none!important;user-select:none!important}
