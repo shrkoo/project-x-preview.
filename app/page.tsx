@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import NovyraSignupFlow from "./components/NovyraSignupFlow";
 import NovyraLuxuryApp from "./components/NovyraLuxuryApp";
 import AppLockScreen from "./components/AppLockScreen";
-import { apiRequest, clearSession, derivePasswordHash } from "./lib/api";
+import { apiRequest, clearSession } from "./lib/api";
 import { languages, languageByCode } from "./data/languages";
 import {removeDeviceLock} from "./lib/device-lock";
 
@@ -20,9 +20,6 @@ export default function Home() {
   const [startupReady, setStartupReady] = useState(false);
   const [notice, setNotice] = useState("");
   const [locked, setLocked] = useState(false);
-  const [lockInput, setLockInput] = useState("");
-  const [lockError, setLockError] = useState("");
-  const lockText=language==="fa"?{title:"قفل برنامه",description:"برای محافظت از اطلاعات خصوصی، قفل را باز کنید.",placeholder:"رمز یا الگو",verify:"تأیید با زیست‌سنجی",unlock:"بازکردن قفل"}:language==="ar"?{title:"التطبيق مقفل",description:"افتح القفل لحماية معلوماتك الخاصة.",placeholder:"PIN أو النمط",verify:"التحقق بالبصمة",unlock:"فتح القفل"}:language==="ckb"?{title:"ئەپ قوفڵە",description:"بۆ پاراستنی زانیارییە تایبەتییەکانت قوفڵەکە بکەرەوە.",placeholder:"PIN یان شێوە",verify:"پشتڕاستکردنەوە بە پەنجەمۆر",unlock:"کردنەوەی قوفڵ"}:{title:"App locked",description:"Unlock to protect your private information.",placeholder:"PIN or pattern",verify:"Verify with biometrics",unlock:"Unlock"};
 
 
   useEffect(() => {
@@ -131,22 +128,7 @@ export default function Home() {
     document.documentElement.dir = languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr";
   }
 
-  async function unlockApp() {
-    try {
-      const method = localStorage.getItem("projectx-app-lock-type") || "none";
-      if (method === "pin" || method === "pattern") {
-        const actual = await derivePasswordHash(lockInput, account?.email || "");
-        if (actual !== localStorage.getItem("projectx-app-lock-hash")) throw new Error("Incorrect app lock.");
-      } else if (method === "biometric") {
-        const encoded = localStorage.getItem("projectx-app-lock-credential") || "";
-        const padded = encoded.replace(/-/g,"+").replace(/_/g,"/") + "=".repeat((4-encoded.length%4)%4);
-        const id = Uint8Array.from(atob(padded), c=>c.charCodeAt(0));
-        const credential = await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:"public-key",id}],userVerification:"required",timeout:60000}});
-        if (!credential || (credential as PublicKeyCredential).id !== encoded) throw new Error("Biometric verification failed.");
-      }
-      setLocked(false);setLockInput("");setLockError("");
-    } catch (error) { const message=error instanceof Error?error.message:"Unlock failed."; setLockError(language==="fa"?(message==="Incorrect app lock."?"الگو یا رمز اشتباه است.":message):message); }
-  }
+
 
 
   useEffect(() => {
@@ -186,7 +168,7 @@ export default function Home() {
     setNotice("");
   }
 
-  if (locked) return <AppLockScreen email={account?.email||""} name={account?.displayName||""} language={language} onUnlock={()=>{setLocked(false);setLockInput("");setLockError("");}} onLogout={logoutComplete}/>;
+  if (locked) return <AppLockScreen email={account?.email||""} name={account?.displayName||""} language={language} onUnlock={()=>setLocked(false)} onLogout={logoutComplete}/>;
 
   if (!startupReady) return <main className="social-startup" aria-label="NOVYRA"><span className="social-startup-mark">N</span><span>NOVYRA</span></main>;
 
