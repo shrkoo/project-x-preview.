@@ -56,6 +56,12 @@ test("invalid input returns 400", async () => {
   assert.equal(data.code, "INVALID_INPUT");
 });
 
+test("malformed email returns 400 instead of reaching D1", async () => {
+  const { response, data } = await invoke({}, { email: "not-an-email", password: "correct-password" });
+  assert.equal(response.status, 400);
+  assert.equal(data.code, "INVALID_INPUT");
+});
+
 test("login succeeds and returns a session", async () => {
   const { response, data } = await invoke();
   assert.equal(response.status, 200);
