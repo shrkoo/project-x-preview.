@@ -16,7 +16,7 @@ for (const file of seen) {
   const source = readFileSync(file, "utf8");
   if (/\.toFixed\s*\(/.test(source)) failures.push(file + ": toFixed() is forbidden for money");
   if (/new\s+Intl\.NumberFormat\s*\([\s\S]{0,400}?style\s*:\s*["']currency["']/.test(source)) failures.push(file + ": currency Intl.NumberFormat must live in app/lib/money.ts");
-  const displaySource = source.replace(/(["'])\$\d[^"']*\1/g, "");
+  const displaySource = source.replace(/\.replace\([^,\n]+,\s*(["'])\$\d[^"']*\1\s*\)/g, "");
   if (/(["'])\$\s*\d/.test(displaySource)) failures.push(file + ": hard-coded dollar display is forbidden");
 }
 if (failures.length) {
