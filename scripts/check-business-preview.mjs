@@ -34,7 +34,12 @@ assert.equal(restored.trash.length,0);
 
 const worker=await readFile(new URL("../workers/api/index.js",import.meta.url),"utf8");
 const migration=await readFile(new URL("../workers/api/migrations-preview/0004_business_collaboration_ledger_reminders.sql",import.meta.url),"utf8");
+const workerConfig=await readFile(new URL("../workers/api/wrangler.preview.toml",import.meta.url),"utf8");
 for(const route of ["/business/team","/business/team/invitations","/business/team/accept","/business/journal","/business/audit","/business/reminders"]) assert(worker.includes(route),`Missing server route: ${route}`);
 for(const table of ["workspace_members","business_invitations","business_audit_log","business_journal_entries","business_journal_lines","business_reminders","business_record_versions"]) assert(migration.includes(`CREATE TABLE IF NOT EXISTS ${table}`),`Missing preview schema: ${table}`);
 assert(worker.includes("deliverBusinessReminders(env,env.DB)"),"Scheduled reminder handler missing");
+assert(worker.includes("INSERT OR IGNORE INTO notifications"),"Scheduled in-app reminder notifications missing");
+assert(worker.includes("inviteUrl,emailSent"),"Secure invitation link response missing");
+assert(worker.includes('businessCan(access,"records:write")'),"Server-side role enforcement missing");
+assert(workerConfig.includes('crons = ["*/15 * * * *"]'),"Preview reminder cron is missing");
 console.log("Business preview schema, permissions, reminders and multi-device merge checks passed.");
