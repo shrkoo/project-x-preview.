@@ -81,5 +81,5 @@ export function formatLegacyMoney(amountMajor:number,currency:string,locale:stri
 /** Group a major-unit input without adding a currency symbol. */
 export function formatMoneyInput(amountMajor:number,locale:string):string {
   if(!Number.isFinite(amountMajor))return "";
-  return new Intl.NumberFormat(locale,{maximumFractionDigits:minorDigits("USD"),useGrouping:true}).format(amountMajor);
+  return new Intl.NumberFormat(locale,{maximumFractionDigits:0,useGrouping:true}).format(amountMajor);
 }
