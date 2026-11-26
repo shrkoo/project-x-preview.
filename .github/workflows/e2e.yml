@@ -26,10 +26,12 @@ jobs:
         run: npm ci
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
-      - name: Check integer money module
-        run: npm run test:money
       - name: Build Preview app
         run: npm run build
+      - name: Run money unit tests
+        run: npm run test:money
+      - name: Run money formatting guard
+        run: npm run test:money-usage
       - name: Run responsive Playwright tests
         run: npx playwright test e2e/responsive-locales.spec.ts
       - name: Upload screenshots and reports
