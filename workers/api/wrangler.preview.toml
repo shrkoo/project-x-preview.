@@ -7,6 +7,7 @@ previews = {}
 
 [vars]
 APP_URL = "https://feature-homa-auth-part1.novyra.pages.dev"
+WEBAUTHN_ORIGIN = "https://feature-homa-auth-part1.novyra-preview.pages.dev"
 REQUIRE_EMAIL_VERIFICATION = "true"
 EMAIL_FROM = "__PREVIEW_EMAIL_FROM__"
 GOOGLE_REDIRECT_URI = "https://novyra-preview-api.projectx-novyratam.workers.dev/auth/google/callback"
