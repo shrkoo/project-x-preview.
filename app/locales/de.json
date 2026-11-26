@@ -84,5 +84,14 @@
   "captchaAgain": "Bitte führen Sie die Sicherheitsprüfung erneut durch.",
   "resetPasswordTitle": "Neues Passwort festlegen",
   "resetPassword": "Passwort zurücksetzen",
-  "passwordResetDone": "Ihr Passwort wurde zurückgesetzt. Melden Sie sich mit dem neuen Passwort an."
+  "passwordResetDone": "Ihr Passwort wurde zurückgesetzt. Melden Sie sich mit dem neuen Passwort an.",
+  "loginInvalidCredentials": "E-Mail-Adresse oder Passwort ist falsch.",
+  "loginEmailUnverified": "Deine E-Mail-Adresse ist noch nicht bestätigt. Sende den Bestätigungscode erneut.",
+  "loginTooManyAttempts": "Zu viele Versuche. Bitte warte, bevor du es erneut versuchst.",
+  "loginOffline": "Du bist offenbar offline. Prüfe deine Verbindung und versuche es erneut.",
+  "loginServerProblem": "Auf dem Server ist ein Problem aufgetreten. Bitte versuche es erneut.",
+  "loginRetry": "Erneut versuchen",
+  "loginWaitSeconds": "Versuche es in {seconds} Sekunden erneut",
+  "loginErrorCode": "Fehlercode: {id}",
+  "createAccount": "Konto erstellen"
 }
