@@ -864,7 +864,7 @@ export default {
       const body=await readBody(request)||{},workspaceId=String(body.workspaceId||"");
       const access=await getBusinessAccess(db,workspaceId,user.id);
       if(!access||access.role!=="owner") return fail("فقط مالک فضای کسب‌وکار می‌تواند دعوت‌نامه ارسال کند.",403);
-      if(!hasMailProvider(env)) return fail("برای دعوت واقعی اعضا، سرویس ایمیل Preview باید پیکربندی شود.",503);
+      
       const email=cleanEmail(body.email),role=String(body.role||"viewer");
       if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("ایمیل معتبر وارد کنید.");
       if(!["manager","accountant","staff","viewer"].includes(role)) return fail("نقش انتخاب‌شده معتبر نیست.");
@@ -875,14 +875,15 @@ export default {
       await db.prepare("UPDATE business_invitations SET revoked_at=CURRENT_TIMESTAMP WHERE workspace_id=? AND email=? AND accepted_at IS NULL AND revoked_at IS NULL").bind(workspaceId,email).run();
       await db.prepare("INSERT INTO business_invitations (id,workspace_id,email,role,invited_by,token_hash,expires_at) VALUES (?,?,?,?,?,?,?)").bind(id,workspaceId,email,role,user.id,tokenHash,expires).run();
       const inviteUrl=(env.APP_URL||"https://novyra.pages.dev")+"/business/invite?token="+encodeURIComponent(token);
-      try {
-        await sendMail(env,email,"دعوت به فضای کسب‌وکار NOVYRA",renderNovyraEmail({eyebrow:"BUSINESS WORKSPACE INVITATION",title:"دعوت به همکاری در NOVYRA",intro:"شما برای همکاری در فضای کسب‌وکار "+access.name+" دعوت شده‌اید. نقش شما: "+role,actionLabel:"پذیرش دعوت",actionUrl:inviteUrl,notice:"این دعوت‌نامه تا ۷ روز معتبر است و فقط با حساب همین نشانی ایمیل پذیرفته می‌شود.",footerNote:"اگر این دعوت را انتظار نداشتید، پیام را نادیده بگیرید."}));
-      } catch(error) {
-        await db.prepare("UPDATE business_invitations SET revoked_at=CURRENT_TIMESTAMP WHERE id=?").bind(id).run();
-        throw error;
+      let emailSent=false;
+      if(hasMailProvider(env)) {
+        try {
+          await sendMail(env,email,"دعوت به فضای کسب‌وکار NOVYRA",renderNovyraEmail({eyebrow:"BUSINESS WORKSPACE INVITATION",title:"دعوت به همکاری در NOVYRA",intro:"شما برای همکاری در فضای کسب‌وکار "+access.name+" دعوت شده‌اید. نقش شما: "+role,actionLabel:"پذیرش دعوت",actionUrl:inviteUrl,notice:"این دعوت‌نامه تا ۷ روز معتبر است و فقط با حساب همین نشانی ایمیل پذیرفته می‌شود.",footerNote:"اگر این دعوت را انتظار نداشتید، پیام را نادیده بگیرید."}));
+          emailSent=true;
+        } catch(error) { console.error("business-invite-email",id,error); }
       }
-      await writeBusinessAudit(db,workspaceId,user.id,"team.invited","member",id,{email,role});
-      return json({ok:true,invitation:{id,email,role,expiresAt:expires}},201);
+      await writeBusinessAudit(db,workspaceId,user.id,"team.invited","member",id,{email,role,emailSent});
+      return json({ok:true,emailSent,inviteUrl,invitation:{id,email,role,expiresAt:expires}},201);
     }
     if(path==="/business/team/accept" && request.method==="POST") {
       const body=await readBody(request)||{},token=String(body.token||"");
