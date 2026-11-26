@@ -159,7 +159,7 @@ const BUSINESS_ROLE_PERMISSIONS = {
  owner: new Set(["read","records:write","finance:write","ledger:write","team:manage","audit:read","reminders:manage","settings:write"]),
  manager: new Set(["read","records:write","finance:write","ledger:write","audit:read","reminders:manage","settings:write"]),
  accountant: new Set(["read","records:write","finance:write","ledger:write","audit:read","reminders:read"]),
- staff: new Set(["read","records:write","finance:write","reminders:read"]),
+ staff: new Set(["read","records:write","finance:write","audit:read","reminders:read"]),
  viewer: new Set(["read","audit:read","reminders:read"])
 };
 async function getBusinessAccess(db,workspaceId,userId) {
