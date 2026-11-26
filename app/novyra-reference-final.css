@@ -4211,3 +4211,16 @@
   right:auto!important;transform:translate(-50%,-50%)!important;width:10px!important;height:10px!important;
   border:2px solid #22A06B!important;border-radius:50%!important;background:#fff!important;z-index:4!important;
 }
+
+
+/* Final accessibility override: all interactive app targets are at least 48px */
+main.nv-finance .nf-mobile-dock button,
+main.nv-finance .nf-page-actions button,
+main.nv-finance .nf-setting-actions button,
+main.nv-finance .nf-category-add button,
+main.nv-finance .nf-report-actions button,
+main.nv-finance .nv-spend-filter button,
+main.nv-finance .nf-category-list button{min-width:48px!important;min-height:48px!important}
+main.nv-finance .nf-category-list button{width:48px!important;height:48px!important}
+main.nv-finance[lang="fa"] .nv-spend-total-head>button{width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important}
+main.nv-finance[lang="en"] .nv-ref-actions button{min-width:48px!important;min-height:48px!important}
