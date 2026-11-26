@@ -177,21 +177,29 @@ async function writeBusinessAudit(db,workspaceId,actorId,action,entityType,entit
   .bind(crypto.randomUUID(),workspaceId,actorId,action,entityType,entityId,details?JSON.stringify(details).slice(0,12000):null).run();
 }
 async function syncBusinessDueReminders(db,workspaceId,ownerId,actorId,records) {
- const now=Date.now(), statements=[];
+ const statements=[];
  for(const kind of ["cheques","loans"]) {
   const rows=Array.isArray(records[kind])?records[kind]:[];
   const activeIds=[];
   for(const row of rows.slice(0,2000)) {
-   const refId=String(row?.id||"").slice(0,80), dueDate=String(row?.dueDate||row?.nextDueDate||"");
-   if(!refId || !/^\\d{4}-\\d{2}-\\d{2}$/.test(dueDate) || ["cashed","bounced","paid","cancelled"].includes(String(row?.status||"").toLowerCase())) continue;
-   const dueAt=Date.parse(dueDate+"T09:00:00Z");
-   if(!Number.isFinite(dueAt)) continue;
+   const baseId=String(row?.id||"").slice(0,80),baseDate=String(row?.dueDate||row?.nextDueDate||"");
+   if(!baseId||!/^\d{4}-\d{2}-\d{2}$/.test(baseDate)||["cashed","bounced","paid","cancelled"].includes(String(row?.status||"").toLowerCase())) continue;
+   const count=kind==="loans"?Math.max(1,Math.min(600,Number(row?.count||1))):1;
+   const paidCount=kind==="loans"?Math.max(0,Math.min(count,Number(row?.paidCount||0))):0;
    const days=Math.max(0,Math.min(90,Number(row?.reminder??1)||0));
-   const remindAt=dueAt-days*86400000;
-   const title=(kind==="cheques"?"سررسید چک: ":"سررسید قسط: ")+String(row?.name||row?.number||"بدون عنوان").slice(0,120);
-   activeIds.push(refId);
-   statements.push(db.prepare("INSERT INTO business_reminders (id,workspace_id,owner_id,reminder_type,reference_id,title,due_at,remind_at,status,created_by) VALUES (?,?,?,?,?,?,?,?, 'pending',?) ON CONFLICT(workspace_id,reminder_type,reference_id) DO UPDATE SET title=excluded.title,due_at=excluded.due_at,remind_at=excluded.remind_at,status=CASE WHEN business_reminders.status='sent' AND business_reminders.due_at=excluded.due_at THEN 'sent' ELSE 'pending' END")
-    .bind(crypto.randomUUID(),workspaceId,ownerId,kind,refId,title,dueAt,remindAt,actorId));
+   const base= new Date(baseDate+"T09:00:00Z");
+   if(!Number.isFinite(base.getTime())) continue;
+   for(let index=paidCount;index<count;index++) {
+    const year=base.getUTCFullYear(),month=base.getUTCMonth()+index,day=base.getUTCDate();
+    const first=new Date(Date.UTC(year,month,1,9,0,0)),lastDay=new Date(Date.UTC(first.getUTCFullYear(),first.getUTCMonth()+1,0)).getUTCDate();
+    const dueAt=Date.UTC(first.getUTCFullYear(),first.getUTCMonth(),Math.min(day,lastDay),9,0,0);
+    const refId=kind==="loans"?baseId+"#"+(index+1):baseId;
+    const title=kind==="cheques"?"سررسید چک: "+String(row?.name||row?.number||"بدون عنوان").slice(0,100):"سررسید قسط "+(index+1)+" از "+count+": "+String(row?.name||"وام").slice(0,100);
+    const remindAt=dueAt-days*86400000;
+    activeIds.push(refId);
+    statements.push(db.prepare("INSERT INTO business_reminders (id,workspace_id,owner_id,reminder_type,reference_id,title,due_at,remind_at,status,created_by) VALUES (?,?,?,?,?,?,?,?, 'pending',?) ON CONFLICT(workspace_id,reminder_type,reference_id) DO UPDATE SET title=excluded.title,due_at=excluded.due_at,remind_at=excluded.remind_at,status=CASE WHEN business_reminders.status='sent' AND business_reminders.due_at=excluded.due_at THEN 'sent' ELSE 'pending' END")
+     .bind(crypto.randomUUID(),workspaceId,ownerId,kind,refId,title,dueAt,remindAt,actorId));
+   }
   }
   if(activeIds.length) statements.push(db.prepare("UPDATE business_reminders SET status='cancelled' WHERE workspace_id=? AND reminder_type=? AND status='pending' AND reference_id NOT IN ("+activeIds.map(()=>"?").join(",")+")").bind(workspaceId,kind,...activeIds));
   else statements.push(db.prepare("UPDATE business_reminders SET status='cancelled' WHERE workspace_id=? AND reminder_type=? AND status='pending'").bind(workspaceId,kind));
