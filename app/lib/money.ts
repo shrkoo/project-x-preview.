@@ -53,7 +53,7 @@ export function parseMoney(input:string,currency:string):number {
   if(!raw||!/^[-+]?([0-9.,٫]+)$/.test(raw))throw new TypeError("Invalid money amount");
   const decimalSeparators=[".", "٫", ","];
   const present=decimalSeparators.filter(sep=>raw.includes(sep));
-  let decimalAt=-1, decimalSeparator="";
+  let decimalAt=-1;
   if(digits>0&&present.length) {
     const candidate=present.length>1
       ? Math.max(...present.map(sep=>raw.lastIndexOf(sep)))
@@ -62,14 +62,14 @@ export function parseMoney(input:string,currency:string):number {
     const trailing=raw.length-candidate-1;
     const repeated=raw.indexOf(sep)!==candidate;
     const isDecimal=sep==="٫" || (present.length>1) || (!repeated&&(trailing<=digits||trailing>3));
-    if(isDecimal){decimalAt=candidate;decimalSeparator=sep;}
+    if(isDecimal)decimalAt=candidate;
   }
   let wholeText:string, fractionText="";
   if(decimalAt>=0){wholeText=raw.slice(0,decimalAt).replace(/[.,٫]/g,"");fractionText=raw.slice(decimalAt+1).replace(/[.,٫]/g,"");}
   else wholeText=raw.replace(/[.,٫]/g,"");
   const negative=wholeText.startsWith("-")||raw.startsWith("-");wholeText=wholeText.replace(/^[-+]/,"");
   if(!wholeText)wholeText="0";
-  if(!/^\\d+$/.test(wholeText)||!/^\\d*$/.test(fractionText))throw new TypeError("Invalid money amount");
+  if(!/^\d+$/.test(wholeText)||!/^\d*$/.test(fractionText))throw new TypeError("Invalid money amount");
   const scale=10n**BigInt(digits);
   const kept=fractionText.padEnd(digits,"0").slice(0,digits);
   let minor=BigInt(wholeText)*scale+BigInt(kept||"0");
