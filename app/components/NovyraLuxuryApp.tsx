@@ -220,12 +220,12 @@ const demoTotal=6_650_000,demoPrevious=6_354_860;
 const displayTotal=isDemo?demoTotal:currentTotal;
 const displayPrevious=isDemo?demoPrevious:prevTotal;
 const trend=displayPrevious?((displayTotal-displayPrevious)/displayPrevious*100):0;
-const spendFmt=(n:number)=>fmt(Math.round(n),digits);
+const spendFmt=(n:number)=>formatMoney(Math.round(n),{...readRegionalPreferences(regionalFallback),language:loc,currency,numberSystem:digits});
 const pct=(n:number)=>`${n>0?"+":n<0?"−":""}٪${spendFmt(Math.abs(n))}`;
 return <div className="nv-ref-spending-page an-screen">
 {categoryFilter&&<div className="nv-spend-filter"><span>{en?"Category: ":"دسته: "}{categoryFilter}</span><button onClick={clearCategory}>{en?"Clear filter":"حذف فیلتر"}</button></div>}
 <section className="nf-panel nv-spend-total">
-<div className="nv-spend-total-head an-spend-total-head"><div><small>مجموع هزینه ماهانه</small><h2 className="an-spend-total-amount"><bdi dir="ltr">{spendFmt(displayTotal)}</bdi><small> ریال</small></h2></div><button className="an-spend-arrow" onClick={()=>setTab("reports")} aria-label="گزارش کامل"><ArrowLeft size={16}/></button></div>
+<div className="nv-spend-total-head an-spend-total-head"><div><small>مجموع هزینه ماهانه</small><h2 className="an-spend-total-amount"><bdi dir="ltr">{spendFmt(displayTotal)}</bdi></h2></div><button className="an-spend-arrow" onClick={()=>setTab("reports")} aria-label="گزارش کامل"><ArrowLeft size={16}/></button></div>
 <div className="nv-spend-chart an-chart">
 <div className="nv-spend-y an-y-labels">{yLabels.map(v=><span key={v}><bdi dir="rtl">{v===0?"۰":spendFmt(v/1_000_000)+" میلیون"}</bdi></span>)}</div>
 <div className="nv-spend-plot an-chart-plot">
@@ -243,12 +243,12 @@ return <div className="nv-ref-spending-page an-screen">
 {hasData&&selected&&<div className="nv-spend-tooltip an-chart-tooltip" style={{left:`clamp(72px, ${(selected.x/600)*100}%, calc(100% - 72px))`,top:`${Math.max(38,selected.y)/190*100}%`}} aria-live="polite"><bdi dir="ltr">{spendFmt(selected.v)}</bdi>{" "}ریال</div>}
 </div>
 </div>
-{monthlyBudget&&<div className="nv-spend-budget">بودجه ماهانه: <bdi dir="ltr">{spendFmt(Number(monthlyBudget)||0)} ریال</bdi> · {Number(monthlyBudget)>0?Math.round(currentTotal/Number(monthlyBudget)*100)+"% used":"—"}</div>}
+{monthlyBudget&&<div className="nv-spend-budget">بودجه ماهانه: <bdi dir="ltr">{spendFmt(Number(monthlyBudget)||0)}</bdi> · {Number(monthlyBudget)>0?Math.round(currentTotal/Number(monthlyBudget)*100)+"% used":"—"}</div>}
 <div className="nv-spend-axis an-x-axis">{[1,5,10,15,20,25,30].map(day=><span key={day}>{spendFmt(day)}</span>)}</div>
 </section>
 <h2 className="nv-spend-heading">برجسته‌های این هفته</h2>
 <div className="nv-spend-highlights an-highlights">
-<article className="high an-highlight-card"><small><TrendingUp size={14} aria-hidden="true"/> بیشترین هزینه</small><div className="nv-spend-highlight-value an-highlight-value"><b><bdi dir="ltr">{spendFmt(isDemo?1850000:high?high.amount:0)}</bdi><small> ریال</small></b><i className="up"><bdi dir="ltr" style={{unicodeBidi:"isolate"}}>({pct(highTrend)})</bdi></i></div><p className="nv-spend-month-note an-highlight-subtitle"><span>ماه گذشته هزینه‌ات </span><bdi dir="ltr" style={{whiteSpace:"nowrap"}}>{spendFmt(isDemo?6354860:prevTotal)}</bdi>{" "}ریال{" "}<span>بود</span></p></article>
+<article className="high an-highlight-card"><small><TrendingUp size={14} aria-hidden="true"/> بیشترین هزینه</small><div className="nv-spend-highlight-value an-highlight-value"><b><bdi dir="ltr">{spendFmt(isDemo?1850000:high?high.amount:0)}</bdi><small> ریال</small></b><i className="up"><bdi dir="ltr" style={{unicodeBidi:"isolate"}}>({pct(highTrend)})</bdi></i></div><p className="nv-spend-month-note an-highlight-subtitle"><span>ماه گذشته هزینه‌ات </span><bdi dir="ltr" style={{whiteSpace:"nowrap"}}>{spendFmt(isDemo?6354860:prevTotal)}</bdi>{" "}<span>بود</span></p></article>
 <article className="low an-highlight-card"><small><TrendingDown size={14} aria-hidden="true"/> کمترین هزینه</small><div className="nv-spend-highlight-value an-highlight-value"><b><bdi dir="ltr">{spendFmt(isDemo?125000:low?low.amount:0)}</bdi><small> ریال</small></b><i className="down"><bdi dir="ltr" style={{unicodeBidi:"isolate"}}>({pct(lowTrend)})</bdi></i></div><p className="nv-spend-month-note an-highlight-subtitle an-highlight-subtitle-ellipsis"><span>ماه گذشته هزینه‌ات </span><bdi dir="ltr" style={{whiteSpace:"nowrap"}}>{spendFmt(isDemo?6354860:prevTotal)}</bdi>{" "}ریال{" "}<span>بود</span></p></article>
 </div>
 <h2 className="nv-spend-heading">اقدام‌های سریع</h2>
