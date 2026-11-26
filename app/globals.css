@@ -3756,3 +3756,45 @@ html.novyra-app-obscured body>*{filter:none!important;pointer-events:auto!import
 .nbo-invite-link input{flex:1;min-width:0;direction:ltr;text-align:left}
 .nbo-invite-link button{flex:0 0 auto;white-space:nowrap}
 @media(max-width:520px){.nbo-invite-link{flex-direction:column;align-items:stretch}.nbo-invite-link button{width:100%}}
+
+
+/* Novyra shared frosted toast system: consistent, short-lived and above the mobile dock */
+@keyframes novyraToastLifecycle{0%,86%{opacity:1;visibility:visible}100%{opacity:0;visibility:hidden}}
+.nf-toast,.nvbd-toast,.nbo-toast,.nvsh-toast,.toast{
+ position:fixed!important;left:16px!important;right:16px!important;bottom:calc(96px + env(safe-area-inset-bottom))!important;
+ z-index:1600!important;width:auto!important;max-width:520px!important;margin:0 auto!important;box-sizing:border-box!important;
+ display:flex!important;align-items:center!important;gap:9px!important;padding:10px 14px!important;min-height:44px!important;
+ border:1px solid rgba(255,255,255,.92)!important;border-radius:16px!important;background:rgba(255,255,255,.88)!important;
+ color:#315a7c!important;box-shadow:0 10px 28px rgba(39,91,140,.14)!important;
+ -webkit-backdrop-filter:blur(20px)!important;backdrop-filter:blur(20px)!important;
+ white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;line-height:1.35!important;
+ animation:novyraToastLifecycle 3s ease-in forwards!important;
+}
+.nf-toast::before,.nvbd-toast::before,.nbo-toast::before,.nvsh-toast::before,.toast::before{content:"✓";flex:0 0 20px;width:20px;height:20px;display:grid;place-items:center;border-radius:50%;background:#e7f1ff;color:#2f80ed;font-weight:900;font-size:12px}
+.nf-toast button,.nvbd-toast button,.nbo-toast button,.nvsh-toast button,.toast button{flex:0 0 32px!important;width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;margin-inline-start:auto!important;border:0!important;border-radius:50%!important;background:#edf5ff!important;color:#2f80ed!important}
+.nvbd-root{display:grid;gap:16px;padding:16px 16px calc(112px + env(safe-area-inset-bottom))!important}
+.nvbd-heading{justify-content:flex-start!important}
+.nvbd-heading small{font-size:11px!important;letter-spacing:0!important;color:#8294a8!important;font-weight:600!important}
+.nvbd-heading h2{font-size:25px!important;font-weight:800!important;color:#17324f!important;margin-top:3px!important}
+.nvbd-cash{min-height:126px!important;padding:20px 22px!important;border-radius:24px!important}
+.nvbd-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+.nvbd-metric{height:96px!important;min-height:96px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:space-between!important;padding:13px 14px!important;text-align:start!important}
+.nvbd-metric span{font-size:12px!important;gap:7px!important}
+.nvbd-metric strong{margin-top:4px!important;font-size:16px!important;white-space:nowrap!important}
+.nvbd-quick,.nvbd-attention,.nvbd-chart{padding:16px!important;border:1px solid rgba(255,255,255,.92)!important;border-radius:22px!important;background:rgba(255,255,255,.76)!important;backdrop-filter:blur(18px)!important;box-shadow:0 7px 22px rgba(65,125,180,.08)!important}
+.nvbd-quick>div{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}
+.nvbd-quick>div button{min-width:0!important;min-height:88px!important;height:88px!important;padding:8px 4px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:6px!important;border-radius:16px!important;white-space:nowrap!important;font-size:11px!important}
+.nvbd-quick>div .nvbd-action-primary{grid-column:1/-1!important;height:50px!important;min-height:50px!important;flex-direction:row!important}
+.nvbd-quick>div .nvbd-action-secondary{background:rgba(255,255,255,.88)!important;color:#4d6882!important;border:1px solid rgba(210,229,246,.9)!important;box-shadow:none!important}
+.nvbd-action-icon{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border-radius:12px;background:#eaf4ff;color:#2f80ed}
+.nvbd-action-secondary.expense .nvbd-action-icon{background:#fff0f0;color:#d64c4c}
+.nvbd-action-secondary.customer .nvbd-action-icon{background:#eaf4ff;color:#2f80ed}
+.nvbd-action-secondary.product .nvbd-action-icon{background:#edf2ff;color:#596fd1}
+.nvbd-quick>div .nvbd-action-secondary>span:last-child{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nvbd-chart-empty{display:grid;justify-items:center;gap:10px;padding:20px 8px;text-align:center;color:#7890a7}
+.nvbd-chart-empty>span{width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:#eaf4ff;color:#2f80ed}
+.nvbd-chart-empty b{font-size:13px;color:#54718d}
+.nvbd-chart-empty button{min-height:44px;padding:0 16px;border:0;border-radius:999px;background:linear-gradient(135deg,#2f80ed,#1f6fdb);color:#fff;font-weight:700}
+.nvbd-attention p{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;margin:0;border-bottom:1px solid #e8f0f7;font-size:12px}
+.nvbd-attention p:last-of-type{border-bottom:0}
+@media(max-width:390px){.nvbd-root{gap:14px}.nvbd-cash{padding:17px!important}.nvbd-metric{padding:11px!important}.nvbd-metric strong{font-size:14px!important}.nvbd-quick{padding:13px!important}}
