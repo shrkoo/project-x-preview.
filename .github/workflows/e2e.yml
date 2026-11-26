@@ -3,8 +3,10 @@ name: Preview E2E
 on:
   push:
     branches:
-      - "**"
+      - "feature/**"
   pull_request:
+    branches:
+      - "feature/**"
   workflow_dispatch:
 
 permissions:
