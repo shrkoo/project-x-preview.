@@ -814,7 +814,7 @@ export default {
    if (!user) return fail("برای استفاده از این بخش وارد حساب شو.",401);
 
    if(path==="/workspaces" && request.method==="GET") {
-    const rows=await db.prepare("SELECT id,type,name,currency,created_at AS createdAt FROM workspaces WHERE owner_id=? ORDER BY CASE type WHEN 'personal' THEN 0 ELSE 1 END").bind(user.id).all();
+    const rows=await db.prepare("SELECT DISTINCT w.id,w.type,w.name,w.currency,w.created_at AS createdAt,CASE WHEN w.owner_id=? THEN 'owner' ELSE m.role END AS role FROM workspaces w LEFT JOIN workspace_members m ON m.workspace_id=w.id AND m.user_id=? AND m.status='active' WHERE w.owner_id=? OR m.user_id=? ORDER BY CASE w.type WHEN 'personal' THEN 0 ELSE 1 END,w.created_at").bind(user.id,user.id,user.id,user.id).all();
     return json({workspaces:rows.results||[]});
    }
    if(path==="/workspaces" && request.method==="POST") {
@@ -874,11 +874,11 @@ export default {
     if(path==="/business/team/accept" && request.method==="POST") {
       const body=await readBody(request)||{},token=String(body.token||"");
       if(token.length<30||token.length>200) return fail("لینک دعوت معتبر نیست.",400);
-      const invite=await db.prepare("SELECT i.id,i.workspace_id AS workspaceId,i.email,i.role,i.expires_at AS expiresAt,w.owner_id AS ownerId FROM business_invitations i JOIN workspaces w ON w.id=i.workspace_id WHERE i.token_hash=? AND i.accepted_at IS NULL AND i.revoked_at IS NULL").bind(await digest(token)).first();
+      const invite=await db.prepare("SELECT i.id,i.workspace_id AS workspaceId,i.email,i.role,i.invited_by AS invitedBy,i.expires_at AS expiresAt,w.owner_id AS ownerId FROM business_invitations i JOIN workspaces w ON w.id=i.workspace_id WHERE i.token_hash=? AND i.accepted_at IS NULL AND i.revoked_at IS NULL").bind(await digest(token)).first();
       if(!invite||Number(invite.expiresAt)<=Date.now()) return fail("دعوت‌نامه منقضی یا لغو شده است.",410);
       if(cleanEmail(invite.email)!==cleanEmail(user.email)) return fail("این دعوت‌نامه برای نشانی ایمیل حساب فعلی صادر نشده است.",403);
       if(invite.ownerId===user.id) return fail("مالک از قبل به این فضا دسترسی دارد.");
-      await db.prepare("INSERT INTO workspace_members (workspace_id,user_id,email,role,status,invited_by,joined_at) VALUES (?,?,?,?,'active',?,CURRENT_TIMESTAMP) ON CONFLICT(workspace_id,user_id) DO UPDATE SET email=excluded.email,role=excluded.role,status='active',invited_by=excluded.invited_by,joined_at=CURRENT_TIMESTAMP").bind(invite.workspaceId,user.id,user.email,invite.role,invite.ownerId).run();
+      await db.prepare("INSERT INTO workspace_members (workspace_id,user_id,email,role,status,invited_by,joined_at) VALUES (?,?,?,?,'active',?,CURRENT_TIMESTAMP) ON CONFLICT(workspace_id,user_id) DO UPDATE SET email=excluded.email,role=excluded.role,status='active',invited_by=excluded.invited_by,joined_at=CURRENT_TIMESTAMP").bind(invite.workspaceId,user.id,user.email,invite.role,invite.invitedBy).run();
       await db.prepare("UPDATE business_invitations SET accepted_at=CURRENT_TIMESTAMP WHERE id=?").bind(invite.id).run();
       await writeBusinessAudit(db,invite.workspaceId,user.id,"team.joined","member",user.id,{role:invite.role});
       return json({ok:true,workspaceId:invite.workspaceId,role:invite.role});
