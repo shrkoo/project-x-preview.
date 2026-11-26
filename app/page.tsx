@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import NovyraSignupFlow from "./components/NovyraSignupFlow";
 import NovyraLuxuryApp from "./components/NovyraLuxuryApp";
 import AppLockScreen from "./components/AppLockScreen";
-import { apiRequest, clearSession } from "./lib/api";
+import { apiRequest, clearSession, ApiRequestError } from "./lib/api";
 import { languages, languageByCode } from "./data/languages";
 import {removeDeviceLock} from "./lib/device-lock";
 
@@ -20,6 +20,20 @@ export default function Home() {
   const [startupReady, setStartupReady] = useState(false);
   const [notice, setNotice] = useState("");
   const [locked, setLocked] = useState(false);
+  const [sessionRecovery, setSessionRecovery] = useState(false);
+
+  function handleSessionFailure(error: unknown) {
+    if (error instanceof ApiRequestError && (error.status === 401 || error.status === 403)) {
+      clearSession();
+      setAccount(null);
+      setSessionRecovery(false);
+      return;
+    }
+    // Keep the saved token when the server is temporarily unreachable.
+    // A network hiccup must never silently sign the user out.
+    setSessionRecovery(true);
+    setNotice("اتصال برقرار نشد؛ حساب ذخیره‌شده‌ات پاک نشده است. دوباره تلاش کن.");
+  }
 
 
   useEffect(() => {
@@ -47,9 +61,10 @@ export default function Home() {
         setAccount(data.user);
         localStorage.setItem("projectx-account", JSON.stringify({name:data.user.displayName,email:data.user.email}));
         setStartupReady(true);
-      }).catch(() => {
+      }).catch(error => {
         if (!alive) return;
-        clearSession(); setAccount(null); setNotice("Google sign-in could not be completed. Please try again."); setStartupReady(true);
+        handleSessionFailure(error);
+        setStartupReady(true);
       });
       return () => { alive = false; };
     }
@@ -81,10 +96,9 @@ export default function Home() {
       if ((deviceLock === "pin" || deviceLock === "pattern") && localStorage.getItem("projectx-app-lock-configured") === "1" && localStorage.getItem("projectx-app-lock-user") === data.user.id) setLocked(true);
       localStorage.setItem("projectx-account", JSON.stringify({ name: data.user.displayName, email: data.user.email }));
       setStartupReady(true);
-    }).catch(() => {
+    }).catch(error => {
       if (!alive) return;
-      clearSession();
-      setAccount(null);
+      handleSessionFailure(error);
       setStartupReady(true);
     });
 
@@ -167,6 +181,8 @@ export default function Home() {
     setAccount(null);
     setNotice("");
   }
+
+  if (sessionRecovery) return <main className="social-startup" dir="rtl"><span className="social-startup-mark">N</span><span>NOVYRA</span><p>{notice || "اتصال با سرور برقرار نشد."}</p><button type="button" onClick={() => window.location.reload()}>تلاش دوباره</button></main>;
 
   if (locked) return <AppLockScreen email={account?.email||""} name={account?.displayName||""} language={language} onUnlock={()=>{setLocked(false);document.documentElement.classList.remove("novyra-app-obscured");}} onLogout={logoutComplete}/>;
 
