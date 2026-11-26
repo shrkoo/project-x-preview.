@@ -17,8 +17,8 @@ export async function handlePasswordLogin({ request, env, db, requestId, helpers
     const body = await request.json().catch(() => null);
     const email = cleanEmail(body?.email);
     const password = String(body?.password || "");
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || password.length < 1 || password.length > 1024) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 1 || password.length > 1024) {
+      return json({ code: "INVALID_INPUT", message: "Enter a valid email and password.", requestId }, 400);
     }
     stage = "rate-limit";
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
