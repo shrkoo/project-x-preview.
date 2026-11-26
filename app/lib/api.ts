@@ -14,10 +14,15 @@ export function createPasswordSalt() {
   return Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
 }
 
+export const PASSWORD_ITERATIONS = 100000;
+
 export async function derivePasswordHash(password: string, salt: string) {
+  const normalizedSalt = String(salt).toLowerCase();
+  if (!/^[a-f0-9]{32}$/.test(normalizedSalt)) throw new Error("Invalid password salt");
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: new TextEncoder().encode(salt), iterations: 210000, hash: "SHA-256" }, key, 256);
-  return Array.from(new Uint8Array(bits), b => b.toString(16).padStart(2, "0")).join("");
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: new TextEncoder().encode(normalizedSalt), iterations: PASSWORD_ITERATIONS, hash: "SHA-256" }, key, 256);
+  const hash = Array.from(new Uint8Array(bits), b => b.toString(16).padStart(2, "0")).join("");
+  return `pbkdf2${PASSWORD_ITERATIONS}${normalizedSalt}${hash}`;
 }
 
 
