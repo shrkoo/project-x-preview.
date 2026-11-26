@@ -1,5 +1,5 @@
-import { formatMoney, formatMoneyInput, parseMoney } from "../lib/money";
 "use client";
+import { formatMoney, formatMoneyInput, parseMoney } from "../lib/money";
 import {useEffect,useRef,useState,type ReactNode} from "react";
 import {Activity,ArrowLeft,ArrowRight,Bell,BriefcaseBusiness,Building2,ChartNoAxesCombined,ChevronRight,Copy,Download,FileDown,Fingerprint,Globe,HelpCircle,LockKeyhole,LogOut,Palette,Plus,Search,ShieldCheck,SlidersHorizontal,Trash2,User,Wallet,X,Check,Clock3,Users,Receipt,Boxes,FileSpreadsheet,Landmark,LifeBuoy,Database,EyeOff,CalendarDays,Upload,Share2,Settings} from "lucide-react";
 import {verifyDeviceLock} from "../lib/device-lock";
