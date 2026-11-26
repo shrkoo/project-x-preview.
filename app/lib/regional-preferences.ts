@@ -1,3 +1,4 @@
+import { formatLegacyMoney } from "./money";
 export type RegionalPreferences = {
   country: string;
   language: string;
@@ -48,17 +49,8 @@ export function formatNumber(value: number, prefs: RegionalPreferences, options:
   return new Intl.NumberFormat(localeForPreferences(prefs), options).format(value);
 }
 
-export function formatMoney(value: number, prefs: RegionalPreferences, options: Intl.NumberFormatOptions = {}): string {
-  const amount = Number.isFinite(value) ? value : 0;
-  const digits = prefs.numberSystem || "latn";
-  const locale = localeForPreferences(prefs);
-  if (prefs.currency === "IRT" || prefs.tomanDisplay) {
-    return new Intl.NumberFormat(locale, { maximumFractionDigits: 0, ...options }).format(amount) + " تومان";
-  }
-  if (prefs.currency === "IRR") {
-    return new Intl.NumberFormat(locale, { maximumFractionDigits: 0, ...options }).format(amount) + " ریال";
-  }
-  return new Intl.NumberFormat(locale, { style: "currency", currency: prefs.currency || "USD", ...options }).format(amount);
+export function formatMoney(value: number, prefs: RegionalPreferences, options: Intl.NumberFormatOptions & { hidden?: boolean } = {}): string {
+  return formatLegacyMoney(value, prefs.currency, localeForPreferences(prefs), { hidden: options.hidden });
 }
 
 export function formatDate(value: Date | string | number, prefs: RegionalPreferences, options: Intl.DateTimeFormatOptions = {}): string {
