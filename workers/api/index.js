@@ -1,6 +1,6 @@
 import { countryCodes, currencyCodes, calendarCodes, languageCodes, numberFormatCodes, numberSystemCodes } from "./data/catalog-validation.js";
 import { mergeBusinessRecordPayload } from "./business-sync.js";
-import { handlePasswordLogin } from "./auth-login.js";
+import { handlePasswordLogin } from "./auth-login.mjs";
 import { generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions, verifyAuthenticationResponse } from "@simplewebauthn/server";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
