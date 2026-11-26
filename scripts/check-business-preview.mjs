@@ -18,6 +18,11 @@ const update=mergeBusinessRecordPayload(
 );
 assert.equal(update.products.length,1);
 assert.equal(update.products[0].stock,8);
+const partialUpdate=mergeBusinessRecordPayload(
+ {invoices:[{id:"inv-3",amount:100,customer:"A",status:"unpaid"}]},
+ {invoices:[{id:"inv-3",paid:40,status:"partial"}]}
+);
+assert.deepEqual(partialUpdate.invoices[0],{id:"inv-3",amount:100,customer:"A",status:"partial",paid:40});
 
 const deleted=mergeBusinessRecordPayload(
  {products:[{id:"p-1",name:"Item"},{id:"p-2",name:"Keep"}],trash:[]},
