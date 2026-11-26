@@ -9,7 +9,7 @@ import { languages, languageByCode } from "./data/languages";
 import {removeDeviceLock} from "./lib/device-lock";
 
 type Language = (typeof languages)[number]["code"];
-type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string; profile?: { accountType?: "personal" | "business"; appLockType?: "none"|"pin"|"pattern"|"biometric" } };
+type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string; profile?: { accountType?: "personal" | "business"; appLockType?: "none"|"pin"|"pattern" } };
 
 const allowedLanguages = new Set(languages.map(item => item.code));
 
