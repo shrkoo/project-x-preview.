@@ -21,3 +21,17 @@ migrations_dir = "migrations-preview"
 
 [triggers]
 crons = ["*/15 * * * *"]
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+invocation_logs = true
+persist = true
+
+[observability.traces]
+enabled = true
+persist = true
+head_sampling_rate = 1
