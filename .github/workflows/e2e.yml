@@ -1,0 +1,42 @@
+name: Preview E2E
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build Preview app
+        run: npm run build
+      - name: Run responsive Playwright tests
+        run: npx playwright test e2e/responsive-locales.spec.ts
+      - name: Upload screenshots and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: novyra-preview-e2e-${{ github.run_number }}
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: warn
+          retention-days: 14
