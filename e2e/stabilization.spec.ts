@@ -64,8 +64,8 @@ for (const language of ["fa", "en"] as const) {
           await expect(page.getByText(language === "fa" ? "افزودن سریع" : "Quick add")).toBeVisible();
           const expenseChoice = page.getByRole("button", { name: language === "fa" ? "هزینه" : "Expense" });
           await expenseChoice.click();
-          await expect(page.locator(".nf-modal")).toBeVisible();
-          await page.locator(".nf-modal-head button").click();
+          await expect(page.locator(".nbo-root")).toBeVisible();
+          await expect(page.locator(".nbo-card")).toBeVisible();
         } else {
           await expect(page.locator(".nf-modal")).toBeVisible();
           await page.locator(".nf-modal-head button").click();
