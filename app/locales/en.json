@@ -89,5 +89,14 @@
   "biometricCancelled": "Biometric authentication was cancelled or timed out. Please try again.",
   "biometricFailed": "Biometric setup failed. Check your device lock settings and browser permissions.",
   "biometricEmailRequired": "Enter a valid email on the account details step first.",
-  "biometricLogin": "Sign in with fingerprint or Face ID"
+  "biometricLogin": "Sign in with fingerprint or Face ID",
+  "loginInvalidCredentials": "Email or password is incorrect.",
+  "loginEmailUnverified": "Your email is not verified. Resend the verification code.",
+  "loginTooManyAttempts": "Too many attempts. Please wait before trying again.",
+  "loginOffline": "You appear to be offline. Check your connection and retry.",
+  "loginServerProblem": "A server problem occurred. Please try again.",
+  "loginRetry": "Try again",
+  "loginWaitSeconds": "Try again in {seconds}s",
+  "loginErrorCode": "Error code: {id}",
+  "createAccount": "Create account"
 }
