@@ -50,6 +50,31 @@ for (const language of ["fa", "en"] as const) {
         await expect(page.locator(".nv-finance[data-account-type]")).toBeVisible({ timeout: 30_000 });
         await expect(page.locator(".nf-mobile-dock")).toBeVisible();
 
+        if (accountType === "business") {
+          const home = page.locator(".nvbd-root");
+          await expect(home).toBeVisible();
+          const homeText = await home.innerText();
+          expect(homeText).not.toContain("\\n");
+          expect(homeText).not.toContain("n\\");
+          expect(homeText).not.toContain("$");
+          await expect(page.locator(".nvbd-action-secondary")).toHaveCount(3);
+          for (const tile of await page.locator(".nvbd-action-secondary").all()) {
+            await expect(tile.locator("svg")).toBeVisible();
+            await tile.click();
+            await expect(page.locator(".nvbd-sheet")).toBeVisible();
+            await page.locator(".nvbd-close").click();
+          }
+          for (const metric of await page.locator(".nvbd-metric").all()) {
+            await metric.click();
+            await expect(page.locator(".nvbd-sheet")).toBeVisible();
+            await page.locator(".nvbd-close").click();
+          }
+          await expect(page.locator(".nvbd-chart-empty")).toBeVisible();
+          await expect(page.locator("body")).not.toContainText("permission to view reminders");
+          const toastStyles = await page.evaluate(() => Array.from(document.querySelectorAll(".nf-toast,.nvbd-toast,.nbo-toast,.nvsh-toast,.toast")).map(el => getComputedStyle(el).backgroundColor));
+          expect(toastStyles.every(color => !/rgb\(1[0-9], ?[0-9], ?[0-9]/.test(color))).toBeTruthy();
+        }
+
         const nav = page.locator(".nf-mobile-dock button");
         const navCount = await nav.count();
         expect(navCount).toBe(5);
