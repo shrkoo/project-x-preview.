@@ -557,7 +557,7 @@ export default {
       verifiedBiometric=verification.registrationInfo;
     }
     const id = crypto.randomUUID(), hash = suppliedHash;
-    try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,first_name,last_name,country,currency,calendar,number_format,number_system,date_format,text_direction,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout,lock_failed_attempts,onboarding_completed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.number_system,profile.date_format,profile.text_direction,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,profileComplete(profile)?1:0).run(); }
+    try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,verified_at,first_name,last_name,country,currency,calendar,number_format,number_system,date_format,text_direction,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout,lock_failed_attempts,onboarding_completed) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.number_system,profile.date_format,profile.text_direction,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,profileComplete(profile)?1:0).run(); }
     catch (insertError) {
       const existing=await db.prepare("SELECT id FROM users WHERE email=? LIMIT 1").bind(email).first();
       if(existing) return fail("برای این ایمیل حسابی وجود دارد. از ورود یا ورود با Google استفاده کن.",409);
@@ -575,12 +575,9 @@ export default {
     const initialWorkspaceType=profile.account_type;
     const initialWorkspaceName=initialWorkspaceType==="business"?String(body?.companyName||"").trim().replace(/[<>]/g,"").slice(0,100)||"Business":"Personal";
     await db.prepare("INSERT INTO workspaces (id,owner_id,type,name,currency) VALUES (?,?,?,?,?)").bind(initialWorkspaceId,id,initialWorkspaceType,initialWorkspaceName,profile.currency).run();
-    if(!hasMailProvider(env)){await db.prepare("DELETE FROM users WHERE id=?").bind(id).run();return fail("Email delivery is not configured.",503);}
-    try{
-      const code=await createSignupCode(db,id);
-      await sendMail(env,email,"Your NOVYRA verification code",renderNovyraEmail({eyebrow:"ACCOUNT VERIFICATION",title:"Your verification code",intro:"Enter this 6-digit code in Novyra to activate your account.",actionLabel:code,actionUrl:env.APP_URL||"https://novyra.pages.dev",notice:"This code expires in 10 minutes. Maximum 5 attempts.",footerNote:"If you did not create this account, ignore this email."}));
-    }catch(mailError){console.error("novyra-signup-code-delivery",mailError);await db.prepare("DELETE FROM users WHERE id=?").bind(id).run();return fail("Could not send the verification code. Try again later.",503);}
-    return json({verificationRequired:true,email,expiresInSeconds:600,resendCooldownSeconds:60,message:"Enter the 6-digit code sent to your email."},202);
+    const createdUser=await db.prepare("SELECT * FROM users WHERE id=?").bind(id).first();
+    const session=await createSession(db,id);
+    return json({token:session.token,expiresAt:session.expiresAt,user:{id,email,displayName,xp:0,gamesPlayed:0,role:createdUser?.role||"user",profile:createdUser?publicProfile(createdUser):null}});
    }
 
    if (path === "/auth/verify-email" && request.method === "POST") {
