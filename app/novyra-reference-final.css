@@ -4229,3 +4229,10 @@ main.nv-finance[lang="en"] .nv-ref-actions button{min-width:48px!important;min-h
 /* Brand and bottom navigation tap areas */
 main.nv-finance button.nf-brand{width:auto!important;min-width:48px!important;min-height:48px!important}
 main.nv-finance nav.nf-mobile-dock.nv-ref-dock>button{min-width:48px!important}
+
+
+/* Fixed-width five-item dock: every navigation target is at least 48px */
+main.nv-finance nav.nf-mobile-dock.nv-ref-dock{grid-template-columns:repeat(5,48px)!important;justify-content:space-around!important}
+main.nv-finance nav.nf-mobile-dock.nv-ref-dock>button{width:48px!important;min-width:48px!important;min-height:48px!important}
+main.nv-finance nav.nf-mobile-dock.nv-ref-dock>button.nv-ref-dock-center{width:56px!important;min-width:56px!important;min-height:56px!important}
+main.nv-finance button.nf-brand{width:48px!important;min-width:48px!important;min-height:48px!important;flex:0 0 48px!important}
