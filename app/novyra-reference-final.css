@@ -4373,3 +4373,42 @@ main.nv-finance button.nf-brand{width:48px!important;min-width:48px!important;mi
 .nv-personal-v1 .nf-topbar>.nf-brand,.nv-personal-v1 .nf-topbar .profile-btn{width:48px!important;min-width:48px!important;height:48px!important;min-height:48px!important}
 \n
 .nv-personal-v1 .nv-p-empty button.nv-p-secondary{background:rgba(255,255,255,.9)!important;border:1px solid #cfe3f5!important;color:#2f80ed!important;box-shadow:none!important}
+
+
+/* Phase 1 responsive polish: compact hero, snap categories, safe dock spacing */
+.nv-personal-v1 .nv-p-home{gap:16px!important}
+.nv-personal-v1 .nv-p-section{gap:16px!important}
+.nv-personal-v1 .nv-p-hero{
+  min-height:0!important;
+  height:auto!important;
+  gap:8px!important;
+  padding:16px!important;
+}
+.nv-personal-v1 .nv-p-dots{margin-top:3px!important}
+.nv-personal-v1 .nv-p-category-strip{
+  margin-inline:-16px!important;
+  padding:4px 16px 8px!important;
+  scroll-padding-inline:16px!important;
+  scroll-snap-type:x mandatory!important;
+  overscroll-behavior-inline:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  mask-image:linear-gradient(90deg,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%)!important;
+}
+.nv-personal-v1 .nv-p-category-strip>button{
+  flex:0 0 104px!important;
+  min-width:104px!important;
+  border-radius:24px!important;
+  scroll-snap-align:start!important;
+}
+.nv-personal-v1 .nv-p-dock{
+  border:1px solid transparent!important;
+  border-top:0!important;
+  box-shadow:0 9px 28px rgba(40,90,130,.12)!important;
+}
+.nv-personal-v1 .nf-main{
+  padding-bottom:calc(112px + env(safe-area-inset-bottom))!important;
+}
+@media(max-width:380px){
+  .nv-personal-v1 .nv-p-category-strip>button{flex-basis:104px!important}
+  .nv-personal-v1 .nv-p-home{gap:16px!important}
+}
