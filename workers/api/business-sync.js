@@ -6,7 +6,7 @@ export function mergeBusinessRecordPayload(previous,incoming) {
   const merged=new Map();
   const rowKey=row=>row&&typeof row==="object"&&row.id?String(row.id):"legacy:"+JSON.stringify(row);
   for(const row of Array.isArray(previous[key])?previous[key]:[]) merged.set(rowKey(row),row);
-  for(const row of incoming[key]) merged.set(rowKey(row),row);
+  for(const row of incoming[key]) { const keyId=rowKey(row),prior=merged.get(keyId); merged.set(keyId,prior&&row&&typeof prior==="object"&&typeof row==="object"?{...prior,...row}:row); }
   out[key]=Array.from(merged.values());
  }
  if(incoming.settings&&typeof incoming.settings==="object"&&!Array.isArray(incoming.settings)) out.settings={...(previous.settings||{}),...incoming.settings};
