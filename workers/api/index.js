@@ -1031,11 +1031,11 @@ export default {
       const body=request.method==="POST"?(await readBody(request)||{}):{},workspaceId=String(url.searchParams.get("workspaceId")||body.workspaceId||""),access=await getBusinessAccess(db,workspaceId,user.id);
       if(!access) return fail("فضای کسب‌وکار پیدا نشد یا دسترسی ندارید.",404);
       if(request.method==="GET") {
-        if(!businessCan(access,"reminders:read")) return fail("اجازه مشاهده یادآوری‌ها را ندارید.",403);
+        if(!["owner","admin"].includes(access.role)&&!businessCan(access,"reminders:read")) return fail("اجازه مشاهده یادآوری‌ها را ندارید.",403);
         const rows=await db.prepare("SELECT id,reminder_type AS type,reference_id AS referenceId,title,due_at AS dueAt,remind_at AS remindAt,status,notified_at AS notifiedAt FROM business_reminders WHERE workspace_id=? ORDER BY remind_at LIMIT 500").bind(workspaceId).all();
         return json({reminders:rows.results||[]});
       }
-      if(!businessCan(access,"reminders:manage")) return fail("نقش شما اجازه مدیریت یادآوری‌ها را ندارد.",403);
+      if(!["owner","admin"].includes(access.role)&&!businessCan(access,"reminders:manage")) return fail("نقش شما اجازه مدیریت یادآوری‌ها را ندارد.",403);
       const title=String(body.title||"").trim().slice(0,180),dueAt=Number(body.dueAt),remindAt=Number(body.remindAt??dueAt),type=String(body.type||"custom");
       if(!title||!Number.isFinite(dueAt)||!Number.isFinite(remindAt)||dueAt<=0||remindAt>dueAt||!["custom","cheque","loan","invoice","installment"].includes(type)) return fail("اطلاعات یادآوری معتبر نیست.");
       const id=crypto.randomUUID();await db.prepare("INSERT INTO business_reminders (id,workspace_id,owner_id,reminder_type,reference_id,title,due_at,remind_at,status,created_by) VALUES (?,?,?,?,?,?,?,?, 'pending',?)").bind(id,workspaceId,access.ownerId,type,String(body.referenceId||id).slice(0,80),title,dueAt,remindAt,user.id).run();
