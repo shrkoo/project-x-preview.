@@ -104,10 +104,34 @@ for (const language of ["fa", "en"] as const) {
           await nav.nth(4).click();
           await expect(page.locator(".nbo-more-menu")).toBeVisible();
         } else {
+          const home = page.locator(".nv-p-home");
+          await nav.nth(0).click();
+          await expect(home).toBeVisible();
+          const homeText = await home.innerText();
+          expect(homeText).not.toContain("$");
+          expect(homeText).not.toContain("\\n");
+          expect(homeText).not.toContain('n\\"');
+          await home.locator(".nv-p-eye").click();
+          await home.locator(".nv-p-eye").click();
+          for (const action of await home.locator(".nv-p-quick button").all()) {
+            await action.click();
+            await expect(page.locator(".nf-modal")).toBeVisible();
+            await page.locator(".nf-modal-head button").click();
+          }
+          await home.locator(".nv-p-insight").click();
+          await expect(page.locator(".nf-report-actions")).toBeVisible();
+          await nav.nth(0).click();
+          await home.locator(".nv-p-section-head button").first().click();
+          await expect(page.locator(".nv-p-transactions")).toBeVisible();
+          await nav.nth(0).click();
+          await home.locator(".nv-p-category-strip button").first().click();
+          await expect(page.locator(".nv-p-transactions")).toBeVisible();
+          await nav.nth(1).click();
+          await expect(page.locator(".nv-p-coming")).toBeVisible();
           await nav.nth(3).click();
           await expect(page.locator(".nf-report-actions")).toBeVisible();
           await nav.nth(4).click();
-          await expect(page.locator(".nf-more-panel")).toBeVisible();
+          await expect(page.locator(".nv-p-coming")).toBeVisible();
         }
 
         const quick = page.locator(".nv-ref-dock-center");
