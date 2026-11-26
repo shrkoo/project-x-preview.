@@ -808,7 +808,7 @@ export default {
       const table=String(entry.name||"");
       if(!/^[A-Za-z0-9_]+$/.test(table) || table==="users") continue;
       const columns=await db.prepare('PRAGMA table_info("'+table+'")').all();
-      const userColumns=(columns.results||[]).map(column=>String(column.name||"")).filter(name=>/^(user_id|owner_id|author_id|creator_id|sender_id|recipient_id|viewer_id|follower_id|following_id|actor_id|invited_by|invited_user_id|member_id|account_id)$/.test(name));
+      const userColumns=(columns.results||[]).map(column=>String(column.name||"")).filter(name=>/^(user_id|owner_id|author_id|creator_id|created_by|sender_id|recipient_id|viewer_id|follower_id|following_id|actor_id|actor_user_id|invited_by|invited_user_id|member_id|account_id)$/.test(name));
       for(const column of userColumns) statements.push(db.prepare('DELETE FROM "'+table+'" WHERE "'+column+'"=?').bind(user.id));
     }
     const token=request.headers.get("Authorization")?.replace(/^Bearer\s+/i,"");
@@ -929,6 +929,8 @@ export default {
       const safeRecords={};
       for(const [key,value] of Object.entries(records).slice(0,40)) {
         if(!/^[a-zA-Z][a-zA-Z0-9_]{0,39}$/.test(key)||["__proto__","constructor","prototype"].includes(key)) continue;
+        if(key==="team") continue;
+        if(key==="settings"&&!businessCan(access,"settings:write")) continue;
         if(allowedArrays.includes(key)) safeRecords[key]=Array.isArray(value)?value.slice(0,2000):[];
         else if(key==="settings"&&value&&typeof value==="object"&&!Array.isArray(value)) safeRecords.settings=Object.fromEntries(Object.entries(value).slice(0,200).map(([k,v])=>[String(k).slice(0,100),String(v??"").slice(0,2000)]));
       }
