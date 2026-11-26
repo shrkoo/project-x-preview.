@@ -73,7 +73,7 @@ for (const language of ["fa", "en"] as const) {
           await expect(page.locator(".nbo-more-menu")).toBeVisible();
         } else {
           await nav.nth(3).click();
-          await expect(page.locator(".nf-metrics")).toBeVisible();
+          await expect(page.locator(".nf-report-actions")).toBeVisible();
           await nav.nth(4).click();
           await expect(page.locator(".nf-more-panel")).toBeVisible();
         }
