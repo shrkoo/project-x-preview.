@@ -7,7 +7,7 @@ const codeOf=(currency:string)=>String(currency||"USD").toUpperCase();
 export function currencyDigits(currency:string):number {
   const code=codeOf(currency);
   if(ZERO_DECIMAL.has(code))return 0;
-  try{return new Intl.NumberFormat("en",{style:"currency",currency:code}).resolvedOptions().maximumFractionDigits;}catch{return 2;}
+  try{return new Intl.NumberFormat("en",{style:"currency",currency:code}).resolvedOptions().maximumFractionDigits ?? 2;}catch{return 2;}
 }
 export function formatMoney(amount:number,currency:string,locale:string,options:MoneyOptions={}):string {
   if(options.hidden)return MONEY_HIDDEN_TEXT;
