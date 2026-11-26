@@ -206,6 +206,31 @@ async function syncBusinessDueReminders(db,workspaceId,ownerId,actorId,records) 
  }
  for(let i=0;i<statements.length;i+=80) await db.batch(statements.slice(i,i+80));
 }
+function mergeBusinessRecordPayload(previous,incoming) {
+ const out={...previous};
+ const arrayKeys=["invoices","payables","customers","suppliers","products","transactions","cheques","loans","team","activity","trash","bankImports"];
+ for(const key of arrayKeys) {
+  if(!Array.isArray(incoming[key])) continue;
+  const merged=new Map();
+  for(const row of Array.isArray(previous[key])?previous[key]:[]) if(row&&row.id) merged.set(String(row.id),row);
+  for(const row of incoming[key]) if(row&&row.id) merged.set(String(row.id),row);
+  out[key]=Array.from(merged.values());
+ }
+ if(incoming.settings&&typeof incoming.settings==="object"&&!Array.isArray(incoming.settings)) out.settings={...(previous.settings||{}),...incoming.settings};
+ const trash=Array.isArray(out.trash)?out.trash:[];
+ for(const item of trash) {
+  const source=String(item?.source||""),id=String(item?.id||"");
+  if(!source||!id||!arrayKeys.includes(source)||source==="trash") continue;
+  if((out[source]||[]).some(row=>String(row?.id||"")===id)) {
+   out.trash=out.trash.filter(row=>!(String(row?.source||"")===source&&String(row?.id||"")===id));
+  }
+ }
+ for(const item of (out.trash||[])) {
+  const source=String(item?.source||""),id=String(item?.id||"");
+  if(source&&id&&arrayKeys.includes(source)&&source!=="trash") out[source]=(out[source]||[]).filter(row=>String(row?.id||"")!==id);
+ }
+ return out;
+}
 async function deliverBusinessReminders(env,db) {
  if(!hasMailProvider(env)) return {sent:0,skipped:"email_not_configured"};
  const due=await db.prepare("SELECT r.id,r.title,r.due_at AS dueAt,r.reminder_type AS reminderType,u.email,w.name AS workspaceName FROM business_reminders r JOIN workspaces w ON w.id=r.workspace_id JOIN users u ON u.id=r.owner_id WHERE r.status='pending' AND r.remind_at<=? ORDER BY r.remind_at LIMIT 100").bind(Date.now()).all();
@@ -919,8 +944,10 @@ export default {
         if(!businessCan(access,"read")) return fail("اجازه مشاهده اطلاعات را ندارید.",403);
         await db.prepare("CREATE TABLE IF NOT EXISTS business_records (workspace_id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, payload TEXT NOT NULL, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
         const row=await db.prepare("SELECT payload,updated_at AS updatedAt FROM business_records WHERE workspace_id=? AND owner_id=?").bind(workspaceId,access.ownerId).first();
-        if(!row) return json({records:null,updatedAt:null,role:access.role});
-        try { return json({records:JSON.parse(row.payload),updatedAt:row.updatedAt,role:access.role}); } catch { return fail("اطلاعات فضای کسب‌وکار قابل خواندن نیست.",500); }
+        const versionRow=await db.prepare("SELECT revision FROM business_record_versions WHERE workspace_id=?").bind(workspaceId).first();
+        const revision=Number(versionRow?.revision||0);
+        if(!row) return json({records:null,updatedAt:null,revision,role:access.role});
+        try { return json({records:JSON.parse(row.payload),updatedAt:row.updatedAt,revision,role:access.role}); } catch { return fail("اطلاعات فضای کسب‌وکار قابل خواندن نیست.",500); }
       }
       if(!businessCan(access,"records:write")) return fail("نقش شما اجازه ویرایش اطلاعات کسب‌وکار را ندارد.",403);
       const records=body.records;
@@ -935,12 +962,17 @@ export default {
       await db.prepare("CREATE TABLE IF NOT EXISTS business_records (workspace_id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, payload TEXT NOT NULL, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
       const previous=await db.prepare("SELECT payload FROM business_records WHERE workspace_id=? AND owner_id=?").bind(workspaceId,access.ownerId).first();
       let previousRecords={};try{if(previous?.payload)previousRecords=JSON.parse(previous.payload)||{};}catch{}
-      const payload=JSON.stringify({...previousRecords,...safeRecords});
+      const mergedRecords=mergeBusinessRecordPayload(previousRecords,safeRecords),payload=JSON.stringify(mergedRecords);
       if(payload.length>200000)return fail("حجم اطلاعات کسب‌وکار بیش از حد مجاز است.",413);
-      await db.prepare("INSERT INTO business_records (workspace_id,owner_id,payload,updated_at) VALUES (?,?,?,CURRENT_TIMESTAMP) ON CONFLICT(workspace_id) DO UPDATE SET payload=excluded.payload,updated_at=CURRENT_TIMESTAMP WHERE business_records.owner_id=excluded.owner_id").bind(workspaceId,access.ownerId,payload).run();
-      await syncBusinessDueReminders(db,workspaceId,access.ownerId,user.id,JSON.parse(payload));
-      await writeBusinessAudit(db,workspaceId,user.id,"records.updated","business_records",workspaceId,{keys:Object.keys(safeRecords)});
-      return json({ok:true,savedAt:new Date().toISOString(),actor:{id:user.id,displayName:user.display_name},role:access.role});
+      const versionRow=await db.prepare("SELECT revision FROM business_record_versions WHERE workspace_id=?").bind(workspaceId).first();
+      const revision=Number(versionRow?.revision||0)+1;
+      await db.batch([
+        db.prepare("INSERT INTO business_records (workspace_id,owner_id,payload,updated_at) VALUES (?,?,?,CURRENT_TIMESTAMP) ON CONFLICT(workspace_id) DO UPDATE SET payload=excluded.payload,updated_at=CURRENT_TIMESTAMP WHERE business_records.owner_id=excluded.owner_id").bind(workspaceId,access.ownerId,payload),
+        db.prepare("INSERT INTO business_record_versions (workspace_id,revision,updated_at) VALUES (?,?,CURRENT_TIMESTAMP) ON CONFLICT(workspace_id) DO UPDATE SET revision=excluded.revision,updated_at=CURRENT_TIMESTAMP").bind(workspaceId,revision)
+      ]);
+      await syncBusinessDueReminders(db,workspaceId,access.ownerId,user.id,mergedRecords);
+      await writeBusinessAudit(db,workspaceId,user.id,"records.updated","business_records",workspaceId,{keys:Object.keys(safeRecords),revision});
+      return json({ok:true,savedAt:new Date().toISOString(),revision,actor:{id:user.id,displayName:user.display_name},role:access.role});
     }
     if(path==="/business/audit" && request.method==="GET") {
       const workspaceId=String(url.searchParams.get("workspaceId")||""),access=await getBusinessAccess(db,workspaceId,user.id);
