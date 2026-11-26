@@ -482,7 +482,8 @@ export default {
     if(!/^\S+@\S+\.\S+$/.test(email)) return fail("Enter a valid email address.",400);
     const account=await db.prepare("SELECT password_hash,password_salt FROM users WHERE email=? LIMIT 1").bind(email).first();
     const encoded=parsePasswordHash(account?.password_hash);
-    return json({salt:String(encoded?.salt||account?.password_salt||"00000000000000000000000000000000")});
+    const legacySalt=String(account?.password_salt||"");
+    return json({salt:String(encoded?.salt||(/^[a-f0-9]{32}$/i.test(legacySalt)?legacySalt:"00000000000000000000000000000000"))});
    }
 
    if(path==="/auth/webauthn/register/options" && request.method==="POST") {
