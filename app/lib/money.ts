@@ -32,7 +32,7 @@ export function parseMoney(input:string,currency:string):number {
   if(digits>0&&comma>=0&&dot>=0)decimalAt=Math.max(comma,dot);
   else if(digits>0&&(comma>=0||dot>=0)){
     const at=Math.max(comma,dot), sep=raw[at], trailing=raw.length-at-1;
-    const repeated=(raw.match(new RegExp("\\"+sep,"g"))||[]).length>1;
+    const repeated=raw.split(sep).length>2;
     if(!repeated&&trailing>0&&trailing<=digits)decimalAt=at;
   }
   let whole=decimalAt>=0?raw.slice(0,decimalAt):raw;
