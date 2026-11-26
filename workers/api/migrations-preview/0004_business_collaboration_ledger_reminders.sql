@@ -80,3 +80,10 @@ CREATE TABLE IF NOT EXISTS business_reminders (
   UNIQUE(workspace_id,reminder_type,reference_id)
 );
 CREATE INDEX IF NOT EXISTS idx_business_reminders_due ON business_reminders(status,remind_at);
+
+-- Monotonic revisions let clients detect and reconcile multi-device writes.
+CREATE TABLE IF NOT EXISTS business_record_versions (
+  workspace_id TEXT PRIMARY KEY REFERENCES workspaces(id) ON DELETE CASCADE,
+  revision INTEGER NOT NULL DEFAULT 1,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
