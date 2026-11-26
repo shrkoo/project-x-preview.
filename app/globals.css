@@ -3713,3 +3713,5 @@ html.novyra-app-obscured body>*{filter:none!important;pointer-events:auto!import
 .nvsh-root{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 @media(min-width:760px){.nvbd-root{max-width:900px;margin:0 auto;padding:20px 24px 40px}.nvbd-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.nvbd-lists{grid-template-columns:1fr 1fr}.nvbd-quick>div{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.nvbd-root *,.nvsh-root *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+.nf-main{padding-bottom:calc(112px + env(safe-area-inset-bottom))!important}.nf-shell{padding-bottom:env(safe-area-inset-bottom)}
