@@ -154,6 +154,65 @@ async function authenticate(request, db) {
   const tokenHash = await digest(token);
   return await db.prepare("SELECT u.id,u.email,u.password_hash,u.password_salt,u.display_name,u.xp,u.games_played,u.role,u.username,u.avatar_url,u.bio,u.first_name,u.last_name,u.country,u.currency,u.calendar,u.number_format,u.number_system,u.date_format,u.text_direction,u.week_start,u.language,u.account_type,u.app_lock_type,u.app_lock_hash,u.app_lock_timeout,u.lock_failed_attempts,u.onboarding_completed FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
 }
+
+const BUSINESS_ROLE_PERMISSIONS = {
+ owner: new Set(["read","records:write","finance:write","ledger:write","team:manage","audit:read","reminders:manage","settings:write"]),
+ manager: new Set(["read","records:write","finance:write","ledger:write","audit:read","reminders:manage","settings:write"]),
+ accountant: new Set(["read","records:write","finance:write","ledger:write","audit:read","reminders:read"]),
+ staff: new Set(["read","records:write","finance:write","reminders:read"]),
+ viewer: new Set(["read","audit:read","reminders:read"])
+};
+async function getBusinessAccess(db,workspaceId,userId) {
+ const row=await db.prepare("SELECT w.id,w.owner_id AS ownerId,w.name,w.currency,m.role AS memberRole,m.status AS memberStatus FROM workspaces w LEFT JOIN workspace_members m ON m.workspace_id=w.id AND m.user_id=? WHERE w.id=? AND w.type='business'").bind(userId,workspaceId).first();
+ if(!row) return null;
+ if(row.ownerId===userId) return {...row,role:"owner"};
+ if(row.memberStatus!=="active" || !row.memberRole) return null;
+ return {...row,role:row.memberRole};
+}
+function businessCan(access,permission) {
+ return Boolean(access && BUSINESS_ROLE_PERMISSIONS[access.role]?.has(permission));
+}
+async function writeBusinessAudit(db,workspaceId,actorId,action,entityType,entityId=null,details=null) {
+ await db.prepare("INSERT INTO business_audit_log (id,workspace_id,actor_user_id,action,entity_type,entity_id,details_json) VALUES (?,?,?,?,?,?,?)")
+  .bind(crypto.randomUUID(),workspaceId,actorId,action,entityType,entityId,details?JSON.stringify(details).slice(0,12000):null).run();
+}
+async function syncBusinessDueReminders(db,workspaceId,ownerId,actorId,records) {
+ const now=Date.now(), statements=[];
+ for(const kind of ["cheques","loans"]) {
+  const rows=Array.isArray(records[kind])?records[kind]:[];
+  const activeIds=[];
+  for(const row of rows.slice(0,2000)) {
+   const refId=String(row?.id||"").slice(0,80), dueDate=String(row?.dueDate||row?.nextDueDate||"");
+   if(!refId || !/^\\d{4}-\\d{2}-\\d{2}$/.test(dueDate) || ["cashed","bounced","paid","cancelled"].includes(String(row?.status||"").toLowerCase())) continue;
+   const dueAt=Date.parse(dueDate+"T09:00:00Z");
+   if(!Number.isFinite(dueAt)) continue;
+   const days=Math.max(0,Math.min(90,Number(row?.reminder??1)||0));
+   const remindAt=dueAt-days*86400000;
+   const title=(kind==="cheques"?"سررسید چک: ":"سررسید قسط: ")+String(row?.name||row?.number||"بدون عنوان").slice(0,120);
+   activeIds.push(refId);
+   statements.push(db.prepare("INSERT INTO business_reminders (id,workspace_id,owner_id,reminder_type,reference_id,title,due_at,remind_at,status,created_by) VALUES (?,?,?,?,?,?,?,?, 'pending',?) ON CONFLICT(workspace_id,reminder_type,reference_id) DO UPDATE SET title=excluded.title,due_at=excluded.due_at,remind_at=excluded.remind_at,status=CASE WHEN business_reminders.status='sent' AND business_reminders.due_at=excluded.due_at THEN 'sent' ELSE 'pending' END")
+    .bind(crypto.randomUUID(),workspaceId,ownerId,kind,refId,title,dueAt,remindAt,actorId));
+  }
+  if(activeIds.length) statements.push(db.prepare("UPDATE business_reminders SET status='cancelled' WHERE workspace_id=? AND reminder_type=? AND status='pending' AND reference_id NOT IN ("+activeIds.map(()=>"?").join(",")+")").bind(workspaceId,kind,...activeIds));
+  else statements.push(db.prepare("UPDATE business_reminders SET status='cancelled' WHERE workspace_id=? AND reminder_type=? AND status='pending'").bind(workspaceId,kind));
+ }
+ for(let i=0;i<statements.length;i+=80) await db.batch(statements.slice(i,i+80));
+}
+async function deliverBusinessReminders(env,db) {
+ if(!hasMailProvider(env)) return {sent:0,skipped:"email_not_configured"};
+ const due=await db.prepare("SELECT r.id,r.title,r.due_at AS dueAt,r.reminder_type AS reminderType,u.email,w.name AS workspaceName FROM business_reminders r JOIN workspaces w ON w.id=r.workspace_id JOIN users u ON u.id=r.owner_id WHERE r.status='pending' AND r.remind_at<=? ORDER BY r.remind_at LIMIT 100").bind(Date.now()).all();
+ let sent=0;
+ for(const row of due.results||[]) {
+  try {
+   const dueDate=new Date(Number(row.dueAt)).toLocaleDateString("fa-IR");
+   await sendMail(env,row.email,"یادآوری سررسید کسب‌وکار NOVYRA",renderNovyraEmail({eyebrow:"BUSINESS REMINDER",title:row.title,intro:"یک موعد مالی در فضای کسب‌وکار شما نزدیک یا سررسید شده است.",actionLabel:"ورود به فضای کسب‌وکار",actionUrl:(env.APP_URL||"https://novyra.pages.dev")+"/business",notice:"فضا: "+row.workspaceName+" · تاریخ سررسید: "+dueDate,footerNote:"این یادآوری بر اساس اطلاعات ثبت‌شده در فضای کسب‌وکار ارسال شده است."}));
+   await db.prepare("UPDATE business_reminders SET status='sent',notified_at=? WHERE id=? AND status='pending'").bind(Date.now(),row.id).run();
+   sent++;
+  } catch(error) { console.error("business-reminder-delivery",row.id,error); }
+ }
+ return {sent};
+}
+
 function cleanName(value) { return String(value || "").trim().replace(/[<>]/g, "").slice(0, 32); }
 function cleanEmail(value) { return String(value ?? "").normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g, "").replace(/\s+/g, "").toLowerCase().slice(0, 254); }
 
