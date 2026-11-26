@@ -80,12 +80,14 @@ for (const language of ["fa", "en"] as const) {
           direction: document.querySelector("main.nv-finance")?.getAttribute("dir"),
           smallTargets: Array.from(document.querySelectorAll("button")).filter(el => {
             const r = el.getBoundingClientRect();
-            return r.width > 0 && r.height > 0 && (r.width < 44 || r.height < 44);
+            return r.width > 0 && r.height > 0 && (r.width < 48 || r.height < 48);
           }).length,
+          textOverflows: Array.from(document.querySelectorAll("button")).filter(el => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && el.scrollWidth > el.clientWidth + 2; }).length,
         }));
         expect(layout.page).toBeLessThanOrEqual(layout.viewport + 1);
         expect(layout.direction).toBe(language === "fa" ? "rtl" : "ltr");
         expect(layout.smallTargets).toBe(0);
+        expect(layout.textOverflows).toBe(0);
         expect(errors).toEqual([]);
       });
     }
