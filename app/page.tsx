@@ -6,6 +6,7 @@ import NovyraLuxuryApp from "./components/NovyraLuxuryApp";
 import AppLockScreen from "./components/AppLockScreen";
 import { apiRequest, clearSession, derivePasswordHash } from "./lib/api";
 import { languages, languageByCode } from "./data/languages";
+import {removeDeviceLock} from "./lib/device-lock";
 
 type Language = (typeof languages)[number]["code"];
 type Account = { id: string; email: string; displayName: string; xp?: number; gamesPlayed?: number; role?: string; profile?: { accountType?: "personal" | "business"; appLockType?: "none"|"pin"|"pattern"|"biometric" } };
@@ -178,6 +179,7 @@ export default function Home() {
 
   function logoutComplete() {
     clearSession();
+    void removeDeviceLock();
     ["projectx-app-lock-type","projectx-app-lock-hash","projectx-app-lock-user","projectx-app-lock-configured","projectx-app-lock-credential","projectx-app-lock-biometric","projectx-app-lock-pin-length","novyra-lock-failures","novyra-lock-until"].forEach(key => localStorage.removeItem(key));
     setLocked(false);
     setAccount(null);
