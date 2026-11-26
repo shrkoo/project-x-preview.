@@ -778,7 +778,25 @@ export default {
     await db.prepare("INSERT INTO workspaces (id,owner_id,type,name,currency) VALUES (?,?,?,?,?)").bind(id,user.id,type,name,currency).run();
     return json({workspace:{id,type,name,currency}},201);
    }
-   if(path==="/finance/transactions" && request.method==="GET") {
+   if(path==="/business/records" && (request.method==="GET" || request.method==="PUT")) {
+     const body=request.method==="PUT"?(await readBody(request)||{}):{};
+     const workspaceId=String(url.searchParams.get("workspaceId") || body.workspaceId || "");
+     const workspace=await db.prepare("SELECT id FROM workspaces WHERE id=? AND owner_id=? AND type='business'").bind(workspaceId,user.id).first();
+     if(!workspace) return fail("فضای کسب‌وکار پیدا نشد یا دسترسی ندارید.",404);
+     await db.prepare("CREATE TABLE IF NOT EXISTS business_records (workspace_id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, payload TEXT NOT NULL, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
+     if(request.method==="GET") {
+      const row=await db.prepare("SELECT payload,updated_at AS updatedAt FROM business_records WHERE workspace_id=? AND owner_id=?").bind(workspaceId,user.id).first();
+      if(!row) return json({records:null,updatedAt:null});
+      try { return json({records:JSON.parse(row.payload),updatedAt:row.updatedAt}); } catch { return fail("اطلاعات فضای کسب‌وکار قابل خواندن نیست.",500); }
+     }
+     const records=body.records;
+     if(!records || typeof records!=="object" || Array.isArray(records)) return fail("ساختار اطلاعات کسب‌وکار معتبر نیست.");
+     const payload=JSON.stringify({invoices:Array.isArray(records.invoices)?records.invoices.slice(0,2000):[],payables:Array.isArray(records.payables)?records.payables.slice(0,2000):[],customers:Array.isArray(records.customers)?records.customers.slice(0,2000):[],products:Array.isArray(records.products)?records.products.slice(0,2000):[]});
+     if(payload.length>200000) return fail("حجم اطلاعات کسب‌وکار بیش از حد مجاز است.",413);
+     await db.prepare("INSERT INTO business_records (workspace_id,owner_id,payload,updated_at) VALUES (?,?,?,CURRENT_TIMESTAMP) ON CONFLICT(workspace_id) DO UPDATE SET payload=excluded.payload,updated_at=CURRENT_TIMESTAMP WHERE business_records.owner_id=excluded.owner_id").bind(workspaceId,user.id,payload).run();
+     return json({ok:true,savedAt:new Date().toISOString()});
+    }
+    if(path==="/finance/transactions" && request.method==="GET") {
     const workspaceId=String(url.searchParams.get("workspaceId")||"");
     const workspace=await db.prepare("SELECT id FROM workspaces WHERE id=? AND owner_id=?").bind(workspaceId,user.id).first();
     if(!workspace) return fail("فضای کاری پیدا نشد یا دسترسی ندارید.",404);
