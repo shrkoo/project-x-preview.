@@ -178,7 +178,7 @@ async function writeBusinessAudit(db,workspaceId,actorId,action,entityType,entit
 }
 async function syncBusinessDueReminders(db,workspaceId,ownerId,actorId,records) {
  const statements=[];
- for(const kind of ["cheques","loans"]) {
+ for(const kind of ["cheques","loans","invoices","payables"]) {
   statements.push(db.prepare("UPDATE business_reminders SET status='cancelled' WHERE workspace_id=? AND reminder_type=? AND status='pending'").bind(workspaceId,kind));
   const rows=Array.isArray(records[kind])?records[kind].slice(0,300):[];
   for(const row of rows) {
@@ -194,7 +194,7 @@ async function syncBusinessDueReminders(db,workspaceId,ownerId,actorId,records) 
     const lastDay=new Date(Date.UTC(first.getUTCFullYear(),first.getUTCMonth()+1,0)).getUTCDate();
     const dueAt=Date.UTC(first.getUTCFullYear(),first.getUTCMonth(),Math.min(base.getUTCDate(),lastDay),9,0,0);
     const refId=kind==="loans"?baseId+"#"+(index+1):baseId;
-    const title=kind==="cheques"?"سررسید چک: "+String(row?.name||row?.number||"بدون عنوان").slice(0,100):"سررسید قسط "+(index+1)+" از "+count+": "+String(row?.name||"وام").slice(0,100);
+    const title=kind==="cheques"?"سررسید چک: "+String(row?.name||row?.number||"بدون عنوان").slice(0,100):kind==="loans"?"سررسید قسط "+(index+1)+" از "+count+": "+String(row?.name||"وام").slice(0,100):kind==="invoices"?"سررسید فاکتور: "+String(row?.number||row?.customer||"فاکتور").slice(0,100):"سررسید پرداختنی: "+String(row?.supplier||row?.name||"بدهی").slice(0,100);
     const remindAt=dueAt-days*86400000;
     statements.push(db.prepare("INSERT INTO business_reminders (id,workspace_id,owner_id,reminder_type,reference_id,title,due_at,remind_at,status,created_by) VALUES (?,?,?,?,?,?,?,?, 'pending',?) ON CONFLICT(workspace_id,reminder_type,reference_id) DO UPDATE SET title=excluded.title,due_at=excluded.due_at,remind_at=excluded.remind_at,status=CASE WHEN business_reminders.status='sent' AND business_reminders.due_at=excluded.due_at THEN 'sent' ELSE 'pending' END")
      .bind(crypto.randomUUID(),workspaceId,ownerId,kind,refId,title,dueAt,remindAt,actorId));
