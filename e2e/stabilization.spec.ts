@@ -8,6 +8,7 @@ async function prepare(page: Page, language: "fa" | "en", accountType: "personal
     localStorage.setItem("projectx-language", language);
     localStorage.setItem("projectx-account-type", accountType);
     localStorage.setItem("novyra-finance-currency", language === "fa" ? "IRR" : "USD");
+    localStorage.removeItem("novyra-text-direction");
     localStorage.removeItem("projectx-app-lock-type");
     localStorage.removeItem("projectx-app-lock-configured");
   }, { language, accountType });
@@ -77,7 +78,7 @@ for (const language of ["fa", "en"] as const) {
           viewport: document.documentElement.clientWidth,
           page: document.documentElement.scrollWidth,
           direction: document.querySelector("main.nv-finance")?.getAttribute("dir"),
-          smallTargets: Array.from(document.querySelectorAll("button:visible")).filter(el => {
+          smallTargets: Array.from(document.querySelectorAll("button")).filter(el => {
             const r = el.getBoundingClientRect();
             return r.width > 0 && r.height > 0 && (r.width < 44 || r.height < 44);
           }).length,
