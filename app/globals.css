@@ -3683,3 +3683,7 @@ body { font-family:Arial,Helvetica,sans-serif!important; }
 
 html.novyra-app-obscured body>*{filter:blur(18px)!important;pointer-events:none!important;user-select:none!important}html.novyra-app-obscured{background:#eaf6ff!important}
 html.novyra-app-obscured body>*{filter:none!important;pointer-events:auto!important;user-select:auto!important}html.novyra-app-obscured .nv-finance{filter:blur(18px)!important;pointer-events:none!important;user-select:none!important}
+/* Settings hub content safety: keep all scrollable screens clear of the fixed dock. */
+.nv-finance{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+.nf-mobile-dock{padding-bottom:env(safe-area-inset-bottom)}
+.nvsh-root{scroll-margin-bottom:calc(90px + env(safe-area-inset-bottom))}
