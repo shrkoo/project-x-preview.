@@ -123,3 +123,20 @@ jobs:
           html="$(curl --fail --silent --show-error "$PREVIEW_PAGES_URL/")"
           test -n "$html"
           echo "Preview Pages returned a successful HTML response."
+
+      - name: Verify live Preview version stamp
+        env:
+          PREVIEW_PAGES_URL: https://feature-homa-auth-part1.novyra.pages.dev
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error "$PREVIEW_PAGES_URL/version.json?verify=$GITHUB_SHA" --output /tmp/preview-version.json; then
+              if node -e 'const d=require("/tmp/preview-version.json");if(d.commit!==process.env.GITHUB_SHA||d.branch!=="feature/homa-auth-part1")process.exit(1);console.log("Live Preview version:",d.shortCommit,d.builtAt)' ; then
+                exit 0
+              fi
+            fi
+            sleep 4
+          done
+          echo "Live /version.json did not match $GITHUB_SHA" >&2
+          cat /tmp/preview-version.json 2>/dev/null || true
+          exit 1
