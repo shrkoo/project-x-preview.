@@ -35,13 +35,12 @@ function harness({ user = validUser, rateAllowed = true, dbFailure = false, veri
     helpers: {
       cleanEmail: value => String(value || "").trim().toLowerCase(),
       hitAuthLimit: async () => rateAllowed,
-      passwordHash: async password => password === "correct-password" ? "hash-ok" : "hash-bad",
-      createSession: async () => ({ token: "session-token", expiresAt: 123456789 }),
+          createSession: async () => ({ token: "session-token", expiresAt: 123456789 }),
       publicProfile: () => ({ accountType: "personal" })
     }
   };
 }
-async function invoke(options, body = { email: "person@example.com", password: "correct-password" }) {
+async function invoke(options, body = { email: "person@example.com", passwordHash: "hash-ok" }) {
   const config = harness(options);
   const response = await handlePasswordLogin({
     request: requestFor(body), env: config.env, db: config.db,
@@ -51,13 +50,13 @@ async function invoke(options, body = { email: "person@example.com", password: "
 }
 
 test("invalid input returns 400", async () => {
-  const { response, data } = await invoke({}, { email: "not-an-email", password: "" });
+  const { response, data } = await invoke({}, { email: "not-an-email", passwordHash: "" });
   assert.equal(response.status, 400);
   assert.equal(data.code, "INVALID_INPUT");
 });
 
 test("malformed email returns 400 instead of reaching D1", async () => {
-  const { response, data } = await invoke({}, { email: "not-an-email", password: "correct-password" });
+  const { response, data } = await invoke({}, { email: "not-an-email", passwordHash: "hash-ok" });
   assert.equal(response.status, 400);
   assert.equal(data.code, "INVALID_INPUT");
 });
@@ -70,7 +69,7 @@ test("login succeeds and returns a session", async () => {
 });
 
 test("wrong password returns 401", async () => {
-  const { response, data } = await invoke({}, { email: "person@example.com", password: "wrong-password" });
+  const { response, data } = await invoke({}, { email: "person@example.com", passwordHash: "hash-bad" });
   assert.equal(response.status, 401);
   assert.equal(data.code, "INVALID_CREDENTIALS");
 });
