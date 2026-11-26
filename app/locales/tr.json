@@ -84,5 +84,14 @@
   "captchaAgain": "Devam etmek için güvenlik kontrolünü tekrar tamamlayın.",
   "resetPasswordTitle": "Yeni bir şifre belirleyin",
   "resetPassword": "Şifreyi sıfırla",
-  "passwordResetDone": "Şifreniz sıfırlandı. Yeni şifrenizle giriş yapın."
+  "passwordResetDone": "Şifreniz sıfırlandı. Yeni şifrenizle giriş yapın.",
+  "loginInvalidCredentials": "E-posta veya şifre hatalı.",
+  "loginEmailUnverified": "E-posta adresiniz doğrulanmadı. Doğrulama kodunu yeniden gönderin.",
+  "loginTooManyAttempts": "Çok fazla deneme yapıldı. Lütfen tekrar denemeden önce bekleyin.",
+  "loginOffline": "Çevrimdışı görünüyorsunuz. Bağlantınızı kontrol edip yeniden deneyin.",
+  "loginServerProblem": "Sunucuda bir sorun oluştu. Lütfen yeniden deneyin.",
+  "loginRetry": "Tekrar dene",
+  "loginWaitSeconds": "{seconds} saniye sonra tekrar deneyin",
+  "loginErrorCode": "Hata kodu: {id}",
+  "createAccount": "Hesap oluştur"
 }
