@@ -10,6 +10,7 @@ import NovyraPersonalHome from "./NovyraPersonalHome";
 import NovyraBusinessReports from "./NovyraBusinessReports";
 import {countries} from "../data/countries";
 import {currencies} from "../data/currencies";
+import {parseMoney} from "../lib/money";
 import {languages,languageByCode} from "../data/languages";
 import {calendars,type CalendarCode} from "../data/calendars";
 import {numberSystems,type NumberSystemCode} from "../data/number-systems";
