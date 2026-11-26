@@ -2,7 +2,7 @@
 .nv-finance{padding-bottom:calc(180px + env(safe-area-inset-bottom))!important}
 .nv-finance .nf-main,.nv-finance .nf-shell,.nv-finance .nf-settings{padding-bottom:calc(180px + env(safe-area-inset-bottom))!important}
 .nv-finance button,.nv-finance [role="button"],.nv-finance label.nf-file-label{cursor:pointer!important;-webkit-tap-highlight-color:transparent}
-.nv-finance button{min-height:44px}
+.nv-finance button{min-height:48px}
 .nv-finance button:active,.nv-finance [role="button"]:active{transform:scale(.975);filter:brightness(.97)}
 .nv-finance input:not([type=checkbox]),.nv-finance select,.nv-finance textarea{min-height:44px!important;border:1px solid #dcebf4!important;border-radius:13px!important;background:rgba(255,255,255,.88)!important;color:#29485b!important;box-shadow:inset 0 1px 2px #6b9ab00a!important;padding:10px 12px!important;outline:none!important}
 .nv-finance input:focus,.nv-finance select:focus,.nv-finance textarea:focus{border-color:#72b8df!important;box-shadow:0 0 0 3px #73bce322!important}
@@ -72,3 +72,5 @@
 .nvsh-root .nvsh-secondary[href]{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:10px 14px;border-radius:14px;color:#2F80ED;text-decoration:none;background:rgba(47,128,237,.08)}
 .nf-main{padding-bottom:calc(100px + env(safe-area-inset-bottom))!important}
 .nf-mobile-dock{padding-bottom:env(safe-area-inset-bottom)!important}
+
+.nv-finance button,.nv-finance [role="button"]{min-height:48px!important;touch-action:manipulation}
