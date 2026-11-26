@@ -26,9 +26,6 @@ id = "81ae79962a0c47778b8ca32fc9e35422"
 name = "ROOM_HUB"
 class_name = "RoomHub"
 
-[[migrations]]
-tag = "v1"
-new_sqlite_classes = ["RoomHub"]
 
 [ai]
 binding = "AI"
