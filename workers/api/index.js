@@ -425,6 +425,8 @@ export default {
     if(!credential) return fail("کلید زیستی برای این حساب پیدا نشد.",401);
     const appOrigin=String(env.WEBAUTHN_ORIGIN||env.APP_URL||"").trim();
     if(!appOrigin) return fail("تنظیمات دامنه احراز هویت زیستی کامل نیست.",503);
+    const consumed=await db.prepare("DELETE FROM webauthn_pending_challenges WHERE email=? AND challenge=? AND expires_at>? RETURNING email").bind(email,pending.challenge,Date.now()).first();
+    if(!consumed) return fail("درخواست احراز هویت قبلاً استفاده شده یا منقضی شده است؛ دوباره تلاش کن.",410);
     const publicKeyHex=String(credential.public_key||"");
     if(!/^(?:[a-f0-9]{2})+$/i.test(publicKeyHex)) return fail("کلید ثبت‌شده معتبر نیست.",500);
     const publicKey=Uint8Array.from(publicKeyHex.match(/.{2}/g)||[],byte=>parseInt(byte,16));
@@ -438,8 +440,7 @@ export default {
     });
     if(!verification.verified) return fail("اثر انگشت یا تشخیص چهره تأیید نشد.",401);
     await db.batch([
-      db.prepare("UPDATE webauthn_credentials SET counter=? WHERE credential_id=? AND user_id=?").bind(verification.authenticationInfo.newCounter,credential.credential_id,user.id),
-      db.prepare("DELETE FROM webauthn_pending_challenges WHERE email=?").bind(email)
+      db.prepare("UPDATE webauthn_credentials SET counter=? WHERE credential_id=? AND user_id=?").bind(verification.authenticationInfo.newCounter,credential.credential_id,user.id)
     ]);
     const session=await createSession(db,user.id);
     return json({token:session.token,expiresAt:session.expiresAt,user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role,profile:publicProfile(user)}});
@@ -471,6 +472,8 @@ export default {
       const appOrigin=String(env.WEBAUTHN_ORIGIN||env.APP_URL||"").trim();
       if(!appOrigin) return fail("تنظیمات دامنه احراز هویت زیستی کامل نیست.",503);
       const rpID=new URL(appOrigin).hostname;
+      const consumed=await db.prepare("DELETE FROM webauthn_pending_challenges WHERE email=? AND challenge=? AND expires_at>? RETURNING email").bind(email,pending.challenge,Date.now()).first();
+      if(!consumed) return fail("درخواست ثبت اثر انگشت قبلاً استفاده شده یا منقضی شده است؛ دوباره تلاش کن.",410);
       const verification=await verifyRegistrationResponse({
         response:body.webauthnRegistration,
         expectedChallenge:pending.challenge,
@@ -480,7 +483,6 @@ export default {
       });
       if(!verification.verified || !verification.registrationInfo) return fail("ثبت امن اثر انگشت یا تشخیص چهره تأیید نشد.",400);
       verifiedBiometric=verification.registrationInfo;
-      await db.prepare("DELETE FROM webauthn_pending_challenges WHERE email=?").bind(email).run();
     }
     const id = crypto.randomUUID(), hash = suppliedHash;
     try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,first_name,last_name,country,currency,calendar,number_format,number_system,date_format,text_direction,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout,lock_failed_attempts,onboarding_completed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.number_system,profile.date_format,profile.text_direction,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,profileComplete(profile)?1:0).run(); }
