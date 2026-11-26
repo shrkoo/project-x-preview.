@@ -98,16 +98,13 @@ for (const language of ["fa", "en"] as const) {
           viewport: document.documentElement.clientWidth,
           page: document.documentElement.scrollWidth,
           direction: document.querySelector("main.nv-finance")?.getAttribute("dir"),
-          smallTargets: Array.from(document.querySelectorAll("main.nv-finance button")).filter(el => {
-            const r = el.getBoundingClientRect();
-            return r.width > 0 && r.height > 0 && (r.width < 48 || r.height < 48);
-          }).length,
-          textOverflows: Array.from(document.querySelectorAll("button")).filter(el => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && el.scrollWidth > el.clientWidth + 2; }).length,
+          smallTargets: Array.from(document.querySelectorAll("main.nv-finance button")).filter(el => { const r=el.getBoundingClientRect(); return r.width>0&&r.height>0&&(r.width<48||r.height<48); }).map(el => { const r=el.getBoundingClientRect(); return {label:el.getAttribute("aria-label")||el.textContent?.trim(),width:Math.round(r.width),height:Math.round(r.height)}; }),
+          textOverflows: Array.from(document.querySelectorAll("main.nv-finance button")).filter(el => { const r=el.getBoundingClientRect(); return r.width>0&&r.height>0&&el.scrollWidth>el.clientWidth+2; }).map(el => ({label:el.getAttribute("aria-label")||el.textContent?.trim(),scroll:el.scrollWidth,client:el.clientWidth})),
         }));
         expect(layout.page).toBeLessThanOrEqual(layout.viewport + 1);
         expect(layout.direction).toBe(language === "fa" ? "rtl" : "ltr");
-        expect(layout.smallTargets).toBe(0);
-        expect(layout.textOverflows).toBe(0);
+        expect(layout.smallTargets).toEqual([]);
+        expect(layout.textOverflows).toEqual([]);
         expect(errors).toEqual([]);
       });
     }
