@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { handlePasswordLogin } from "../auth-login.js";
+import { handlePasswordLogin } from "../auth-login.mjs";
 
 const requestFor = (body) => new Request("https://api.example.test/auth/login", {
   method: "POST",
