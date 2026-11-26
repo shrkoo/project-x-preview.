@@ -370,17 +370,30 @@ export default {
       REQUIRE_EMAIL_VERIFICATION: env.REQUIRE_EMAIL_VERIFICATION === "true" || env.REQUIRE_EMAIL_VERIFICATION === "false"
     };
     let tables = Object.fromEntries(requiredTables.map(name => [name, false]));
+    const expectedColumns = {
+      users: ["id","email","password_hash","password_salt","verified_at","display_name","xp","games_played","role"],
+      sessions: ["token_hash","user_id","expires_at"],
+      auth_rate_limits: ["rate_key","window_started_at","request_count"],
+      signup_verification_codes: ["id","user_id","code_hash","expires_at","attempts","sent_at","used_at"]
+    };
+    let columns = Object.fromEntries(Object.keys(expectedColumns).map(name => [name, false]));
     let databaseOk = false;
     if (env.DB) {
       try {
         const rows = await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name IN (?,?,?,?)").bind(...requiredTables).all();
         for (const row of rows.results || []) tables[row.name] = true;
-        databaseOk = requiredTables.every(name => tables[name]);
+        for (const [table, expected] of Object.entries(expectedColumns)) {
+          if (!tables[table]) continue;
+          const info = await env.DB.prepare("PRAGMA table_info(" + table + ")").all();
+          const present = new Set((info.results || []).map(column => column.name));
+          columns[table] = expected.every(name => present.has(name));
+        }
+        databaseOk = requiredTables.every(name => tables[name] && columns[name]);
       } catch (error) {
         console.error("novyra-health-d1-check", { requestId, errorName: String(error?.name || "Error"), message: String(error?.message || "D1 check failed").slice(0,180) });
       }
     }
-    return json({ ok: Boolean(env.DB) && databaseOk, service: "novyra-api", database: databaseOk ? "connected" : "unavailable", region: "EU", requestId, bindings, secrets, configuration, tables, databaseOk });
+    return json({ ok: Boolean(env.DB) && databaseOk, service: "novyra-api", database: databaseOk ? "connected" : "unavailable", region: "EU", requestId, bindings, secrets, configuration, tables, columns, databaseOk });
    }
    if(path==="/auth/email-check" && request.method==="POST"){
     const body=await readBody(request),email=cleanEmail(body?.email);
