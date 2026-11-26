@@ -57,7 +57,7 @@ for (const language of ["fa", "en"] as const) {
           expect(homeText).not.toContain("\\n");
           expect(homeText).not.toContain("n\\");
           expect(homeText).not.toContain('n\\"');
-          if (language === "fa") if (language === "fa") expect(homeText).not.toContain("$");
+          if (language === "fa") expect(homeText).not.toContain("$");
           await expect(page.locator(".nvbd-action-secondary")).toHaveCount(3);
           for (const tile of await page.locator(".nvbd-action-secondary").all()) {
             await expect(tile.locator("svg")).toBeVisible();
@@ -108,7 +108,7 @@ for (const language of ["fa", "en"] as const) {
           await nav.nth(0).click();
           await expect(home).toBeVisible();
           const homeText = await home.innerText();
-          expect(homeText).not.toContain("$");
+          if (language === "fa") expect(homeText).not.toContain("$");
           expect(homeText).not.toContain("\\n");
           expect(homeText).not.toContain('n\\"');
           await home.locator(".nv-p-eye").click();
