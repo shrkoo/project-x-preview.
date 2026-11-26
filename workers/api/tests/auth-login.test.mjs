@@ -9,7 +9,7 @@ const requestFor = (body) => new Request("https://api.example.test/auth/login", 
 });
 const validUser = {
   id: "user-1", email: "person@example.com", display_name: "Person",
-  password_salt: "salt", password_hash: "hash-ok", verified_at: "2026-01-01",
+  password_salt: "salt", password_hash: "a".repeat(64), verified_at: "2026-01-01",
   xp: 10, games_played: 2, role: "user"
 };
 function harness({ user = validUser, rateAllowed = true, dbFailure = false, verificationRequired = false } = {}) {
@@ -35,12 +35,12 @@ function harness({ user = validUser, rateAllowed = true, dbFailure = false, veri
     helpers: {
       cleanEmail: value => String(value || "").trim().toLowerCase(),
       hitAuthLimit: async () => rateAllowed,
-          createSession: async () => ({ token: "session-token", expiresAt: 123456789 }),
+      createSession: async () => ({ token: "session-token", expiresAt: 123456789 }),
       publicProfile: () => ({ accountType: "personal" })
     }
   };
 }
-async function invoke(options, body = { email: "person@example.com", passwordHash: "hash-ok" }) {
+async function invoke(options, body = { email: "person@example.com", passwordHash: "a".repeat(64) }) {
   const config = harness(options);
   const response = await handlePasswordLogin({
     request: requestFor(body), env: config.env, db: config.db,
@@ -69,14 +69,14 @@ test("login succeeds and returns a session", async () => {
 });
 
 test("wrong password returns 401", async () => {
-  const { response, data } = await invoke({}, { email: "person@example.com", passwordHash: "hash-bad" });
+  const { response, data } = await invoke({}, { email: "person@example.com", passwordHash: "b".repeat(64) });
   assert.equal(response.status, 401);
   assert.equal(data.code, "INVALID_CREDENTIALS");
 });
 
 test("unknown email has the same generic response as a wrong password", async () => {
   const unknown = await invoke({ user: null });
-  const wrong = await invoke({}, { email: "person@example.com", password: "wrong-password" });
+  const wrong = await invoke({}, { email: "person@example.com", passwordHash: "b".repeat(64) });
   assert.equal(unknown.response.status, wrong.response.status);
   assert.equal(unknown.data.code, wrong.data.code);
   assert.equal(unknown.data.message, wrong.data.message);
