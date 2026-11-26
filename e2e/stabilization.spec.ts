@@ -58,6 +58,25 @@ for (const language of ["fa", "en"] as const) {
           await expect(page.locator(".nf-mobile-dock")).toBeVisible();
         }
 
+        if (accountType === "business") {
+          await nav.nth(1).click();
+          await expect(page.locator(".nvbd-sales-tabs")).toBeVisible();
+          await page.getByRole("button", { name: language === "fa" ? "پیش‌فاکتورها" : "Quotes" }).click();
+          await expect(page.locator(".nvbd-sales-tabs")).toBeVisible();
+          await page.getByRole("button", { name: language === "fa" ? "مشتریان" : "Customers" }).click();
+          await expect(page.locator(".nvbd-sales-tabs")).toBeVisible();
+          await nav.nth(3).click();
+          await expect(page.locator(".nvr-root")).toBeVisible();
+          await page.locator(".nvr-export").click();
+          await nav.nth(4).click();
+          await expect(page.locator(".nbo-more-menu")).toBeVisible();
+        } else {
+          await nav.nth(3).click();
+          await expect(page.locator(".nf-metrics")).toBeVisible();
+          await nav.nth(4).click();
+          await expect(page.locator(".nf-more-panel")).toBeVisible();
+        }
+
         const quick = page.locator(".nv-ref-dock-center");
         await quick.click();
         if (accountType === "business") {
