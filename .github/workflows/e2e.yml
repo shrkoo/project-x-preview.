@@ -30,6 +30,8 @@ jobs:
         run: npm run build
       - name: TypeScript typecheck
         run: npm run typecheck
+      - name: Run auth API tests
+        run: npm run test:auth-login
       - name: Run money unit tests
         run: npm run test:money
       - name: Run money formatting guard
