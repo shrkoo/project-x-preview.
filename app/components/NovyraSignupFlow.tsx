@@ -45,18 +45,31 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
  const localizedCurrency=(code:string)=>{try{return new Intl.DisplayNames([locale],{type:"currency"}).of(code)||code}catch{return code}};
  const currencyList=useMemo(()=>Array.from(new Set([...currencies.map(c=>c.code),...currenciesFallback])).sort(),[]);
  async function checkEmailExists(){
-  // Email availability is checked atomically by /auth/register.
-  // The old /auth/email-check endpoint is not implemented by the Preview Worker.
+  const email=values.email.trim().toLowerCase();
+  if(!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return false;
+  try{
+    const result=await apiRequest<{exists:boolean; salt?:string}>("/auth/password-salt?email="+encodeURIComponent(email),{method:"GET"});
+    setEmailAccountType(result.exists?"password":null);
+    return result.exists;
+  }catch(e){
+    setNotice(e instanceof Error?e.message:t("error"));
+    return null;
+  }
  }
  async function forgotPassword(){
   setBusy(true);try{await apiRequest("/auth/forgot-password",{method:"POST",body:JSON.stringify({email:values.email.trim().toLowerCase()})});setNotice(t("forgotSent"));}catch(e){setNotice(e instanceof Error?e.message:t("error"));}finally{setBusy(false);}
  }
  async function submitDetails(){
   setNotice("");
-  if(emailAccountType){setNotice(t("accountExists"));return;}
   if(!captchaToken){setNotice(t("captchaAgain"));return;}
-  setEmailContinueChecked(true);
-  setStep(2);
+  setBusy(true);
+  try{
+    const exists=await checkEmailExists();
+    if(exists){setNotice(t("accountExists"));return;}
+    if(exists===null)return;
+    setEmailContinueChecked(true);
+    setStep(2);
+  }finally{setBusy(false);}
  }
  async function setupBiometric(){try{if(!window.PublicKeyCredential||!navigator.credentials?.create)throw new Error("Biometric authentication is unavailable on this device.");const credential=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:"Novyra",id:location.hostname},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:values.email,displayName:values.firstName+" "+values.lastName},pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},timeout:60000,attestation:"none"}});if(!credential)throw new Error("Biometric setup was cancelled.");setPin((credential as PublicKeyCredential).id);setLock("biometric");setNotice("");}catch(e){setNotice(e instanceof Error?e.message:"Biometric setup failed.");}}
  async function finish(){if(busy)return;setNotice("");if(lock==="pin"&&(pin.length<6||pin!==pinConfirm)){setNotice(pin!==pinConfirm?t("pinMismatch"):t("pinEnter"));return;}if(lock==="pattern"&&(pattern.split("-").length<4||pattern!==patternConfirm)){setNotice(pattern!==patternConfirm?t("patternMismatch"):t("patternDraw"));return;}if(mode==="business"&&!company.trim()){setNotice(t("companyRequired"));return;}setBusy(true);const email=values.email.trim().toLowerCase();let timer=0;const controller=new AbortController();timer=window.setTimeout(()=>controller.abort(),25000);
@@ -96,7 +109,7 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
     {step===6&&<div className="nv-step"><p className="nv-muted">{t("resetPasswordTitle")}</p><Input label={t("password")}><input type="password" autoComplete="new-password" value={resetPassword} onChange={e=>setResetPassword(e.target.value)}/></Input><Input label={t("confirm")}><input type="password" autoComplete="new-password" value={resetConfirm} onChange={e=>setResetConfirm(e.target.value)}/></Input><Button disabled={busy} onClick={submitPasswordReset}>{busy?"…":t("resetPassword")}</Button></div>}
     {step===5&&<div className="nv-step"><p className="nv-muted">{t("verificationSent")}</p><Input label={t("verificationCode")}><input value={verificationCode} onChange={e=>setVerificationCode(e.target.value.replace(/\\D/g,"").slice(0,6))} inputMode="numeric" autoComplete="one-time-code" dir="ltr" maxLength={6}/></Input><Button disabled={busy||verificationCode.length!==6} onClick={verifySignupCode}>{busy?"…":t("verifyCode")}</Button><button type="button" className="nv-skip" disabled={busy||resendSeconds>0} onClick={resendSignupCode}>{resendSeconds>0?`${t("resendCode")} (${new Intl.NumberFormat(locale).format(resendSeconds)}s)`:t("resendCode")}</button></div>}
     {step===2&&<div className="nv-step"><p className="nv-muted">{t("step2Title")}</p><div className="nv-lock-grid">{([{id:"none",icon:<ShieldCheck/>,label:t("noLock")},{id:"pin",icon:<LockKeyhole/>,label:t("pin")},{id:"pattern",icon:<Wallet/>,label:t("pattern")},{id:"biometric",icon:<Fingerprint/>,label:t("biometric")}] as const).map(item=><button type="button" key={item.id} className={lock===item.id?"selected":""} onClick={()=>{setLock(item.id);setLockPhase("create");setPin("");setPinConfirm("");setPattern("");setPatternConfirm("");}}>{item.icon}<span>{item.label}</span></button>)}</div>
-     {lock==="pin"&&<><p className="nv-muted">{lockPhase==="create"?t("pinEnter"):t("pinConfirm")}</p><PinPad value={lockPhase==="create"?pin:pinConfirm} onChange={v=>lockPhase==="create"?setPin(v):setPinConfirm(v)}/><Button variant="secondary" onClick={()=>setLockPhase(lockPhase==="create"?"confirm":"create")}>{lockPhase==="create"?t("continue"):t("back")}</Button></>}
+     {lock==="pin"&&<><p className="nv-muted">{lockPhase==="create"?t("pinEnter"):t("pinConfirm")}</p><div className="nv-pin-progress" aria-live="polite">{Array.from({length:6},(_,i)=><span key={i} className={(lockPhase==="create"?pin:pinConfirm).length>i?"filled":""}/>)}</div><PinPad value={lockPhase==="create"?pin:pinConfirm} onChange={v=>lockPhase==="create"?setPin(v.slice(0,6)):setPinConfirm(v.slice(0,6))}/>{lockPhase==="create"?<Button variant="secondary" disabled={pin.length!==6} onClick={()=>{setPinConfirm("");setLockPhase("confirm");}}>{t("continue")}</Button>:<><Button variant="secondary" disabled={pinConfirm.length!==6} onClick={()=>{if(pin!==pinConfirm){setNotice(t("pinMismatch"));setPinConfirm("");return;}setNotice("");setStep(3);}}>{t("continue")}</Button><button type="button" className="nv-skip" onClick={()=>{setPinConfirm("");setLockPhase("create");}}>{t("back")}</button></>}</>}
      {lock==="pattern"&&<><p className="nv-muted">{lockPhase==="create"?t("patternDraw"):t("patternConfirm")}</p><PatternLock value={lockPhase==="create"?pattern:patternConfirm} onChange={v=>lockPhase==="create"?setPattern(v):setPatternConfirm(v)}/><Button variant="secondary" onClick={()=>setLockPhase(lockPhase==="create"?"confirm":"create")}>{lockPhase==="create"?t("continue"):t("back")}</Button></>}
      {lock==="biometric"&&<Button variant="secondary" onClick={setupBiometric}><Fingerprint size={18}/>{t("biometric")}</Button>}
      <Button onClick={()=>{if(lock==="pin"&&(pin.length<6||pin!==pinConfirm)){setNotice(pin!==pinConfirm?t("pinMismatch"):t("pinEnter"));return;}if(lock==="pattern"&&(pattern.split("-").length<4||pattern!==patternConfirm)){setNotice(pattern!==patternConfirm?t("patternMismatch"):t("patternDraw"));return;}if(lock==="biometric"&&!pin){setNotice("Set up biometrics on your device first.");return;}setNotice("");setStep(3);}}>{t("continue")} <NextIcon size={17}/></Button><button className="nv-skip" onClick={()=>{setLock("none");setStep(3);}}>{t("skip")}</button></div>}
