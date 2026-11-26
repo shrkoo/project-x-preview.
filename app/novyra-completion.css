@@ -39,3 +39,23 @@
  .nv-finance,.nv-finance .nf-shell,.nv-finance .nf-main{padding:0!important;background:#fff!important;max-width:none!important}
  .nv-finance .nf-panel,.nv-finance .nf-metrics article{break-inside:avoid!important;box-shadow:none!important}
 }
+
+
+/* NOVYRA stabilization pass */
+.nv-brand-mark{width:36px;height:36px;min-width:36px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.95);border-radius:12px;background:rgba(255,255,255,.78);box-shadow:0 5px 16px rgba(47,128,237,.12);color:#2F80ED;font:800 23px Inter,Vazirmatn,Arial,sans-serif;letter-spacing:0}
+.nvbd-metric{appearance:none!important;-webkit-appearance:none!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:space-between!important;gap:12px!important;width:100%!important;min-width:0!important;min-height:92px!important;padding:14px!important;border:1px solid rgba(255,255,255,.86)!important;border-radius:18px!important;background:rgba(255,255,255,.78)!important;color:#29465f!important;text-align:start!important;font:inherit!important;cursor:pointer!important}
+.nvbd-metric:focus-visible,.nbo-search-result:focus-visible{outline:2px solid #2F80ED!important;outline-offset:3px!important}
+.nvbd-attention{margin:14px 0 18px;padding:15px;border:1px solid rgba(255,255,255,.9);border-radius:20px;background:rgba(255,255,255,.74);box-shadow:0 7px 22px rgba(48,91,132,.06)}
+.nvbd-attention h3{margin:0 0 10px;font-size:14px;font-weight:700;color:#29465f}
+.nvbd-attention p{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:10px 0;border-bottom:1px solid #e7f0f7;font-size:12px}
+.nvbd-attention p:last-of-type{border-bottom:0}
+.nvbd-attention p span{font-size:11px;color:#668098;white-space:nowrap}
+.nbo-search-result{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;width:100%!important;min-height:48px!important;padding:10px 12px!important;border:1px solid #e3edf6!important;border-radius:13px!important;background:rgba(255,255,255,.82)!important;color:#29465f!important;text-align:start!important}
+.nbo-overlay{position:fixed!important;inset:0!important;z-index:1200!important;display:grid!important;place-items:center!important;padding:18px!important;background:rgba(15,35,55,.34)!important;backdrop-filter:blur(8px)!important}
+.nbo-record-detail{width:min(100%,520px)!important;max-height:82dvh!important;overflow:auto!important;background:#fff!important;border-radius:22px!important;padding:18px!important;box-shadow:0 18px 60px rgba(20,50,80,.2)!important}
+.nf-quick-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.nf-quick-choices button{display:flex;min-width:0;min-height:76px;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:10px 6px;border:1px solid rgba(255,255,255,.95);border-radius:17px;background:rgba(255,255,255,.86);color:#2F80ED;font-size:12px;font-weight:700;white-space:normal}
+.nf-more-panel{display:grid;gap:9px}
+.nf-more-panel h2{margin:0 0 5px}
+.nf-more-panel button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:48px;padding:10px 13px;border:1px solid rgba(255,255,255,.9);border-radius:14px;background:rgba(255,255,255,.76);color:#2F80ED;text-align:start}
+@media(max-width:380px){.nf-quick-choices{gap:7px}.nf-quick-choices button{font-size:11px;padding-inline:4px}.nvbd-metric{min-height:84px;padding:11px!important}}
