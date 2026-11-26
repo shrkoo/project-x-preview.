@@ -144,10 +144,10 @@ export default function Home() {
       if ((type === "pin" || type === "pattern") && owner === account.id && localStorage.getItem("projectx-app-lock-configured") === "1") setLocked(true);
     };
     const onVisibility = () => {
-      if (document.visibilityState === "hidden") hiddenAt = Date.now();
-      else if (hiddenAt && Date.now() - hiddenAt >= delay()) lockIfConfigured();
+      if (document.visibilityState === "hidden") { hiddenAt = Date.now(); document.documentElement.classList.add("novyra-app-obscured"); if (delay() === 0) lockIfConfigured(); }
+      else if (hiddenAt) { if (Date.now() - hiddenAt >= delay()) lockIfConfigured(); else document.documentElement.classList.remove("novyra-app-obscured"); }
     };
-    const onPageHide = () => { hiddenAt = Date.now(); };
+    const onPageHide = () => { hiddenAt = Date.now(); document.documentElement.classList.add("novyra-app-obscured"); if (delay() === 0) lockIfConfigured(); };
     const onPageShow = () => { if (hiddenAt && Date.now() - hiddenAt >= delay()) lockIfConfigured(); };
     document.addEventListener("visibilitychange", onVisibility);
     window.addEventListener("pagehide", onPageHide);
@@ -168,7 +168,7 @@ export default function Home() {
     setNotice("");
   }
 
-  if (locked) return <AppLockScreen email={account?.email||""} name={account?.displayName||""} language={language} onUnlock={()=>setLocked(false)} onLogout={logoutComplete}/>;
+  if (locked) return <AppLockScreen email={account?.email||""} name={account?.displayName||""} language={language} onUnlock={()=>{setLocked(false);document.documentElement.classList.remove("novyra-app-obscured");}} onLogout={logoutComplete}/>;
 
   if (!startupReady) return <main className="social-startup" aria-label="NOVYRA"><span className="social-startup-mark">N</span><span>NOVYRA</span></main>;
 
