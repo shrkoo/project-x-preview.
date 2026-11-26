@@ -178,6 +178,8 @@ export default function Home() {
 
   function logoutComplete() {
     clearSession();
+    ["projectx-app-lock-type","projectx-app-lock-hash","projectx-app-lock-user","projectx-app-lock-credential","projectx-app-lock-biometric","projectx-app-lock-pin-length","novyra-lock-failures","novyra-lock-until"].forEach(key => localStorage.removeItem(key));
+    setLocked(false);
     setAccount(null);
     setNotice("");
   }
