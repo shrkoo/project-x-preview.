@@ -874,7 +874,7 @@ export default {
       const token=randomToken(32),tokenHash=await digest(token),id=crypto.randomUUID(),expires=Date.now()+7*86400000;
       await db.prepare("UPDATE business_invitations SET revoked_at=CURRENT_TIMESTAMP WHERE workspace_id=? AND email=? AND accepted_at IS NULL AND revoked_at IS NULL").bind(workspaceId,email).run();
       await db.prepare("INSERT INTO business_invitations (id,workspace_id,email,role,invited_by,token_hash,expires_at) VALUES (?,?,?,?,?,?,?)").bind(id,workspaceId,email,role,user.id,tokenHash,expires).run();
-      const inviteUrl=(env.APP_URL||"https://novyra.pages.dev")+"/business/invite?token="+encodeURIComponent(token);
+      const inviteUrl=(env.APP_URL||"https://novyra.pages.dev")+"/business/invite/?token="+encodeURIComponent(token);
       let emailSent=false;
       if(hasMailProvider(env)) {
         try {
