@@ -347,8 +347,34 @@ export default {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, "") || "/";
   const db = env.DB;
+  const requestId = crypto.randomUUID();
   try {
-   if (path === "/health" && request.method === "GET") return json({ ok: true, service: "novyra-api", database: "connected", region: "EU" });
+   if ((path === "/api/health" || path === "/health") && request.method === "GET") {
+    const requiredTables = ["users","sessions","auth_rate_limits","signup_verification_codes"];
+    const bindings = { DB: Boolean(env.DB), ROOM_HUB: Boolean(env.ROOM_HUB), STORY_MEDIA: Boolean(env.STORY_MEDIA), AI: Boolean(env.AI) };
+    const secrets = {
+      GOOGLE_CLIENT_ID: Boolean(env.GOOGLE_CLIENT_ID),
+      GOOGLE_CLIENT_SECRET: Boolean(env.GOOGLE_CLIENT_SECRET),
+      TURNSTILE_SECRET_KEY: Boolean(env.TURNSTILE_SECRET_KEY),
+      RESEND_API_KEY: Boolean(env.RESEND_API_KEY),
+      EMAIL_BRIDGE_URL: Boolean(env.EMAIL_BRIDGE_URL),
+      EMAIL_BRIDGE_SECRET: Boolean(env.EMAIL_BRIDGE_SECRET),
+      SESSION_SECRET: Boolean(env.SESSION_SECRET),
+      JWT_SECRET: Boolean(env.JWT_SECRET)
+    };
+    let tables = Object.fromEntries(requiredTables.map(name => [name, false]));
+    let databaseOk = false;
+    if (env.DB) {
+      try {
+        const rows = await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name IN (?,?,?,?)").bind(...requiredTables).all();
+        for (const row of rows.results || []) tables[row.name] = true;
+        databaseOk = requiredTables.every(name => tables[name]);
+      } catch (error) {
+        console.error("novyra-health-d1-check", { requestId, errorName: String(error?.name || "Error"), message: String(error?.message || "D1 check failed").slice(0,180) });
+      }
+    }
+    return json({ ok: Boolean(env.DB) && databaseOk, service: "novyra-api", requestId, bindings, secrets, tables, databaseOk });
+   }
    if(path==="/auth/email-check" && request.method==="POST"){
     const body=await readBody(request),email=cleanEmail(body?.email);
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return fail("Enter a valid email.");
@@ -622,16 +648,38 @@ export default {
     return json({ok:true,message:"رمز عبور تغییر کرد؛ دوباره وارد شو."});
    }
    if (path === "/auth/login" && request.method === "POST") {
-    const ip=request.headers.get("CF-Connecting-IP")||"unknown";if(!await hitAuthLimit(db,"login:"+ip,12,900000))return fail("Too many login attempts. Try again later.",429);
-    const body=await readBody(request),email=cleanEmail(body?.email),password=String(body?.password||"");
-    const user=await db.prepare("SELECT * FROM users WHERE email=?").bind(email).first();
-    if(!user)return fail("Email or password is incorrect.",401);
-    if(env.REQUIRE_EMAIL_VERIFICATION==="true"&&!user.verified_at)return fail("Verify your email before logging in.",403);
-    if(password.length<1||password.length>1024)return fail("Email or password is incorrect.",401);
-    const suppliedHash=await passwordHash(password,user.password_salt);
-    if(suppliedHash!==user.password_hash)return fail("Email or password is incorrect.",401);
-    const session=await createSession(db,user.id);
-    return json({token:session.token,expiresAt:session.expiresAt,user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role,profile:publicProfile(user)}});
+    let stage = "validate";
+    try {
+      if (!db) throw new Error("missing_D1_binding_DB");
+      const body = await readBody(request);
+      const email = cleanEmail(body?.email);
+      const password = String(body?.password || "");
+      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || password.length < 1 || password.length > 1024) {
+        return json({ code: "INVALID_INPUT", message: "Enter a valid email and password.", requestId }, 400);
+      }
+      stage = "rate-limit";
+      const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+      if (!await hitAuthLimit(db, "login:" + ip, 12, 900000)) {
+        return json({ code: "RATE_LIMITED", message: "Too many login attempts. Try again later.", requestId, retryAfterSeconds: 900 }, 429);
+      }
+      stage = "user-lookup";
+      const user = await db.prepare("SELECT * FROM users WHERE email=?").bind(email).first();
+      // Deliberately identical response for an unknown account and a wrong password.
+      if (!user) return json({ code: "INVALID_CREDENTIALS", message: "Email or password is incorrect.", requestId }, 401);
+      if (env.REQUIRE_EMAIL_VERIFICATION === "true" && !user.verified_at) {
+        return json({ code: "EMAIL_NOT_VERIFIED", message: "Verify your email before logging in.", requestId }, 403);
+      }
+      stage = "password-derive";
+      if (!user.password_salt || !user.password_hash) return json({ code: "INVALID_CREDENTIALS", message: "Email or password is incorrect.", requestId }, 401);
+      const suppliedHash = await passwordHash(password, user.password_salt);
+      if (suppliedHash !== user.password_hash) return json({ code: "INVALID_CREDENTIALS", message: "Email or password is incorrect.", requestId }, 401);
+      stage = "session-create";
+      const session = await createSession(db, user.id);
+      return json({ token: session.token, expiresAt: session.expiresAt, user: { id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role,profile:publicProfile(user) } });
+    } catch (error) {
+      console.error("novyra-auth-login-error", { requestId, route: path, stage, errorName: String(error?.name || "Error"), message: String(error?.message || "Unknown login failure").slice(0, 180) });
+      return json({ code: "INTERNAL_ERROR", message: "A server error occurred. Please try again.", requestId }, 500);
+    }
    }
 
    const wsMatch=path.match(/^\/rooms\/([A-Z0-9]+)\/live$/);
@@ -1702,12 +1750,12 @@ if(path==="/finance/transactions" && request.method==="GET") {
    }
    return fail("مسیر API پیدا نشد.",404);
   } catch (error) {
-   console.error("novyra-api-error",path,error);
+   console.error("novyra-api-error", { requestId, route: path, errorName: String(error?.name || "Error"), message: String(error?.message || "Unknown API failure").slice(0,180) });
    if(path==="/auth/forgot-password") {
     const code=String(error?.message||"unknown_error").replace(/[^a-zA-Z0-9_-]/g,"_").slice(0,80);
     return fail("ارسال ایمیل بازیابی ناموفق بود. کد خطا: "+code,502);
    }
-   return fail("خطای داخلی سرور. دوباره تلاش کن.",500);
+   return json({ code: "INTERNAL_ERROR", message: "خطای داخلی سرور. دوباره تلاش کن.", requestId }, 500);
   }
  }
 };
