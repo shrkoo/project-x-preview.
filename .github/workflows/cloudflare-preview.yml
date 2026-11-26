@@ -89,6 +89,19 @@ jobs:
           test "$options_status" = "204" -o "$options_status" = "200"
           echo "Preview API D1 schema health and auth CORS preflight checks passed."
 
+      - name: Smoke-test preview password login
+        env:
+          PREVIEW_WORKER_URL: https://novyra-preview-api.projectx-novyratam.workers.dev
+        run: |
+          set -euo pipefail
+          status="$(curl --silent --show-error --output /tmp/login-response.json --write-out '%{http_code}' \
+            --request POST "$PREVIEW_WORKER_URL/auth/login" \
+            --header 'Content-Type: application/json' \
+            --data '{"email":"novyra-preview-smoke-nobody@example.invalid","passwordHash":"pbkdf2$100000$0123456789abcdef0123456789abcdef$aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}')"
+          test "$status" = "401"
+          node -e 'const d=require("/tmp/login-response.json");if(d.code!=="INVALID_CREDENTIALS"||!d.requestId||d.message!=="Email or password is incorrect.")process.exit(1)'
+          echo "Preview password-login route returned the expected generic 401 response."
+
       - name: Build static frontend for preview API
         run: npm run build
         env:
