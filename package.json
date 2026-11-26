@@ -14,7 +14,8 @@
     "test:business-preview": "node scripts/check-business-preview.mjs",
     "test:auth-login": "node --test workers/api/tests/auth-login.test.mjs",
     "test:e2e": "playwright test",
-    "serve:e2e": "node scripts/serve-static.mjs"
+    "serve:e2e": "node scripts/serve-static.mjs",
+    "test:money": "node --experimental-strip-types scripts/check-money.mjs"
   },
   "dependencies": {
     "next": "15.5.28",
