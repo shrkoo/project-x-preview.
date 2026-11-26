@@ -1,6 +1,7 @@
 import { countryCodes, currencyCodes, calendarCodes, languageCodes, numberFormatCodes, numberSystemCodes } from "./data/catalog-validation.js";
 import { mergeBusinessRecordPayload } from "./business-sync.js";
 import { handlePasswordLogin } from "./auth-login.mjs";
+import { isNewPasswordHash, parsePasswordHash, verifyPassword } from "./auth-password.mjs";
 import { generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions, verifyAuthenticationResponse } from "@simplewebauthn/server";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,11 +20,7 @@ const digest = async value => {
   const out = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   return Array.from(new Uint8Array(out), b => b.toString(16).padStart(2, "0")).join("");
 };
-const passwordHash = async (password, salt) => {
-  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: new TextEncoder().encode(salt), iterations: 210000, hash: "SHA-256" }, key, 256);
-  return Array.from(new Uint8Array(bits), b => b.toString(16).padStart(2, "0")).join("");
-};
+
 
 async function sendMail(env,to,subject,html) {
  if(String(env.EMAIL_BRIDGE_URL||"").trim() && String(env.EMAIL_BRIDGE_SECRET||"").trim()) {
@@ -483,8 +480,9 @@ export default {
     // Unknown addresses receive a fixed dummy salt and still get the same login response.
     const email=cleanEmail(url.searchParams.get("email"));
     if(!/^\S+@\S+\.\S+$/.test(email)) return fail("Enter a valid email address.",400);
-    const account=await db.prepare("SELECT password_salt FROM users WHERE email=? LIMIT 1").bind(email).first();
-    return json({salt:String(account?.password_salt||"00000000000000000000000000000000")});
+    const account=await db.prepare("SELECT password_hash,password_salt FROM users WHERE email=? LIMIT 1").bind(email).first();
+    const encoded=parsePasswordHash(account?.password_hash);
+    return json({salt:String(encoded?.salt||account?.password_salt||"00000000000000000000000000000000")});
    }
 
    if(path==="/auth/webauthn/register/options" && request.method==="POST") {
@@ -582,8 +580,8 @@ export default {
     const suppliedHash=String(body?.passwordHash ?? body?.password_hash ?? body?.hash ?? "");
     if (!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
     if (displayName.length < 2) return fail("نام نمایشی باید حداقل ۲ حرف باشد.");
-    if (!salt || salt.length < 16 || salt.length > 128) return fail("داده امنیتی نمک رمز از صفحه دریافت نشد؛ صفحه را تازه‌سازی کن.");
-    if (!/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("خروجی رمز عبور از صفحه ناقص است؛ صفحه را تازه‌سازی کن.");
+    if (!/^[a-f0-9]{32}$/i.test(salt)) return fail("داده امنیتی نمک رمز از صفحه دریافت نشد؛ صفحه را تازه‌سازی کن.");
+    if (!isNewPasswordHash(suppliedHash, salt)) return fail("خروجی رمز عبور از صفحه ناقص است؛ صفحه را تازه‌سازی کن.");
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     if(!await hitAuthLimit(db,"register:"+ip,5,3600000))return fail("Too many registration attempts. Try again later.",429);
     if(!await verifyTurnstile(body?.turnstileToken,request,env))return fail("Complete the security check.",403);
@@ -661,7 +659,7 @@ export default {
    }
    if (path === "/auth/reset-password" && request.method === "POST") {
     const body=await readBody(request), token=String(body?.token||""), salt=String(body?.salt||""), suppliedHash=String(body?.passwordHash||"");
-    if(!/^(?:[A-Za-z0-9_-]{22}|[a-f0-9]{32})$/.test(salt) || !/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("اطلاعات رمز جدید معتبر نیست.");
+    if(!/^[a-f0-9]{32}$/i.test(salt) || !isNewPasswordHash(suppliedHash, salt)) return fail("اطلاعات رمز جدید معتبر نیست.");
     const tokenHash=await digest(token);
     const record=await db.prepare("SELECT id,user_id FROM email_tokens WHERE token_hash=? AND kind='reset' AND expires_at>? AND used_at IS NULL").bind(tokenHash,Date.now()).first();
     if(!record) return fail("لینک بازیابی معتبر نیست یا منقضی شده است.",410);
@@ -675,7 +673,7 @@ export default {
    if (path === "/auth/login" && request.method === "POST") {
     return handlePasswordLogin({
       request, env, db, requestId,
-      helpers: { cleanEmail, hitAuthLimit, passwordHash, createSession, publicProfile }
+      helpers: { cleanEmail, hitAuthLimit, createSession, publicProfile }
     });
    }
 
@@ -792,7 +790,7 @@ export default {
     if (!user) return fail("برای ادامه وارد حساب شو.",401);
     if (path === "/auth/set-password" && request.method === "POST") {
       const body=await readBody(request), salt=String(body?.salt||""), suppliedHash=String(body?.passwordHash||"");
-      if(!/^(?:[A-Za-z0-9_-]{22}|[a-f0-9]{32})$/.test(salt) || !/^[a-f0-9]{64}$/i.test(suppliedHash)) return fail("اطلاعات رمز عبور معتبر نیست.");
+      if(!/^[a-f0-9]{32}$/i.test(salt) || !isNewPasswordHash(suppliedHash, salt)) return fail("اطلاعات رمز عبور معتبر نیست.");
       await db.prepare("UPDATE users SET password_hash=?,password_salt=? WHERE id=?").bind(suppliedHash,salt,user.id).run();
       return json({ok:true,message:"رمز عبور با موفقیت تنظیم شد."});
     }
@@ -849,8 +847,9 @@ export default {
     if(String(body.confirmation||"")!=="DELETE") return fail("Type DELETE to confirm account deletion.");
     const password=String(body.password||"");
     if(!password || password.length>1024) return fail("Enter your account password.",401);
-    const supplied=await passwordHash(password,String(user.password_salt||""));
-    if(supplied!==String(user.password_hash||"")) return fail("The account password is incorrect.",401);
+    const passwordCheck=await verifyPassword(password,user.password_hash,user.password_salt);
+    if(passwordCheck.needsReset) return json({code:"NEEDS_RESET",message:"Reset your password before deleting this legacy account.",requestId});
+    if(!passwordCheck.ok) return json({code:"INVALID_CREDENTIALS",message:"The account password is incorrect.",requestId},401);
     const tables=await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all();
     const statements=[];
     for(const entry of tables.results||[]) {
