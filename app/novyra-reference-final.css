@@ -4371,3 +4371,5 @@ main.nv-finance button.nf-brand{width:48px!important;min-width:48px!important;mi
 
 
 .nv-personal-v1 .nf-topbar>.nf-brand,.nv-personal-v1 .nf-topbar .profile-btn{width:48px!important;min-width:48px!important;height:48px!important;min-height:48px!important}
+\n
+.nv-personal-v1 .nv-p-empty button.nv-p-secondary{background:rgba(255,255,255,.9)!important;border:1px solid #cfe3f5!important;color:#2f80ed!important;box-shadow:none!important}
