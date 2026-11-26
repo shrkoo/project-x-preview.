@@ -4295,3 +4295,19 @@ main.nv-finance button.nf-brand{width:48px!important;min-width:48px!important;mi
 .nvbd-chart-empty button{min-height:42px!important;padding:0 14px!important;border:1px solid #cfe2f5!important;border-radius:13px!important;background:#fff!important;color:#2878d0!important;font-weight:700!important}
 .nvbd-toast{bottom:calc(88px + env(safe-area-inset-bottom))!important}
 @media(min-width:760px){.nvbd-root{max-width:900px!important;margin:0 auto!important;padding:20px 24px 40px!important}}
+
+
+.nv-business-workspace .nf-topbar{display:grid!important;grid-template-columns:48px minmax(0,1fr) 48px!important;align-items:center!important;gap:10px!important}
+.nv-business-workspace .nf-topbar>.nf-brand{grid-column:1!important;width:42px!important;height:42px!important;min-width:42px!important;
+ display:grid!important;place-items:center!important;border:1px solid rgba(255,255,255,.9)!important;border-radius:15px!important;
+ background:rgba(255,255,255,.78)!important;box-shadow:0 5px 16px rgba(50,100,150,.1)!important;backdrop-filter:blur(18px)!important}
+.nv-business-workspace .nf-topbar>.nf-business-workspace-label{grid-column:2!important;justify-self:center!important;
+ background:rgba(255,255,255,.72)!important;border:1px solid rgba(255,255,255,.9)!important;color:#42617f!important;
+ padding:7px 15px!important;border-radius:999px!important;white-space:nowrap!important}
+.nv-business-workspace .nf-topbar>.nf-top-right{grid-column:3!important;justify-self:end!important}
+.nv-business-workspace .nf-topbar .profile-btn{width:42px!important;min-width:42px!important;height:42px!important;padding:0!important;
+ display:grid!important;place-items:center!important;border:1px solid rgba(255,255,255,.9)!important;border-radius:15px!important;
+ background:rgba(255,255,255,.78)!important;box-shadow:0 5px 16px rgba(50,100,150,.1)!important}
+.nv-business-workspace .nf-topbar .profile-btn span{display:none!important}
+.nv-business-workspace .nf-topbar .nf-brand .nv-brand-mark{display:grid!important;place-items:center!important;width:30px!important;height:30px!important;
+ border-radius:10px!important;background:linear-gradient(145deg,#fff,#eaf4ff)!important;color:#2878d0!important;font-weight:900!important}
