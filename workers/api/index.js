@@ -478,8 +478,12 @@ export default {
    }
 
    if (path === "/auth/password-salt" && request.method === "GET") {
-    // Legacy compatibility only: never reveal whether an address is registered.
-    return json({salt:"AAAAAAAAAAAAAAAAAAAAAA",exists:false});
+    // Return the account's PBKDF2 salt without disclosing account existence.
+    // Unknown addresses receive a fixed dummy salt and still get the same login response.
+    const email=cleanEmail(url.searchParams.get("email"));
+    if(!/^\\S+@\\S+\\.\\S+$/.test(email)) return fail("Enter a valid email address.",400);
+    const account=await db.prepare("SELECT password_salt FROM users WHERE email=? LIMIT 1").bind(email).first();
+    return json({salt:String(account?.password_salt||"00000000000000000000000000000000")});
    }
 
    if(path==="/auth/webauthn/register/options" && request.method==="POST") {
