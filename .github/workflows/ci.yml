@@ -33,6 +33,10 @@ jobs:
         shell: bash
         run: set -o pipefail; npm run test:auth-translations 2>&1 | tee -a ci-build.log
 
+      - name: Test password login API
+        shell: bash
+        run: set -o pipefail; npm run test:auth-login 2>&1 | tee -a ci-build.log
+
       - name: Check regional formatters
         shell: bash
         run: set -o pipefail; npm run test:regional-preferences 2>&1 | tee -a ci-build.log
