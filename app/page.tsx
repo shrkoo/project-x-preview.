@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import NovyraSignupFlow from "./components/NovyraSignupFlow";
 import NovyraLuxuryApp from "./components/NovyraLuxuryApp";
+import { PatternLock } from "./components/novyra/PatternLock";
 import { apiRequest, clearSession, derivePasswordHash } from "./lib/api";
 import { languages, languageByCode } from "./data/languages";
 
@@ -143,7 +144,7 @@ export default function Home() {
         if (!credential || (credential as PublicKeyCredential).id !== encoded) throw new Error("Biometric verification failed.");
       }
       setLocked(false);setLockInput("");setLockError("");
-    } catch (error) { setLockError(error instanceof Error ? error.message : "Unlock failed."); }
+    } catch (error) { const message=error instanceof Error?error.message:"Unlock failed."; setLockError(language==="fa"?(message==="Incorrect app lock."?"الگو یا رمز اشتباه است.":message):message); }
   }
 
   function logoutComplete() {
@@ -156,7 +157,7 @@ export default function Home() {
     <section className="px-onboarding-stage"><div className="px-glass-panel px-auth-panel">
       <div className="px-auth-emblem">🔒</div><h1>{lockText.title}</h1>
       <p className="px-stage-subtitle">{lockText.description}</p>
-      {(localStorage.getItem("projectx-app-lock-type")==="pin"||localStorage.getItem("projectx-app-lock-type")==="pattern")&&<input type="password" autoComplete="off" value={lockInput} onChange={e=>setLockInput(e.target.value)} placeholder={lockText.placeholder} />}
+      {localStorage.getItem("projectx-app-lock-type")==="pin"&&<input type="password" inputMode="numeric" autoComplete="off" value={lockInput} onChange={e=>setLockInput(e.target.value.replace(/\\D/g,"").slice(0,6))} placeholder={language==="fa"?"رمز ۶ رقمی":language==="en"?"6-digit PIN":lockText.placeholder} />}\n      {localStorage.getItem("projectx-app-lock-type")==="pattern"&&<><p className="px-stage-subtitle">{language==="fa"?"الگوی انتخاب‌شده را روی ۹ نقطه رسم کنید.":"Draw your saved pattern on the 9 dots."}</p><PatternLock value={lockInput} onChange={setLockInput}/></> }
       {lockError&&<p role="alert">{lockError}</p>}
       <button className="px-primary-action" onClick={unlockApp}>{localStorage.getItem("projectx-app-lock-type")==="biometric"?lockText.verify:lockText.unlock}</button>
     </div></section>
