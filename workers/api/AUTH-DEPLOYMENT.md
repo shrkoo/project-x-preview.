@@ -5,7 +5,7 @@
 Password login requires only:
 - Worker binding `DB` pointing to the correct environment's D1 database.
 - D1 tables `users`, `sessions`, and `auth_rate_limits`.
-- The expected user columns, including `email`, `password_hash`, `password_salt`, and `verified_at`.
+- The expected columns in `users`, `sessions`, `auth_rate_limits`, and `signup_verification_codes`; `/api/health` checks the login and verification columns too.
 - Workers WebCrypto (`crypto.subtle` PBKDF2/SHA-256 and `crypto.getRandomValues`), which is native to the Workers runtime.
 
 The `/api/health` endpoint also checks `signup_verification_codes` because it is required for the complete signup/verification flow. It reports binding/secret/configuration presence as booleans only and never returns secret values.
@@ -78,11 +78,10 @@ printf '%s' "$GOOGLE_CLIENT_ID" | npx wrangler secret put GOOGLE_CLIENT_ID --con
 printf '%s' "$GOOGLE_CLIENT_SECRET" | npx wrangler secret put GOOGLE_CLIENT_SECRET --config wrangler.jsonc
 printf '%s' "$RESEND_API_KEY" | npx wrangler secret put RESEND_API_KEY --config wrangler.jsonc
 printf '%s' "$EMAIL_BRIDGE_SECRET" | npx wrangler secret put EMAIL_BRIDGE_SECRET --config wrangler.jsonc
-printf '%s' "$EMAIL_BRIDGE_URL" | npx wrangler secret put EMAIL_BRIDGE_URL --config wrangler.jsonc
 printf '%s' "$ADMIN_EMAIL" | npx wrangler secret put ADMIN_EMAIL --config wrangler.jsonc
 ```
 
-Only set the provider credentials you actually use. If using Resend, also configure `EMAIL_FROM` as a plain-text `vars` value in the matching Wrangler config. The Preview workflow already maps Preview GitHub Environment secrets into the Preview Worker; Production is intentionally not changed by this branch.
+Only set the provider credentials you actually use. `EMAIL_BRIDGE_URL` is already a plain-text Production `vars` value in `wrangler.jsonc`; Preview CI can inject its Preview-specific endpoint as a secret. If using Resend, configure `EMAIL_FROM` as a plain-text `vars` value in the matching Wrangler config. The Preview workflow already maps Preview GitHub Environment secrets into the Preview Worker; Production is intentionally not changed by this branch.
 
 ### Live logs
 
