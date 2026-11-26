@@ -106,3 +106,5 @@
 .nvr-empty{padding:18px;border:1px dashed #c8dceb;border-radius:16px;color:#6c879e;text-align:center;font-size:12px}
 .nvr-export{display:flex;align-items:center;justify-content:center;gap:9px;min-height:50px;padding:12px 16px;border:0;border-radius:999px;background:linear-gradient(110deg,#66c5f3,#2F80ED);color:white;font-weight:700}
 @media(max-width:370px){.nvr-grid{gap:8px}.nvr-grid article{padding:11px}.nvr-grid article>strong{font-size:16px}}
+
+.nv-finance button,.nv-finance [role="button"]{min-width:48px!important}
