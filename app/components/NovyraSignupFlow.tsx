@@ -46,7 +46,7 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
  const currencyList=useMemo(()=>Array.from(new Set([...currencies.map(c=>c.code),...currenciesFallback])).sort(),[]);
  async function checkEmailExists(){
   const email=values.email.trim().toLowerCase();
-  if(!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return false;
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
   try{
     const result=await apiRequest<{exists:boolean; salt?:string}>("/auth/password-salt?email="+encodeURIComponent(email),{method:"GET"});
     setEmailAccountType(result.exists?"password":null);
