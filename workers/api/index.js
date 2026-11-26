@@ -152,7 +152,7 @@ async function authenticate(request, db) {
   const token = request.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
   if (!token || token.length < 30) return null;
   const tokenHash = await digest(token);
-  return await db.prepare("SELECT u.id,u.email,u.display_name,u.xp,u.games_played,u.role,u.username,u.avatar_url,u.bio,u.first_name,u.last_name,u.country,u.currency,u.calendar,u.number_format,u.number_system,u.date_format,u.text_direction,u.week_start,u.language,u.account_type,u.app_lock_type,u.app_lock_hash,u.app_lock_timeout,u.lock_failed_attempts,u.onboarding_completed FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
+  return await db.prepare("SELECT u.id,u.email,u.password_hash,u.password_salt,u.display_name,u.xp,u.games_played,u.role,u.username,u.avatar_url,u.bio,u.first_name,u.last_name,u.country,u.currency,u.calendar,u.number_format,u.number_system,u.date_format,u.text_direction,u.week_start,u.language,u.account_type,u.app_lock_type,u.app_lock_hash,u.app_lock_timeout,u.lock_failed_attempts,u.onboarding_completed FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(tokenHash,Date.now()).first();
 }
 function cleanName(value) { return String(value || "").trim().replace(/[<>]/g, "").slice(0, 32); }
 function cleanEmail(value) { return String(value ?? "").normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g, "").replace(/\s+/g, "").toLowerCase().slice(0, 254); }
