@@ -218,7 +218,7 @@ function mergeBusinessRecordPayload(previous,incoming) {
  for(const item of trash) {
   const source=String(item?.source||""),id=String(item?.id||"");
   if(!source||!id||!arrayKeys.includes(source)||source==="trash") continue;
-  if((out[source]||[]).some(row=>String(row?.id||"")===id)) {
+  if((Array.isArray(incoming[source])?incoming[source]:[]).some(row=>String(row?.id||"")===id)) {
    out.trash=out.trash.filter(row=>!(String(row?.source||"")===source&&String(row?.id||"")===id));
   }
  }
