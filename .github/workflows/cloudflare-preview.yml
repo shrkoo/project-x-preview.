@@ -15,7 +15,6 @@ concurrency:
 
 jobs:
   deploy-preview:
-    if: vars.PREVIEW_DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
     environment: preview
     steps:
@@ -33,14 +32,13 @@ jobs:
       - name: Configure isolated preview Worker
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          PREVIEW_D1_DATABASE_ID: ${{ vars.PREVIEW_D1_DATABASE_ID }}
-          PRODUCTION_D1_DATABASE_ID: ${{ vars.PRODUCTION_D1_DATABASE_ID }}
-          PREVIEW_R2_BUCKET_NAME: ${{ vars.PREVIEW_R2_BUCKET_NAME }}
-          CLOUDFLARE_WORKERS_SUBDOMAIN: ${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}
-          PREVIEW_WORKER_URL: https://novyra-preview-api.${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}.workers.dev
+          PREVIEW_D1_DATABASE_ID: 51e14038-5b81-49f8-83a1-4c5ba1f05bd8
+          PRODUCTION_D1_DATABASE_ID: 04aef3ef-8143-4fc2-af7b-7f40c06534e1
+          CLOUDFLARE_WORKERS_SUBDOMAIN: projectx-novyratam
+          PREVIEW_WORKER_URL: https://novyra-preview-api.projectx-novyratam.workers.dev
           PREVIEW_EMAIL_FROM: ${{ vars.PREVIEW_EMAIL_FROM }}
         run: |
-          node -e "const fs=require('fs');if(!process.env.CLOUDFLARE_WORKERS_SUBDOMAIN)throw new Error('Set CLOUDFLARE_WORKERS_SUBDOMAIN');if(!process.env.PRODUCTION_D1_DATABASE_ID)throw new Error('Set PRODUCTION_D1_DATABASE_ID as a safety guard');if(process.env.PREVIEW_D1_DATABASE_ID===process.env.PRODUCTION_D1_DATABASE_ID)throw new Error('Refusing to run migrations: preview D1 ID equals production D1 ID');let p=fs.readFileSync('workers/api/wrangler.preview.toml','utf8');for(const [k,v] of Object.entries({__PREVIEW_ACCOUNT_ID__:process.env.CLOUDFLARE_ACCOUNT_ID,__PREVIEW_D1_DATABASE_ID__:process.env.PREVIEW_D1_DATABASE_ID,__PREVIEW_R2_BUCKET_NAME__:process.env.PREVIEW_R2_BUCKET_NAME,__PREVIEW_WORKER_URL__:process.env.PREVIEW_WORKER_URL,__PREVIEW_EMAIL_FROM__:process.env.PREVIEW_EMAIL_FROM})){if(!v)throw new Error('Missing '+k);p=p.replaceAll(k,v)}fs.writeFileSync('workers/api/wrangler.preview.toml',p)"
+          node -e "const fs=require('fs');const pPath='workers/api/wrangler.preview.toml';const p=fs.readFileSync(pPath,'utf8');const prod=fs.readFileSync('workers/api/wrangler.jsonc','utf8');const previewId=(p.match(/database_id\\s*=\\s*\"([^\"]+)\"/)||[])[1];const productionId=(prod.match(/\"database_id\"\\s*:\\s*\"([^\"]+)\"/)||[])[1];if(!previewId||!productionId||previewId===productionId)throw new Error('Refusing preview deployment: D1 database isolation check failed');let out=p.replaceAll('__PREVIEW_ACCOUNT_ID__',process.env.CLOUDFLARE_ACCOUNT_ID||'595c5761b6974e9f7ed15db0e5ffe3b8').replaceAll('__PREVIEW_D1_DATABASE_ID__',previewId).replaceAll('__PREVIEW_WORKER_URL__',process.env.PREVIEW_WORKER_URL);if(process.env.PREVIEW_EMAIL_FROM)out=out.replace('__PREVIEW_EMAIL_FROM__',process.env.PREVIEW_EMAIL_FROM);else out=out.replace(/EMAIL_FROM\\s*=\\s*\"__PREVIEW_EMAIL_FROM__\"\\n/,'');fs.writeFileSync(pPath,out)"
 
       - name: Apply migrations to PREVIEW D1 only
         working-directory: workers/api
@@ -79,7 +77,7 @@ jobs:
         run: npm run build
         env:
           DEPLOY_TARGET: cloudflare-pages
-          NEXT_PUBLIC_API_BASE: https://novyra-api-preview.${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}.workers.dev
+          NEXT_PUBLIC_API_BASE: https://novyra-preview-api.projectx-novyratam.workers.dev
 
       - name: Deploy Pages preview only
         run: npx wrangler pages deploy out --project-name novyra-preview --branch feature-homa-auth-part1
