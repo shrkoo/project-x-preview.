@@ -4362,3 +4362,9 @@ main.nv-finance button.nf-brand{width:48px!important;min-width:48px!important;mi
 .nv-personal-v1 .nf-transaction>button{width:48px;min-width:48px;height:48px;min-height:48px}
 .nv-personal-v1 .nf-toast{z-index:1200}
 .nv-personal-v1 .nf-main{padding-bottom:calc(100px + env(safe-area-inset-bottom))!important}
+
+
+.nv-personal-v1 .nv-p-account-link{min-height:48px}
+.nv-personal-v1 .nv-p-empty button{min-height:48px}
+.nv-personal-v1 .nv-p-filter-row select,.nv-personal-v1 .nv-p-date-filters input{min-height:48px}
+.nv-personal-v1 .nv-p-dock>button.nv-ref-dock-center{min-height:60px!important}
