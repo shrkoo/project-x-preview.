@@ -10,6 +10,8 @@ assert.equal(formatMoney(12500000, "IRT-display", "fa-IR"), "۱٬۲۵۰٬۰۰۰ 
 assert.equal(formatMoney(1250000, "IRT-display", "en-US"), "125,000 Toman");
 assert.equal(formatMoney(1250000, "IRR", "fa-IR"), "۱٬۲۵۰٬۰۰۰ ریال");
 assert.equal(parseMoney("1,234.56", "USD"), 123456);
+assert.equal(parseMoney("1.9999", "USD"), 200, "excess fractional digits round half up");
+assert.equal(parseMoney("1,234", "USD"), 123400, "three-digit grouping is not mistaken for decimals");
 assert.equal(parseMoney("1.234,56", "EUR"), 123456);
 assert.equal(parseMoney("١٬٢٣٤٫٥٦", "USD"), 123456);
 assert.equal(formatMoney(123456, "USD", "en-US"), "$1,234.56");
