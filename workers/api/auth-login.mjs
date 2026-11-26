@@ -1,4 +1,4 @@
-import { verifyLoginHash } from "./auth-password.mjs";
+import { parsePasswordHash, verifyLoginHash } from "./auth-password.mjs";
 
 export async function handlePasswordLogin({ request, env, db, requestId, helpers }) {
   const { cleanEmail, hitAuthLimit, createSession, publicProfile } = helpers;
@@ -19,7 +19,8 @@ export async function handlePasswordLogin({ request, env, db, requestId, helpers
     const body = await request.json().catch(() => null);
     const email = cleanEmail(body?.email);
     const suppliedHash = String(body?.passwordHash || "").toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^[a-f0-9]{64}$/.test(suppliedHash)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+        (!parsePasswordHash(suppliedHash) && !/^[a-f0-9]{64}$/.test(suppliedHash))) {
       return json({ code: "INVALID_INPUT", message: "Enter a valid email and password.", requestId }, 400);
     }
     stage = "rate-limit";
