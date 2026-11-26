@@ -279,7 +279,7 @@ export default {
    if (path === "/health" && request.method === "GET") return json({ ok: true, service: "novyra-api", database: "connected", region: "EU" });
    if(path==="/auth/email-check" && request.method==="POST"){
     const body=await readBody(request),email=cleanEmail(body?.email);
-    if(!/^\\S+@\\S+\\.\\S+$/.test(email))return fail("Enter a valid email.");
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return fail("Enter a valid email.");
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     if(!await hitAuthLimit(db,"email-check:"+ip,8,600000))return fail("Too many checks. Try again later.",429);
     if(!await verifyTurnstile(body?.turnstileToken,request,env))return fail("Complete the security check.",403);
