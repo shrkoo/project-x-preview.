@@ -22,7 +22,13 @@ export async function derivePasswordHash(password: string, salt: string) {
 
 
 export class ApiRequestError extends Error {
-  constructor(message: string, public readonly status: number) {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly code?: string,
+    public readonly requestId?: string,
+    public readonly retryAfterSeconds?: number
+  ) {
     super(message);
     this.name = "ApiRequestError";
   }
@@ -35,7 +41,7 @@ export async function apiRequest<T = any>(path: string, options: RequestInit = {
   if (token) headers.set("Authorization", `Bearer ${token}`);
   const response = await fetch(`${API_BASE}${path}`, { ...options, headers, cache: "no-store" });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new ApiRequestError(data?.error || "ارتباط با سرور برقرار نشد.", response.status);
+  if (!response.ok) throw new ApiRequestError(data?.message || data?.error || "ارتباط با سرور برقرار نشد.", response.status, data?.code, data?.requestId, Number(data?.retryAfterSeconds) || undefined);
   return data as T;
 }
 
