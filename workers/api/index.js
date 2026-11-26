@@ -205,20 +205,27 @@ async function syncBusinessDueReminders(db,workspaceId,ownerId,actorId,records) 
  for(let i=0;i<statements.length;i+=80) await db.batch(statements.slice(i,i+80));
 }
 async function deliverBusinessReminders(env,db) {
- if(!hasMailProvider(env)) return {sent:0,skipped:"email_not_configured"};
- const due=await db.prepare("SELECT r.id,r.title,r.due_at AS dueAt,r.reminder_type AS reminderType,u.email,w.name AS workspaceName FROM business_reminders r JOIN workspaces w ON w.id=r.workspace_id JOIN users u ON u.id=r.owner_id WHERE r.status='pending' AND r.remind_at<=? ORDER BY r.remind_at LIMIT 100").bind(Date.now()).all();
+ const due=await db.prepare("SELECT r.id,r.workspace_id AS workspaceId,r.owner_id AS ownerId,r.title,r.due_at AS dueAt,r.reminder_type AS reminderType,w.name AS workspaceName FROM business_reminders r JOIN workspaces w ON w.id=r.workspace_id WHERE r.status='pending' AND r.remind_at<=? ORDER BY r.remind_at LIMIT 100").bind(Date.now()).all();
  let sent=0;
  for(const row of due.results||[]) {
   try {
    const dueDate=new Date(Number(row.dueAt)).toLocaleDateString("fa-IR");
-   await sendMail(env,row.email,"یادآوری سررسید کسب‌وکار NOVYRA",renderNovyraEmail({eyebrow:"BUSINESS REMINDER",title:row.title,intro:"یک موعد مالی در فضای کسب‌وکار شما نزدیک یا سررسید شده است.",actionLabel:"ورود به فضای کسب‌وکار",actionUrl:(env.APP_URL||"https://novyra.pages.dev")+"/business",notice:"فضا: "+row.workspaceName+" · تاریخ سررسید: "+dueDate,footerNote:"این یادآوری بر اساس اطلاعات ثبت‌شده در فضای کسب‌وکار ارسال شده است."}));
+   const body="فضا: "+row.workspaceName+" · تاریخ سررسید: "+dueDate+" · لطفاً وضعیت این مورد را بررسی کنید.";
+   const recipients=await db.prepare("SELECT user_id AS userId FROM workspace_members WHERE workspace_id=? AND status='active' UNION SELECT owner_id AS userId FROM workspaces WHERE id=?").bind(row.workspaceId,row.workspaceId).all();
+   const notices=(recipients.results||[]).map(member=>db.prepare("INSERT OR IGNORE INTO notifications (id,user_id,kind,title,body) VALUES (?,?,?,?,?)").bind("business-reminder:"+row.id+":"+member.userId,member.userId,"business_reminder",row.title,body));
+   for(let i=0;i<notices.length;i+=80) await db.batch(notices.slice(i,i+80));
+   if(hasMailProvider(env)) {
+    try {
+     const owner=await db.prepare("SELECT email FROM users WHERE id=?").bind(row.ownerId).first();
+     if(owner?.email) await sendMail(env,owner.email,"یادآوری سررسید کسب‌وکار NOVYRA",renderNovyraEmail({eyebrow:"BUSINESS REMINDER",title:row.title,intro:"یک موعد مالی در فضای کسب‌وکار شما نزدیک یا سررسید شده است.",actionLabel:"ورود به فضای کسب‌وکار",actionUrl:(env.APP_URL||"https://novyra.pages.dev")+"/business",notice:body,footerNote:"این یادآوری بر اساس اطلاعات ثبت‌شده در فضای کسب‌وکار ارسال شده است."}));
+    } catch(error) { console.error("business-reminder-email",row.id,error); }
+   }
    await db.prepare("UPDATE business_reminders SET status='sent',notified_at=? WHERE id=? AND status='pending'").bind(Date.now(),row.id).run();
    sent++;
   } catch(error) { console.error("business-reminder-delivery",row.id,error); }
  }
  return {sent};
 }
-
 function cleanName(value) { return String(value || "").trim().replace(/[<>]/g, "").slice(0, 32); }
 function cleanEmail(value) { return String(value ?? "").normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g, "").replace(/\s+/g, "").toLowerCase().slice(0, 254); }
 
