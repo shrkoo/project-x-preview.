@@ -1,4 +1,4 @@
-import { formatMoney as formatMoneyValue } from "./money";
+import { formatMoney as formatMoneyValue } from "./money.ts";
 export type RegionalPreferences = {
   country: string;
   language: string;
