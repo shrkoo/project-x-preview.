@@ -28,6 +28,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Build Preview app
         run: npm run build
+      - name: TypeScript typecheck
+        run: npm run typecheck
       - name: Run money unit tests
         run: npm run test:money
       - name: Run money formatting guard
