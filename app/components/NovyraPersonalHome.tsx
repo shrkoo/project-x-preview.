@@ -1,8 +1,8 @@
 "use client";
-import {useMemo,useState} from "react";
+import {useMemo,useState,type ReactNode} from "react";
 import {ArrowDownLeft,ArrowUpRight,ChevronLeft,Eye,EyeOff,ReceiptText,Sparkles,Utensils,CarFront,ShoppingBag,House} from "lucide-react";
 type Tx={id:string;title:string;category:string;amount:number;kind:"income"|"expense";date:string};
-type Props={language:string;items:Tx[];income:number;expense:number;balance:number;budget:number;savingsTarget:number;savedForGoal:number;hidden:boolean;amount:(n:number)=>string;dateLabel:(s:string)=>string;onToggleHidden:()=>void;onAdd:(k:"income"|"expense")=>void;onTransactions:(q?:string,c?:string)=>void;onReports:()=>void;onAccounts:()=>void};
+type Props={language:string;items:Tx[];income:number;expense:number;balance:number;budget:number;savingsTarget:number;savedForGoal:number;hidden:boolean;amount:(n:number)=>ReactNode;dateLabel:(s:string)=>string;onToggleHidden:()=>void;onAdd:(k:"income"|"expense")=>void;onTransactions:(q?:string,c?:string)=>void;onReports:()=>void;onAccounts:()=>void};
 export default function NovyraPersonalHome(p:Props){
  const en=p.language==="en",ar=p.language==="ar",ckb=p.language==="ckb";const tr=(fa:string,e:string,a:string,k:string)=>en?e:ar?a:ckb?k:fa;
  const [hero,setHero]=useState(0);const recent=useMemo(()=>[...p.items].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5),[p.items]);
