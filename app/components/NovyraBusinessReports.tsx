@@ -1,3 +1,4 @@
+import { formatLegacyMoney } from "../lib/money";
 "use client";
 import {useEffect,useMemo,useState} from "react";
 import {apiRequest} from "../lib/api";
@@ -13,7 +14,7 @@ export default function NovyraBusinessReports({workspaceId,currency,language}:Pr
  const income=selected.filter(r=>r.kind==="income").reduce((n,r)=>n+Number(r.amount||0),0),expense=selected.filter(r=>r.kind==="expense").reduce((n,r)=>n+Number(r.amount||0),0),net=income-expense;
  const receivables=invoices.filter(r=>r.status!=="paid").reduce((n,r)=>n+Math.max(0,Number(r.amount||0)-Number(r.paid||0)),0);
  const categories=Object.entries(selected.filter(r=>r.kind==="expense").reduce((a:any,r)=>{const k=r.category||"Other";a[k]=(a[k]||0)+Number(r.amount||0);return a},{})).sort((a:any,b:any)=>b[1]-a[1]);
- const money=(n:number)=>new Intl.NumberFormat(fa?"fa-IR":"en-US",{style:"currency",currency,maximumFractionDigits:0}).format(n);
+ const money=(n:number)=>formatLegacyMoney(n,currency,fa?"fa-IR":"en-US");
  const labels=fa?{title:"گزارش‌ها",period:"بازه زمانی",month:"این ماه",last:"ماه گذشته",year:"امسال",all:"همه زمان‌ها",profit:"سود و زیان",cash:"جریان نقدی",receivable:"دریافتنی‌ها",category:"هزینه بر اساس دسته‌بندی",income:"درآمد",expense:"هزینه",net:"خالص",empty:"برای این بازه هنوز تراکنشی ثبت نشده است",export:"خروجی گزارش"}:{title:"Reports",period:"Period",month:"This month",last:"Last month",year:"This year",all:"All time",profit:"Profit and loss",cash:"Cash flow",receivable:"Receivables",category:"Expenses by category",income:"Income",expense:"Expenses",net:"Net",empty:"No transactions recorded for this period yet",export:"Export report"};
  const exportCsv=()=>{const lines=[["Type","Description","Category","Amount","Date"],...selected.map(r=>[r.kind||"",r.title||"",r.category||"",r.amount||0,r.date||""])];const csv="\uFEFF"+lines.map(line=>line.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n");const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="novyra-business-report.csv";a.click();URL.revokeObjectURL(url)};
  return <section className="nvr-root" dir={fa?"rtl":"ltr"}><header className="nvr-head"><div><small>NOVYRA</small><h2>{labels.title}</h2></div><label>{labels.period}<select value={period} onChange={e=>setPeriod(e.target.value)}><option value="month">{labels.month}</option><option value="last">{labels.last}</option><option value="year">{labels.year}</option><option value="all">{labels.all}</option></select></label></header>
