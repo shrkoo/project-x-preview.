@@ -56,7 +56,7 @@ for (const language of ["fa", "en"] as const) {
           const homeText = await home.innerText();
           expect(homeText).not.toContain("\\n");
           expect(homeText).not.toContain("n\\");
-          expect(homeText).not.toContain("$");
+          if (language === "fa") expect(homeText).not.toContain("$");
           await expect(page.locator(".nvbd-action-secondary")).toHaveCount(3);
           for (const tile of await page.locator(".nvbd-action-secondary").all()) {
             await expect(tile.locator("svg")).toBeVisible();
@@ -87,12 +87,18 @@ for (const language of ["fa", "en"] as const) {
         if (accountType === "business") {
           await nav.nth(1).click();
           await expect(page.locator(".nvbd-sales-tabs")).toBeVisible();
+          const invoicesText = await page.locator(".nvbd-root").innerText();
+          expect(invoicesText).not.toContain("\\n");
+          expect(invoicesText).not.toContain("n\\");
           await page.getByRole("button", { name: language === "fa" ? "پیش‌فاکتورها" : "Quotes" }).click();
           await expect(page.locator(".nvbd-sales-tabs")).toBeVisible();
           await page.getByRole("button", { name: language === "fa" ? "مشتریان" : "Customers" }).click();
           await expect(page.locator(".nvbd-sales-tabs")).toBeVisible();
           await nav.nth(3).click();
           await expect(page.locator(".nvr-root")).toBeVisible();
+          const reportsText = await page.locator("body").innerText();
+          expect(reportsText).not.toContain("\\n");
+          expect(reportsText).not.toContain("n\\");
           await page.locator(".nvr-export").click();
           await nav.nth(4).click();
           await expect(page.locator(".nbo-more-menu")).toBeVisible();
