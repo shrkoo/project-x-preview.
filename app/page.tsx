@@ -141,14 +141,14 @@ export default function Home() {
     const lockIfConfigured = () => {
       const type = localStorage.getItem("projectx-app-lock-type") || "none";
       const owner = localStorage.getItem("projectx-app-lock-user");
-      if ((type === "pin" || type === "pattern") && owner === account.id && localStorage.getItem("projectx-app-lock-configured") === "1") setLocked(true);
+      if ((type === "pin" || type === "pattern") && owner === account.id && localStorage.getItem("projectx-app-lock-configured") === "1") setLocked(true); else document.documentElement.classList.remove("novyra-app-obscured");
     };
     const onVisibility = () => {
       if (document.visibilityState === "hidden") { hiddenAt = Date.now(); document.documentElement.classList.add("novyra-app-obscured"); if (delay() === 0) lockIfConfigured(); }
       else if (hiddenAt) { if (Date.now() - hiddenAt >= delay()) lockIfConfigured(); else document.documentElement.classList.remove("novyra-app-obscured"); }
     };
     const onPageHide = () => { hiddenAt = Date.now(); document.documentElement.classList.add("novyra-app-obscured"); if (delay() === 0) lockIfConfigured(); };
-    const onPageShow = () => { if (hiddenAt && Date.now() - hiddenAt >= delay()) lockIfConfigured(); };
+    const onPageShow = () => { if (hiddenAt && Date.now() - hiddenAt >= delay()) lockIfConfigured(); else document.documentElement.classList.remove("novyra-app-obscured"); };
     document.addEventListener("visibilitychange", onVisibility);
     window.addEventListener("pagehide", onPageHide);
     window.addEventListener("pageshow", onPageShow);
