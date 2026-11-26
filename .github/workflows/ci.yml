@@ -25,6 +25,12 @@ jobs:
         shell: bash
         run: set -o pipefail; npm install 2>&1 | tee -a ci-build.log
 
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run responsive stabilization tests
+        run: npm run test:e2e
+
       - name: Check language autonyms
         shell: bash
         run: set -o pipefail; npm run test:language-autonyms 2>&1 | tee -a ci-build.log
