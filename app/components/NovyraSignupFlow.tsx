@@ -45,14 +45,8 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
  const localizedCurrency=(code:string)=>{try{return new Intl.DisplayNames([locale],{type:"currency"}).of(code)||code}catch{return code}};
  const currencyList=useMemo(()=>Array.from(new Set([...currencies.map(c=>c.code),...currenciesFallback])).sort(),[]);
  async function checkEmailExists(){
-  await new Promise(resolve=>window.setTimeout(resolve,300));
-  const email=values.email.trim().toLowerCase();
-  if(!/^\\S+@\\S+\\.\\S+$/.test(email)||!captchaToken)return;
-  try{
-   const result=await apiRequest<{exists:boolean;provider:"password"|"google"|null}>("/auth/email-check",{method:"POST",body:JSON.stringify({email,turnstileToken:captchaToken})});
-   setEmailAccountType(result.exists?(result.provider==="google"?"google":"password"):null);
-  }catch(e){setNotice(e instanceof Error?e.message:t("error"));}
-  finally{setCaptchaToken("");if(captchaWidget)window.turnstile?.reset(captchaWidget);}
+  // Email availability is checked atomically by /auth/register.
+  // The old /auth/email-check endpoint is not implemented by the Preview Worker.
  }
  async function forgotPassword(){
   setBusy(true);try{await apiRequest("/auth/forgot-password",{method:"POST",body:JSON.stringify({email:values.email.trim().toLowerCase()})});setNotice(t("forgotSent"));}catch(e){setNotice(e instanceof Error?e.message:t("error"));}finally{setBusy(false);}
@@ -60,23 +54,29 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
  async function submitDetails(){
   setNotice("");
   if(emailAccountType){setNotice(t("accountExists"));return;}
-  if(!emailContinueChecked){
-   if(!captchaToken){setNotice(t("captchaAgain"));return;}
-   try{
-    const result=await apiRequest<{exists:boolean;provider:"password"|"google"|null}>("/auth/email-check",{method:"POST",body:JSON.stringify({email:values.email.trim().toLowerCase(),turnstileToken:captchaToken})});
-    setCaptchaToken("");if(captchaWidget)window.turnstile?.reset(captchaWidget);
-    if(result.exists){setEmailAccountType(result.provider==="google"?"google":"password");return;}
-    setEmailContinueChecked(true);setStep(2);
-   }catch(e){setNotice(e instanceof Error?e.message:t("error"));}
-   return;
-  }
+  if(!captchaToken){setNotice(t("captchaAgain"));return;}
+  setEmailContinueChecked(true);
   setStep(2);
  }
  async function setupBiometric(){try{if(!window.PublicKeyCredential||!navigator.credentials?.create)throw new Error("Biometric authentication is unavailable on this device.");const credential=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:"Novyra",id:location.hostname},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:values.email,displayName:values.firstName+" "+values.lastName},pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},timeout:60000,attestation:"none"}});if(!credential)throw new Error("Biometric setup was cancelled.");setPin((credential as PublicKeyCredential).id);setLock("biometric");setNotice("");}catch(e){setNotice(e instanceof Error?e.message:"Biometric setup failed.");}}
  async function finish(){if(busy)return;setNotice("");if(lock==="pin"&&(pin.length<6||pin!==pinConfirm)){setNotice(pin!==pinConfirm?t("pinMismatch"):t("pinEnter"));return;}if(lock==="pattern"&&(pattern.split("-").length<4||pattern!==patternConfirm)){setNotice(pattern!==patternConfirm?t("patternMismatch"):t("patternDraw"));return;}if(mode==="business"&&!company.trim()){setNotice(t("companyRequired"));return;}setBusy(true);const email=values.email.trim().toLowerCase();let timer=0;const controller=new AbortController();timer=window.setTimeout(()=>controller.abort(),25000);
  try{const salt=createPasswordSalt();const passwordHash=await derivePasswordHash(values.password,salt);const lockSecret=lock==="pin"?pin:lock==="pattern"?pattern:lock==="biometric"?pin:"";const appLockHash=lock==="none"?null:await derivePasswordHash(lockSecret,email);const data=await apiRequest<{token?:string;user?:User;verificationRequired?:boolean}>("/auth/register",{method:"POST",body:JSON.stringify({turnstileToken:captchaToken,email,name:values.firstName.trim()+" "+values.lastName.trim(),firstName:values.firstName.trim(),lastName:values.lastName.trim(),country:values.country,currency,language:locale,direction:rtl?"rtl":"ltr",accountType:mode,companyName:mode==="business"?company.trim():null,appLockType:lock,appLockHash,salt,passwordHash}),signal:controller.signal});if(data.verificationRequired){setVerificationPending(true);setResendSeconds(60);setStep(5);setNotice(t("verificationSent"));return;}if(!data.token||!data.user)throw new Error(t("error"));setSession(data.token);localStorage.setItem("projectx-language",locale);localStorage.setItem("projectx-country",values.country);localStorage.setItem("projectx-account-type",mode);if(mode==="business")localStorage.setItem("novyra-business-name",company.trim());localStorage.setItem("novyra-finance-currency",currency);localStorage.setItem("projectx-app-lock-type",lock);localStorage.setItem("projectx-app-lock-user",data.user.id);if(lock!=="none")localStorage.setItem("projectx-app-lock-hash",appLockHash||"");else localStorage.removeItem("projectx-app-lock-hash");if(lock==="biometric")localStorage.setItem("projectx-app-lock-credential",pin);localStorage.setItem("projectx-account",JSON.stringify({name:data.user.displayName||values.firstName+" "+values.lastName,email}));localStorage.setItem("projectx-first-run-complete","1");setComplete(true);setStep(4);
  }catch(e){setNotice(e instanceof DOMException&&e.name==="AbortError"?t("timeout"):e instanceof Error?e.message:t("error"));}finally{clearTimeout(timer);setBusy(false);}}
- async function login(){const email=values.email.trim().toLowerCase();if(!email||!values.password){setNotice(t("required"));return;}setBusy(true);try{const data=await apiRequest<{token:string;user:User}>("/auth/login",{method:"POST",body:JSON.stringify({email,password:values.password})});setSession(data.token);localStorage.setItem("projectx-language",locale);onComplete(data.user,locale as any);}catch(e){setNotice(e instanceof Error?e.message:t("error"));}finally{setBusy(false);}}
+ async function login(){
+  const email=values.email.trim().toLowerCase();
+  if(!email||!values.password){setNotice(t("required"));return;}
+  setBusy(true);
+  try{
+    const saltData=await apiRequest<{salt:string;exists:boolean}>("/auth/password-salt?email="+encodeURIComponent(email),{method:"GET"});
+    if(!saltData.exists){throw new Error(t("error"));}
+    const passwordHash=await derivePasswordHash(values.password,saltData.salt);
+    const data=await apiRequest<{token:string;user:User}>("/auth/login",{method:"POST",body:JSON.stringify({email,passwordHash})});
+    setSession(data.token);
+    localStorage.setItem("projectx-language",locale);
+    onComplete(data.user,locale as any);
+  }catch(e){setNotice(e instanceof Error?e.message:t("error"));}
+  finally{setBusy(false);}
+ }
  const passwordStrengthText=strength<2?t("weak"):strength<4?t("fair"):t("strong");
  return <main className="nv-root" dir={rtl?"rtl":"ltr"} lang={locale}>
   <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" strategy="afterInteractive" onLoad={()=>setCaptchaReady(true)}/>
@@ -104,7 +104,7 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
     {step===4&&<div className="nv-step nv-success"><div className="nv-success-check"><Check size={42}/></div><h3>{t("success")}</h3><p>{t("successSub")}</p><Button onClick={()=>onComplete(null,locale as any)}>{t("go")}</Button></div>}
     {!loginMode&&step>=1&&step<=3&&<div className="nv-turnstile-wrap"><div id="novyra-turnstile"/>{!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY&&<small>{t("captchaSetup")}</small>}</div>}
 
-    {notice&&<div className="nv-toast" role="alert">{notice}<button type="button" onClick={()=>setNotice("")} aria-label={t("dismiss")}>×</button></div>}
+    {notice&&<div className="nv-toast" role="alert" aria-live="assertive">{notice}<button type="button" onClick={()=>setNotice("")} aria-label={t("dismiss")}>×</button></div>}
    </Card></div>
   <footer className="nv-footer">NOVYRA <span>•</span> {t("slogan")}</footer>
  </main>;
