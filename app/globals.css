@@ -3613,3 +3613,40 @@ body { font-family:Arial,Helvetica,sans-serif!important; }
 .nv-turnstile-wrap{display:flex;justify-content:center;align-items:center;flex-direction:column;gap:7px;min-height:68px;margin:12px 0}
 .nv-turnstile-wrap small{font-size:10px;color:#8b6470;text-align:center}
 .nv-country-trigger:focus-visible,.nv-country-search:focus-visible{outline:2px solid #8b6cf0;outline-offset:2px}
+
+
+/* Novyra signup: prominent, accessible inline error notice */
+.nv-flow-card > .nv-toast {
+  position:relative!important;
+  inset:auto!important;
+  z-index:5!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:0 0 18px!important;
+  padding:15px 17px!important;
+  border:1px solid #e6a2a2!important;
+  border-inline-start:5px solid #d92d20!important;
+  border-radius:13px!important;
+  background:#fff1f0!important;
+  color:#8f1d18!important;
+  box-shadow:0 5px 18px #7f1d1d14!important;
+  font-size:14px!important;
+  font-weight:700!important;
+  line-height:1.8!important;
+  text-align:start!important;
+  overflow-wrap:anywhere!important;
+}
+.nv-flow-card > .nv-toast button {
+  flex:0 0 32px!important;
+  width:32px!important;
+  height:32px!important;
+  margin-inline-start:auto!important;
+  border:1px solid #e8b5b2!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  color:#8f1d18!important;
+  font-size:22px!important;
+}
