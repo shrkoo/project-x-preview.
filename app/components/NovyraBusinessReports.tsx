@@ -1,5 +1,5 @@
-import { formatMoney } from "../lib/money";
 "use client";
+import { formatMoney } from "../lib/money";
 import {useEffect,useMemo,useState} from "react";
 import {apiRequest} from "../lib/api";
 import {ArrowDownLeft,ArrowUpRight,Download,FileText,Wallet} from "lucide-react";
