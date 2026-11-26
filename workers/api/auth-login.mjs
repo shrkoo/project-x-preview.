@@ -1,5 +1,5 @@
 export async function handlePasswordLogin({ request, env, db, requestId, helpers }) {
-  const { cleanEmail, hitAuthLimit, passwordHash, createSession, publicProfile } = helpers;
+  const { cleanEmail, hitAuthLimit, createSession, publicProfile } = helpers;
   const json = (data, status = 200) => new Response(JSON.stringify(data), {
     status,
     headers: {
@@ -38,9 +38,8 @@ export async function handlePasswordLogin({ request, env, db, requestId, helpers
     if (!user.password_salt || !user.password_hash) {
       return json({ code: "INVALID_CREDENTIALS", message: "Email or password is incorrect.", requestId }, 401);
     }
-    stage = "password-derive";
-    const suppliedHash = await passwordHash(password, user.password_salt);
-    if (suppliedHash !== user.password_hash) {
+    stage = "password-verify";
+    if (suppliedHash !== String(user.password_hash || "")) {
       return json({ code: "INVALID_CREDENTIALS", message: "Email or password is incorrect.", requestId }, 401);
     }
     stage = "session-create";
