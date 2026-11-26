@@ -52,7 +52,7 @@ export function formatMoney(
   const amount = assertMinor(amountMinor);
   if (code === "IRT" || code === "IRT-DISPLAY" || code === "TOMAN") {
     const absolute = amount < 0n ? -amount : amount;\n    const rounded = (absolute + 5n) / 10n;\n    const toman = amount < 0n ? -rounded : rounded;
-    return groupedInteger(toman, locale.startsWith("fa") ? locale : "fa-IR") + " تومان";
+    return groupedInteger(toman, locale) + (locale.startsWith("fa") ? " تومان" : " Toman");
   }
   if (code === "IRR" && locale.startsWith("fa")) {
     return groupedInteger(amount, locale) + " ریال";
