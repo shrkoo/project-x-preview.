@@ -1,5 +1,5 @@
 import { countryCodes, currencyCodes, calendarCodes, languageCodes, numberFormatCodes, numberSystemCodes } from "./data/catalog-validation.js";
-import { generateRegistrationOptions, verifyRegistrationResponse } from "@simplewebauthn/server";
+import { generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions, verifyAuthenticationResponse } from "@simplewebauthn/server";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,HEAD,POST,PATCH,DELETE,OPTIONS",
@@ -388,6 +388,61 @@ export default {
     await db.prepare("INSERT INTO webauthn_pending_challenges(email,challenge,expires_at) VALUES(?,?,?) ON CONFLICT(email) DO UPDATE SET challenge=excluded.challenge,expires_at=excluded.expires_at")
       .bind(email,options.challenge,Date.now()+300000).run();
     return json(options);
+   }
+
+   if(path==="/auth/webauthn/authenticate/options" && request.method==="POST") {
+    const body=await readBody(request),email=cleanEmail(body?.email);
+    if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
+    const ip=request.headers.get("CF-Connecting-IP")||"unknown";
+    if(!await hitAuthLimit(db,"webauthn-auth-options:"+ip,8,600000)) return fail("درخواست‌های زیاد؛ کمی بعد دوباره تلاش کن.",429);
+    const user=await db.prepare("SELECT id,email,verified_at FROM users WHERE email=?").bind(email).first();
+    if(!user || !user.verified_at) return fail("برای این ایمیل ورود زیستی در دسترس نیست.",401);
+    const credentials=await db.prepare("SELECT credential_id,transports FROM webauthn_credentials WHERE user_id=?").bind(user.id).all();
+    if(!credentials.results?.length) return fail("برای این حساب کلید زیستی ثبت نشده است.",404);
+    const appOrigin=String(env.WEBAUTHN_ORIGIN||env.APP_URL||"").trim();
+    if(!appOrigin) return fail("تنظیمات دامنه احراز هویت زیستی کامل نیست.",503);
+    const rpID=new URL(appOrigin).hostname;
+    const options=await generateAuthenticationOptions({
+      rpID,
+      allowCredentials:(credentials.results||[]).map(row=>({id:row.credential_id,transports:JSON.parse(row.transports||"[]")})),
+      userVerification:"required",
+      timeout:60000
+    });
+    await db.prepare("INSERT INTO webauthn_pending_challenges(email,challenge,expires_at) VALUES(?,?,?) ON CONFLICT(email) DO UPDATE SET challenge=excluded.challenge,expires_at=excluded.expires_at")
+      .bind(email,options.challenge,Date.now()+300000).run();
+    return json(options);
+   }
+   if(path==="/auth/webauthn/authenticate/verify" && request.method==="POST") {
+    const body=await readBody(request),email=cleanEmail(body?.email),response=body?.credential;
+    const ip=request.headers.get("CF-Connecting-IP")||"unknown";
+    if(!await hitAuthLimit(db,"webauthn-auth-verify:"+ip,8,600000)) return fail("تلاش‌های زیاد؛ کمی بعد دوباره تلاش کن.",429);
+    const user=await db.prepare("SELECT * FROM users WHERE email=?").bind(email).first();
+    if(!user || !user.verified_at) return fail("احراز هویت زیستی ناموفق بود.",401);
+    const pending=await db.prepare("SELECT challenge,expires_at FROM webauthn_pending_challenges WHERE email=?").bind(email).first();
+    if(!pending || Number(pending.expires_at)<=Date.now()) return fail("درخواست احراز هویت منقضی شده است؛ دوباره تلاش کن.",410);
+    const credentialId=String(response?.id||"");
+    const credential=await db.prepare("SELECT credential_id,public_key,counter,transports FROM webauthn_credentials WHERE user_id=? AND credential_id=?").bind(user.id,credentialId).first();
+    if(!credential) return fail("کلید زیستی برای این حساب پیدا نشد.",401);
+    const appOrigin=String(env.WEBAUTHN_ORIGIN||env.APP_URL||"").trim();
+    if(!appOrigin) return fail("تنظیمات دامنه احراز هویت زیستی کامل نیست.",503);
+    const publicKeyHex=String(credential.public_key||"");
+    if(!/^(?:[a-f0-9]{2})+$/i.test(publicKeyHex)) return fail("کلید ثبت‌شده معتبر نیست.",500);
+    const publicKey=Uint8Array.from(publicKeyHex.match(/.{2}/g)||[],byte=>parseInt(byte,16));
+    const verification=await verifyAuthenticationResponse({
+      response,
+      expectedChallenge:pending.challenge,
+      expectedOrigin:appOrigin,
+      expectedRPID:new URL(appOrigin).hostname,
+      credential:{id:credential.credential_id,publicKey,counter:Number(credential.counter||0),transports:JSON.parse(credential.transports||"[]")},
+      requireUserVerification:true
+    });
+    if(!verification.verified) return fail("اثر انگشت یا تشخیص چهره تأیید نشد.",401);
+    await db.batch([
+      db.prepare("UPDATE webauthn_credentials SET counter=? WHERE credential_id=? AND user_id=?").bind(verification.authenticationInfo.newCounter,credential.credential_id,user.id),
+      db.prepare("DELETE FROM webauthn_pending_challenges WHERE email=?").bind(email)
+    ]);
+    const session=await createSession(db,user.id);
+    return json({token:session.token,expiresAt:session.expiresAt,user:{id:user.id,email:user.email,displayName:user.display_name,xp:user.xp,gamesPlayed:user.games_played,role:user.role,profile:publicProfile(user)}});
    }
 
    if (path === "/auth/register" && request.method === "POST") {
