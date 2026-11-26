@@ -33,7 +33,7 @@ export default function BusinessInvitePage(){
    <h1 style={{fontSize:24,margin:"14px 0"}}>دعوت به فضای کسب‌وکار</h1>
    <p style={{lineHeight:2,color:"#526078"}}>{message}</p>
    {!accepted&&<div style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:24}}>
-    <button onClick={accept} disabled={!token||busy} style={{border:0,borderRadius:10,padding:"12px 20px",background:"#172b4d",color:"#fff",fontWeight:700,opacity:!token||busy?.6:1}}>{busy?"در حال پذیرش…":"پذیرش دعوت‌نامه"}</button>
+    <button onClick={accept} disabled={!token||busy} style={{border:0,borderRadius:10,padding:"12px 20px",background:"#172b4d",color:"#fff",fontWeight:700,opacity:(!token||busy)?0.6:1}}>{busy?"در حال پذیرش…":"پذیرش دعوت‌نامه"}</button>
     <a href="/" style={{border:"1px solid #d8dee8",borderRadius:10,padding:"12px 20px",color:"#172b4d",textDecoration:"none"}}>ورود به NOVYRA</a>
    </div>}
    {accepted&&<a href="/" style={{display:"inline-block",marginTop:20,color:"#172b4d"}}>بازگشت به NOVYRA</a>}
