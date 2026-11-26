@@ -18,6 +18,21 @@ database_name = "novyra-preview-db"
 database_id = "51e14038-5b81-49f8-83a1-4c5ba1f05bd8"
 migrations_dir = "migrations-preview"
 
+[[kv_namespaces]]
+binding = "STORY_MEDIA"
+id = "81ae79962a0c47778b8ca32fc9e35422"
+
+[[durable_objects.bindings]]
+name = "ROOM_HUB"
+class_name = "RoomHub"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RoomHub"]
+
+[ai]
+binding = "AI"
+
 
 [triggers]
 crons = ["*/15 * * * *"]
