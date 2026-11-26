@@ -1,4 +1,4 @@
-import { formatLegacyMoney } from "./money";
+import { formatMoney as formatMoneyValue } from "./money";
 export type RegionalPreferences = {
   country: string;
   language: string;
@@ -50,7 +50,7 @@ export function formatNumber(value: number, prefs: RegionalPreferences, options:
 }
 
 export function formatMoney(value: number, prefs: RegionalPreferences, options: Intl.NumberFormatOptions & { hidden?: boolean } = {}): string {
-  return formatLegacyMoney(value, prefs.currency, localeForPreferences(prefs), { hidden: options.hidden });
+  return formatMoneyValue(value, prefs.currency, localeForPreferences(prefs), { hidden: options.hidden });
 }
 
 export function formatDate(value: Date | string | number, prefs: RegionalPreferences, options: Intl.DateTimeFormatOptions = {}): string {
