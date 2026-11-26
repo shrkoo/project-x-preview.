@@ -52,8 +52,8 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
   const email=values.email.trim().toLowerCase();
   if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
   try{
-    const result=await apiRequest<{exists:boolean; salt?:string}>("/auth/password-salt?email="+encodeURIComponent(email),{method:"GET"});
-    setEmailAccountType(result.exists?"password":null);
+    const result=await apiRequest<{exists:boolean;provider:"password"|"google"|null}>("/auth/email-check",{method:"POST",body:JSON.stringify({email,turnstileToken:captchaToken})});
+    setEmailAccountType(result.exists?result.provider:null);
     if(result.exists) setNotice(t("accountExists"));
     else setNotice(current=>current===t("accountExists")?"":current);
     return result.exists;
