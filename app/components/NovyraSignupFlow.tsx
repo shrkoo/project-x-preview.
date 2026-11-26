@@ -77,7 +77,7 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
  }
  async function setupBiometric(){try{
   const email=values.email.trim().toLowerCase();
-  if(!email||!/^\\S+@\\S+\\.\\S+$/.test(email))throw new Error("biometricEmailRequired");
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw new Error("biometricEmailRequired");
   if(!window.isSecureContext||!window.PublicKeyCredential||!navigator.credentials?.create)throw new Error("biometricUnavailable");
   if(typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable==="function"&&!await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())throw new Error("biometricUnavailable");
   const options=await apiRequest<any>("/auth/webauthn/register/options",{method:"POST",body:JSON.stringify({email})});
