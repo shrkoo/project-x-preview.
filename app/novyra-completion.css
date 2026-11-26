@@ -74,3 +74,17 @@
 .nf-mobile-dock{padding-bottom:env(safe-area-inset-bottom)!important}
 
 .nv-finance button,.nv-finance [role="button"]{min-height:48px!important;touch-action:manipulation}
+
+
+/* Business Sales and More layout */
+.nvbd-sales-tabs,.nvbd-sales-filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+.nvbd-sales-tabs button,.nvbd-sales-filters button{min-height:48px;padding:9px 14px;border:1px solid rgba(255,255,255,.92);border-radius:999px;background:rgba(255,255,255,.78);color:#4b6b86;font:inherit;font-size:12px}
+.nvbd-sales-tabs button.active,.nvbd-sales-filters button.active{border-color:rgba(47,128,237,.32);background:rgba(47,128,237,.12);color:#2F80ED;font-weight:700}
+.nvbd-quick>div{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px!important}
+.nvbd-quick>div>.nvbd-action-primary{grid-column:1/-1;width:100%;min-height:50px}
+.nvbd-quick>div>.nvbd-action-secondary{min-width:0!important;min-height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;white-space:normal}
+.nbo-more-menu{display:grid;gap:15px;margin:12px 0 20px}
+.nbo-more-menu>div{display:grid;gap:7px}
+.nbo-more-menu h4{margin:0 0 3px;color:#59748c;font-size:12px;font-weight:700}
+.nbo-more-menu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:48px;padding:10px 13px;border:1px solid rgba(255,255,255,.92);border-radius:14px;background:rgba(255,255,255,.82);color:#2F80ED;text-align:start;font:inherit;font-size:13px}
+.nbo-more-menu button.danger{color:#c74747}
