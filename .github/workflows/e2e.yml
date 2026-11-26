@@ -31,6 +31,8 @@ jobs:
         run: npm run typecheck
       - name: Run auth API tests
         run: npm run test:auth-login
+      - name: Run client auth hash tests
+        run: npm run test:auth-client
       - name: Run money unit tests
         run: npm run test:money
       - name: Run money formatting guard
