@@ -373,7 +373,7 @@ export default {
         console.error("novyra-health-d1-check", { requestId, errorName: String(error?.name || "Error"), message: String(error?.message || "D1 check failed").slice(0,180) });
       }
     }
-    return json({ ok: Boolean(env.DB) && databaseOk, service: "novyra-api", requestId, bindings, secrets, tables, databaseOk });
+    return json({ ok: Boolean(env.DB) && databaseOk, service: "novyra-api", database: databaseOk ? "connected" : "unavailable", region: "EU", requestId, bindings, secrets, tables, databaseOk });
    }
    if(path==="/auth/email-check" && request.method==="POST"){
     const body=await readBody(request),email=cleanEmail(body?.email);
@@ -659,8 +659,11 @@ export default {
       }
       stage = "rate-limit";
       const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-      if (!await hitAuthLimit(db, "login:" + ip, 12, 900000)) {
-        return json({ code: "RATE_LIMITED", message: "Too many login attempts. Try again later.", requestId, retryAfterSeconds: 900 }, 429);
+      const rateKey = "login:" + ip;
+      if (!await hitAuthLimit(db, rateKey, 12, 900000)) {
+        const limitRow = await db.prepare("SELECT window_started_at FROM auth_rate_limits WHERE rate_key=?").bind(rateKey).first();
+        const retryAfterSeconds = Math.max(1, Math.ceil((Number(limitRow?.window_started_at || Date.now()) + 900000 - Date.now()) / 1000));
+        return json({ code: "RATE_LIMITED", message: "Too many login attempts. Try again later.", requestId, retryAfterSeconds }, 429);
       }
       stage = "user-lookup";
       const user = await db.prepare("SELECT * FROM users WHERE email=?").bind(email).first();
