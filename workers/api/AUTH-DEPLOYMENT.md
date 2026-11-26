@@ -39,6 +39,12 @@ Email delivery requires either `RESEND_API_KEY` plus `EMAIL_FROM`, or `EMAIL_BRI
 - `NEXT_PUBLIC_API_BASE`: API Worker base URL.
 - `NEXT_PUBLIC_TURNSTILE_SITE_KEY`: public Turnstile site key (not a secret).
 
+### CI/CD-only variables and GitHub Environment secrets
+- `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`: required by GitHub Actions to apply Preview migrations and deploy the Preview Worker/Pages site.
+- Preview GitHub Environment secrets consumed by the existing workflow: `PREVIEW_GOOGLE_CLIENT_ID`, `PREVIEW_GOOGLE_CLIENT_SECRET`, `PREVIEW_RESEND_API_KEY`, `PREVIEW_EMAIL_BRIDGE_URL`, `PREVIEW_EMAIL_BRIDGE_SECRET`, and `PREVIEW_ADMIN_EMAIL`.
+- Preview GitHub Environment variable: `PREVIEW_EMAIL_FROM`.
+- The workflow maps those Preview-prefixed names to the runtime Worker names listed above. They are not additional `env.*` names inside the Worker.
+
 The current code does not use a JWT signing secret or session secret: sessions are random opaque tokens generated with WebCrypto, and only their SHA-256 hashes are stored in D1. Do not add `SESSION_SECRET` or `JWT_SECRET` merely to fix password login.
 
 ## Exact Wrangler commands
