@@ -16,8 +16,8 @@ export async function handlePasswordLogin({ request, env, db, requestId, helpers
     if (!db) throw new Error("missing_D1_binding_DB");
     const body = await request.json().catch(() => null);
     const email = cleanEmail(body?.email);
-    const password = String(body?.password || "");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 1 || password.length > 1024) {
+    const suppliedHash = String(body?.passwordHash || "").toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^[a-f0-9]{64}$/.test(suppliedHash)) {
       return json({ code: "INVALID_INPUT", message: "Enter a valid email and password.", requestId }, 400);
     }
     stage = "rate-limit";
@@ -39,7 +39,7 @@ export async function handlePasswordLogin({ request, env, db, requestId, helpers
       return json({ code: "INVALID_CREDENTIALS", message: "Email or password is incorrect.", requestId }, 401);
     }
     stage = "password-verify";
-    if (suppliedHash !== String(user.password_hash || "")) {
+    if (suppliedHash !== String(user.password_hash || "").toLowerCase()) {
       return json({ code: "INVALID_CREDENTIALS", message: "Email or password is incorrect.", requestId }, 401);
     }
     stage = "session-create";
