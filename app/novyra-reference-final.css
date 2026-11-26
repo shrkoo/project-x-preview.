@@ -4311,3 +4311,10 @@ main.nv-finance button.nf-brand{width:48px!important;min-width:48px!important;mi
 .nv-business-workspace .nf-topbar .profile-btn span{display:none!important}
 .nv-business-workspace .nf-topbar .nf-brand .nv-brand-mark{display:grid!important;place-items:center!important;width:30px!important;height:30px!important;
  border-radius:10px!important;background:linear-gradient(145deg,#fff,#eaf4ff)!important;color:#2878d0!important;font-weight:900!important}
+
+
+/* Keep every Business header control at the shared 48px touch target */
+.nv-business-workspace .nf-topbar>.nf-brand,
+.nv-business-workspace .nf-topbar .profile-btn{width:48px!important;min-width:48px!important;height:48px!important;min-height:48px!important}
+.nv-business-workspace .nf-topbar>.nf-brand{grid-column:1!important}
+.nv-business-workspace .nf-topbar>.nf-top-right{grid-column:3!important}
