@@ -728,6 +728,29 @@ export default {
     await db.prepare("INSERT INTO ws_tickets (ticket_hash,user_id,expires_at) VALUES (?,?,?)").bind(ticketHash,user.id,Date.now()+60_000).run();
     return json({ticket,expiresIn:60});
    }
+
+   if(path==="/auth/account" && request.method==="DELETE") {
+    const body=await readBody(request)||{};
+    if(String(body.confirmation||"")!=="DELETE") return fail("Type DELETE to confirm account deletion.");
+    const password=String(body.password||"");
+    if(!password || password.length>1024) return fail("Enter your account password.",401);
+    const supplied=await passwordHash(password,String(user.password_salt||""));
+    if(supplied!==String(user.password_hash||"")) return fail("The account password is incorrect.",401);
+    const tables=await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all();
+    const statements=[];
+    for(const entry of tables.results||[]) {
+      const table=String(entry.name||"");
+      if(!/^[A-Za-z0-9_]+$/.test(table) || table==="users") continue;
+      const columns=await db.prepare('PRAGMA table_info("'+table+'")').all();
+      const userColumns=(columns.results||[]).map(column=>String(column.name||"")).filter(name=>/^(user_id|owner_id|author_id|creator_id|sender_id|recipient_id|viewer_id|follower_id|following_id|actor_id|invited_by|invited_user_id|member_id|account_id)$/.test(name));
+      for(const column of userColumns) statements.push(db.prepare('DELETE FROM "'+table+'" WHERE "'+column+'"=?').bind(user.id));
+    }
+    const token=request.headers.get("Authorization")?.replace(/^Bearer\\s+/i,"");
+    if(token) statements.push(db.prepare("DELETE FROM sessions WHERE token_hash=?").bind(await digest(token)));
+    statements.push(db.prepare("DELETE FROM users WHERE id=?").bind(user.id));
+    for(let i=0;i<statements.length;i+=90) await db.batch(statements.slice(i,i+90));
+    return json({ok:true,deleted:true});
+   }
    if (!user) return fail("برای استفاده از این بخش وارد حساب شو.",401);
 
    if(path==="/workspaces" && request.method==="GET") {
