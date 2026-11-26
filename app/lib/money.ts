@@ -52,16 +52,28 @@ export function parseMoney(input:string,currency:string):number {
   let raw=String(input??"").replace(/[۰-۹٠-٩]/g,d=>DIGITS[d]||d).replace(/[\u00a0\u202f\s']/g,"").replace(/[٬،]/g,"");
   if(!raw||!/^[-+]?([0-9.,٫]+)$/.test(raw))throw new TypeError("Invalid money amount");
   const decimalSeparators=[".", "٫", ","];
-  let decimalAt=-1;
-  if(digits>0)for(const sep of decimalSeparators){const at=raw.lastIndexOf(sep);if(at>decimalAt&&at>=0&&raw.length-at-1>0&&raw.length-at-1<=digits)decimalAt=at;}
+  const present=decimalSeparators.filter(sep=>raw.includes(sep));
+  let decimalAt=-1, decimalSeparator="";
+  if(digits>0&&present.length) {
+    const candidate=present.length>1
+      ? Math.max(...present.map(sep=>raw.lastIndexOf(sep)))
+      : raw.lastIndexOf(present[0]);
+    const sep=raw[candidate];
+    const trailing=raw.length-candidate-1;
+    const repeated=raw.indexOf(sep)!==candidate;
+    const isDecimal=sep==="٫" || (present.length>1) || (!repeated&&(trailing<=digits||trailing>3));
+    if(isDecimal){decimalAt=candidate;decimalSeparator=sep;}
+  }
   let wholeText:string, fractionText="";
   if(decimalAt>=0){wholeText=raw.slice(0,decimalAt).replace(/[.,٫]/g,"");fractionText=raw.slice(decimalAt+1).replace(/[.,٫]/g,"");}
   else wholeText=raw.replace(/[.,٫]/g,"");
   const negative=wholeText.startsWith("-")||raw.startsWith("-");wholeText=wholeText.replace(/^[-+]/,"");
   if(!wholeText)wholeText="0";
-  if(!/^\d+$/.test(wholeText)||!/^\d*$/.test(fractionText))throw new TypeError("Invalid money amount");
+  if(!/^\\d+$/.test(wholeText)||!/^\\d*$/.test(fractionText))throw new TypeError("Invalid money amount");
   const scale=10n**BigInt(digits);
-  let minor=BigInt(wholeText)*scale+BigInt((fractionText||"").padEnd(digits,"0").slice(0,digits)||"0");
+  const kept=fractionText.padEnd(digits,"0").slice(0,digits);
+  let minor=BigInt(wholeText)*scale+BigInt(kept||"0");
+  if(fractionText.length>digits&&Number(fractionText[digits])>=5)minor+=1n;
   // Toman is only an input/display denomination; the stored base unit is Rial.
   if(code==="IRT"||code==="IRT-DISPLAY"||code==="TOMAN")minor*=10n;
   if(negative)minor=-minor;
