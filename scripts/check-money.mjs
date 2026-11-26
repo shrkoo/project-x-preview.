@@ -11,7 +11,7 @@ assert.equal(parseMoney("1.234,56", "EUR"), 123456);
 assert.equal(formatMoney(123456, "USD", "en-US"), "$1,234.56");
 assert.equal(formatMoney(123456, "EUR", "de-DE"), "1.234,56 €");
 assert.equal(formatMoney(123456, "USD", "en-US", { hidden: true }), "••••");
-assert.equal(formatMoney(10, "IRT", "fa-IR"), "۱ تومان", "toman display rounds half up");
+assert.equal(formatMoney(10, "IRT", "fa-IR"), "۱ تومان", "toman display rounds half up");\nassert.equal(formatMoney(-10, "IRT", "fa-IR"), "-۱ تومان", "negative toman rounding is symmetric");
 assert.throws(() => parseMoney("abc", "USD"), /Invalid money/);
 assert.throws(() => formatMoney(1.5, "USD", "en-US"), /safe integer/);
 console.log("money unit checks: PASS");
