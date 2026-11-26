@@ -73,6 +73,18 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+
+      - name: Smoke-test isolated preview API
+        env:
+          PREVIEW_WORKER_URL: https://novyra-preview-api.projectx-novyratam.workers.dev
+        run: |
+          set -euo pipefail
+          response="$(curl --fail --silent --show-error "$PREVIEW_WORKER_URL/health")"
+          node -e 'const data=JSON.parse(process.argv[1]);if(data.ok!==true||data.service!=="novyra-api"||data.database!=="connected")process.exit(1)' "$response"
+          options_status="$(curl --silent --output /dev/null --write-out '%{http_code}' --request OPTIONS "$PREVIEW_WORKER_URL/auth/login")"
+          test "$options_status" = "204" -o "$options_status" = "200"
+          echo "Preview API health and auth CORS preflight checks passed."
+
       - name: Build static frontend for preview API
         run: npm run build
         env:
