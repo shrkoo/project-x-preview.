@@ -50,6 +50,12 @@ async function invoke(options, body = { email: "person@example.com", password: "
   return { response, data: await response.json() };
 }
 
+test("invalid input returns 400", async () => {
+  const { response, data } = await invoke({}, { email: "not-an-email", password: "" });
+  assert.equal(response.status, 400);
+  assert.equal(data.code, "INVALID_INPUT");
+});
+
 test("login succeeds and returns a session", async () => {
   const { response, data } = await invoke();
   assert.equal(response.status, 200);
