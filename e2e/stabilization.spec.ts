@@ -118,6 +118,12 @@ for (const language of ["fa", "en"] as const) {
             await expect(page.locator(".nf-modal")).toBeVisible();
             await page.locator(".nf-modal-head button").click();
           }
+          const emptyAction = home.locator(".nv-p-empty button");
+          if (await emptyAction.count()) {
+            await emptyAction.click();
+            await expect(page.locator(".nf-modal")).toBeVisible();
+            await page.locator(".nf-modal-head button").click();
+          }
           await home.locator(".nv-p-insight").click();
           await expect(page.locator(".nf-report-actions")).toBeVisible();
           await nav.nth(0).click();
