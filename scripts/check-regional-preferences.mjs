@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { defaultDateFormat, formatDate, formatMoney, formatNumber, weekStart } from "../app/lib/regional-preferences.ts";
+import { currencies } from "../app/data/currencies.ts";
 
 const cases = [
   { country:"IR", language:"fa", direction:"rtl", currency:"IRR", calendar:"persian", dateFormat:"YYYY/MM/DD", numberSystem:"arabext", firstDay:"saturday" },
@@ -27,4 +28,10 @@ assert.equal(defaultDateFormat("fa","IR"),"YYYY/MM/DD");
 assert.equal(defaultDateFormat("en","US"),"MM/DD/YYYY");
 assert.equal(defaultDateFormat("de","DE"),"DD.MM.YYYY");
 assert.equal(defaultDateFormat("ja","JP"),"YYYY/MM/DD");
+const activeCodes = new Set(currencies.map(item => item.code));
+for (const retired of ["BGN","CUC","HRK","SLL","SVC","ZWL"]) assert.equal(activeCodes.has(retired), false, retired + " must not appear in the active currency chooser");
+for (const special of ["XAG","XAU","XBA","XBB","XBC","XBD","XDR","XSU","XTS","XXX"]) assert.equal(activeCodes.has(special), false, special + " is not a regular active money currency");
+for (const current of ["USD","EUR","GBP","CAD","IRR","XCG","ZWG"]) assert.equal(activeCodes.has(current), true, current + " must be available");
+assert.equal(activeCodes.has("IRT"), true, "Toman remains available as a clearly separate display unit");
+
 console.log("PASS: regional formatters and country date defaults for IR, US, SA, DE, JP and IN");
