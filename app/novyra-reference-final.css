@@ -4224,3 +4224,8 @@ main.nv-finance .nf-category-list button{min-width:48px!important;min-height:48p
 main.nv-finance .nf-category-list button{width:48px!important;height:48px!important}
 main.nv-finance[lang="fa"] .nv-spend-total-head>button{width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important}
 main.nv-finance[lang="en"] .nv-ref-actions button{min-width:48px!important;min-height:48px!important}
+
+
+/* Brand and bottom navigation tap areas */
+main.nv-finance button.nf-brand{width:auto!important;min-width:48px!important;min-height:48px!important}
+main.nv-finance nav.nf-mobile-dock.nv-ref-dock>button{min-width:48px!important}
