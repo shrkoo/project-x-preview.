@@ -1,4 +1,5 @@
 import { countryCodes, currencyCodes, calendarCodes, languageCodes, numberFormatCodes, numberSystemCodes } from "./data/catalog-validation.js";
+import { generateRegistrationOptions, verifyRegistrationResponse } from "@simplewebauthn/server";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,HEAD,POST,PATCH,DELETE,OPTIONS",
@@ -226,7 +227,7 @@ function normalizeProfile(input = {}, current = PROFILE_DEFAULTS) {
   if (!PROFILE_ENUMS.app_lock_type.has(app_lock_type)) return { error: "نوع قفل برنامه معتبر نیست." };
   if (app_lock_hash !== null && !/^[a-f0-9]{64}$/i.test(app_lock_hash)) return { error: "مقدار رمز قفل معتبر نیست." };
   if (!Number.isInteger(app_lock_timeout) || app_lock_timeout < 0 || app_lock_timeout > 86400) return { error: "زمان قفل خودکار باید بین صفر تا ۸۶۴۰۰ ثانیه باشد." };
-  if (app_lock_type !== "none" && !app_lock_hash) return { error: "برای فعال‌کردن قفل، ابتدا باید مقدار رمز قفل ثبت شود." };
+  if (app_lock_type !== "none" && app_lock_type !== "biometric" && !app_lock_hash) return { error: "برای فعال‌کردن قفل، ابتدا باید مقدار رمز قفل ثبت شود." };
   return { value: { first_name,last_name,country,currency,calendar,number_format,number_system,date_format,text_direction,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout } };
 }
 function profileComplete(profile) {
@@ -363,6 +364,32 @@ export default {
     return json({salt:"AAAAAAAAAAAAAAAAAAAAAA",exists:false});
    }
 
+   if(path==="/auth/webauthn/register/options" && request.method==="POST") {
+    const body=await readBody(request),email=cleanEmail(body?.email);
+    if(!/^\\S+@\\S+\\.\\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
+    const ip=request.headers.get("CF-Connecting-IP")||"unknown";
+    if(!await hitAuthLimit(db,"webauthn-options:"+ip,5,600000)) return fail("درخواست‌های زیاد؛ کمی بعد دوباره تلاش کن.",429);
+    const existing=await db.prepare("SELECT id FROM users WHERE email=? LIMIT 1").bind(email).first();
+    if(existing) return fail("برای این ایمیل حسابی وجود دارد.",409);
+    const appOrigin=String(env.WEBAUTHN_ORIGIN||env.APP_URL||"").trim();
+    if(!appOrigin) return fail("تنظیمات دامنه احراز هویت زیستی کامل نیست.",503);
+    const rpID=new URL(appOrigin).hostname;
+    const options=await generateRegistrationOptions({
+      rpName:"NOVYRA",
+      rpID,
+      userName:email,
+      userDisplayName:email,
+      userID:crypto.getRandomValues(new Uint8Array(32)),
+      attestationType:"none",
+      authenticatorSelection:{authenticatorAttachment:"platform",residentKey:"preferred",userVerification:"required"},
+      supportedAlgorithmIDs:[-7,-257],
+      timeout:60000
+    });
+    await db.prepare("INSERT INTO webauthn_pending_challenges(email,challenge,expires_at) VALUES(?,?,?) ON CONFLICT(email) DO UPDATE SET challenge=excluded.challenge,expires_at=excluded.expires_at")
+      .bind(email,options.challenge,Date.now()+300000).run();
+    return json(options);
+   }
+
    if (path === "/auth/register" && request.method === "POST") {
     const body = await readBody(request);
     const email = cleanEmail(body?.email ?? body?.emailAddress);
@@ -381,6 +408,25 @@ export default {
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     if(!await hitAuthLimit(db,"register:"+ip,5,3600000))return fail("Too many registration attempts. Try again later.",429);
     if(!await verifyTurnstile(body?.turnstileToken,request,env))return fail("Complete the security check.",403);
+    let verifiedBiometric=null;
+    if(profile.app_lock_type==="biometric") {
+      if(!body?.webauthnRegistration) return fail("ثبت اثر انگشت یا تشخیص چهره کامل نشده است.",400);
+      const pending=await db.prepare("SELECT challenge,expires_at FROM webauthn_pending_challenges WHERE email=?").bind(email).first();
+      if(!pending || Number(pending.expires_at)<=Date.now()) return fail("درخواست ثبت اثر انگشت منقضی شده است؛ دوباره تلاش کن.",410);
+      const appOrigin=String(env.WEBAUTHN_ORIGIN||env.APP_URL||"").trim();
+      if(!appOrigin) return fail("تنظیمات دامنه احراز هویت زیستی کامل نیست.",503);
+      const rpID=new URL(appOrigin).hostname;
+      const verification=await verifyRegistrationResponse({
+        response:body.webauthnRegistration,
+        expectedChallenge:pending.challenge,
+        expectedOrigin:appOrigin,
+        expectedRPID:rpID,
+        requireUserVerification:true
+      });
+      if(!verification.verified || !verification.registrationInfo) return fail("ثبت امن اثر انگشت یا تشخیص چهره تأیید نشد.",400);
+      verifiedBiometric=verification.registrationInfo;
+      await db.prepare("DELETE FROM webauthn_pending_challenges WHERE email=?").bind(email).run();
+    }
     const id = crypto.randomUUID(), hash = suppliedHash;
     try { await db.prepare("INSERT INTO users (id,email,display_name,password_hash,password_salt,role,first_name,last_name,country,currency,calendar,number_format,number_system,date_format,text_direction,week_start,language,account_type,app_lock_type,app_lock_hash,app_lock_timeout,lock_failed_attempts,onboarding_completed) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)").bind(id,email,displayName,hash,salt,email===cleanEmail(env.ADMIN_EMAIL)?"admin":"user",profile.first_name,profile.last_name,profile.country,profile.currency,profile.calendar,profile.number_format,profile.number_system,profile.date_format,profile.text_direction,profile.week_start,profile.language,profile.account_type,profile.app_lock_type,profile.app_lock_hash,profile.app_lock_timeout,profileComplete(profile)?1:0).run(); }
     catch (insertError) {
@@ -388,6 +434,13 @@ export default {
       if(existing) return fail("برای این ایمیل حسابی وجود دارد. از ورود یا ورود با Google استفاده کن.",409);
       console.error("project-x-register-insert-error",insertError);
       return fail("ساخت حساب در پایگاه‌داده ناموفق بود؛ مشکل از ایمیل تکراری نیست. لطفاً بعداً دوباره تلاش کن.",500);
+    }
+    if(verifiedBiometric) {
+      const credential=verifiedBiometric.credential;
+      const credentialId=String(credential.id);
+      const publicKey=Array.from(credential.publicKey,byte=>byte.toString(16).padStart(2,"0")).join("");
+      await db.prepare("INSERT INTO webauthn_credentials (credential_id,user_id,public_key,counter,transports,device_type,backed_up) VALUES (?,?,?,?,?,?,?)")
+        .bind(credentialId,id,publicKey,Number(credential.counter||0),JSON.stringify(credential.transports||[]),verifiedBiometric.credentialDeviceType||"singleDevice",verifiedBiometric.credentialBackedUp?1:0).run();
     }
     const initialWorkspaceId=crypto.randomUUID();
     const initialWorkspaceType=profile.account_type;
