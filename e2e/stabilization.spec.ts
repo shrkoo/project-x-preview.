@@ -57,7 +57,7 @@ for (const language of ["fa", "en"] as const) {
           expect(homeText).not.toContain("\\n");
           expect(homeText).not.toContain("n\\");
           expect(homeText).not.toContain('n\\"');
-          if (language === "fa") expect(homeText).not.toContain("$");
+          if (language === "fa") if (language === "fa") expect(homeText).not.toContain("$");
           await expect(page.locator(".nvbd-action-secondary")).toHaveCount(3);
           for (const tile of await page.locator(".nvbd-action-secondary").all()) {
             await expect(tile.locator("svg")).toBeVisible();
