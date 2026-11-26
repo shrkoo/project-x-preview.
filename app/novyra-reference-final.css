@@ -4350,3 +4350,15 @@ main.nv-finance button.nf-brand{width:48px!important;min-width:48px!important;mi
 .nv-personal-v1 .nf-toast{bottom:calc(92px + env(safe-area-inset-bottom))!important;background:#fffffff2!important;color:#24445f!important;border:1px solid #ffffffed!important;backdrop-filter:blur(18px)!important}
 @media(min-width:760px){.nv-p-home,.nv-p-transactions{padding-left:22px;padding-right:22px}.nv-p-dock{max-width:520px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}}
 @media(max-width:380px){.nv-p-home,.nv-p-transactions{padding-left:12px;padding-right:12px}.nv-p-hero{padding:16px 15px}.nv-p-hero-amount{font-size:25px}.nv-p-category-strip button{flex-basis:98px}}
+
+
+/* Personal workspace touch-target and safe-area refinements */
+.nv-personal-v1 .nv-p-eye{width:48px;min-width:48px;height:48px;min-height:48px}
+.nv-personal-v1 .nv-p-section-head>button{min-height:48px}
+.nv-personal-v1 .nv-p-dots button{width:48px;height:48px;min-width:48px;min-height:48px;background:transparent;position:relative}
+.nv-personal-v1 .nv-p-dots button:before{content:"";width:7px;height:7px;border-radius:99px;background:#ffffff70;display:block;margin:auto}
+.nv-personal-v1 .nv-p-dots button.active:before{width:20px;background:#fff}
+.nv-personal-v1 .nv-p-filter-search button{width:48px;min-width:48px;height:48px;min-height:48px}
+.nv-personal-v1 .nf-transaction>button{width:48px;min-width:48px;height:48px;min-height:48px}
+.nv-personal-v1 .nf-toast{z-index:1200}
+.nv-personal-v1 .nf-main{padding-bottom:calc(100px + env(safe-area-inset-bottom))!important}
