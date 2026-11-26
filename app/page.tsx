@@ -109,7 +109,7 @@ export default function Home() {
     }
     const token = localStorage.getItem("projectx-token");
     if (token) {
-      apiRequest<{ user: Account }>("/auth/me").then(data => setAccount(data.user)).catch(() => {
+      apiRequest<{ user: Account }>("/auth/me").then(data => { setAccount(data.user); const type=localStorage.getItem("projectx-app-lock-type"); if((type==="pin"||type==="pattern")&&localStorage.getItem("projectx-app-lock-user")===data.user.id&&localStorage.getItem("projectx-app-lock-configured")==="1") setLocked(true); }).catch(() => {
         clearSession();
         setAccount(null);
       }).finally(() => setStartupReady(true));
