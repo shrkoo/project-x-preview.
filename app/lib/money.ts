@@ -70,3 +70,16 @@ export function parseMoney(input:string,currency:string):number {
   return result;
 }
 export const MONEY_HIDDEN_TEXT=HIDDEN;
+
+/** Compatibility formatter for pre-schema records that still store display-unit numbers. */
+export function formatLegacyMoney(amountMajor:number,currency:string,locale:string,options:MoneyOptions={}):string {
+  if(options.hidden)return HIDDEN;
+  if(!Number.isFinite(amountMajor))return formatMoney(0,currency,locale);
+  const minor=parseMoney(String(amountMajor),currency);
+  return formatMoney(minor,currency,locale,options);
+}
+/** Group a major-unit input without adding a currency symbol. */
+export function formatMoneyInput(amountMajor:number,locale:string):string {
+  if(!Number.isFinite(amountMajor))return "";
+  return new Intl.NumberFormat(locale,{maximumFractionDigits:minorDigits("USD"),useGrouping:true}).format(amountMajor);
+}
