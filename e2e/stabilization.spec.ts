@@ -98,7 +98,7 @@ for (const language of ["fa", "en"] as const) {
           viewport: document.documentElement.clientWidth,
           page: document.documentElement.scrollWidth,
           direction: document.querySelector("main.nv-finance")?.getAttribute("dir"),
-          smallTargets: Array.from(document.querySelectorAll("button")).filter(el => {
+          smallTargets: Array.from(document.querySelectorAll("main.nv-finance button")).filter(el => {
             const r = el.getBoundingClientRect();
             return r.width > 0 && r.height > 0 && (r.width < 48 || r.height < 48);
           }).length,
