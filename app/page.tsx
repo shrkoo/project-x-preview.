@@ -80,7 +80,7 @@ export default function Home() {
       if (!alive) return;
       setAccount(data.user);
       const deviceLock = localStorage.getItem("projectx-app-lock-type");
-      if (deviceLock && deviceLock !== "none" && localStorage.getItem("projectx-app-lock-hash") && localStorage.getItem("projectx-app-lock-user") === data.user.id) setLocked(true);
+      if ((deviceLock === "pin" || deviceLock === "pattern") && localStorage.getItem("projectx-app-lock-configured") === "1" && localStorage.getItem("projectx-app-lock-user") === data.user.id) setLocked(true);
       localStorage.setItem("projectx-account", JSON.stringify({ name: data.user.displayName, email: data.user.email }));
       setStartupReady(true);
     }).catch(() => {
@@ -104,7 +104,7 @@ export default function Home() {
     if (user) {
       setAccount(user);
       const deviceLock = localStorage.getItem("projectx-app-lock-type");
-      if (deviceLock && deviceLock !== "none" && localStorage.getItem("projectx-app-lock-hash") && localStorage.getItem("projectx-app-lock-user") === user.id) setLocked(true);
+      if ((deviceLock === "pin" || deviceLock === "pattern") && localStorage.getItem("projectx-app-lock-configured") === "1" && localStorage.getItem("projectx-app-lock-user") === user.id) setLocked(true);
       localStorage.setItem("projectx-account", JSON.stringify({ name: user.displayName, email: user.email }));
       setStartupReady(true);
       return;
@@ -158,7 +158,7 @@ export default function Home() {
     const lockIfConfigured = () => {
       const type = localStorage.getItem("projectx-app-lock-type") || "none";
       const owner = localStorage.getItem("projectx-app-lock-user");
-      if ((type === "pin" || type === "pattern") && owner === account.id && localStorage.getItem("projectx-app-lock-hash")) setLocked(true);
+      if ((type === "pin" || type === "pattern") && owner === account.id && localStorage.getItem("projectx-app-lock-configured") === "1") setLocked(true);
     };
     const onVisibility = () => {
       if (document.visibilityState === "hidden") hiddenAt = Date.now();
@@ -178,7 +178,7 @@ export default function Home() {
 
   function logoutComplete() {
     clearSession();
-    ["projectx-app-lock-type","projectx-app-lock-hash","projectx-app-lock-user","projectx-app-lock-credential","projectx-app-lock-biometric","projectx-app-lock-pin-length","novyra-lock-failures","novyra-lock-until"].forEach(key => localStorage.removeItem(key));
+    ["projectx-app-lock-type","projectx-app-lock-hash","projectx-app-lock-user","projectx-app-lock-configured","projectx-app-lock-credential","projectx-app-lock-biometric","projectx-app-lock-pin-length","novyra-lock-failures","novyra-lock-until"].forEach(key => localStorage.removeItem(key));
     setLocked(false);
     setAccount(null);
     setNotice("");
