@@ -119,7 +119,9 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
   if(!email||!values.password){setNotice(t("required"));return;}
   setBusy(true);setNotice("");setLoginErrorKind(null);setLoginRequestId("");
   try{
-    const data=await apiRequest<{token:string;user:User}>("/auth/login",{method:"POST",body:JSON.stringify({email,password:values.password})});
+    const saltData=await apiRequest<{salt:string}>("/auth/password-salt?email="+encodeURIComponent(email),{method:"GET"});
+    const passwordHash=await derivePasswordHash(values.password,saltData.salt);
+    const data=await apiRequest<{token:string;user:User}>("/auth/login",{method:"POST",body:JSON.stringify({email,passwordHash})});
     setSession(data.token);
     localStorage.setItem("projectx-language",locale);
     localStorage.setItem("projectx-account",JSON.stringify({name:data.user.displayName,email:data.user.email}));
