@@ -4368,3 +4368,6 @@ main.nv-finance button.nf-brand{width:48px!important;min-width:48px!important;mi
 .nv-personal-v1 .nv-p-empty button{min-height:48px}
 .nv-personal-v1 .nv-p-filter-row select,.nv-personal-v1 .nv-p-date-filters input{min-height:48px}
 .nv-personal-v1 .nv-p-dock>button.nv-ref-dock-center{min-height:60px!important}
+
+
+.nv-personal-v1 .nf-topbar>.nf-brand,.nv-personal-v1 .nf-topbar .profile-btn{width:48px!important;min-width:48px!important;height:48px!important;min-height:48px!important}
