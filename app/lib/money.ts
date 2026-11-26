@@ -28,6 +28,14 @@ export function parseMoney(input:string,currency:string):number {
   if(!raw||!/^[-+]?([0-9.,٫]+)$/.test(raw))throw new TypeError("Invalid money amount");
   raw=raw.replace(/٫/g,".");
   const comma=raw.lastIndexOf(","), dot=raw.lastIndexOf(".");
+  if(digits===0) {
+    const separatorAt=Math.max(comma,dot);
+    if(separatorAt>=0) {
+      const separator=raw[separatorAt], trailing=raw.length-separatorAt-1;
+      const repeated=raw.split(separator).length>2;
+      if(!repeated&&trailing>0&&trailing<=2)throw new TypeError("This currency does not support decimal amounts");
+    }
+  }
   let decimalAt=-1;
   if(digits>0&&comma>=0&&dot>=0)decimalAt=Math.max(comma,dot);
   else if(digits>0&&(comma>=0||dot>=0)){
