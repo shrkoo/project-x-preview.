@@ -730,6 +730,7 @@ export default {
    }
 
    if(path==="/auth/account" && request.method==="DELETE") {
+    if (!user) return fail("Please sign in again.",401);
     const body=await readBody(request)||{};
     if(String(body.confirmation||"")!=="DELETE") return fail("Type DELETE to confirm account deletion.");
     const password=String(body.password||"");
@@ -745,7 +746,7 @@ export default {
       const userColumns=(columns.results||[]).map(column=>String(column.name||"")).filter(name=>/^(user_id|owner_id|author_id|creator_id|sender_id|recipient_id|viewer_id|follower_id|following_id|actor_id|invited_by|invited_user_id|member_id|account_id)$/.test(name));
       for(const column of userColumns) statements.push(db.prepare('DELETE FROM "'+table+'" WHERE "'+column+'"=?').bind(user.id));
     }
-    const token=request.headers.get("Authorization")?.replace(/^Bearer\\s+/i,"");
+    const token=request.headers.get("Authorization")?.replace(/^Bearer\s+/i,"");
     if(token) statements.push(db.prepare("DELETE FROM sessions WHERE token_hash=?").bind(await digest(token)));
     statements.push(db.prepare("DELETE FROM users WHERE id=?").bind(user.id));
     for(let i=0;i<statements.length;i+=90) await db.batch(statements.slice(i,i+90));
