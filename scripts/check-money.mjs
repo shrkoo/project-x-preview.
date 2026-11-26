@@ -4,7 +4,7 @@ import { formatMoney, parseMoney } from "../app/lib/money.ts";
 assert.equal(parseMoney("۱٬۲۵۰٬۰۰۰", "IRR"), 1250000);
 assert.equal(parseMoney("١٬٢٥٠٬٠٠٠", "IRR"), 1250000);
 assert.equal(parseMoney("۱۲۵٬۰۰۰", "IRT"), 1250000, "toman input is stored as rial");
-assert.equal(formatMoney(1250000, "IRT-display", "fa-IR"), "۱۲۵٬۰۰۰ تومان");
+assert.equal(formatMoney(1250000, "IRT-display", "fa-IR"), "۱۲۵٬۰۰۰ تومان");\nassert.equal(formatMoney(1250000, "IRT-display", "en-US"), "125,000 Toman");
 assert.equal(formatMoney(1250000, "IRR", "fa-IR"), "۱٬۲۵۰٬۰۰۰ ریال");
 assert.equal(parseMoney("1,234.56", "USD"), 123456);
 assert.equal(parseMoney("1.234,56", "EUR"), 123456);
