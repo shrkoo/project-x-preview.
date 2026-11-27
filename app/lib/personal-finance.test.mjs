@@ -21,6 +21,15 @@ test("transfer changes account balances but not income or expense totals", () =>
   assert.equal(isValidTransfer(0, "Cash", "Bank"), false);
 });
 
+test("legacy transfer pairs stay out of income/expense totals while preserving both account movements", () => {
+  const legacy = [
+    { id: "old-out", kind: "expense", category: "Transfer", amount: 50, account: "Cash" },
+    { id: "old-in", kind: "income", category: "Transfer", amount: 50, account: "Bank" },
+  ];
+  assert.deepEqual(summarizeTransactions(legacy), { income: 0, expense: 0 });
+  assert.deepEqual(calculateAccountBalances(legacy), { Cash: -50, Bank: 50 });
+});
+
 const smsCases = [
   ["واریز: مبلغ ۱,۲۵۰,۰۰۰ ریال", { amount: 1250000, kind: "income" }],
   ["برداشت از کارت به مبلغ ۲۵۰٬۰۰۰ ریال", { amount: 250000, kind: "expense" }],
