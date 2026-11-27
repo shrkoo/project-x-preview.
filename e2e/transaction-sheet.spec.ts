@@ -98,7 +98,7 @@ for(const scenario of cases){
   await expect(page.locator(".nf-transaction").filter({hasText:"E2E expense"})).toContainText(scenario.language==="fa"?"۱٬۲۵۰٬۰۰۰":"1,250,000");
   await expect(page.locator(".nf-transaction").filter({hasText:"E2E income"})).toContainText(scenario.language==="fa"?"۵٬۰۰۰٬۰۰۰":"5,000,000");
   await page.locator("nav.nv-ref-dock button").nth(2).click();
-  await page.getByRole("button",{name:scenario.language==="en"?/Expense/:/هزینه/}).click();
+  await page.getByRole("button",{name:scenario.language==="en"?/^Expense$/:/^هزینه$/}).click();
   const transferSheet=page.getByRole("dialog");
   await expect(transferSheet).toBeVisible();
   await transferSheet.getByRole("button",{name:scenario.language==="en"?/Transfer/:/انتقال وجه/}).click();
