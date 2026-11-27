@@ -4547,3 +4547,14 @@ main.nv-business-overview .nf-topbar .profile-btn span{display:none!important}
   .nv-business-overview .nvbd-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
   .nv-business-overview .nvbd-business-dock{left:50%!important;right:auto!important;width:min(520px,calc(100% - 32px))!important;transform:translateX(-50%)!important}
 }
+
+
+.nv-business-overview .nvbd-skeleton{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}
+.nv-business-overview .nvbd-skeleton i{display:block!important;height:13px!important;border-radius:99px!important;background:linear-gradient(90deg,#ffffff70,#ffffffd9,#ffffff70)!important;background-size:200% 100%!important;animation:nvbd-skeleton-shimmer 1.4s ease-in-out infinite!important}
+.nv-business-overview .nvbd-skeleton i:nth-child(2){height:25px!important}.nv-business-overview .nvbd-skeleton i:nth-child(3){height:18px!important}
+@keyframes nvbd-skeleton-shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.nv-business-overview .nvbd-calendar-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;padding:12px 0!important;border-bottom:1px solid #e7eff7!important}
+.nv-business-overview .nvbd-calendar-row>span{display:grid!important;gap:4px!important;min-width:0!important}
+.nv-business-overview .nvbd-calendar-row b{font-size:12px!important;color:#244766!important}
+.nv-business-overview .nvbd-calendar-row small{font-size:10px!important;color:#7890a5!important}
+.nv-business-overview .nvbd-calendar-row strong{font-size:11px!important;color:#31516e!important;white-space:nowrap!important}
