@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { normalizeEmail, isValidEmail } from "./email.mjs";
+import { normalizeEmail, isValidEmail } from "../workers/api/auth-email.mjs";
 
 test("accepts a valid ordinary email", () => {
   assert.equal(normalizeEmail("shahramalidazeh6203@gmail.com"), "shahramalidazeh6203@gmail.com");
