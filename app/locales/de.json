@@ -104,5 +104,6 @@
   "forgotEmailUnavailable": "Der E-Mail-Dienst zum Zurücksetzen ist derzeit nicht verfügbar. Bitte später erneut versuchen.",
   "forgotServerError": "Der Server konnte die Anfrage nicht verarbeiten. Bitte erneut versuchen.",
   "forgotRequestFailed": "Die Anfrage ist fehlgeschlagen. Prüfen Sie die Angaben und versuchen Sie es erneut.",
-  "forgotNetworkError": "Verbindung fehlgeschlagen. Prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut."
+  "forgotNetworkError": "Verbindung fehlgeschlagen. Prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+  "authNeedsReset": "Dieses Konto verwendet ein älteres Passwortformat. Setzen Sie Ihr Passwort zurück, um fortzufahren."
 }
