@@ -182,11 +182,11 @@ export default function Home() {
     setNotice("");
   }
 
-  if (sessionRecovery) return <main className="social-startup" dir="rtl"><span className="social-startup-mark">N</span><span>NOVYRA</span><p>{notice || "اتصال با سرور برقرار نشد."}</p><button type="button" onClick={() => window.location.reload()}>تلاش دوباره</button></main>;
+  if (sessionRecovery) return <main className="social-startup" dir="rtl"><span className="social-startup-mark">N</span><span>Homa AI</span><p>{notice || "اتصال با سرور برقرار نشد."}</p><button type="button" onClick={() => window.location.reload()}>تلاش دوباره</button></main>;
 
   if (locked) return <AppLockScreen email={account?.email||""} name={account?.displayName||""} language={language} onUnlock={()=>{setLocked(false);document.documentElement.classList.remove("novyra-app-obscured");}} onLogout={logoutComplete}/>;
 
-  if (!startupReady) return <main className="social-startup" aria-label="NOVYRA"><span className="social-startup-mark">N</span><span>NOVYRA</span></main>;
+  if (!startupReady) return <main className="social-startup" aria-label="Homa AI"><span className="social-startup-mark">N</span><span>Homa AI</span></main>;
 
   if (!account) return <NovyraSignupFlow onComplete={completeOnboarding} initialNotice={notice} />;
 
