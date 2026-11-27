@@ -125,7 +125,29 @@ for (const language of ["fa", "en"] as const) {
           const home = page.locator(".nv-p-home");
           await nav.nth(0).click();
           await expect(home).toBeVisible();
+          const spacing = await home.evaluate(element => {
+            const sections = Array.from(element.querySelectorAll(".nv-p-section"));
+            const heading = sections[1]?.querySelector(".nv-p-section-head");
+            const cards = sections[1]?.querySelector(".nv-p-category-strip");
+            const card = cards?.querySelector("button");
+            if (!sections[0] || !sections[1] || !heading || !cards || !card) return null;
+            const first = sections[0].getBoundingClientRect();
+            const second = sections[1].getBoundingClientRect();
+            return {
+              titleToCards: Math.round(cards.getBoundingClientRect().top - heading.getBoundingClientRect().bottom),
+              betweenSections: Math.round(second.top - first.bottom),
+              cardHeight: Math.round(card.getBoundingClientRect().height)
+            };
+          });
+          expect(spacing).not.toBeNull();
+          expect(spacing?.titleToCards).toBe(12);
+          expect(spacing?.betweenSections).toBe(16);
+          expect(spacing?.cardHeight).toBe(80);
           const homeText = await home.innerText();
+          await home.locator(".nv-personal-bell").click();
+          const notificationSheet = page.getByRole("dialog", { name: /Notifications|اعلان‌ها/ });
+          await expect(notificationSheet).toBeVisible();
+          await notificationSheet.getByRole("button", { name: /Close|بستن/ }).click();
           if (language === "fa") expect(homeText).not.toContain("$");
           expect(homeText).not.toContain("\\n");
           expect(homeText).not.toContain('n\\"');
