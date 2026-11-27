@@ -231,13 +231,20 @@ async function deliverBusinessReminders(env,db) {
 function cleanName(value) { return String(value || "").trim().replace(/[<>]/g, "").slice(0, 32); }
 function cleanEmail(value) { return normalizeEmail(value).toLowerCase().slice(0, 254); }
 
-async function verifyTurnstile(token, request, env) {
-  if (!env.TURNSTILE_SECRET_KEY || !token) return false;
+async function verifyTurnstile(token, request, env, requestId) {
+  const fail = reason => { console.error("novyra-auth-error",{requestId,route:"turnstile",code:"TURNSTILE_FAILED",reason}); return false; };
+  if (!env.TURNSTILE_SECRET_KEY) return fail("TURNSTILE_SECRET_MISSING");
+  if (!token) return fail("TURNSTILE_TOKEN_MISSING");
   const form = new URLSearchParams({secret: env.TURNSTILE_SECRET_KEY, response: String(token)});
   const ip = request.headers.get("CF-Connecting-IP"); if (ip) form.set("remoteip", ip);
-  const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {method:"POST", body:form});
-  if (!response.ok) return false;
-  const result = await response.json(); return result.success === true;
+  try {
+    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {method:"POST", body:form});
+    if (!response.ok) return fail("TURNSTILE_PROVIDER_HTTP_" + response.status);
+    const result = await response.json();
+    return result.success === true ? true : fail("TURNSTILE_VERIFICATION_REJECTED");
+  } catch (error) {
+    return fail("TURNSTILE_PROVIDER_NETWORK_ERROR");
+  }
 }
 async function hitAuthLimit(db, key, max = 6, windowMs = 600000) {
   const now=Date.now(),cutoff=now-windowMs;
@@ -405,7 +412,7 @@ export default {
      if(!isValidEmail(email)) return fail("ایمیل معتبر وارد کن.");
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     if(!await hitAuthLimit(db,"email-check:"+ip,8,600000))return fail("Too many checks. Try again later.",429);
-    if(!await verifyTurnstile(body?.turnstileToken,request,env))return fail("Complete the security check.",403);
+    if(!await verifyTurnstile(body?.turnstileToken,request,env,requestId))return json({code:"TURNSTILE_FAILED",message:"بررسی امنیتی انجام نشد؛ دوباره تلاش کن.",requestId},403);
     const found=await db.prepare("SELECT auth_provider FROM users WHERE email=? LIMIT 1").bind(email).first();
     return json({exists:Boolean(found),provider:found?.auth_provider==="google"?"google":found?"password":null});
    }
@@ -587,7 +594,7 @@ export default {
 
    if (path === "/auth/register" && request.method === "POST") {
     const authFail=(message,status=400)=>json({
-      code:status===429?"RATE_LIMITED":status===403?"FORBIDDEN":status===409?"ACCOUNT_EXISTS":status===410?"TOKEN_EXPIRED":status>=500?"INTERNAL_ERROR":"INVALID_INPUT",
+      code:status===429?"RATE_LIMITED":status===403?"TURNSTILE_FAILED":status===409?"ACCOUNT_EXISTS":status===410?"TOKEN_EXPIRED":status>=500?"INTERNAL_ERROR":"INVALID_INPUT",
       message,requestId
     },status);
     try {
