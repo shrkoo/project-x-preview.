@@ -84,7 +84,7 @@ jobs:
         run: |
           set -euo pipefail
           response="$(curl --fail --silent --show-error "$PREVIEW_WORKER_URL/api/health")"
-          node -e 'const d=JSON.parse(process.argv[1]);const required=["users","sessions","auth_rate_limits","signup_verification_codes"];if(d.ok!==true||d.service!=="novyra-api"||d.database!=="connected"||required.some(k=>d.tables?.[k]!==true)||d.bindings?.D1!==true||typeof d.secrets?.TURNSTILE!=="boolean"||typeof d.secrets?.EMAIL_PROVIDER!=="boolean"||typeof d.secrets?.GOOGLE_OAUTH!=="boolean"||d.configuration?.SESSION_SECRET_REQUIRED!==false)process.exit(1);console.log("Auth readiness:",JSON.stringify({D1:d.bindings.D1,Turnstile:d.secrets.TURNSTILE,EmailProvider:d.secrets.EMAIL_PROVIDER,GoogleOAuth:d.secrets.GOOGLE_OAUTH,SessionSecretRequired:d.configuration.SESSION_SECRET_REQUIRED}))' "$response"
+          node -e 'const d=JSON.parse(process.argv[1]);const required=["users","sessions","auth_rate_limits","signup_verification_codes","finance_transfers"];if(d.ok!==true||d.service!=="novyra-api"||d.database!=="connected"||required.some(k=>d.tables?.[k]!==true)||d.bindings?.D1!==true||typeof d.secrets?.TURNSTILE!=="boolean"||typeof d.secrets?.EMAIL_PROVIDER!=="boolean"||typeof d.secrets?.GOOGLE_OAUTH!=="boolean"||d.configuration?.SESSION_SECRET_REQUIRED!==false)process.exit(1);console.log("Auth readiness:",JSON.stringify({D1:d.bindings.D1,Turnstile:d.secrets.TURNSTILE,EmailProvider:d.secrets.EMAIL_PROVIDER,GoogleOAuth:d.secrets.GOOGLE_OAUTH,SessionSecretRequired:d.configuration.SESSION_SECRET_REQUIRED}))' "$response"
           options_status="$(curl --silent --output /dev/null --write-out '%{http_code}' --request OPTIONS "$PREVIEW_WORKER_URL/auth/login")"
           test "$options_status" = "204" -o "$options_status" = "200"
           echo "Preview API D1 schema health and auth CORS preflight checks passed."
@@ -114,6 +114,8 @@ jobs:
           test "$status" = "200"
           node -e 'const d=require("/tmp/login-response.json");if(!d.token||d.user?.email!=="novyra-preview-smoke@example.invalid"||!d.requestId&&d.code)process.exit(1);console.log("Preview login PASS for ephemeral test account; requestId:",d.requestId||"returned session")'
           echo "Preview password login succeeded with a real, temporary D1 account."
+          token="$(node -e 'process.stdout.write(require("/tmp/login-response.json").token)')"
+          PREVIEW_API_TOKEN="$token" node tests/finance-transfer-smoke.mjs
 
       - name: Build static frontend for preview API
         run: npm run build
