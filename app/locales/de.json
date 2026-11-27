@@ -105,5 +105,6 @@
   "forgotServerError": "Der Server konnte die Anfrage nicht verarbeiten. Bitte erneut versuchen.",
   "forgotRequestFailed": "Die Anfrage ist fehlgeschlagen. Prüfen Sie die Angaben und versuchen Sie es erneut.",
   "forgotNetworkError": "Verbindung fehlgeschlagen. Prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
-  "authNeedsReset": "Dieses Konto verwendet ein älteres Passwortformat. Setzen Sie Ihr Passwort zurück, um fortzufahren."
+  "authNeedsReset": "Dieses Konto verwendet ein älteres Passwortformat. Setzen Sie Ihr Passwort zurück, um fortzufahren.",
+  "resetTokenExpired": "Dieser Zurücksetzen-Link ist abgelaufen oder wurde bereits verwendet. Fordern Sie einen neuen Link an."
 }
