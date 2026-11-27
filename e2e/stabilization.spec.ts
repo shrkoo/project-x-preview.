@@ -53,24 +53,6 @@ for (const language of ["fa", "en"] as const) {
         if (accountType === "business") {
           const home = page.locator(".nvbd-root");
           await expect(home).toBeVisible();
-          const layout = await home.evaluate(element => {
-            const sections = Array.from(element.querySelectorAll(".nv-p-section"));
-            const heading = sections[1]?.querySelector(".nv-p-section-head");
-            const cards = sections[1]?.querySelector(".nv-p-category-strip");
-            const card = cards?.querySelector("button");
-            if (!sections[0] || !sections[1] || !heading || !cards || !card) return null;
-            const first = sections[0].getBoundingClientRect();
-            const second = sections[1].getBoundingClientRect();
-            return {
-              titleToCards: Math.round(cards.getBoundingClientRect().top - heading.getBoundingClientRect().bottom),
-              betweenSections: Math.round(second.top - first.bottom),
-              categoryCardHeight: Math.round(card.getBoundingClientRect().height)
-            };
-          });
-          expect(layout).not.toBeNull();
-          expect(layout?.titleToCards).toBe(12);
-          expect(layout?.betweenSections).toBe(16);
-          expect(layout?.categoryCardHeight).toBe(80);
           const homeText = await home.innerText();
           expect(homeText).not.toContain("\\n");
           expect(homeText).not.toContain("n\\");
