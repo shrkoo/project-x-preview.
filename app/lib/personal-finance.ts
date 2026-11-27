@@ -1,4 +1,4 @@
-export type FinanceEvent = { id: string; kind: "income" | "expense" | "transfer"; amount: number; account?: string; fromAccount?: string; toAccount?: string };
+export type FinanceEvent = { id: string; kind: "income" | "expense" | "transfer"; amount: number; category?: string; account?: string; fromAccount?: string; toAccount?: string };
 
 const dateParts = (date: Date) => {
   const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Tehran", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
@@ -19,6 +19,7 @@ export function dateOffsetInTehran(offset: number, now: Date = new Date()): stri
 
 export function summarizeTransactions(events: FinanceEvent[]) {
   return events.reduce((totals, event) => {
+    if (event.kind === "transfer" || event.category === "Transfer") return totals;
     if (event.kind === "income") totals.income += event.amount;
     if (event.kind === "expense") totals.expense += event.amount;
     return totals;
