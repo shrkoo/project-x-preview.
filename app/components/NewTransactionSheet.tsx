@@ -1,6 +1,6 @@
 "use client";
 import {useEffect,useMemo,useRef,useState,type Dispatch,type SetStateAction,type FormEvent} from "react";
-import {X,ArrowLeftRight,ArrowDownLeft,ArrowUpRight,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Check,Search,Plus,Wallet,Camera,Repeat2,Tag,MessageSquareText,Trash2,ImagePlus,Clock3,Utensils,Car,ShoppingBag,House,HeartPulse,BookOpen,Lightbulb,Gift,BriefcaseBusiness,WalletCards,ChartNoAxesCombined,Receipt} from "lucide-react";
+import {X,ArrowLeftRight,ArrowDownLeft,ArrowUpRight,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Check,Search,Plus,Wallet,Camera,Repeat2,Tag,MessageSquareText,Trash2,ImagePlus,Clock3,Utensils,Car,ShoppingBag,House,HeartPulse,BookOpen,Lightbulb,Gift,BriefcaseBusiness,WalletCards,ChartNoAxesCombined,Receipt,MoreHorizontal} from "lucide-react";
 import {formatMoney,parseMoney,currencyDigits} from "../lib/money";
 import {formatCalendarDate,type CalendarCode} from "../data/calendars";
 
