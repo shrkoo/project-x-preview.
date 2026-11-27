@@ -438,7 +438,7 @@ export default {
     if(!user||user.verified_at)return json({ok:true});
     const previous=await db.prepare("SELECT sent_at FROM signup_verification_codes WHERE user_id=? ORDER BY sent_at DESC LIMIT 1").bind(user.id).first();
     if(previous&&Date.now()-Number(previous.sent_at)<60000)return fail("Wait before requesting another code.",429);
-    if(!hasMailProvider(env))return fail("Email delivery is not configured.",503);
+    if(!hasMailProvider(env))return json({code:"EMAIL_SEND_FAILED",message:"Email delivery is not configured in this environment.",requestId},503);
     const code=await createSignupCode(db,user.id);
     await sendMail(env,email,"Your NOVYRA verification code",renderNovyraEmail({eyebrow:"ACCOUNT VERIFICATION",title:"Your verification code",intro:"Enter this 6-digit code in Novyra to activate your account.",actionLabel:code,actionUrl:env.APP_URL||"https://novyra.pages.dev",notice:"This code expires in 10 minutes. Maximum 5 attempts.",footerNote:"If you did not create this account, ignore this email."}));
     return json({ok:true,cooldownSeconds:60});
