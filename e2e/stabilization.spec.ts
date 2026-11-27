@@ -144,7 +144,7 @@ for (const language of ["fa", "en"] as const) {
           expect(spacing?.betweenSections).toBe(16);
           expect(spacing?.cardHeight).toBe(80);
           const homeText = await home.innerText();
-          await home.locator(".nv-personal-bell").click();
+          await page.locator(".nv-personal-bell").click();
           const notificationSheet = page.getByRole("dialog", { name: /Notifications|اعلان‌ها/ });
           await expect(notificationSheet).toBeVisible();
           await notificationSheet.getByRole("button", { name: /Close|بستن/ }).click();
