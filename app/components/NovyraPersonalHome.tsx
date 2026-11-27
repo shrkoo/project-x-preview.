@@ -66,8 +66,7 @@ export default function NovyraPersonalHome(p:Props){
 
 .nv-finance.nv-personal-v1 .nv-p-dock>button svg{width:20px!important;height:20px!important;stroke-width:1.8!important}
 @media(max-width:380px){.nv-finance.nv-personal-v1 .nv-p-home{gap:14px!important}.nv-finance.nv-personal-v1 .nv-p-category-strip>button{height:88px!important;min-height:88px!important}}
-`}
-/* Precise final home layout overrides. Earlier duplicate section-head rule was winning the 8px spacing request. */
+/* Precise final home layout overrides. */
 .nv-finance.nv-personal-v1.nv-home-active{min-height:100svh!important;background:linear-gradient(180deg,#c6e6fa 0%,#c6e6fa 100%)!important}
 .nv-finance.nv-personal-v1 .nv-p-home{gap:16px!important}
 .nv-finance.nv-personal-v1 .nv-p-section-head{margin:0 0 12px!important;padding:0!important;min-height:0!important}
@@ -75,9 +74,9 @@ export default function NovyraPersonalHome(p:Props){
 .nv-finance.nv-personal-v1 .nv-p-eye{width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important;flex:0 0 36px!important;padding:0!important;border-radius:50%!important;aspect-ratio:1/1!important}
 .nv-finance.nv-personal-v1 .nv-p-hero{background:linear-gradient(135deg,#55a8ec 0%,#55a8ec 100%)!important}
 .nv-finance.nv-personal-v1 .nv-p-hero>small,.nv-finance.nv-personal-v1 .nv-p-hero-top>span,.nv-finance.nv-personal-v1 .nv-p-flow span,.nv-finance.nv-personal-v1 .nv-p-flow b,.nv-finance.nv-personal-v1 .nv-p-hero>span,.nv-finance.nv-personal-v1 .nv-p-account-link{color:#fff!important;font-weight:600!important;text-shadow:0 1px 2px rgba(0,40,80,.18)!important}
-.nv-finance.nv-personal-v1 .nv-p-category-strip>button{height:80px!important;min-height:80px!important;max-height:80px!important}
-.nv-finance.nv-personal-v1 .nv-p-category-strip>button{flex-basis:82px!important}
+.nv-finance.nv-personal-v1 .nv-p-category-strip>button{height:80px!important;min-height:80px!important;max-height:80px!important;flex-basis:82px!important}
 .nv-finance.nv-personal-v1 .nv-p-category-strip>button b,.nv-finance.nv-personal-v1 .nv-p-category-strip>button small{font-weight:600!important}
+`}
 </style>
  </div>;
 }
