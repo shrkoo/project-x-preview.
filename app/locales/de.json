@@ -93,5 +93,16 @@
   "loginRetry": "Erneut versuchen",
   "loginWaitSeconds": "Versuche es in {seconds} Sekunden erneut",
   "loginErrorCode": "Fehlercode: {id}",
-  "createAccount": "Konto erstellen"
+  "createAccount": "Konto erstellen",
+  "forgotIntro": "Geben Sie Ihre Konto-E-Mail ein. Falls ein Konto existiert, senden wir einen Link zum Zurücksetzen.",
+  "forgotSend": "Link zum Zurücksetzen senden",
+  "forgotSuccessTitle": "Anfrage erhalten",
+  "forgotSuccessBody": "Falls ein Konto zu dieser E-Mail existiert, haben wir einen Link gesendet.",
+  "forgotResendWait": "Erneut senden in {seconds} Sek.",
+  "forgotResend": "Link erneut senden",
+  "forgotRateLimited": "Anfragen zum Zurücksetzen sind vorübergehend begrenzt. Bitte warten Sie und versuchen Sie es erneut.",
+  "forgotEmailUnavailable": "Der E-Mail-Dienst zum Zurücksetzen ist derzeit nicht verfügbar. Bitte später erneut versuchen.",
+  "forgotServerError": "Der Server konnte die Anfrage nicht verarbeiten. Bitte erneut versuchen.",
+  "forgotRequestFailed": "Die Anfrage ist fehlgeschlagen. Prüfen Sie die Angaben und versuchen Sie es erneut.",
+  "forgotNetworkError": "Verbindung fehlgeschlagen. Prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut."
 }
