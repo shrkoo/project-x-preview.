@@ -15,6 +15,9 @@ for (const scenario of scenarios) {
         localStorage.setItem("projectx-language", language);
         localStorage.removeItem("projectx-token");
       }, { language: scenario.language });
+      await page.route("https://challenges.cloudflare.com/**", async route => {
+        await route.fulfill({ status: 200, contentType: "application/javascript", body: "window.turnstile={render:function(_container,options){options.callback('mock-turnstile-token');document.documentElement.dataset.turnstileMock='ready';return 'mock-turnstile-widget';},reset:function(){}};" });
+      });
     });
 
     test("forgot password normalizes RTL controls, sends and shows cooldown success", async ({ page }) => {
@@ -84,6 +87,7 @@ for (const scenario of scenarios) {
       await page.getByRole("button", { name: /United States/ }).click();
       await page.getByLabel(scenario.password).fill("PreviewPass123!");
       await page.getByLabel(scenario.language === "fa" ? "تکرار رمز عبور" : "Confirm password").fill("PreviewPass123!");
+      await expect.poll(() => page.evaluate(() => document.documentElement.dataset.turnstileMock)).toBe("ready");
       await page.getByRole("button", { name: scenario.continue }).click();
       await page.getByRole("button", { name: scenario.continue }).click();
       await page.getByLabel(scenario.currency).selectOption("USD");
