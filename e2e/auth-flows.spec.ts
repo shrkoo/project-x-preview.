@@ -15,7 +15,7 @@ for (const scenario of scenarios) {
         localStorage.setItem("projectx-language", language);
         localStorage.removeItem("projectx-token");
       }, { language: scenario.language });
-      await page.route(/challenges\\.cloudflare\\.com\\/turnstile\\/v0\\/api\\.js/, async route => {
+      await page.route(/challenges\.cloudflare\.com\/turnstile\/v0\/api\.js/, async route => {
         await route.fulfill({ status: 200, contentType: "application/javascript", body: "window.turnstile={render:function(_container,options){options.callback('mock-turnstile-token');document.documentElement.dataset.turnstileMock='ready';return 'mock-turnstile-widget';},reset:function(){}};" });
       });
     });
