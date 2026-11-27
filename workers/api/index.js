@@ -300,7 +300,7 @@ export default {
       const pending=await db.prepare("SELECT COUNT(*) AS total FROM email_tokens WHERE user_id=? AND kind='password_reset' AND expires_at>? AND used_at IS NULL").bind(target.id,Date.now()).first();
       if((pending?.total||0)<3) {
         const token=await issueEmailToken(db,target.id,"password_reset",60*60*1000);
-        const link=(env.APP_URL || "https://novyra.pages.dev") + "/?reset=" + encodeURIComponent(token);
+        const link="https://homaai-email-preview.novyra.pages.dev" + "/?reset=" + encodeURIComponent(token);
         await sendMail(env,target.email,"بازیابی رمز عبور HomaAi",renderNovyraEmail({eyebrow:"ACCOUNT SECURITY",title:"بازیابی رمز عبور",intro:"درخواست بازیابی رمز عبور حساب HomaAi شما ثبت شده است. نگران نباشید؛ با انتخاب یک رمز تازه و امن، دوباره با خیال راحت به حساب و اطلاعات مالی خود دسترسی خواهید داشت.",actionLabel:"تغییر رمز عبور",actionUrl:link,notice:"این لینک فقط تا یک ساعت معتبر است و پس از آن منقضی می‌شود.",footerNote:"اگر شما این درخواست را ثبت نکرده‌اید، این ایمیل را نادیده بگیرید؛ رمز عبور حساب شما تغییر نخواهد کرد."}));
       }
     }
