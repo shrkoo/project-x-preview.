@@ -111,3 +111,16 @@
 .nv-tx-helper{font-size:10px!important;color:#527b98!important}
 .nv-tx-calendar{direction:rtl!important}
 .nv-tx-calendar-grid button{font-variant-numeric:tabular-nums!important}
+
+/* Final compact transaction sheet layout */
+.nv-tx-scroll{scrollbar-width:none!important;-ms-overflow-style:none!important}
+.nv-tx-scroll::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;background:transparent!important}
+.nv-tx-cats{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important;overflow:visible!important}
+.nv-tx-cats button{min-width:0!important;width:100%!important;min-height:60px!important;height:60px!important;padding:4px 2px!important;gap:3px!important;border-radius:11px!important}
+.nv-tx-cats button>span{width:29px!important;height:29px!important;border-radius:9px!important;font-size:16px!important}
+.nv-tx-cats button small{font-size:9px!important;line-height:1.15!important}
+.nv-tx-footer{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:auto 48px!important;gap:6px!important;align-items:center!important;padding:7px 12px calc(8px + env(safe-area-inset-bottom))!important}
+.nv-tx-footer .nv-tx-disabled-reason{grid-column:1/-1!important;grid-row:1!important;order:0!important;margin:0!important;min-height:12px!important;line-height:12px!important;font-size:9px!important;text-align:center!important}
+.nv-tx-footer .nv-tx-save{grid-column:1!important;grid-row:2!important;order:1!important;width:100%!important;height:48px!important;min-height:48px!important;max-height:48px!important;border-radius:14px!important;font-size:12px!important}
+.nv-tx-footer .nv-tx-save-another{grid-column:2!important;grid-row:2!important;order:2!important;width:100%!important;height:48px!important;min-height:48px!important;max-height:48px!important;border-radius:14px!important;font-size:11px!important;padding:0 5px!important;white-space:nowrap!important}
+.nv-tx-footer .nv-tx-delete{grid-column:1/-1!important;grid-row:3!important;position:static!important;justify-self:center!important;min-height:32px!important}
