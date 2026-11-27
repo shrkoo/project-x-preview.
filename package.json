@@ -19,7 +19,8 @@
     "serve:e2e": "node scripts/serve-static.mjs",
     "test:money": "node --experimental-strip-types scripts/check-money.mjs",
     "test:money-usage": "node scripts/check-money-usage.mjs",
-    "test:email-normalization": "node --test shared/email.test.mjs"
+    "test:email-normalization": "node --test shared/email.test.mjs",
+    "test:personal-finance": "node --experimental-strip-types --test app/lib/personal-finance.test.mjs"
   },
   "dependencies": {
     "next": "15.5.28",
