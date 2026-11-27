@@ -65,11 +65,9 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
  }
  async function forgotPassword(){
   if(busy)return;
-  const visibleEmail=document.querySelector<HTMLInputElement>('input[autocomplete="email"]')?.value||"";
-  const email=(visibleEmail||values.email||"").trim().toLowerCase();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setNotice(t("emailInvalid"));return;}
-  setValue("email",email,{shouldValidate:true});
-  setBusy(true);try{await apiRequest("/auth/forgot-password",{method:"POST",body:JSON.stringify({email})});setNotice(t("forgotSent"));}catch(e){setNotice(e instanceof Error?e.message:t("error"));}finally{setBusy(false);}
+  const email=forgotEmail.trim().toLowerCase();
+  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){setNotice(t("emailInvalid"));return;}
+  setBusy(true);setNotice("");try{await apiRequest("/auth/forgot-password",{method:"POST",body:JSON.stringify({email})});setNotice(t("forgotSent"));}catch(e){setNotice(e instanceof Error?e.message:t("error"));}finally{setBusy(false);}
  }
  async function submitDetails(){
   setNotice("");
