@@ -20,7 +20,7 @@ migrations_dir = "migrations-preview"
 
 [[kv_namespaces]]
 binding = "STORY_MEDIA"
-id = "81e14038-5b81-49f8-83a1-4c5ba1f05bd8"
+id = "81ae79962a0c47778b8ca32fc9e35422"
 
 [[durable_objects.bindings]]
 name = "ROOM_HUB"
