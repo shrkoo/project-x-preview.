@@ -133,7 +133,7 @@ for(const scenario of cases){
   await expect(page.locator(".nv-tx-sub-sheet")).toBeVisible();
   await page.locator(".nv-tx-sub-sheet textarea").fill("پیام نامعتبر");
   await page.locator(".nv-tx-sub-sheet .nv-tx-sms-button").click();
-  await expect(page.getByRole("alert")).toContainText("پیامک");
+  await expect(page.locator(".nv-tx-sms-error")).toContainText("پیامک");
   await page.locator(".nv-tx-sub-sheet textarea").fill("واریز مبلغ ۱٬۲۵۰٬۰۰۰ ریال");
   await page.locator(".nv-tx-sub-sheet .nv-tx-sms-button").click();
   await expect(page.locator("#nv-tx-amount")).toHaveValue(/۱٬۲۵۰٬۰۰۰|1,250,000/);
