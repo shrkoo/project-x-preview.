@@ -104,13 +104,14 @@ for(const scenario of cases){
   await transferSheet.getByRole("button",{name:scenario.language==="en"?/Transfer/:/انتقال وجه/}).click();
   await expect(transferSheet.getByText("برای انتقال، دو حساب لازم است")).toHaveCount(0);
   await transferSheet.locator("#nv-tx-amount").fill("250000");
+  await transferSheet.locator('input[placeholder="توضیح (اختیاری)"]').fill("انتقال پس‌انداز");
   await transferSheet.locator(".nv-tx-transfer select").nth(0).selectOption("Checking");
   await transferSheet.locator(".nv-tx-transfer select").nth(1).selectOption("Savings");
   await transferSheet.locator(".nv-tx-save").click();
   await expect(page.locator(".nf-toast")).toBeVisible();
   const transferRow=page.locator(".nf-transaction").filter({hasText:"انتقال از Checking به Savings"});
   await expect(transferRow).toBeVisible();
-  await expect.poll(()=>remoteItems.some(item=>item.kind==="transfer"&&item.fromAccount==="Checking"&&item.toAccount==="Savings")).toBe(true);
+  await expect.poll(()=>remoteItems.some(item=>item.kind==="transfer"&&item.fromAccount==="Checking"&&item.toAccount==="Savings"&&item.note.includes("انتقال پس‌انداز"))).toBe(true);
   await page.locator(".nf-toast button").first().click();
   await expect(transferRow).toHaveCount(0);
   await expect.poll(()=>remoteItems.some(item=>item.kind==="transfer")).toBe(false);
