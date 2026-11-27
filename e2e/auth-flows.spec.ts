@@ -33,6 +33,25 @@ for (const scenario of scenarios) {
       await expect(page.locator(".nv-success .nv-button")).toBeDisabled();
     });
 
+    test("email provider errors stay inline, include request id and can be retried", async ({ page }) => {
+      let requests = 0;
+      await page.route("**/auth/forgot-password", async route => {
+        requests++;
+        await route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({
+          code: "EMAIL_SEND_FAILED", message: "Email provider is not configured.", requestId: "req-preview-503"
+        }) });
+      });
+      await page.goto("/");
+      await page.getByRole("button", { name: scenario.login }).click();
+      await page.getByRole("button", { name: scenario.forgot }).click();
+      await page.locator('input[type="email"]').fill("auth-preview@example.com");
+      await page.getByRole("button", { name: scenario.send }).click();
+      await expect(page.locator(".nv-inline-error")).toContainText("req-preview-503");
+      const retry = scenario.language === "fa" ? "تلاش دوباره" : "Try again";
+      await page.getByRole("button", { name: retry }).click();
+      await expect.poll(() => requests).toBe(2);
+    });
+
     test("Google button starts OAuth redirect", async ({ page }) => {
       await page.route("**/auth/google/start", async route => {
         await route.fulfill({ status: 302, headers: { location: "https://accounts.google.com/o/oauth2/v2/auth?client_id=mock-preview-client&redirect_uri=https%3A%2F%2Fnovyra-preview-api.projectx-novyratam.workers.dev%2Fauth%2Fgoogle%2Fcallback&state=mock-state" } });
