@@ -33,15 +33,12 @@ export default function NovyraPersonalHome(p:Props){
 .nv-finance.nv-personal-v1 .nv-p-insight{min-height:64px!important;padding:10px 13px!important;gap:10px!important}
 .nv-finance.nv-personal-v1 .nv-p-insight>span{gap:3px!important}
 .nv-finance.nv-personal-v1 .nv-p-insight small{font-size:10px!important;line-height:1.4!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
-.nv-finance.nv-personal-v1 .nv-p-section{margin:0!important;padding:0!important}
-.nv-finance.nv-personal-v1 .nv-p-section-head{margin-bottom:8px!important}
 .nv-finance.nv-personal-v1 .nv-p-empty{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;min-height:42px!important;padding:7px 10px!important;border-radius:13px!important}
 .nv-finance.nv-personal-v1 .nv-p-empty-copy{display:flex!important;align-items:center!important;gap:7px!important;min-width:0!important;font-size:11px!important;white-space:nowrap!important}
 .nv-finance.nv-personal-v1 .nv-p-empty-copy>svg{width:16px!important;height:16px!important;flex:0 0 auto!important}
 .nv-finance.nv-personal-v1 .nv-p-empty-copy>span{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
 .nv-finance.nv-personal-v1 .nv-p-empty>button{flex:0 0 auto!important;min-height:29px!important;padding:0 10px!important;border-radius:9px!important;font-size:10px!important}
 .nv-finance.nv-personal-v1 .nv-p-category-strip{gap:8px!important}
-.nv-finance.nv-personal-v1 .nv-p-category-strip>button{height:88px!important;min-height:88px!important;padding:9px 7px!important;gap:5px!important}
 .nv-finance.nv-personal-v1 .nv-p-dock{left:14px!important;right:14px!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;height:66px!important;min-height:66px!important;padding:5px 8px!important;border-radius:22px!important;background:rgba(255,255,255,.86)!important;border:1px solid rgba(255,255,255,.92)!important;box-shadow:0 8px 26px rgba(40,90,140,.12)!important;backdrop-filter:blur(22px) saturate(145%)!important;-webkit-backdrop-filter:blur(22px) saturate(145%)!important}
 .nv-finance.nv-personal-v1 .nv-p-dock>button{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;width:100%!important;height:54px!important;min-height:54px!important;padding:2px 0!important;border:0!important;border-radius:14px!important;background:transparent!important;color:#8196aa!important;font-size:11px!important;box-shadow:none!important}
 .nv-finance.nv-personal-v1 .nv-p-dock>button.active{color:#2f80ed!important}
@@ -54,8 +51,6 @@ export default function NovyraPersonalHome(p:Props){
 .nv-finance.nv-personal-v1 .nv-p-dock>button:not(.nv-p-dock-center) svg{width:22px!important;height:22px!important}
 .nv-finance.nv-personal-v1 .nv-p-category-strip{display:flex!important;overflow-x:auto!important;overscroll-behavior-x:contain!important;scrollbar-width:none!important;padding-bottom:2px!important}
 .nv-finance.nv-personal-v1 .nv-p-category-strip::-webkit-scrollbar{display:none!important}
-.nv-finance.nv-personal-v1 .nv-p-category-strip>button{flex:0 0 82px!important}
-.nv-finance.nv-personal-v1 .nv-p-section-head{margin-bottom:12px!important}
 .nv-finance.nv-personal-v1 .nv-p-hero{background:linear-gradient(135deg,#55a8ec 0%,#55a8ec 100%)!important;color:#fff!important}
 .nv-finance.nv-personal-v1 .nv-p-hero span,.nv-finance.nv-personal-v1 .nv-p-hero small,.nv-finance.nv-personal-v1 .nv-p-hero b{color:#fff!important;text-shadow:0 1px 3px rgba(0,24,66,.28)!important}
 .nv-finance.nv-personal-v1 .nv-p-hero-amount{font-size:clamp(28px,8vw,34px)!important;letter-spacing:.01em!important;text-shadow:0 1px 3px rgba(0,24,66,.25)!important}
@@ -69,13 +64,12 @@ export default function NovyraPersonalHome(p:Props){
 
 /* Precise final home layout overrides. */
 .nv-finance.nv-personal-v1.nv-home-active{min-height:100svh!important;background:linear-gradient(180deg,#c6e6fa 0%,#c6e6fa 100%)!important}
-.nv-finance.nv-personal-v1 .nv-p-home{gap:16px!important}
 .nv-finance.nv-personal-v1 .nv-p-section-head{margin:0 0 12px!important;padding:0!important;min-height:0!important}
 .nv-finance.nv-personal-v1 .nv-p-section{margin:0!important;padding:0!important;min-height:0!important}
 .nv-finance.nv-personal-v1 .nv-p-eye{width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important;flex:0 0 36px!important;padding:0!important;border-radius:50%!important;aspect-ratio:1/1!important}
 .nv-finance.nv-personal-v1 .nv-p-hero{background:linear-gradient(135deg,#55a8ec 0%,#55a8ec 100%)!important}
 .nv-finance.nv-personal-v1 .nv-p-hero>small,.nv-finance.nv-personal-v1 .nv-p-hero-top>span,.nv-finance.nv-personal-v1 .nv-p-flow span,.nv-finance.nv-personal-v1 .nv-p-flow b,.nv-finance.nv-personal-v1 .nv-p-hero>span,.nv-finance.nv-personal-v1 .nv-p-account-link{color:#fff!important;font-weight:600!important;text-shadow:0 1px 2px rgba(0,40,80,.18)!important}
-.nv-finance.nv-personal-v1 .nv-p-category-strip>button{height:80px!important;min-height:80px!important;max-height:80px!important;flex:0 0 82px!important}
+.nv-finance.nv-personal-v1 .nv-p-category-strip>button{height:80px!important;min-height:80px!important;max-height:80px!important;flex:0 0 82px!important;min-width:82px!important}
 .nv-finance.nv-personal-v1 .nv-p-category-strip>button b,.nv-finance.nv-personal-v1 .nv-p-category-strip>button small{font-weight:600!important}
 `}
 </style>
