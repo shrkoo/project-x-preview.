@@ -351,7 +351,7 @@ export default {
   try {
    if ((path === "/api/health" || path === "/health") && request.method === "GET") {
     const requiredTables = ["users","sessions","auth_rate_limits","signup_verification_codes"];
-    const bindings = { DB: Boolean(env.DB), ROOM_HUB: Boolean(env.ROOM_HUB), STORY_MEDIA_KV: Boolean(env.STORY_MEDIA), R2: Boolean(env.R2), AI: Boolean(env.AI) };
+    const bindings = { D1: Boolean(env.DB), DB: Boolean(env.DB), ROOM_HUB: Boolean(env.ROOM_HUB), STORY_MEDIA_KV: Boolean(env.STORY_MEDIA), R2: Boolean(env.R2), AI: Boolean(env.AI) };
     const secrets = {
       GOOGLE_CLIENT_ID: Boolean(env.GOOGLE_CLIENT_ID),
       GOOGLE_CLIENT_SECRET: Boolean(env.GOOGLE_CLIENT_SECRET),
@@ -1774,7 +1774,7 @@ if(path==="/finance/transactions" && request.method==="GET") {
    console.error("novyra-api-error", { requestId, route: path, errorName: String(error?.name || "Error"), message: String(error?.message || "Unknown API failure").slice(0,180) });
    if(path==="/auth/forgot-password") {
     const code=String(error?.message||"unknown_error").replace(/[^a-zA-Z0-9_-]/g,"_").slice(0,80);
-    return fail("ارسال ایمیل بازیابی ناموفق بود. کد خطا: "+code,502);
+    return json({code:"SERVER",message:"در پردازش درخواست بازیابی خطایی رخ داد. دوباره تلاش کن.",requestId},502);
    }
    return json({ code: "INTERNAL_ERROR", message: "خطای داخلی سرور. دوباره تلاش کن.", requestId }, 500);
   }
