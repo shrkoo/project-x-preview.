@@ -17,7 +17,7 @@ for(const scenario of cases){
    localStorage.setItem("novyra-finance-currency","IRT");
    localStorage.setItem("novyra-preferences-v1",JSON.stringify({country:"IR",language,direction,currency:"IRT",calendar:language==="fa"?"persian":"gregory",dateFormat:"YYYY/MM/DD",numberSystem:language==="fa"?"arabext":"latn",digits:language==="fa"?"arabext":"latn",firstDay:"saturday"}));
    localStorage.removeItem("nv-tx-draft:IRT");
-   localStorage.setItem("nv-personal-accounts:IRT",JSON.stringify(["Checking","Savings"]));
+   localStorage.setItem("nv-personal-accounts:IRT",JSON.stringify([]));
   },{language:scenario.language,direction:scenario.direction});
   let remoteItems:Array<any>=[];
   await page.route("**/*",async route=>{
@@ -102,7 +102,17 @@ for(const scenario of cases){
   const transferSheet=page.getByRole("dialog");
   await expect(transferSheet).toBeVisible();
   await transferSheet.getByRole("button",{name:scenario.language==="en"?/Transfer/:/انتقال وجه/}).click();
-  await expect(transferSheet.getByText("برای انتقال، دو حساب لازم است")).toHaveCount(0);
+  const noAccounts=transferSheet.locator(".nv-tx-no-transfer-accounts");
+  await expect(noAccounts).toContainText("برای انتقال، دو حساب لازم است");
+  await expect(noAccounts.locator("button")).toHaveCount(1);
+  await expect(transferSheet.locator(".nv-tx-section-title button")).toHaveCount(0);
+  for(const accountName of ["Checking","Savings"]){
+    await noAccounts.locator("button").click();
+    await transferSheet.locator(".nv-tx-add-account input").fill(accountName);
+    await transferSheet.locator(".nv-tx-add-account button").click();
+  }
+  await expect(noAccounts).toHaveCount(0);
+  await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem("nv-personal-accounts:IRT")||"[]").length)).toBe(2);
   await transferSheet.locator("#nv-tx-amount").fill("250000");
   await transferSheet.locator('input[placeholder="توضیح (اختیاری)"]').fill("انتقال پس‌انداز");
   await transferSheet.locator(".nv-tx-transfer select").nth(0).selectOption("Checking");
