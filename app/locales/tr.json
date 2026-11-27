@@ -105,5 +105,6 @@
   "forgotServerError": "Sunucu isteği işleyemedi. Lütfen tekrar deneyin.",
   "forgotRequestFailed": "Sıfırlama isteği başarısız. Bilgileri kontrol edip tekrar deneyin.",
   "forgotNetworkError": "Bağlantı kurulamadı. İnternetinizi kontrol edip tekrar deneyin.",
-  "authNeedsReset": "Bu hesap eski bir parola biçimi kullanıyor. Devam etmek için parolanızı sıfırlayın."
+  "authNeedsReset": "Bu hesap eski bir parola biçimi kullanıyor. Devam etmek için parolanızı sıfırlayın.",
+  "resetTokenExpired": "Bu sıfırlama bağlantısının süresi doldu veya bağlantı zaten kullanıldı. Yeni bir bağlantı isteyin."
 }
