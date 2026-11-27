@@ -18,18 +18,18 @@ type Mode = "login" | "signup";
 
 const copy: Partial<Record<Language, Record<string, string>>> = {
   en: {
-    choose: "Choose your language", chooseSub: "A calm, seamless experience across every part of NOVYRA.",
+    choose: "Choose your language", chooseSub: "A calm, seamless experience across every part of Homa AI.",
     continue: "Continue", languageNote: "You can change this anytime in Settings.",
-    welcome: "Welcome to NOVYRA", welcomeSub: "Your people. Your moments. Your world.",
+    welcome: "Welcome to Homa AI", welcomeSub: "Your people. Your moments. Your world.",
     signIn: "Sign in", create: "Create account", loginTitle: "Welcome back", signupTitle: "Create your account",
     loginSub: "Sign in to continue to your space.", signupSub: "A few details and your space is ready.",
     google: "Continue with Google", apple: "Continue with Apple", or: "OR CONTINUE WITH EMAIL",
     name: "Full name", email: "Email address", password: "Password", confirm: "Confirm password",
-    forgot: "Forgot password?", noAccount: "New to NOVYRA?", haveAccount: "Already have an account?",
+    forgot: "Forgot password?", noAccount: "New to Homa AI?", haveAccount: "Already have an account?",
     createLink: "Create account", loginLink: "Sign in", minPassword: "Use at least 10 characters.",
     profileTitle: "Make it yours", profileSub: "Choose an avatar or add your own photo. You can skip this for now.",
     readyAvatars: "Choose an avatar", upload: "Upload your photo", changePhoto: "Change photo",
-    displayName: "Display name", finish: "Enter NOVYRA", skip: "Skip for now",
+    displayName: "Display name", finish: "Enter Homa AI", skip: "Skip for now",
     emailSent: "If this email is registered, recovery instructions will be sent.", oauthUnavailable: "Google and Apple sign-in need provider credentials before they can be activated.",
     back: "Back", resetTitle: "Reset your password", sendReset: "Send recovery link", recoverySub: "Enter your account email and we will send a recovery link.", updatePassword: "Update password",
     passwordMismatch: "Passwords do not match.", authError: "Something went wrong. Please try again.",
@@ -37,18 +37,18 @@ const copy: Partial<Record<Language, Record<string, string>>> = {
     missingName: "Enter your name.", photoError: "Choose an image file smaller than 8 MB."
   },
   fa: {
-    choose: "زبانت را انتخاب کن", chooseSub: "برای تجربه‌ای روان و یکپارچه در تمام بخش‌های NOVYRA.",
+    choose: "زبانت را انتخاب کن", chooseSub: "برای تجربه‌ای روان و یکپارچه در تمام بخش‌های Homa AI.",
     continue: "ادامه", languageNote: "هر زمان بخواهی، می‌توانی زبان را از تنظیمات تغییر بدهی.",
-    welcome: "به NOVYRA خوش آمدید", welcomeSub: "دوستان شما، لحظه‌های شما، دنیای شما.",
+    welcome: "به Homa AI خوش آمدید", welcomeSub: "دوستان شما، لحظه‌های شما، دنیای شما.",
     signIn: "ورود", create: "ساخت حساب", loginTitle: "خوش برگشتید", signupTitle: "حساب خود را بسازید",
     loginSub: "برای ورود به فضای خود وارد حساب شوید.", signupSub: "چند اطلاعات ساده وارد کنید تا فضای شما آماده شود.",
     google: "ادامه با Google", apple: "ادامه با Apple", or: "یا با ایمیل ادامه دهید",
     name: "نام و نام خانوادگی", email: "آدرس ایمیل", password: "رمز عبور", confirm: "تکرار رمز عبور",
-    forgot: "رمز عبور را فراموش کرده‌اید؟", noAccount: "تازه به NOVYRA آمده‌اید؟", haveAccount: "از قبل حساب دارید؟",
+    forgot: "رمز عبور را فراموش کرده‌اید؟", noAccount: "تازه به Homa AI آمده‌اید؟", haveAccount: "از قبل حساب دارید؟",
     createLink: "ساخت حساب", loginLink: "ورود", minPassword: "حداقل ۱۰ نویسه وارد کنید.",
     profileTitle: "پروفایل خود را بسازید", profileSub: "یک آواتار انتخاب کنید یا عکس خودتان را بارگذاری کنید. می‌توانید فعلاً رد کنید.",
     readyAvatars: "انتخاب آواتار", upload: "بارگذاری عکس شخصی", changePhoto: "تغییر عکس",
-    displayName: "نام نمایشی", finish: "ورود به NOVYRA", skip: "فعلاً رد می‌کنم",
+    displayName: "نام نمایشی", finish: "ورود به Homa AI", skip: "فعلاً رد می‌کنم",
     emailSent: "اگر حسابی با این ایمیل وجود داشته باشد، راهنمای بازیابی ارسال می‌شود.", oauthUnavailable: "برای فعال‌شدن ورود Google و Apple، اطلاعات اتصال رسمی این سرویس‌ها لازم است.",
     back: "بازگشت", resetTitle: "بازیابی رمز عبور", sendReset: "ارسال لینک بازیابی", recoverySub: "ایمیل حسابت را وارد کن تا لینک بازیابی برایت ارسال شود.", updatePassword: "تغییر رمز عبور",
     passwordMismatch: "رمزهای عبور یکسان نیستند.", authError: "مشکلی پیش آمد. دوباره تلاش کنید.",
@@ -56,18 +56,18 @@ const copy: Partial<Record<Language, Record<string, string>>> = {
     missingName: "نام خود را وارد کنید.", photoError: "یک تصویر کوچک‌تر از ۸ مگابایت انتخاب کنید."
   },
   ar: {
-    choose: "اختر لغتك", chooseSub: "تجربة هادئة وسلسة في جميع أقسام NOVYRA.",
+    choose: "اختر لغتك", chooseSub: "تجربة هادئة وسلسة في جميع أقسام Homa AI.",
     continue: "متابعة", languageNote: "يمكنك تغيير اللغة لاحقاً من الإعدادات.",
-    welcome: "مرحباً بك في NOVYRA", welcomeSub: "أصدقاؤك، لحظاتك، عالمك.",
+    welcome: "مرحباً بك في Homa AI", welcomeSub: "أصدقاؤك، لحظاتك، عالمك.",
     signIn: "تسجيل الدخول", create: "إنشاء حساب", loginTitle: "مرحباً بعودتك", signupTitle: "أنشئ حسابك",
     loginSub: "سجّل الدخول للمتابعة إلى مساحتك.", signupSub: "أدخل بعض التفاصيل للبدء.",
     google: "المتابعة باستخدام Google", apple: "المتابعة باستخدام Apple", or: "أو المتابعة بالبريد الإلكتروني",
     name: "الاسم الكامل", email: "البريد الإلكتروني", password: "كلمة المرور", confirm: "تأكيد كلمة المرور",
-    forgot: "هل نسيت كلمة المرور؟", noAccount: "جديد في NOVYRA؟", haveAccount: "لديك حساب بالفعل؟",
+    forgot: "هل نسيت كلمة المرور؟", noAccount: "جديد في Homa AI؟", haveAccount: "لديك حساب بالفعل؟",
     createLink: "إنشاء حساب", loginLink: "تسجيل الدخول", minPassword: "استخدم ١٠ أحرف على الأقل.",
     profileTitle: "اجعل ملفك الشخصي مميزاً", profileSub: "اختر صورة رمزية أو أضف صورتك. يمكنك التخطي الآن.",
     readyAvatars: "اختر صورة رمزية", upload: "تحميل صورتك", changePhoto: "تغيير الصورة",
-    displayName: "الاسم الظاهر", finish: "الدخول إلى NOVYRA", skip: "تخطي الآن",
+    displayName: "الاسم الظاهر", finish: "الدخول إلى Homa AI", skip: "تخطي الآن",
     emailSent: "إذا كان البريد مسجلاً، فستصلك تعليمات الاستعادة.", oauthUnavailable: "يلزم إعداد بيانات Google وApple الرسمية لتفعيل تسجيل الدخول.",
     back: "رجوع", resetTitle: "إعادة تعيين كلمة المرور", sendReset: "إرسال رابط الاستعادة", recoverySub: "أدخل بريد حسابك لإرسال رابط الاستعادة.", updatePassword: "تحديث كلمة المرور",
     passwordMismatch: "كلمتا المرور غير متطابقتين.", authError: "حدث خطأ. حاول مرة أخرى.",
@@ -75,18 +75,18 @@ const copy: Partial<Record<Language, Record<string, string>>> = {
     missingName: "أدخل اسمك.", photoError: "اختر صورة يقل حجمها عن ٨ ميغابايت."
   },
   ckb: {
-    choose: "زمانی خۆت هەڵبژێرە", chooseSub: "بۆ ئەزموونێکی ئارام و یەکگرتوو لە هەموو بەشەکانی NOVYRA.",
+    choose: "زمانی خۆت هەڵبژێرە", chooseSub: "بۆ ئەزموونێکی ئارام و یەکگرتوو لە هەموو بەشەکانی Homa AI.",
     continue: "بەردەوام بە", languageNote: "دەتوانیت دواتر لە ڕێکخستنەکان زمان بگۆڕیت.",
-    welcome: "بەخێربێیت بۆ NOVYRA", welcomeSub: "هاوڕێکانت، ساتەکانت، جیهانی تۆ.",
+    welcome: "بەخێربێیت بۆ Homa AI", welcomeSub: "هاوڕێکانت، ساتەکانت، جیهانی تۆ.",
     signIn: "چوونەژوورەوە", create: "دروستکردنی هەژمار", loginTitle: "بەخێرهاتیتەوە", signupTitle: "هەژمارەکەت دروست بکە",
     loginSub: "بۆ بەردەوامبوون بچۆ ژوورەوە.", signupSub: "چەند زانیارییەک بنووسە بۆ دەستپێکردن.",
     google: "بەردەوامبوون بە Google", apple: "بەردەوامبوون بە Apple", or: "یان بە ئیمەیڵ بەردەوام بە",
     name: "ناوی تەواو", email: "ناونیشانی ئیمەیڵ", password: "وشەی نهێنی", confirm: "دووبارەکردنەوەی وشەی نهێنی",
-    forgot: "وشەی نهێنیت لەبیرچووە؟", noAccount: "تازە هاتوویتە NOVYRA؟", haveAccount: "پێشتر هەژمارت هەیە؟",
+    forgot: "وشەی نهێنیت لەبیرچووە؟", noAccount: "تازە هاتوویتە Homa AI؟", haveAccount: "پێشتر هەژمارت هەیە؟",
     createLink: "دروستکردنی هەژمار", loginLink: "چوونەژوورەوە", minPassword: "لانیکەم ١٠ پیت بەکاربهێنە.",
     profileTitle: "پرۆفایلەکەت تایبەت بکە", profileSub: "ئاوەتارێک هەڵبژێرە یان وێنەی خۆت باربکە. دەتوانیت ئێستا تێپەڕێنیت.",
     readyAvatars: "ئاوەتار هەڵبژێرە", upload: "بارکردنی وێنەی خۆت", changePhoto: "گۆڕینی وێنە",
-    displayName: "ناوی پیشاندراو", finish: "چوونە ژوورەوەی NOVYRA", skip: "ئێستا تێپەڕێنە",
+    displayName: "ناوی پیشاندراو", finish: "چوونە ژوورەوەی Homa AI", skip: "ئێستا تێپەڕێنە",
     emailSent: "ئەگەر ئەم ئیمەیڵە تۆمارکرابێت، ڕێنمایی گەڕاندنەوەی بۆ دەنێردرێت.", oauthUnavailable: "بۆ چالاککردنی چوونەژوورەوەی Google و Apple، زانیارییە فەرمییەکانی پێویستن.",
     back: "گەڕانەوە", resetTitle: "نوێکردنەوەی وشەی نهێنی", sendReset: "ناردنی بەستەری گەڕاندنەوە", recoverySub: "ئیمەیڵی هەژمارەکەت بنووسە بۆ ناردنی بەستەری گەڕاندنەوە.", updatePassword: "گۆڕینی وشەی نهێنی",
     passwordMismatch: "وشە نهێنییەکان یەکسان نین.", authError: "هەڵەیەک ڕوویدا. دووبارە هەوڵ بدەوە.",
@@ -96,10 +96,10 @@ const copy: Partial<Record<Language, Record<string, string>>> = {
 };
 
 const flowCopy: Partial<Record<Language, Record<string,string>>> = {
-en:{country:"Country",passwordStrength:"Password strength",confirmPasswordTitle:"Confirm your password",step:"Step",of:"of",searchClear:"Clear search",noCountries:"No countries found",welcomeTitle:"Welcome to NOVYRA",welcomeSub:"Your space, your way.",noAccountFound:"No account found. Create an account first.",googleFailed:"Google sign-in did not complete. Please try again.",showPassword:"Show password",hidePassword:"Hide password",clearPattern:"Clear pattern",countrySub:"Regional preferences apply instantly. Review and edit them before continuing.",languageNote:"You can change these preferences anytime in Settings.",directionToggle:"Switch direction",signUp:"Sign up",logIn:"Log in",firstName:"First name",lastName:"Last name",next:"Continue",searchCountry:"Search countries",language:"UI language",direction:"Direction",currency:"Currency",calendar:"Calendar",dateFormat:"Date format",numberSystem:"Number system",weekStart:"First day of week",lockTitle:"Protect your app",lockExplain:"An app lock helps protect private information when family or others use your phone. Change it later in Settings > Security.",noLock:"No app lock",pin:"PIN",pattern:"Pattern",biometric:"Fingerprint / Face ID",lockSecret:"Create PIN or pattern",accountType:"Choose account type",personal:"Personal",business:"Business",createAccount:"Create account",creatingAccount:"Creating account…",signupTimeout:"The server took too long to respond. Check your connection and try again.",emailUsed:"This email is already registered. Log in or use Google.",emailCheck:"Checking email…",back:"Back",weak:"Weak",medium:"Medium",strong:"Strong",emailInvalid:"Enter a valid email address.",firstRequired:"Enter your first name.",lastRequired:"Enter your last name.",lockRequired:"Enter a PIN or pattern, or skip app lock.",biometricUnsupported:"Biometric lock is not supported by this browser or device. Choose PIN, pattern, or skip.",translationMissing:"Translation not available yet — English fallback is active."},
-fa:{country:"کشور",passwordStrength:"قدرت رمز عبور",confirmPasswordTitle:"تأیید رمز عبور",step:"مرحله",of:"از",searchClear:"پاک‌کردن جست‌وجو",noCountries:"کشوری پیدا نشد",welcomeTitle:"به نوویرا خوش آمدید",welcomeSub:"فضای شما، به روش شما.",noAccountFound:"حسابی با این ایمیل پیدا نشد؛ ابتدا ثبت‌نام کنید.",googleFailed:"ورود با Google کامل نشد؛ دوباره تلاش کنید.",showPassword:"نمایش رمز",hidePassword:"پنهان‌کردن رمز",clearPattern:"پاک‌کردن الگو",countrySub:"تنظیمات منطقه‌ای فوراً اعمال می‌شوند و پیش از ادامه می‌توانید آن‌ها را ویرایش کنید.",languageNote:"هر زمان می‌توانید این تنظیمات را در بخش تنظیمات تغییر دهید.",directionToggle:"تغییر جهت نوشتار",signUp:"ثبت‌نام",logIn:"ورود",firstName:"نام",lastName:"نام خانوادگی",next:"ادامه",searchCountry:"جست‌وجوی کشور",language:"زبان برنامه",direction:"جهت نوشتار",currency:"واحد پول",calendar:"تقویم",dateFormat:"قالب تاریخ",numberSystem:"سیستم ارقام",weekStart:"اولین روز هفته",lockTitle:"از برنامه محافظت کنید",lockExplain:"قفل برنامه هنگام استفاده خانواده یا دیگران از تلفن، به محافظت از اطلاعات خصوصی کمک می‌کند. بعداً از تنظیمات > امنیت قابل تغییر است.",noLock:"بدون قفل",pin:"رمز عددی",pattern:"الگو",biometric:"اثر انگشت / تشخیص چهره",lockSecret:"ساخت رمز یا الگو",accountType:"نوع حساب را انتخاب کنید",personal:"شخصی",business:"تجاری",createAccount:"ایجاد حساب",creatingAccount:"در حال ساخت حساب…",signupTimeout:"پاسخ سرور بیش از حد طول کشید. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.",emailUsed:"این ایمیل قبلاً ثبت شده است. وارد شوید یا از Google استفاده کنید.",emailCheck:"در حال بررسی ایمیل…",back:"بازگشت",weak:"ضعیف",medium:"متوسط",strong:"قوی",emailInvalid:"ایمیل معتبر وارد کنید.",firstRequired:"نام را وارد کنید.",lastRequired:"نام خانوادگی را وارد کنید.",lockRequired:"رمز یا الگو را وارد کنید یا قفل را رد کنید.",biometricUnsupported:"قفل زیست‌سنجی در این مرورگر یا دستگاه پشتیبانی نمی‌شود. رمز، الگو یا ردکردن را انتخاب کنید.",translationMissing:"ترجمه هنوز آماده نیست؛ زبان انگلیسی نمایش داده می‌شود."},
-ar:{country:"الدولة",passwordStrength:"قوة كلمة المرور",confirmPasswordTitle:"تأكيد كلمة المرور",step:"الخطوة",of:"من",searchClear:"مسح البحث",noCountries:"لم يتم العثور على دولة",welcomeTitle:"مرحباً بك في NOVYRA",welcomeSub:"مساحتك، بطريقتك.",noAccountFound:"لم يتم العثور على حساب بهذا البريد. أنشئ حساباً أولاً.",googleFailed:"لم يكتمل تسجيل الدخول عبر Google. حاول مرة أخرى.",showPassword:"إظهار كلمة المرور",hidePassword:"إخفاء كلمة المرور",clearPattern:"مسح النمط",countrySub:"تُطبّق الإعدادات الإقليمية فوراً ويمكنك تعديلها قبل المتابعة.",languageNote:"يمكنك تغيير هذه الإعدادات في أي وقت من الإعدادات.",directionToggle:"تبديل اتجاه الكتابة",signUp:"إنشاء حساب",logIn:"تسجيل الدخول",firstName:"الاسم الأول",lastName:"اسم العائلة",next:"متابعة",searchCountry:"ابحث عن دولة",language:"لغة التطبيق",direction:"اتجاه الكتابة",currency:"العملة",calendar:"التقويم",dateFormat:"تنسيق التاريخ",numberSystem:"نظام الأرقام",weekStart:"أول يوم في الأسبوع",lockTitle:"احمِ التطبيق",lockExplain:"يساعد قفل التطبيق في حماية معلوماتك الخاصة عندما يستخدم أفراد العائلة أو غيرهم هاتفك. يمكنك تغييره لاحقاً من الإعدادات > الأمان.",noLock:"بدون قفل",pin:"رمز PIN",pattern:"نمط",biometric:"بصمة / Face ID",lockSecret:"أنشئ رمزاً أو نمطاً",accountType:"اختر نوع الحساب",personal:"شخصي",business:"تجاري",createAccount:"إنشاء الحساب",creatingAccount:"جارٍ إنشاء الحساب…",signupTimeout:"استغرق الخادم وقتاً طويلاً للرد. تحقق من اتصالك وحاول مرة أخرى.",emailUsed:"هذا البريد مسجل بالفعل. سجّل الدخول أو استخدم Google.",emailCheck:"جارٍ التحقق من البريد…",back:"رجوع",weak:"ضعيفة",medium:"متوسطة",strong:"قوية",emailInvalid:"أدخل بريداً صالحاً.",firstRequired:"أدخل الاسم الأول.",lastRequired:"أدخل اسم العائلة.",lockRequired:"أدخل رمزاً أو نمطاً، أو تخطَّ القفل.",biometricUnsupported:"قفل القياسات الحيوية غير مدعوم هنا. اختر PIN أو نمطاً أو تخطَّ.",translationMissing:"الترجمة غير متاحة بعد — يتم عرض الإنجليزية."},
-ckb:{country:"وڵات",passwordStrength:"هێزی وشەی نهێنی",confirmPasswordTitle:"دڵنیابوونەوە لە وشەی نهێنی",step:"هەنگاو",of:"لە",searchClear:"پاککردنەوەی گەڕان",noCountries:"هیچ وڵاتێک نەدۆزرایەوە",welcomeTitle:"بەخێربێیت بۆ NOVYRA",welcomeSub:"شوێنی تۆ، بە شێوازی تۆ.",noAccountFound:"هەژمارێک بەو ئیمەیڵە نەدۆزرایەوە؛ سەرەتا هەژمار دروست بکە.",googleFailed:"چوونەژوورەوە بە Google تەواو نەبوو؛ دووبارە هەوڵ بدەوە.",showPassword:"پیشاندانی وشەی نهێنی",hidePassword:"شاردنەوەی وشەی نهێنی",clearPattern:"پاککردنەوەی شێوە",countrySub:"ڕێکخستنە ناوچەییەکان دەستبەجێ جێبەجێ دەبن و پێش بەردەوامبوون دەتوانیت بیانگۆڕیت.",languageNote:"هەر کاتێک دەتوانیت ئەم ڕێکخستنانە لە ڕێکخستنەکان بگۆڕیت.",directionToggle:"گۆڕینی ئاڕاستەی نووسین",signUp:"تۆمارکردن",logIn:"چوونەژوورەوە",firstName:"ناو",lastName:"ناوی خێزان",next:"بەردەوام بە",searchCountry:"گەڕان بەدوای وڵات",language:"زمانی ئەپ",direction:"ئاڕاستەی نووسین",currency:"دراو",calendar:"ساڵژمێر",dateFormat:"شێوازی بەروار",numberSystem:"سیستەمی ژمارە",weekStart:"یەکەم ڕۆژی هەفتە",lockTitle:"پاراستنی ئەپ",lockExplain:"قوفڵی ئەپ یارمەتیدەرە بۆ پاراستنی زانیارییە تایبەتییەکانت کاتێک کەسانی تر مۆبایلەکەت بەکاردەهێنن. دواتر لە ڕێکخستنەکان > ئاسایش دەگۆڕدرێت.",noLock:"بێ قوفڵ",pin:"PIN",pattern:"شێوە",biometric:"پەنجەمۆر / Face ID",lockSecret:"PIN یان شێوە دروست بکە",accountType:"جۆری هەژمار هەڵبژێرە",personal:"کەسی",business:"بازرگانی",createAccount:"دروستکردنی هەژمار",creatingAccount:"هەژمار دروست دەکرێت…",signupTimeout:"وەڵامی سێرڤەر زۆر درەنگ بوو. پەیوەندی ئینتەرنێت بپشکنە و دووبارە هەوڵ بدەوە.",emailUsed:"ئەم ئیمەیڵە پێشتر تۆمارکراوە. بچۆ ژوورەوە یان Google بەکاربهێنە.",emailCheck:"پشکنینی ئیمەیڵ…",back:"گەڕانەوە",weak:"لاواز",medium:"مامناوەند",strong:"بەهێز",emailInvalid:"ئیمەیڵێکی دروست بنووسە.",firstRequired:"ناوەکەت بنووسە.",lastRequired:"ناوی خێزان بنووسە.",lockRequired:"PIN یان شێوە بنووسە یان قوفڵەکە تێپەڕێنە.",biometricUnsupported:"قوفڵی زیست‌پێوانەیی لەم ئامێرەدا پشتگیری ناکرێت. PIN یان شێوە هەڵبژێرە یان تێپەڕێنە.",translationMissing:"وەرگێڕان ئامادە نییە؛ ئینگلیزی پیشان دەدرێت."}
+en:{country:"Country",passwordStrength:"Password strength",confirmPasswordTitle:"Confirm your password",step:"Step",of:"of",searchClear:"Clear search",noCountries:"No countries found",welcomeTitle:"Welcome to Homa AI",welcomeSub:"Your space, your way.",noAccountFound:"No account found. Create an account first.",googleFailed:"Google sign-in did not complete. Please try again.",showPassword:"Show password",hidePassword:"Hide password",clearPattern:"Clear pattern",countrySub:"Regional preferences apply instantly. Review and edit them before continuing.",languageNote:"You can change these preferences anytime in Settings.",directionToggle:"Switch direction",signUp:"Sign up",logIn:"Log in",firstName:"First name",lastName:"Last name",next:"Continue",searchCountry:"Search countries",language:"UI language",direction:"Direction",currency:"Currency",calendar:"Calendar",dateFormat:"Date format",numberSystem:"Number system",weekStart:"First day of week",lockTitle:"Protect your app",lockExplain:"An app lock helps protect private information when family or others use your phone. Change it later in Settings > Security.",noLock:"No app lock",pin:"PIN",pattern:"Pattern",biometric:"Fingerprint / Face ID",lockSecret:"Create PIN or pattern",accountType:"Choose account type",personal:"Personal",business:"Business",createAccount:"Create account",creatingAccount:"Creating account…",signupTimeout:"The server took too long to respond. Check your connection and try again.",emailUsed:"This email is already registered. Log in or use Google.",emailCheck:"Checking email…",back:"Back",weak:"Weak",medium:"Medium",strong:"Strong",emailInvalid:"Enter a valid email address.",firstRequired:"Enter your first name.",lastRequired:"Enter your last name.",lockRequired:"Enter a PIN or pattern, or skip app lock.",biometricUnsupported:"Biometric lock is not supported by this browser or device. Choose PIN, pattern, or skip.",translationMissing:"Translation not available yet — English fallback is active."},
+fa:{country:"کشور",passwordStrength:"قدرت رمز عبور",confirmPasswordTitle:"تأیید رمز عبور",step:"مرحله",of:"از",searchClear:"پاک‌کردن جست‌وجو",noCountries:"کشوری پیدا نشد",welcomeTitle:"به هما AI خوش آمدید",welcomeSub:"فضای شما، به روش شما.",noAccountFound:"حسابی با این ایمیل پیدا نشد؛ ابتدا ثبت‌نام کنید.",googleFailed:"ورود با Google کامل نشد؛ دوباره تلاش کنید.",showPassword:"نمایش رمز",hidePassword:"پنهان‌کردن رمز",clearPattern:"پاک‌کردن الگو",countrySub:"تنظیمات منطقه‌ای فوراً اعمال می‌شوند و پیش از ادامه می‌توانید آن‌ها را ویرایش کنید.",languageNote:"هر زمان می‌توانید این تنظیمات را در بخش تنظیمات تغییر دهید.",directionToggle:"تغییر جهت نوشتار",signUp:"ثبت‌نام",logIn:"ورود",firstName:"نام",lastName:"نام خانوادگی",next:"ادامه",searchCountry:"جست‌وجوی کشور",language:"زبان برنامه",direction:"جهت نوشتار",currency:"واحد پول",calendar:"تقویم",dateFormat:"قالب تاریخ",numberSystem:"سیستم ارقام",weekStart:"اولین روز هفته",lockTitle:"از برنامه محافظت کنید",lockExplain:"قفل برنامه هنگام استفاده خانواده یا دیگران از تلفن، به محافظت از اطلاعات خصوصی کمک می‌کند. بعداً از تنظیمات > امنیت قابل تغییر است.",noLock:"بدون قفل",pin:"رمز عددی",pattern:"الگو",biometric:"اثر انگشت / تشخیص چهره",lockSecret:"ساخت رمز یا الگو",accountType:"نوع حساب را انتخاب کنید",personal:"شخصی",business:"تجاری",createAccount:"ایجاد حساب",creatingAccount:"در حال ساخت حساب…",signupTimeout:"پاسخ سرور بیش از حد طول کشید. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.",emailUsed:"این ایمیل قبلاً ثبت شده است. وارد شوید یا از Google استفاده کنید.",emailCheck:"در حال بررسی ایمیل…",back:"بازگشت",weak:"ضعیف",medium:"متوسط",strong:"قوی",emailInvalid:"ایمیل معتبر وارد کنید.",firstRequired:"نام را وارد کنید.",lastRequired:"نام خانوادگی را وارد کنید.",lockRequired:"رمز یا الگو را وارد کنید یا قفل را رد کنید.",biometricUnsupported:"قفل زیست‌سنجی در این مرورگر یا دستگاه پشتیبانی نمی‌شود. رمز، الگو یا ردکردن را انتخاب کنید.",translationMissing:"ترجمه هنوز آماده نیست؛ زبان انگلیسی نمایش داده می‌شود."},
+ar:{country:"الدولة",passwordStrength:"قوة كلمة المرور",confirmPasswordTitle:"تأكيد كلمة المرور",step:"الخطوة",of:"من",searchClear:"مسح البحث",noCountries:"لم يتم العثور على دولة",welcomeTitle:"مرحباً بك في Homa AI",welcomeSub:"مساحتك، بطريقتك.",noAccountFound:"لم يتم العثور على حساب بهذا البريد. أنشئ حساباً أولاً.",googleFailed:"لم يكتمل تسجيل الدخول عبر Google. حاول مرة أخرى.",showPassword:"إظهار كلمة المرور",hidePassword:"إخفاء كلمة المرور",clearPattern:"مسح النمط",countrySub:"تُطبّق الإعدادات الإقليمية فوراً ويمكنك تعديلها قبل المتابعة.",languageNote:"يمكنك تغيير هذه الإعدادات في أي وقت من الإعدادات.",directionToggle:"تبديل اتجاه الكتابة",signUp:"إنشاء حساب",logIn:"تسجيل الدخول",firstName:"الاسم الأول",lastName:"اسم العائلة",next:"متابعة",searchCountry:"ابحث عن دولة",language:"لغة التطبيق",direction:"اتجاه الكتابة",currency:"العملة",calendar:"التقويم",dateFormat:"تنسيق التاريخ",numberSystem:"نظام الأرقام",weekStart:"أول يوم في الأسبوع",lockTitle:"احمِ التطبيق",lockExplain:"يساعد قفل التطبيق في حماية معلوماتك الخاصة عندما يستخدم أفراد العائلة أو غيرهم هاتفك. يمكنك تغييره لاحقاً من الإعدادات > الأمان.",noLock:"بدون قفل",pin:"رمز PIN",pattern:"نمط",biometric:"بصمة / Face ID",lockSecret:"أنشئ رمزاً أو نمطاً",accountType:"اختر نوع الحساب",personal:"شخصي",business:"تجاري",createAccount:"إنشاء الحساب",creatingAccount:"جارٍ إنشاء الحساب…",signupTimeout:"استغرق الخادم وقتاً طويلاً للرد. تحقق من اتصالك وحاول مرة أخرى.",emailUsed:"هذا البريد مسجل بالفعل. سجّل الدخول أو استخدم Google.",emailCheck:"جارٍ التحقق من البريد…",back:"رجوع",weak:"ضعيفة",medium:"متوسطة",strong:"قوية",emailInvalid:"أدخل بريداً صالحاً.",firstRequired:"أدخل الاسم الأول.",lastRequired:"أدخل اسم العائلة.",lockRequired:"أدخل رمزاً أو نمطاً، أو تخطَّ القفل.",biometricUnsupported:"قفل القياسات الحيوية غير مدعوم هنا. اختر PIN أو نمطاً أو تخطَّ.",translationMissing:"الترجمة غير متاحة بعد — يتم عرض الإنجليزية."},
+ckb:{country:"وڵات",passwordStrength:"هێزی وشەی نهێنی",confirmPasswordTitle:"دڵنیابوونەوە لە وشەی نهێنی",step:"هەنگاو",of:"لە",searchClear:"پاککردنەوەی گەڕان",noCountries:"هیچ وڵاتێک نەدۆزرایەوە",welcomeTitle:"بەخێربێیت بۆ Homa AI",welcomeSub:"شوێنی تۆ، بە شێوازی تۆ.",noAccountFound:"هەژمارێک بەو ئیمەیڵە نەدۆزرایەوە؛ سەرەتا هەژمار دروست بکە.",googleFailed:"چوونەژوورەوە بە Google تەواو نەبوو؛ دووبارە هەوڵ بدەوە.",showPassword:"پیشاندانی وشەی نهێنی",hidePassword:"شاردنەوەی وشەی نهێنی",clearPattern:"پاککردنەوەی شێوە",countrySub:"ڕێکخستنە ناوچەییەکان دەستبەجێ جێبەجێ دەبن و پێش بەردەوامبوون دەتوانیت بیانگۆڕیت.",languageNote:"هەر کاتێک دەتوانیت ئەم ڕێکخستنانە لە ڕێکخستنەکان بگۆڕیت.",directionToggle:"گۆڕینی ئاڕاستەی نووسین",signUp:"تۆمارکردن",logIn:"چوونەژوورەوە",firstName:"ناو",lastName:"ناوی خێزان",next:"بەردەوام بە",searchCountry:"گەڕان بەدوای وڵات",language:"زمانی ئەپ",direction:"ئاڕاستەی نووسین",currency:"دراو",calendar:"ساڵژمێر",dateFormat:"شێوازی بەروار",numberSystem:"سیستەمی ژمارە",weekStart:"یەکەم ڕۆژی هەفتە",lockTitle:"پاراستنی ئەپ",lockExplain:"قوفڵی ئەپ یارمەتیدەرە بۆ پاراستنی زانیارییە تایبەتییەکانت کاتێک کەسانی تر مۆبایلەکەت بەکاردەهێنن. دواتر لە ڕێکخستنەکان > ئاسایش دەگۆڕدرێت.",noLock:"بێ قوفڵ",pin:"PIN",pattern:"شێوە",biometric:"پەنجەمۆر / Face ID",lockSecret:"PIN یان شێوە دروست بکە",accountType:"جۆری هەژمار هەڵبژێرە",personal:"کەسی",business:"بازرگانی",createAccount:"دروستکردنی هەژمار",creatingAccount:"هەژمار دروست دەکرێت…",signupTimeout:"وەڵامی سێرڤەر زۆر درەنگ بوو. پەیوەندی ئینتەرنێت بپشکنە و دووبارە هەوڵ بدەوە.",emailUsed:"ئەم ئیمەیڵە پێشتر تۆمارکراوە. بچۆ ژوورەوە یان Google بەکاربهێنە.",emailCheck:"پشکنینی ئیمەیڵ…",back:"گەڕانەوە",weak:"لاواز",medium:"مامناوەند",strong:"بەهێز",emailInvalid:"ئیمەیڵێکی دروست بنووسە.",firstRequired:"ناوەکەت بنووسە.",lastRequired:"ناوی خێزان بنووسە.",lockRequired:"PIN یان شێوە بنووسە یان قوفڵەکە تێپەڕێنە.",biometricUnsupported:"قوفڵی زیست‌پێوانەیی لەم ئامێرەدا پشتگیری ناکرێت. PIN یان شێوە هەڵبژێرە یان تێپەڕێنە.",translationMissing:"وەرگێڕان ئامادە نییە؛ ئینگلیزی پیشان دەدرێت."}
 };
 
 const avatarChoices = ["✦", "🌙", "🦊", "🐼", "🐺", "🦁", "🐸", "🐙", "🪐", "⚡", "🌊", "🦋"];
@@ -240,7 +240,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
       const challenge=crypto.getRandomValues(new Uint8Array(32));
       const userId=crypto.getRandomValues(new Uint8Array(16));
       const credential=await navigator.credentials.create({publicKey:{
-        challenge,rp:{name:"NOVYRA",id:window.location.hostname},
+        challenge,rp:{name:"Homa AI",id:window.location.hostname},
         user:{id:userId,name:email,displayName:firstName+" "+lastName},
         pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],
         authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},
@@ -494,20 +494,20 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
     <main data-step={progressStep} className={"px-onboarding" + (stage === "welcome" ? " px-language-screen" : "")} dir={dir} lang={language}>
       <div className="px-ambient px-ambient-one" /><div className="px-ambient px-ambient-two" />
       <div className="px-glass-orbit px-orbit-one" /><div className="px-glass-orbit px-orbit-two" />
-      <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">NOVYRA</span></header>
+      <header className="px-onboarding-brand"><span className="px-logo"><NovyraMark /></span><span className="px-brand-wordmark">Homa AI</span></header>
       {progressStep > 0 && stage !== "signupAll" && <div className="px-flow-progress"><button type="button" aria-label={t("back")} onClick={()=>setStage(previousStage[stage] || "welcome")}>{dir==="rtl"?"→":"←"}</button><div className="px-flow-progress-main"><div className="px-flow-progress-label"><span>{t("step")} {progressStep} {t("of")} 8</span><span>{Math.round(progressStep/8*100)}%</span></div><div className="px-flow-progress-track"><i style={{width:(progressStep/8*100)+"%"}} /></div></div></div>}
       <section className="px-onboarding-stage">
         {!translationAvailable&&<p role="status" className="px-translation-note">{t("translationMissing")}</p>}
 
         {stage === "welcome" && <div className="px-glass-panel px-auth-panel">
-          <div className="px-auth-emblem"><NovyraMark /></div><div className="px-eyebrow">NOVYRA / WELCOME</div>
+          <div className="px-auth-emblem"><NovyraMark /></div><div className="px-eyebrow">Homa AI / WELCOME</div>
           <h1>{t("welcomeTitle")}</h1><p className="px-stage-subtitle">{t("welcomeSub")}</p>
           <button type="button" className="px-primary-action" onClick={()=>{setMode("signup");setStage("firstName");setNotice("");}}>{t("signUp")} <span>↗</span></button>
           <button type="button" className="px-social-button" onClick={()=>{setMode("login");setStage("login");setNotice("");}}>{t("logIn")}</button>
           <button type="button" className="px-social-button px-google-button" onClick={socialUnavailable}><GoogleMark/><span>{t("google")}</span></button>
         </div>}
         {stage === "signupAll" && <div className="px-glass-panel px-language-panel px-signup-one-page">
-          <div className="px-eyebrow">NOVYRA / CREATE ACCOUNT</div>
+          <div className="px-eyebrow">Homa AI / CREATE ACCOUNT</div>
           <h1>{t("signupTitle")}</h1><p className="px-stage-subtitle">{t("signupSub")}</p>
           <div className="px-signup-section">
             <h2>{language==="fa"?"اطلاعات شخصی":t("firstName")+" & "+t("lastName")}</h2>
@@ -553,23 +553,23 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <button type="button" className="px-switch-mode" onClick={()=>{setMode("login");setStage("login");setNotice("");}}>{t("haveAccount")} {t("loginLink")}</button>
         </div>}
         {stage === "firstName" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("welcome")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
+          <button className="px-back-link" onClick={()=>setStage("welcome")}>{t("back")}</button><div className="px-eyebrow">Homa AI / SIGN UP</div>
           <h1>{t("firstName")}</h1><label className="px-field"><span>{t("firstName")}</span><input autoComplete="given-name" value={firstName} onChange={e=>setFirstName(e.target.value)} /></label>
           <button className="px-primary-action" onClick={()=>{if(!firstName.trim()){setNotice(t("firstRequired"));return;}setNotice("");setStage("lastName");}}>{t("next")} ↗</button>
         </div>}
         {stage === "lastName" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("firstName")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
+          <button className="px-back-link" onClick={()=>setStage("firstName")}>{t("back")}</button><div className="px-eyebrow">Homa AI / SIGN UP</div>
           <h1>{t("lastName")}</h1><label className="px-field"><span>{t("lastName")}</span><input autoComplete="family-name" value={lastName} onChange={e=>setLastName(e.target.value)} /></label>
           <button className="px-primary-action" onClick={()=>{if(!lastName.trim()){setNotice(t("lastRequired"));return;}setNotice("");setStage("email");}}>{t("next")} ↗</button>
         </div>}
         {stage === "email" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("lastName")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
+          <button className="px-back-link" onClick={()=>setStage("lastName")}>{t("back")}</button><div className="px-eyebrow">Homa AI / SIGN UP</div>
           <h1>{t("email")}</h1><label className="px-field"><span>{t("email")}</span><input type="email" autoComplete="email" dir="ltr" value={email} onChange={e=>setEmail(e.target.value)} /></label>
           <button className="px-primary-action" disabled={busy} onClick={()=>{const value=email.trim().toLowerCase();if(!/^\S+@\S+\.\S+$/.test(value)){setNotice(t("emailInvalid"));return;}setEmail(value);setNotice("");setStage("country");}}>{t("next")} ↗</button>
         </div>}
         {stage === "country" && <div className="px-glass-panel px-language-panel">
-          <div className="px-eyebrow">NOVYRA / YOUR REGION</div>
-          <button className="px-back-link" onClick={()=>setStage("email")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div><h1>{t("country")}</h1>
+          <div className="px-eyebrow">Homa AI / YOUR REGION</div>
+          <button className="px-back-link" onClick={()=>setStage("email")}>{t("back")}</button><div className="px-eyebrow">Homa AI / SIGN UP</div><h1>{t("country")}</h1>
           <p className="px-stage-subtitle">{t("countrySub")}</p>
           <div className="px-country-search"><input aria-label={t("searchCountry")} value={countrySearch} onChange={e => setCountrySearch(e.target.value)} placeholder={t("searchCountry")} /><button type="button" aria-label={t("searchClear")} onClick={()=>setCountrySearch("")} hidden={!countrySearch}>×</button></div>
           <div role="listbox" aria-label={t("country")} className="px-country-list">
@@ -597,21 +597,21 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         
 
         {stage === "password" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("country")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
+          <button className="px-back-link" onClick={()=>setStage("country")}>{t("back")}</button><div className="px-eyebrow">Homa AI / SIGN UP</div>
           <h1>{t("password")}</h1>
           <label className="px-field"><span>{t("password")}</span><span className="px-password-wrap"><input type={showPassword?"text":"password"} autoComplete="new-password" value={password} onChange={e=>setPassword(e.target.value)} /><button type="button" onClick={()=>setShowPassword(v=>!v)} aria-label={showPassword?"Hide password":"Show password"}><EyeMark visible={showPassword}/></button></span></label>
           <div className="px-password-strength"><span>{t("passwordStrength")}: </span><b>{passwordStrengthScore<3?t("weak"):passwordStrengthScore<4?t("medium"):t("strong")}</b><div style={{height:5,borderRadius:8,background:"rgba(120,130,150,.22)",overflow:"hidden",marginTop:6}}><div style={{height:"100%",width:(passwordStrengthScore*20)+"%",background:passwordStrengthScore<3?"#c45d5d":passwordStrengthScore<4?"#c39a42":"#39956b",transition:"width .2s"}}/></div></div>
           <button className="px-primary-action" onClick={()=>{if(password.length<10){setNotice(t("weakPassword"));return;}setNotice("");setStage("confirmPassword");}}>{t("next")} ↗</button>
         </div>}
         {stage === "confirmPassword" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("password")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
+          <button className="px-back-link" onClick={()=>setStage("password")}>{t("back")}</button><div className="px-eyebrow">Homa AI / SIGN UP</div>
           <h1>{t("confirmPasswordTitle")}</h1>
           <label className="px-field"><span>{t("confirm")}</span><span className="px-password-wrap"><input type={showConfirm?"text":"password"} autoComplete="new-password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} /><button type="button" onClick={()=>setShowConfirm(v=>!v)} aria-label={showConfirm?t("hidePassword"):t("showPassword")}><EyeMark visible={showConfirm}/></button></span></label>
           {confirmPassword&&password!==confirmPassword&&<small role="alert">{t("passwordMismatch")}</small>}
           <button className="px-primary-action" onClick={()=>{if(password!==confirmPassword){setNotice(t("passwordMismatch"));return;}setNotice("");setStage("appLock");}}>{t("next")} ↗</button>
         </div>}
         {stage === "appLock" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("confirmPassword")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
+          <button className="px-back-link" onClick={()=>setStage("confirmPassword")}>{t("back")}</button><div className="px-eyebrow">Homa AI / SIGN UP</div>
           <h1>{t("lockTitle")}</h1><p className="px-stage-subtitle">{t("lockExplain")}</p>
           <div className="px-lock-options">{(["none","pin","pattern","biometric"] as const).map(value=><button type="button" key={value} className={lockType===value?"is-selected":""} onClick={()=>{setLockType(value);setLockSecret("");setLockTouched(true);}}>{t(value==="none"?"noLock":value)}</button>)}</div>
           {lockType==="pin"&&<label className="px-field"><span>{t("lockSecret")}</span><input type="password" inputMode="numeric" value={lockSecret} onChange={e=>setLockSecret(e.target.value.replace(/[^0-9]/g,"").slice(0,12))} autoComplete="off" /></label>}{lockType==="pattern"&&<div className="px-lock-grid" role="group" aria-label={t("pattern")}>{Array.from({length:9},(_,i)=>String(i+1)).map(point=><button type="button" key={point} aria-pressed={lockSecret.includes(point)} className={lockSecret.includes(point)?"is-selected":""} onClick={()=>setLockSecret(value=>value.includes(point)?value:value+point)}>{lockSecret.includes(point)?"●":"○"}</button>)}<button type="button" className="px-pattern-clear" onClick={()=>setLockSecret("")}>{t("clearPattern")}</button></div>}
@@ -620,14 +620,14 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <button className="px-skip-action" onClick={()=>{setLockType("none");setLockSecret("");setLockTouched(true);setStage("accountType");}}>{t("skip")}</button>
         </div>}
         {stage === "accountType" && <div className="px-glass-panel px-auth-panel">
-          <button className="px-back-link" onClick={()=>setStage("appLock")}>{t("back")}</button><div className="px-eyebrow">NOVYRA / SIGN UP</div>
+          <button className="px-back-link" onClick={()=>setStage("appLock")}>{t("back")}</button><div className="px-eyebrow">Homa AI / SIGN UP</div>
           <h1>{t("accountType")}</h1>
           <div className="px-lock-options"><button type="button" className={accountType==="personal"?"is-selected":""} onClick={()=>setAccountType("personal")}>{t("personal")}</button><button type="button" className={accountType==="business"?"is-selected":""} onClick={()=>setAccountType("business")}>{t("business")}</button></div>
           <button className="px-primary-action" disabled={busy} onClick={googlePending?finishGoogleOnboarding:submitAuth}>{busy?t("emailCheck"):t("createAccount")} ↗</button>
         </div>}
         {stage === "login" && <div className="px-glass-panel px-auth-panel">
-          <div className="px-auth-emblem" aria-label="NOVYRA"><NovyraMark /></div>
-          <div className="px-eyebrow">NOVYRA / {recoveryMode ? "ACCOUNT RECOVERY" : "YOUR SPACE"}</div>
+          <div className="px-auth-emblem" aria-label="Homa AI"><NovyraMark /></div>
+          <div className="px-eyebrow">Homa AI / {recoveryMode ? "ACCOUNT RECOVERY" : "YOUR SPACE"}</div>
           <h1>{recoveryMode ? t("resetTitle") : mode === "login" ? t("loginTitle") : t("signupTitle")}</h1>
           <p className="px-stage-subtitle">{recoveryMode ? (resetTokenMode ? t("minPassword") : t("recoverySub")) : mode === "login" ? t("loginSub") : t("signupSub")}</p>
           {!recoveryMode && <div className="px-social-stack">
@@ -643,11 +643,11 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <button type="button" className="px-primary-action" disabled={busy} onClick={recoveryMode ? (resetTokenMode ? resetPassword : requestRecovery) : submitAuth}>{busy ? "..." : recoveryMode ? (resetTokenMode ? t("updatePassword") : t("sendReset")) : mode === "login" ? t("signIn") : t("create")} <span>↗</span></button>
           {!recoveryMode && <div className="px-switch-mode"><span>{mode === "login" ? t("noAccount") : t("haveAccount")}</span><button onClick={() => { setMode("login"); setStage("welcome"); setNotice(""); }}>{mode === "login" ? t("createLink") : t("loginLink")}</button></div>}
           {recoveryMode && <button className="px-switch-mode px-back-link" onClick={() => { setRecoveryMode(false); setResetTokenMode(false); setNotice(""); }}>{t("back")}</button>}
-          <p className="px-auth-security">{language === "en" ? "SECURE ACCESS · NOVYRA" : language === "ckb" ? "چوونەژوورەوەی پارێزراو · NOVYRA" : language === "ar" ? "دخول آمن · NOVYRA" : "ورود امن · NOVYRA"}</p>
+          <p className="px-auth-security">{language === "en" ? "SECURE ACCESS · Homa AI" : language === "ckb" ? "چوونەژوورەوەی پارێزراو · Homa AI" : language === "ar" ? "دخول آمن · Homa AI" : "ورود امن · Homa AI"}</p>
         </div>}
 
         {false && stage === "passwordSetup" && <div className="px-glass-panel px-auth-panel">
-          <div className="px-eyebrow">NOVYRA / ACCOUNT SECURITY</div>
+          <div className="px-eyebrow">Homa AI / ACCOUNT SECURITY</div>
           <h1>{language === "en" ? "Create a password" : "تعیین رمز عبور"}</h1>
           <p className="px-stage-subtitle">{language === "en" ? "Your Google account is connected. Add a password so you can also sign in with email." : "حساب Google متصل شد. برای ورود با ایمیل نیز یک رمز عبور تعیین کن."}</p>
           <label className="px-field"><span>{t("password")}</span><input type="password" autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t("minPassword")} /></label>
@@ -656,7 +656,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
           <button type="button" className="px-skip-action" disabled={busy} onClick={skipGooglePassword}>{language === "en" ? "Skip for now" : "فعلاً رد می‌کنم"}</button>
         </div>}
         {false && stage === "profile" && <div className="px-glass-panel px-profile-panel">
-          <div className="px-eyebrow">NOVYRA / PERSONAL PROFILE</div>
+          <div className="px-eyebrow">Homa AI / PERSONAL PROFILE</div>
           <div className="px-profile-preview">{photo ? <img src={photo} alt="Profile preview" /> : <span>{avatar || (profileName || user?.displayName || "N").slice(0, 1)}</span>}</div>
           <h1>{t("profileTitle")}</h1><p className="px-stage-subtitle">{t("profileSub")}</p>
           <div className="px-avatar-heading">{t("readyAvatars")}</div>
@@ -669,7 +669,7 @@ export default function Onboarding({ onComplete, initialNotice }: Props) {
         </div>}
       </section>
       {notice && <div className="px-onboarding-notice" role="status">{notice}<button onClick={() => setNotice("")}>×</button></div>}
-      <footer className="px-onboarding-footer"><span>NOVYRA</span><i /> <span>BUILT FOR YOUR MOMENTS</span></footer>
+      <footer className="px-onboarding-footer"><span>Homa AI</span><i /> <span>BUILT FOR YOUR MOMENTS</span></footer>
     </main>
   );
 }
