@@ -66,7 +66,7 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
  async function forgotPassword(){
   if(busy)return;
   const email=forgotEmail.trim().toLowerCase();
-  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){setNotice(t("emailInvalid"));return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setNotice(t("emailInvalid"));return;}
   setBusy(true);setNotice("");try{await apiRequest("/auth/forgot-password",{method:"POST",body:JSON.stringify({email})});setNotice(t("forgotSent"));}catch(e){setNotice(e instanceof Error?e.message:t("error"));}finally{setBusy(false);}
  }
  async function submitDetails(){
