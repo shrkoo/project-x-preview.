@@ -19,7 +19,7 @@ export default function NovyraPersonalHome(p:Props){
  {recent.length===0?<div className="nv-p-empty"><span className="nv-p-empty-copy"><ReceiptText/><span>{tr("هنوز تراکنشی ثبت نشده است.","No transactions yet.","لا توجد معاملات بعد.","هێشتا مامەڵەیەک نییە.")}</span></span></div>:Object.entries(days).map(([day,rows])=><div className="nv-p-day" key={day}><h3>{day}</h3>{rows.map(x=>{const Icon=/خوراک|غذا|food|dining/i.test(x.category)?Utensils:/حمل|رفت|transport|travel/i.test(x.category)?CarFront:/خرید|shopping/i.test(x.category)?ShoppingBag:/خانه|housing|home/i.test(x.category)?House:ReceiptText;return <button className="nv-p-tx" key={x.id} onClick={()=>p.onTransactions(x.title)}><span className={"nv-p-tx-icon "+x.kind}><Icon size={18}/></span><span className="nv-p-tx-name"><b>{x.title}</b><small>{x.category} · {p.dateLabel(x.date)}</small></span><strong className={x.kind==="income"?"positive":"negative"}>{x.kind==="income"?"+":"−"}{show(x.amount)}</strong></button>})}</div>)}</section>
  <section className="nv-p-section"><div className="nv-p-section-head"><h2>{tr("دسته‌بندی‌ها","Categories","الفئات","هاوپۆلەکان")}</h2><button onClick={()=>p.onTransactions()}>{tr("جزئیات","Details","التفاصيل","وردەکاری")} <ChevronLeft size={15}/></button></div><div className="nv-p-category-strip">{cats.map(c=>{const total=p.items.filter(x=>x.kind==="expense"&&x.category===c.k).reduce((n,x)=>n+x.amount,0);return <button key={c.n} onClick={()=>p.onTransactions(undefined,c.k)}><span><c.I/></span><b>{c.n}</b><small>{show(total)}</small></button>})}</div></section>
  <style jsx global>{`
-.nv-finance.nv-personal-v1.nv-home-active{min-height:100svh!important;background:linear-gradient(180deg,#b9e0f7 0%,#dcefff 58%,#edf6ff 100%)!important}
+.nv-finance.nv-personal-v1.nv-home-active{min-height:100svh!important;background:linear-gradient(180deg,#c6e6fa 0%,#c6e6fa 100%)!important}
 .nv-finance.nv-personal-v1.nv-home-active .nf-shell,.nv-finance.nv-personal-v1.nv-home-active .nf-main{background:transparent!important}
 .nv-finance.nv-personal-v1 .nf-main{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}
 .nv-finance.nv-personal-v1 .nf-topbar .nv-personal-bell{display:grid!important;place-items:center!important;width:38px!important;height:38px!important;border:1px solid #ffffffb8!important;border-radius:13px!important;background:#ffffffa8!important;color:#2878d0!important}
@@ -54,8 +54,8 @@ export default function NovyraPersonalHome(p:Props){
 .nv-finance.nv-personal-v1 .nv-p-category-strip{display:flex!important;overflow-x:auto!important;overscroll-behavior-x:contain!important;scrollbar-width:none!important;padding-bottom:2px!important}
 .nv-finance.nv-personal-v1 .nv-p-category-strip::-webkit-scrollbar{display:none!important}
 .nv-finance.nv-personal-v1 .nv-p-category-strip>button{flex:0 0 82px!important}
-.nv-finance.nv-personal-v1 .nv-p-section-head{margin-bottom:14px!important}
-.nv-finance.nv-personal-v1 .nv-p-hero{background:linear-gradient(135deg,#1763b9 0%,#287bd1 55%,#1a5fb1 100%)!important;color:#fff!important}
+.nv-finance.nv-personal-v1 .nv-p-section-head{margin-bottom:12px!important}
+.nv-finance.nv-personal-v1 .nv-p-hero{background:linear-gradient(135deg,#55a8ec 0%,#55a8ec 100%)!important;color:#fff!important}
 .nv-finance.nv-personal-v1 .nv-p-hero span,.nv-finance.nv-personal-v1 .nv-p-hero small,.nv-finance.nv-personal-v1 .nv-p-hero b{color:#fff!important;text-shadow:0 1px 3px rgba(0,24,66,.28)!important}
 .nv-finance.nv-personal-v1 .nv-p-hero-amount{font-size:clamp(28px,8vw,34px)!important;letter-spacing:.01em!important;text-shadow:0 1px 3px rgba(0,24,66,.25)!important}
 .nv-finance.nv-personal-v1 .nv-p-eye{width:30px!important;height:30px!important;min-width:30px!important;padding:4px!important;border-radius:50%!important;background:rgba(255,255,255,.14)!important;border:1px solid rgba(255,255,255,.25)!important}
@@ -66,6 +66,18 @@ export default function NovyraPersonalHome(p:Props){
 
 .nv-finance.nv-personal-v1 .nv-p-dock>button svg{width:20px!important;height:20px!important;stroke-width:1.8!important}
 @media(max-width:380px){.nv-finance.nv-personal-v1 .nv-p-home{gap:14px!important}.nv-finance.nv-personal-v1 .nv-p-category-strip>button{height:88px!important;min-height:88px!important}}
-`}</style>
+`}
+/* Precise final home layout overrides. Earlier duplicate section-head rule was winning the 8px spacing request. */
+.nv-finance.nv-personal-v1.nv-home-active{min-height:100svh!important;background:linear-gradient(180deg,#c6e6fa 0%,#c6e6fa 100%)!important}
+.nv-finance.nv-personal-v1 .nv-p-home{gap:16px!important}
+.nv-finance.nv-personal-v1 .nv-p-section-head{margin:0 0 12px!important;padding:0!important;min-height:0!important}
+.nv-finance.nv-personal-v1 .nv-p-section{margin:0!important;padding:0!important;min-height:0!important}
+.nv-finance.nv-personal-v1 .nv-p-eye{width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important;flex:0 0 36px!important;padding:0!important;border-radius:50%!important;aspect-ratio:1/1!important}
+.nv-finance.nv-personal-v1 .nv-p-hero{background:linear-gradient(135deg,#55a8ec 0%,#55a8ec 100%)!important}
+.nv-finance.nv-personal-v1 .nv-p-hero>small,.nv-finance.nv-personal-v1 .nv-p-hero-top>span,.nv-finance.nv-personal-v1 .nv-p-flow span,.nv-finance.nv-personal-v1 .nv-p-flow b,.nv-finance.nv-personal-v1 .nv-p-hero>span,.nv-finance.nv-personal-v1 .nv-p-account-link{color:#fff!important;font-weight:600!important;text-shadow:0 1px 2px rgba(0,40,80,.18)!important}
+.nv-finance.nv-personal-v1 .nv-p-category-strip>button{height:80px!important;min-height:80px!important;max-height:80px!important}
+.nv-finance.nv-personal-v1 .nv-p-category-strip>button{flex-basis:82px!important}
+.nv-finance.nv-personal-v1 .nv-p-category-strip>button b,.nv-finance.nv-personal-v1 .nv-p-category-strip>button small{font-weight:600!important}
+</style>
  </div>;
 }
