@@ -1,4 +1,4 @@
-const base=String(process.env.PREVIEW_WORKER_URL||"").replace(/\\/$/,"");
+const base=String(process.env.PREVIEW_WORKER_URL||"").replace(/\/$/,"");
 const token=String(process.env.PREVIEW_API_TOKEN||"");
 if(!base||!token) throw new Error("PREVIEW_WORKER_URL and PREVIEW_API_TOKEN are required");
 const headers={"Content-Type":"application/json","Authorization":"Bearer "+token};
