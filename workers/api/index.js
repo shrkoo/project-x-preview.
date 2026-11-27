@@ -438,18 +438,27 @@ export default {
    if (path === "/auth/google/start" && request.method === "GET") {
     if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) return fail("ورود با Google هنوز پیکربندی نشده است.",503);
     const state=randomToken(32);
+    const appBase=new URL(env.APP_URL || "https://novyra.pages.dev/");
+    const requestedReturn=url.searchParams.get("returnTo")||"/";
+    let returnPath="/";
+    try { const parsedReturn=new URL(requestedReturn,appBase); if(parsedReturn.origin===appBase.origin) returnPath=parsedReturn.pathname+parsedReturn.search; } catch {}
+    const stateCookie=state+"|"+encodeURIComponent(returnPath);
     const redirectUri=env.GOOGLE_REDIRECT_URI || `${url.origin}/auth/google/callback`;
     const params=new URLSearchParams({client_id:env.GOOGLE_CLIENT_ID,redirect_uri:redirectUri,response_type:"code",scope:"openid email profile",state,prompt:"select_account"});
     return new Response(null,{status:302,headers:{
       "Location":`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`,
-      "Set-Cookie":`px_google_state=${state}; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=600`,
+      "Set-Cookie":`px_google_state=${stateCookie}; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=600`,
       ...corsHeaders
     }});
-   }
    if (path === "/auth/google/callback" && request.method === "GET") {
-    const failRedirect=(reason)=>Response.redirect(`${env.APP_URL || "https://novyra.pages.dev/"}#google_error=${encodeURIComponent(reason)}`,302);
-    const code=url.searchParams.get("code"), state=url.searchParams.get("state"), cookie=request.headers.get("Cookie")||"";
-    const cookieState=cookie.match(/(?:^|;\s*)px_google_state=([^;]+)/)?.[1]||"";
+    const appBase=(env.APP_URL || "https://novyra.pages.dev/").replace(/\/+$/,"");
+    const cookie=request.headers.get("Cookie")||"";
+    const stateCookie=cookie.match(/(?:^|;\s*)px_google_state=([^;]+)/)?.[1]||"";
+    const [cookieState,cookieReturn]=stateCookie.split("|");
+    let returnPath="/";
+    try { const candidate=decodeURIComponent(cookieReturn||""); if(candidate.startsWith("/")&&!candidate.startsWith("//")) returnPath=candidate; } catch {}
+    const failRedirect=(reason)=>Response.redirect(`${appBase}${returnPath}#google_error=${encodeURIComponent(reason)}`,302);
+    const code=url.searchParams.get("code"), state=url.searchParams.get("state");
     const cleanCookie={ "Set-Cookie":"px_google_state=; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=0" };
     if(!code || !state || !cookieState || state!==cookieState) return failRedirect("اعتبارسنجی امنیتی Google ناموفق بود؛ دوباره تلاش کن.");
     if(!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) return failRedirect("تنظیمات Google OAuth کامل نیست.");
@@ -476,7 +485,7 @@ export default {
     }
     const requiresGoogleOnboarding=isNewGoogleUser || Number(user.onboarding_completed||0)===0;
     const session=await createSession(db,user.id);
-    const target=env.APP_URL || "https://novyra.pages.dev/";
+    const target=appBase+returnPath;
     return new Response(null,{status:302,headers:{"Location":`${target}#google_token=${encodeURIComponent(session.token)}${requiresGoogleOnboarding?"&google_new=1":""}`,"Set-Cookie":"px_google_state=; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=0",...corsHeaders}});
    }
 
