@@ -115,14 +115,14 @@ for (const language of ["fa", "en"] as const) {
           await home.locator(".nv-p-eye").click();
           for (const action of await home.locator(".nv-p-quick button").all()) {
             await action.click();
-            await expect(page.locator(".nf-modal")).toBeVisible();
-            await page.locator(".nf-modal-head button").click();
+            await expect(page.locator(".nv-tx-sheet")).toBeVisible();
+            await page.locator(".nv-tx-close").click();
           }
           const emptyAction = home.locator(".nv-p-empty button");
           if (await emptyAction.count()) {
             await emptyAction.click();
-            await expect(page.locator(".nf-modal")).toBeVisible();
-            await page.locator(".nf-modal-head button").click();
+            await expect(page.locator(".nv-tx-sheet")).toBeVisible();
+            await page.locator(".nv-tx-close").click();
           }
           await home.locator(".nv-p-insight").click();
           await expect(page.locator(".nf-report-actions")).toBeVisible();
