@@ -104,5 +104,6 @@
   "forgotEmailUnavailable": "Şifre sıfırlama e-postası şu anda kullanılamıyor. Daha sonra tekrar deneyin.",
   "forgotServerError": "Sunucu isteği işleyemedi. Lütfen tekrar deneyin.",
   "forgotRequestFailed": "Sıfırlama isteği başarısız. Bilgileri kontrol edip tekrar deneyin.",
-  "forgotNetworkError": "Bağlantı kurulamadı. İnternetinizi kontrol edip tekrar deneyin."
+  "forgotNetworkError": "Bağlantı kurulamadı. İnternetinizi kontrol edip tekrar deneyin.",
+  "authNeedsReset": "Bu hesap eski bir parola biçimi kullanıyor. Devam etmek için parolanızı sıfırlayın."
 }
