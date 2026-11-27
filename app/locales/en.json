@@ -110,5 +110,6 @@
   "forgotServerError": "The server could not process the request. Please try again.",
   "forgotRequestFailed": "The reset request failed. Check the details and try again.",
   "forgotNetworkError": "Connection failed. Check your internet and try again.",
-  "authNeedsReset": "This account uses an older password format. Reset your password to continue."
+  "authNeedsReset": "This account uses an older password format. Reset your password to continue.",
+  "resetTokenExpired": "This reset link has expired or was already used. Request a new one."
 }
