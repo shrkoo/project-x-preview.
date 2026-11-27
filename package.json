@@ -13,12 +13,13 @@
     "test:auth-translations": "node scripts/check-auth-translations.mjs",
     "test:regional-profile-schema": "node scripts/check-regional-profile-schema.mjs && node --input-type=module --check < workers/api/index.js && node --check workers/api/business-sync.js",
     "test:business-preview": "node scripts/check-business-preview.mjs",
-    "test:auth-login": "node --test workers/api/tests/auth-login.test.mjs workers/api/tests/auth-password.test.mjs",
+    "test:auth-login": "node --test shared/email.test.mjs workers/api/tests/auth-login.test.mjs workers/api/tests/auth-password.test.mjs",
     "test:auth-client": "node --experimental-strip-types scripts/check-auth-client.mjs",
     "test:e2e": "playwright test",
     "serve:e2e": "node scripts/serve-static.mjs",
     "test:money": "node --experimental-strip-types scripts/check-money.mjs",
-    "test:money-usage": "node scripts/check-money-usage.mjs"
+    "test:money-usage": "node scripts/check-money-usage.mjs",
+    "test:email-normalization": "node --test shared/email.test.mjs"
   },
   "dependencies": {
     "next": "15.5.28",
