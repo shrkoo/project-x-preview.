@@ -124,3 +124,5 @@
 .nv-tx-footer .nv-tx-save{grid-column:1!important;grid-row:2!important;order:1!important;width:100%!important;height:48px!important;min-height:48px!important;max-height:48px!important;border-radius:14px!important;font-size:12px!important}
 .nv-tx-footer .nv-tx-save-another{grid-column:2!important;grid-row:2!important;order:2!important;width:100%!important;height:48px!important;min-height:48px!important;max-height:48px!important;border-radius:14px!important;font-size:11px!important;padding:0 5px!important;white-space:nowrap!important}
 .nv-tx-footer .nv-tx-delete{grid-column:1/-1!important;grid-row:3!important;position:static!important;justify-self:center!important;min-height:32px!important}
+
+.nv-tx-cat-actions{display:flex!important;align-items:center!important;gap:6px!important}.nv-tx-cat-actions button{display:inline-flex!important;align-items:center!important;gap:4px!important;min-height:30px!important;padding:0 9px!important;border:1px solid #d7e9f7!important;border-radius:999px!important;background:#f3f9ff!important;color:#3978aa!important;font-size:10px!important;font-weight:600!important}
