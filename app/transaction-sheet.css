@@ -58,3 +58,20 @@
 .nv-tx-calendar-grid.nv-tx-weekdays{margin:0 0 5px!important}.nv-tx-weekdays span{display:grid!important;place-items:center!important;min-height:26px!important;color:#91a8b8!important;font-size:10px!important;font-weight:700!important}
 
 .nv-finance nav.nf-mobile-dock.nv-ref-dock.nv-tx-nav-hidden{display:none!important;visibility:hidden!important;pointer-events:none!important}
+
+/* Final mobile viewport/safe-area fixes for the Personal transaction sheet. */
+.nv-tx-backdrop{box-sizing:border-box!important;width:100%!important;max-width:100%!important;inset-inline:0!important;overflow-x:clip!important;padding-inline:0!important}
+.nv-tx-sheet{box-sizing:border-box!important;width:100%!important;max-width:min(100%,620px)!important;min-width:0!important;inset-inline:0!important;margin-inline:auto!important;overflow-x:hidden!important}
+.nv-tx-sheet *{box-sizing:border-box!important;min-width:0}
+.nv-tx-form{width:100%!important;max-width:100%!important}
+.nv-tx-scroll{width:100%!important;max-width:100%!important;overflow-x:hidden!important;overscroll-behavior-y:contain!important;scroll-padding-bottom:calc(180px + env(safe-area-inset-bottom))!important}
+.nv-tx-head{padding-top:calc(12px + env(safe-area-inset-top))!important}
+.nv-tx-footer{position:sticky!important;bottom:0!important;flex-shrink:0!important;padding-bottom:calc(12px + env(safe-area-inset-bottom))!important}
+.nv-tx-footer button{touch-action:manipulation!important}
+.nv-tx-save,.nv-tx-save-another{min-height:48px!important}
+.nv-tx-close{flex:0 0 40px!important;padding:0!important;display:grid!important;place-items:center!important}
+.nv-tx-amount-line{width:100%!important;min-width:0!important}
+.nv-tx-amount-line input{max-width:100%!important}
+.nv-tx-cats button,.nv-tx-date-chips button,.nv-tx-account-chips button{touch-action:manipulation!important}
+@media(max-width:390px){.nv-tx-sheet{border-radius:22px 22px 0 0!important}.nv-tx-scroll{padding-inline:10px!important}.nv-tx-footer{padding-inline:12px!important}.nv-tx-amount-line input{font-size:clamp(28px,8.4vw,38px)!important}}
+@media(hover:none){.nv-tx-scroll{-webkit-overflow-scrolling:touch!important}}
