@@ -396,7 +396,7 @@ export default {
    }
    if(path==="/auth/email-check" && request.method==="POST"){
     const body=await readBody(request),email=cleanEmail(body?.email);
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return fail("Enter a valid email.");
+     if(!isValidEmail(email)) return fail("ایمیل معتبر وارد کن.");
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     if(!await hitAuthLimit(db,"email-check:"+ip,8,600000))return fail("Too many checks. Try again later.",429);
     if(!await verifyTurnstile(body?.turnstileToken,request,env))return fail("Complete the security check.",403);
@@ -480,7 +480,7 @@ export default {
     // Return the account's PBKDF2 salt without disclosing account existence.
     // Unknown addresses receive a fixed dummy salt and still get the same login response.
     const email=cleanEmail(url.searchParams.get("email"));
-    if(!/^\S+@\S+\.\S+$/.test(email)) return fail("Enter a valid email address.",400);
+    if(!isValidEmail(email)) return json({code:"INVALID_EMAIL",message:"Enter a valid email address.",requestId},400);
     const account=await db.prepare("SELECT password_hash,password_salt FROM users WHERE email=? LIMIT 1").bind(email).first();
     const encoded=parsePasswordHash(account?.password_hash);
     const legacySalt=String(account?.password_salt||"");
@@ -515,7 +515,7 @@ export default {
 
    if(path==="/auth/webauthn/authenticate/options" && request.method==="POST") {
     const body=await readBody(request),email=cleanEmail(body?.email);
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
+     if(!isValidEmail(email)) return fail("ایمیل معتبر وارد کن.");
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     if(!await hitAuthLimit(db,"webauthn-auth-options:"+ip,8,600000)) return fail("درخواست‌های زیاد؛ کمی بعد دوباره تلاش کن.",429);
     const user=await db.prepare("SELECT id,email,verified_at FROM users WHERE email=?").bind(email).first();
@@ -585,7 +585,7 @@ export default {
     const displayName = [profile.first_name,profile.last_name].filter(Boolean).join(" ") || legacyName;
     const salt=String(body?.salt ?? body?.passwordSalt ?? body?.password_salt ?? "");
     const suppliedHash=String(body?.passwordHash ?? body?.password_hash ?? body?.hash ?? "");
-    if (!/^\S+@\S+\.\S+$/.test(email)) return authFail("ایمیل معتبر وارد کن.");
+    if (!isValidEmail(email)) return authFail("ایمیل معتبر وارد کن.");
     if (displayName.length < 2) return authFail("نام نمایشی باید حداقل ۲ حرف باشد.");
     if (!/^[a-f0-9]{32}$/i.test(salt)) return authFail("داده امنیتی نمک رمز از صفحه دریافت نشد؛ صفحه را تازه‌سازی کن.");
     if (!isNewPasswordHash(suppliedHash, salt)) return authFail("خروجی رمز عبور از صفحه ناقص است؛ صفحه را تازه‌سازی کن.");
@@ -928,7 +928,7 @@ export default {
       if(!access||access.role!=="owner") return fail("فقط مالک فضای کسب‌وکار می‌تواند دعوت‌نامه ارسال کند.",403);
       
       const email=cleanEmail(body.email),role=String(body.role||"viewer");
-      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("ایمیل معتبر وارد کنید.");
+     if(!isValidEmail(email)) return fail("ایمیل معتبر وارد کن.");
       if(!["manager","accountant","staff","viewer"].includes(role)) return fail("نقش انتخاب‌شده معتبر نیست.");
       if(email===cleanEmail(user.email)) return fail("مالک نمی‌تواند خودش را دعوت کند.");
       const existing=await db.prepare("SELECT user_id FROM workspace_members WHERE workspace_id=? AND email=? AND status='active'").bind(workspaceId,email).first();
