@@ -137,7 +137,7 @@ for(const scenario of cases){
   await page.locator(".nv-tx-sub-sheet textarea").fill("واریز مبلغ ۱٬۲۵۰٬۰۰۰ ریال");
   await page.locator(".nv-tx-sub-sheet .nv-tx-sms-button").click();
   await expect(page.locator("#nv-tx-amount")).toHaveValue(/۱٬۲۵۰٬۰۰۰|1,250,000/);
-  await expect(smsSheet.getByRole("button",{name:/Income|درآمد/})).toHaveAttribute("aria-pressed","true");
+  await expect(smsSheet.locator(".nv-tx-seg.income")).toHaveAttribute("aria-pressed","true");
   await expect(page.locator("html")).toHaveAttribute("dir",scenario.direction);
  });
 }
