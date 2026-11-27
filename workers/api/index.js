@@ -1082,7 +1082,7 @@ if(path==="/finance/transactions" && request.method==="GET") {
      const workspaceId=String(url.searchParams.get("workspaceId")||"");
      const access=await getFinanceAccess(db,workspaceId,user.id);
      if(!access || (access.type==="business" && !businessCan(access,"read"))) return fail("فضای کاری پیدا نشد یا دسترسی ندارید.",404);
-     const rows=await db.prepare("SELECT id,title,category,amount,kind,transaction_date AS date,note FROM finance_transactions WHERE workspace_id=? AND owner_id=? ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
+     const rows=await db.prepare("SELECT id,title,category,amount,kind,transaction_date AS date,note,account FROM finance_transactions WHERE workspace_id=? AND owner_id=? ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
      const transfers=await db.prepare("SELECT id,'Transfer' AS category,amount,'transfer' AS kind,transaction_date AS date,note,from_account AS fromAccount,to_account AS toAccount FROM finance_transfers WHERE workspace_id=? AND owner_id=? ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
      const items=[...(rows.results||[]),...(transfers.results||[]).map(x=>({...x,title:"انتقال از "+x.fromAccount+" به "+x.toAccount}))].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
      return json({items});
@@ -1104,7 +1104,7 @@ if(path==="/finance/transactions" && request.method==="GET") {
        } else {
          const title=String(item?.title||"").trim().slice(0,120),category=String(item?.category||"Other").trim().slice(0,80);
          if(!title||!["income","expense"].includes(kind)) return fail("یکی از تراکنش‌ها اطلاعات نامعتبر دارد.");
-         statements.push(db.prepare("INSERT INTO finance_transactions (id,workspace_id,owner_id,title,category,amount,kind,transaction_date,note) VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET title=excluded.title,category=excluded.category,amount=excluded.amount,kind=excluded.kind,transaction_date=excluded.transaction_date,note=excluded.note,updated_at=CURRENT_TIMESTAMP WHERE finance_transactions.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,title,category,amount,kind,date,note));
+         statements.push(db.prepare("INSERT INTO finance_transactions (id,workspace_id,owner_id,title,category,amount,kind,transaction_date,note,account) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET title=excluded.title,category=excluded.category,amount=excluded.amount,kind=excluded.kind,transaction_date=excluded.transaction_date,note=excluded.note,account=excluded.account,updated_at=CURRENT_TIMESTAMP WHERE finance_transactions.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,title,category,amount,kind,date,note,String(item?.account||"").trim().slice(0,100)));
        }
      }
      for(let i=0;i<statements.length;i+=90) await db.batch(statements.slice(i,i+90));
