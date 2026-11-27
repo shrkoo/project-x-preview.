@@ -30,7 +30,7 @@ for (const scenario of scenarios) {
       await page.getByRole("button", { name: scenario.send }).click();
       await expect(page.getByText(scenario.sent)).toBeVisible();
       await expect.poll(() => submittedEmail).toBe("shahramalidazeh6203@gmail.com");
-      await expect(page.getByRole("button", { name: /60|۶۰/ })).toBeDisabled();
+      await expect(page.locator(".nv-success .nv-button")).toBeDisabled();
     });
 
     test("Google button starts OAuth redirect", async ({ page }) => {
