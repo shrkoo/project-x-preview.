@@ -1,5 +1,5 @@
 import { countryCodes, currencyCodes, calendarCodes, languageCodes, numberFormatCodes, numberSystemCodes } from "./data/catalog-validation.js";
-import { normalizeEmail, isValidEmail } from "../../shared/email.mjs";
+import { normalizeEmail, isValidEmail } from "./auth-email.mjs";
 import { mergeBusinessRecordPayload } from "./business-sync.js";
 import { handlePasswordLogin } from "./auth-login.mjs";
 import { isNewPasswordHash, parsePasswordHash, verifyPassword } from "./auth-password.mjs";
