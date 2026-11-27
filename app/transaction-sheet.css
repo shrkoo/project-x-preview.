@@ -75,3 +75,6 @@
 .nv-tx-cats button,.nv-tx-date-chips button,.nv-tx-account-chips button{touch-action:manipulation!important}
 @media(max-width:390px){.nv-tx-sheet{border-radius:22px 22px 0 0!important}.nv-tx-scroll{padding-inline:10px!important}.nv-tx-footer{padding-inline:12px!important}.nv-tx-amount-line input{font-size:clamp(28px,8.4vw,38px)!important}}
 @media(hover:none){.nv-tx-scroll{-webkit-overflow-scrolling:touch!important}}
+
+.nv-tx-account-chips button>span{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;min-width:0!important;max-width:100%!important}
+.nv-tx-account-chips button>span small{font-size:9px!important;font-weight:600!important;color:#8aa3b5!important;white-space:nowrap!important}
