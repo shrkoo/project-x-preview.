@@ -450,6 +450,7 @@ export default {
       "Set-Cookie":`px_google_state=${stateCookie}; HttpOnly; Secure; SameSite=Lax; Path=/auth/google/callback; Max-Age=600`,
       ...corsHeaders
     }});
+   }
    if (path === "/auth/google/callback" && request.method === "GET") {
     const appBase=(env.APP_URL || "https://novyra.pages.dev/").replace(/\/+$/,"");
     const cookie=request.headers.get("Cookie")||"";
