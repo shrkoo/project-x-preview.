@@ -489,7 +489,7 @@ export default {
 
    if(path==="/auth/webauthn/register/options" && request.method==="POST") {
     const body=await readBody(request),email=cleanEmail(body?.email);
-    if(!/^\S+@\S+\.\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
+    if(!isValidEmail(email)) return json({code:"INVALID_EMAIL",message:"ایمیل معتبر وارد کن.",requestId},400);
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     if(!await hitAuthLimit(db,"webauthn-options:"+ip,5,600000)) return fail("درخواست‌های زیاد؛ کمی بعد دوباره تلاش کن.",429);
     const existing=await db.prepare("SELECT id FROM users WHERE email=? LIMIT 1").bind(email).first();
