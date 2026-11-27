@@ -24,7 +24,7 @@ export default function NovyraPersonalHome(p:Props){
 .nv-finance.nv-personal-v1.nv-home-active .nf-shell,.nv-finance.nv-personal-v1.nv-home-active .nf-main{background:transparent!important}
 .nv-finance.nv-personal-v1 .nf-main{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}
 .nv-finance.nv-personal-v1 .nf-topbar .nv-personal-bell{display:grid!important;place-items:center!important;width:38px!important;height:38px!important;border:1px solid #ffffffb8!important;border-radius:13px!important;background:#ffffffa8!important;color:#2878d0!important}
-.nv-finance.nv-personal-v1 .nv-p-home{display:flex!important;flex-direction:column!important;gap:16px!important;padding-bottom:12px!important}
+.nv-finance.nv-personal-v1 .nv-p-home{display:flex!important;flex-direction:column!important;padding-bottom:12px!important}
 .nv-finance.nv-personal-v1 .nv-p-hero{padding:14px 16px 12px!important;border-radius:22px!important}
 .nv-finance.nv-personal-v1 .nv-p-hero>small{display:block!important;margin-top:7px!important;font-size:10px!important;line-height:1.45!important;opacity:.78!important}
 .nv-finance.nv-personal-v1 .nv-p-hero-amount{font-size:clamp(25px,7vw,32px)!important;line-height:1.15!important}
@@ -66,7 +66,7 @@ export default function NovyraPersonalHome(p:Props){
 .nv-finance.nv-personal-v1 .nv-p-empty-copy>span{direction:rtl!important;text-align:right!important}
 
 .nv-finance.nv-personal-v1 .nv-p-dock>button svg{width:20px!important;height:20px!important;stroke-width:1.8!important}
-@media(max-width:380px){.nv-finance.nv-personal-v1 .nv-p-home{gap:14px!important}.nv-finance.nv-personal-v1 .nv-p-category-strip>button{height:88px!important;min-height:88px!important}}
+@media(max-width:380px){}
 /* Precise final home layout overrides. */
 .nv-finance.nv-personal-v1.nv-home-active{min-height:100svh!important;background:linear-gradient(180deg,#c6e6fa 0%,#c6e6fa 100%)!important}
 .nv-finance.nv-personal-v1 .nv-p-home{gap:16px!important}
@@ -75,7 +75,7 @@ export default function NovyraPersonalHome(p:Props){
 .nv-finance.nv-personal-v1 .nv-p-eye{width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important;flex:0 0 36px!important;padding:0!important;border-radius:50%!important;aspect-ratio:1/1!important}
 .nv-finance.nv-personal-v1 .nv-p-hero{background:linear-gradient(135deg,#55a8ec 0%,#55a8ec 100%)!important}
 .nv-finance.nv-personal-v1 .nv-p-hero>small,.nv-finance.nv-personal-v1 .nv-p-hero-top>span,.nv-finance.nv-personal-v1 .nv-p-flow span,.nv-finance.nv-personal-v1 .nv-p-flow b,.nv-finance.nv-personal-v1 .nv-p-hero>span,.nv-finance.nv-personal-v1 .nv-p-account-link{color:#fff!important;font-weight:600!important;text-shadow:0 1px 2px rgba(0,40,80,.18)!important}
-.nv-finance.nv-personal-v1 .nv-p-category-strip>button{height:80px!important;min-height:80px!important;max-height:80px!important;flex-basis:82px!important}
+.nv-finance.nv-personal-v1 .nv-p-category-strip>button{height:80px!important;min-height:80px!important;max-height:80px!important;flex:0 0 82px!important}
 .nv-finance.nv-personal-v1 .nv-p-category-strip>button b,.nv-finance.nv-personal-v1 .nv-p-category-strip>button small{font-weight:600!important}
 `}
 </style>
