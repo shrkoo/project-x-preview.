@@ -4630,3 +4630,31 @@ main.nv-business-overview .nf-topbar .profile-btn span{display:none!important}
 .nv-business-overview .nvbd-business-dock .nv-ref-dock-center .nf-dock-icon{width:42px!important;height:42px!important}
 .nv-business-overview .nvbd-business-dock>button.nv-ref-dock-center span:not(.nf-dock-icon){display:none!important}
 @media(max-width:380px){.nv-business-overview .nvbd-root.nvbd-overview{padding-inline:11px!important}.nv-business-overview .nvbd-quick-row button{padding-inline:11px!important}}
+
+
+/* Homa overview refinement pass */
+.nv-business-overview .nvbd-heading .nvbd-sync-chip{display:none!important}
+.nv-business-overview .nvbd-cash.nvbd-carousel{height:158px!important;min-height:158px!important;padding:10px 16px 8px!important}
+.nv-business-overview .nvbd-gauge-wrap{height:94px!important;margin:0 auto!important}
+.nv-business-overview .nvbd-gauge-center{top:40px!important;gap:3px!important;flex-wrap:nowrap!important}
+.nv-business-overview .nvbd-gauge-center strong{font-size:clamp(19px,5vw,25px)!important}
+.nv-business-overview .nvbd-gauge-center span{font-size:9px!important;white-space:nowrap!important}
+.nv-business-overview .nvbd-gauge-legend{position:static!important;display:flex!important;justify-content:space-around!important;margin-top:-1px!important;padding:0 12px!important;font-size:10px!important}
+.nv-business-overview .nvbd-dots{position:relative!important;z-index:2!important;margin:2px auto 0!important;padding:0 8px!important;width:max-content!important;max-width:100%!important}
+.nv-business-overview .nvbd-dots button{width:34px!important;flex-basis:34px!important;height:17px!important;min-height:17px!important}
+.nv-business-overview .nvbd-dots button:before{width:12px!important}
+.nv-business-overview .nvbd-dots button.active:before{width:25px!important}
+.nv-business-overview .nvbd-grid{gap:7px!important}
+.nv-business-overview .nvbd-metric{height:76px!important;min-height:76px!important;max-height:80px!important;padding:9px 10px!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;gap:6px!important}
+.nv-business-overview .nvbd-metric>span{display:flex!important;align-items:center!important;gap:5px!important;font-size:10px!important;line-height:1.2!important}
+.nv-business-overview .nvbd-metric>span svg{width:14px!important;height:14px!important}
+.nv-business-overview .nvbd-metric>strong{font-size:13px!important;line-height:1.2!important;max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.nv-business-overview .nvbd-quick{display:block!important;overflow:hidden!important}
+.nv-business-overview .nvbd-quick-row{display:flex!important;flex-wrap:nowrap!important;gap:7px!important;overflow-x:auto!important;scrollbar-width:none!important;padding:2px 1px 5px!important}
+.nv-business-overview .nvbd-quick-row button{flex:0 0 auto!important;min-height:39px!important;padding:0 11px!important;white-space:nowrap!important}
+.nv-business-overview .nvbd-quick>.nvbd-sms-pending{margin-top:4px!important}
+.nv-business-overview .nvbd-shortcuts{display:none!important}
+.nv-business-overview .nvbd-transactions{padding:12px 13px!important}
+.nv-business-overview .nvbd-empty-quiet{margin:0!important;padding:2px 0!important;font-size:11px!important;line-height:1.6!important;color:#7890a5!important;background:transparent!important;border:0!important;min-height:0!important;height:auto!important}
+.nv-business-overview .nvbd-business-dock{background:#ffffffa8!important;border-color:#ffffffb8!important;backdrop-filter:blur(24px) saturate(145%)!important;-webkit-backdrop-filter:blur(24px) saturate(145%)!important;box-shadow:0 8px 26px #285a8c14!important}
+@media(max-width:380px){.nv-business-overview .nvbd-metric{padding:8px!important}.nv-business-overview .nvbd-metric>strong{font-size:12px!important}.nv-business-overview .nvbd-quick-row button{padding-inline:10px!important}}
