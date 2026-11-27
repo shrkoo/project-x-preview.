@@ -93,5 +93,16 @@
   "loginRetry": "Tekrar dene",
   "loginWaitSeconds": "{seconds} saniye sonra tekrar deneyin",
   "loginErrorCode": "Hata kodu: {id}",
-  "createAccount": "Hesap oluştur"
+  "createAccount": "Hesap oluştur",
+  "forgotIntro": "Hesap e-posta adresinizi girin. Bu adresle bir hesap varsa sıfırlama bağlantısı göndeririz.",
+  "forgotSend": "Sıfırlama bağlantısı gönder",
+  "forgotSuccessTitle": "İstek alındı",
+  "forgotSuccessBody": "Bu e-posta için bir hesap varsa sıfırlama bağlantısını gönderdik.",
+  "forgotResendWait": "Yeniden gönderim {seconds} sn sonra",
+  "forgotResend": "Bağlantıyı yeniden gönder",
+  "forgotRateLimited": "Şifre sıfırlama istekleri geçici olarak sınırlandı. Bekleyip tekrar deneyin.",
+  "forgotEmailUnavailable": "Şifre sıfırlama e-postası şu anda kullanılamıyor. Daha sonra tekrar deneyin.",
+  "forgotServerError": "Sunucu isteği işleyemedi. Lütfen tekrar deneyin.",
+  "forgotRequestFailed": "Sıfırlama isteği başarısız. Bilgileri kontrol edip tekrar deneyin.",
+  "forgotNetworkError": "Bağlantı kurulamadı. İnternetinizi kontrol edip tekrar deneyin."
 }
