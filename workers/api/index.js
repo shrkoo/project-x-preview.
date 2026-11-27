@@ -227,7 +227,7 @@ async function deliverBusinessReminders(env,db) {
  return {sent};
 }
 function cleanName(value) { return String(value || "").trim().replace(/[<>]/g, "").slice(0, 32); }
-function cleanEmail(value) { return String(value ?? "").normalize("NFKC").replace(/[\u200B-\u200D\uFEFF\u202A-\u202E\u2066-\u2069]/g, "").replace(/\s+/g, "").toLowerCase().slice(0, 254); }
+function cleanEmail(value) { return normalizeEmail(value).toLowerCase().slice(0, 254); }
 
 async function verifyTurnstile(token, request, env) {
   if (!env.TURNSTILE_SECRET_KEY || !token) return false;
