@@ -36,7 +36,7 @@ for(const scenario of cases){
   await expect(sheet).toBeVisible();
   await expect(page.locator("nav.nv-ref-dock")).toBeHidden();
   await expect(sheet.locator(".nv-tx-save")).toBeVisible();
-  if(scenario.language==="fa"){await sheet.getByRole("button",{name:/انتخاب تاریخ/}).click();await expect(sheet.locator(".nv-tx-calendar")).toBeVisible();await sheet.locator(".nv-tx-calendar-grid:not(.nv-tx-weekdays) button:not(.outside):not(:disabled)").first().click();await expect(sheet.locator(".nv-tx-date-label")).toContainText(/۱۴۰\d\/\d{2}\/\d{2}/);}
+  if(scenario.language==="fa"){await sheet.getByRole("button",{name:/انتخاب تاریخ/}).click();await expect(sheet.locator(".nv-tx-calendar")).toBeVisible();await sheet.locator(".nv-tx-calendar-grid:not(.nv-tx-weekdays) button:not(.outside):not(:disabled)").first().click();await expect(sheet.locator(".nv-tx-date-label")).toContainText(/۱۴۰[۰-۹]\/[۰-۹]{2}\/[۰-۹]{2}/);}
   const amount=sheet.locator("#nv-tx-amount");
   await amount.fill("1250000");
   if(scenario.language==="fa")await expect(amount).toHaveValue(/۱/);
