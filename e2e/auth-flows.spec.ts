@@ -56,7 +56,7 @@ for (const scenario of scenarios) {
     });
 
     test("Google button starts OAuth redirect", async ({ page }) => {
-      await page.route("**/auth/google/start", async route => {
+      await page.route("**/auth/google/start?*", async route => {
         await route.fulfill({ status: 302, headers: { location: "https://accounts.google.com/o/oauth2/v2/auth?client_id=mock-preview-client&redirect_uri=https%3A%2F%2Fnovyra-preview-api.projectx-novyratam.workers.dev%2Fauth%2Fgoogle%2Fcallback&state=mock-state" } });
       });
       await page.route("https://accounts.google.com/**", async route => {
@@ -79,14 +79,14 @@ for (const scenario of scenarios) {
       });
       await page.goto("/");
       await page.getByRole("button", { name: scenario.create }).click();
-      await page.getByLabel(scenario.first).fill("Preview");
-      await page.getByLabel(scenario.last).fill("User");
+      await page.getByRole("textbox", { name: scenario.first, exact: true }).fill("Preview");
+      await page.getByRole("textbox", { name: scenario.last, exact: true }).fill("User");
       await page.getByLabel(scenario.email).fill("auth-preview@example.com");
       await page.getByRole("combobox", { name: scenario.country }).click();
       await page.getByRole("searchbox", { name: scenario.countrySearch }).fill("United States");
       await page.getByRole("button", { name: /United States/ }).click();
-      await page.getByLabel(scenario.password).fill("PreviewPass123!");
-      await page.getByLabel(scenario.language === "fa" ? "تکرار رمز عبور" : "Confirm password").fill("PreviewPass123!");
+      await page.locator('input[autocomplete="new-password"]').first().fill("PreviewPass123!");
+      await page.locator('input[autocomplete="new-password"]').last().fill("PreviewPass123!");
       await expect.poll(() => page.evaluate(() => document.documentElement.dataset.turnstileMock)).toBe("ready");
       await page.getByRole("button", { name: scenario.continue }).click();
       await page.getByRole("button", { name: scenario.continue }).click();
@@ -109,7 +109,7 @@ for (const scenario of scenarios) {
       await page.goto("/");
       await page.getByRole("button", { name: scenario.login }).click();
       await page.locator('input[type="email"]').fill("auth-preview@example.com");
-      await page.getByLabel(scenario.password).fill("PreviewPass123!");
+      await page.locator('input[autocomplete="current-password"]').fill("PreviewPass123!");
       await page.getByRole("button", { name: scenario.login }).last().click();
       await expect.poll(() => page.evaluate(() => localStorage.getItem("projectx-token"))).toBe("preview-login-session-token");
     });
