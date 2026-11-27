@@ -361,7 +361,7 @@ export default {
       EMAIL_BRIDGE_SECRET: Boolean(env.EMAIL_BRIDGE_SECRET),
       TURNSTILE: Boolean(env.TURNSTILE_SECRET_KEY),
       EMAIL_PROVIDER: hasMailProvider(env),
-      GOOGLE_OAUTH: Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET)
+      GOOGLE_OAUTH: Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
       ADMIN_EMAIL: Boolean(env.ADMIN_EMAIL)
     };
     const configuration = {
@@ -408,8 +408,8 @@ export default {
     return json({exists:Boolean(found),provider:found?.auth_provider==="google"?"google":found?"password":null});
    }
    if(path==="/auth/verify-code" && request.method==="POST"){
-    const body=await readBody(request),email=cleanEmail(body?.email),code=String(body?.code||"").replace(/\\D/g,"");
-    if(!/^\\d{6}$/.test(code))return fail("Enter the 6-digit code.");
+    const body=await readBody(request),email=cleanEmail(body?.email),code=String(body?.code||"").replace(/\D/g,"");
+    if(!/^\d{6}$/.test(code))return fail("Enter the 6-digit code.");
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     if(!await hitAuthLimit(db,"verify-code:"+ip,10,600000))return fail("Too many attempts.",429);
     const user=await db.prepare("SELECT * FROM users WHERE email=?").bind(email).first();
@@ -752,7 +752,7 @@ export default {
     if(request.method==="HEAD") return new Response(null,{status:200,headers:baseHeaders});
     const rangeHeader=request.headers.get("Range");
     if(rangeHeader) {
-      const match=rangeHeader.match(/^bytes=(\\d*)-(\\d*)$/);
+      const match=rangeHeader.match(/^bytes=(\d*)-(\d*)$/);
       if(!match || (!match[1]&&!match[2])) return new Response(null,{status:416,headers:{...baseHeaders,"Content-Range":`bytes */${size}`,"Content-Length":"0"}});
       let start=match[1]?Number(match[1]):Math.max(0,size-Number(match[2]));
       let end=match[2]&&match[1]?Number(match[2]):match[2]&&!match[1]?size-1:size-1;
