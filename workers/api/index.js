@@ -378,6 +378,7 @@ export default {
       APP_URL: Boolean(env.APP_URL),
       GOOGLE_REDIRECT_URI: Boolean(env.GOOGLE_REDIRECT_URI),
       WEBAUTHN_ORIGIN: Boolean(env.WEBAUTHN_ORIGIN),
+      TURNSTILE_SITE_KEY: Boolean(env.TURNSTILE_SITE_KEY),
       EMAIL_FROM: Boolean(env.EMAIL_FROM),
       REQUIRE_EMAIL_VERIFICATION: env.REQUIRE_EMAIL_VERIFICATION === "true" || env.REQUIRE_EMAIL_VERIFICATION === "false"
     };
