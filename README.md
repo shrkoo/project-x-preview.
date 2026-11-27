@@ -1,4 +1,4 @@
-# Novyra
+# Homa AI
 
 **Every moment, accounted for.**
 A mobile-first finance experience with one account and two selectable workspaces: Personal and Business.
@@ -65,9 +65,9 @@ Set these values on the **preview Worker** only:
 
 | Name | Type | Value / purpose |
 |---|---|---|
-| `APP_URL` | Worker variable | Exact Novyra Pages preview origin, e.g. `https://feature-homa-auth-part1.novyra.pages.dev` |
+| `APP_URL` | Worker variable | Exact Homa AI Pages preview origin, e.g. `https://feature-homa-auth-part1.novyra.pages.dev` |
 | `REQUIRE_EMAIL_VERIFICATION` | Worker variable | `true` |
-| `EMAIL_FROM` | Worker variable | Verified sender, e.g. `Novyra <accounts@your-verified-domain.example>` |
+| `EMAIL_FROM` | Worker variable | Verified sender, e.g. `Homa AI <accounts@your-verified-domain.example>` |
 | `GOOGLE_CLIENT_ID` | Worker variable | Google OAuth web client ID |
 | `GOOGLE_REDIRECT_URI` | Worker variable | `https://YOUR-WORKER.workers.dev/auth/google/callback` |
 | `TURNSTILE_SECRET_KEY` | Worker secret | Cloudflare Turnstile secret key |
