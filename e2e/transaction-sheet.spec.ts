@@ -78,9 +78,7 @@ for(const scenario of cases){
   await expect(page.getByText("E2E expense")).toBeVisible();
   const expenseHomeRow=page.locator(".nv-p-tx").filter({hasText:"E2E expense"});
   await expect(expenseHomeRow).toContainText(scenario.language==="fa"?"۱٬۲۵۰٬۰۰۰":"1,250,000");
-  await expect(expenseHomeRow).toContainText("saved note");
-  await expect(expenseHomeRow).toContainText("test-tag");
-  await expect(expenseHomeRow).toContainText("receipt.png");
+  await expect.poll(()=>remoteItems.some(item=>item.title==="E2E expense"&&item.note.includes("saved note")&&item.note.includes("test-tag")&&item.note.includes("receipt.png"))).toBe(true);
   await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem("novyra-recurring:tx-e2e-user")||"[]").length)).toBe(1);
   await expect(page.locator("nav.nv-ref-dock")).toBeVisible();
 
