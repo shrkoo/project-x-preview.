@@ -4658,3 +4658,310 @@ main.nvbd-root.nvbd-overview .nf-topbar .profile-btn span{display:none!important
 .nvbd-root.nvbd-overview .nvbd-empty-quiet{margin:0!important;padding:2px 0!important;font-size:11px!important;line-height:1.6!important;color:#7890a5!important;background:transparent!important;border:0!important;min-height:0!important;height:auto!important}
 .nvbd-root.nvbd-overview .nvbd-business-dock{background:#ffffffa8!important;border-color:#ffffffb8!important;backdrop-filter:blur(24px) saturate(145%)!important;-webkit-backdrop-filter:blur(24px) saturate(145%)!important;box-shadow:0 8px 26px #285a8c14!important}
 @media(max-width:380px){.nvbd-root.nvbd-overview .nvbd-metric{padding:8px!important}.nvbd-root.nvbd-overview .nvbd-metric>strong{font-size:12px!important}.nvbd-root.nvbd-overview .nvbd-quick-row button{padding-inline:10px!important}}
+
+
+/* Homa overview repair — scoped to business overview only */
+.nvbd-root.nvbd-overview{
+  gap:12px!important;
+}
+.nvbd-root.nvbd-overview .nvbd-cash.nvbd-carousel{
+  position:relative!important;
+  box-sizing:border-box!important;
+  height:232px!important;
+  min-height:232px!important;
+  padding:12px 16px 12px!important;
+  overflow:hidden!important;
+}
+.nvbd-root.nvbd-overview .nvbd-carousel-top{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  min-height:30px!important;
+  margin:0!important;
+}
+.nvbd-root.nvbd-overview .nvbd-carousel-top>small{
+  display:block!important;
+  margin:0!important;
+  font-size:13px!important;
+  line-height:20px!important;
+  font-weight:700!important;
+}
+.nvbd-root.nvbd-overview .nvbd-gauge-wrap{
+  position:relative!important;
+  width:min(100%,280px)!important;
+  height:158px!important;
+  margin:0 auto!important;
+  overflow:visible!important;
+}
+.nvbd-root.nvbd-overview .nvbd-gauge{
+  position:absolute!important;
+  top:0!important;
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+  height:112px!important;
+}
+.nvbd-root.nvbd-overview .nvbd-gauge-center{
+  position:absolute!important;
+  top:59px!important;
+  left:0!important;
+  right:0!important;
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:nowrap!important;
+  align-items:baseline!important;
+  justify-content:center!important;
+  gap:5px!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+}
+.nvbd-root.nvbd-overview .nvbd-gauge-center strong{
+  flex:0 0 auto!important;
+  font-size:clamp(25px,7vw,32px)!important;
+  line-height:1!important;
+  font-weight:850!important;
+  color:#fff!important;
+  direction:ltr!important;
+}
+.nvbd-root.nvbd-overview .nvbd-gauge-center span{
+  flex:0 0 auto!important;
+  font-size:11px!important;
+  line-height:1!important;
+  color:#ffffffdf!important;
+}
+.nvbd-root.nvbd-overview .nvbd-gauge-legend{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:28px!important;
+  margin:0!important;
+  padding:0 8px!important;
+  font-size:11px!important;
+  line-height:18px!important;
+  white-space:nowrap!important;
+}
+.nvbd-root.nvbd-overview .nvbd-gauge-legend span{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:6px!important;
+}
+.nvbd-root.nvbd-overview .nvbd-dots{
+  position:absolute!important;
+  left:50%!important;
+  bottom:12px!important;
+  transform:translateX(-50%)!important;
+  z-index:3!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+  width:max-content!important;
+  margin:0!important;
+  padding:0!important;
+}
+.nvbd-root.nvbd-overview .nvbd-dots button{
+  width:30px!important;
+  min-width:30px!important;
+  flex:0 0 30px!important;
+  height:18px!important;
+  min-height:18px!important;
+}
+.nvbd-root.nvbd-overview .nvbd-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  outline:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.nvbd-root.nvbd-overview .nvbd-grid::before,
+.nvbd-root.nvbd-overview .nvbd-grid::after,
+.nvbd-root.nvbd-overview .nvbd-metric::before,
+.nvbd-root.nvbd-overview .nvbd-metric::after{
+  content:none!important;
+  display:none!important;
+  box-shadow:none!important;
+}
+.nvbd-root.nvbd-overview .nvbd-metric{
+  box-sizing:border-box!important;
+  height:78px!important;
+  min-height:78px!important;
+  max-height:80px!important;
+  border:1px solid #ffffffd9!important;
+  outline:0!important;
+  background:rgba(255,255,255,.78)!important;
+  box-shadow:0 4px 14px rgba(47,104,157,.08)!important;
+}
+.nvbd-root.nvbd-overview .nvbd-quick{
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+}
+.nvbd-root.nvbd-overview .nvbd-quick-row{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  align-items:center!important;
+  gap:8px!important;
+  width:100%!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  overscroll-behavior-inline:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  scrollbar-width:none!important;
+  padding:2px 1px 5px!important;
+}
+.nvbd-root.nvbd-overview .nvbd-quick-row::-webkit-scrollbar{display:none!important}
+.nvbd-root.nvbd-overview .nvbd-quick-row>button{
+  flex:0 0 auto!important;
+  min-height:42px!important;
+  width:auto!important;
+  max-width:none!important;
+  padding:0 12px!important;
+  white-space:nowrap!important;
+  border-radius:999px!important;
+  font-size:11px!important;
+}
+.nvbd-root.nvbd-overview .nvbd-quick-row>button.nvbd-action-primary{
+  flex:0 0 auto!important;
+  width:auto!important;
+  background:#2f80ed!important;
+  color:#fff!important;
+}
+.nvbd-root.nvbd-overview .nvbd-start-card{
+  margin-top:0!important;
+  gap:7px!important;
+}
+.nvbd-root.nvbd-overview .nvbd-quick + .nvbd-start-card{
+  margin-top:12px!important;
+}
+.nvbd-root.nvbd-overview .nvbd-quick + .nvbd-transactions,
+.nvbd-root.nvbd-overview .nvbd-quick + .nvbd-start-card + .nvbd-transactions{
+  margin-top:12px!important;
+}
+.nvbd-root.nvbd-overview .nvbd-sms-sheet{
+  z-index:1200!important;
+}
+.nvbd-root.nvbd-overview .nvbd-sms-sheet textarea{
+  display:block!important;
+  width:100%!important;
+  min-height:120px!important;
+  box-sizing:border-box!important;
+}
+
+/* The fixed navigation is a sibling of the dashboard root, so scope it by its
+   business-overview-only state class rather than by .nvbd-root descendants. */
+nav.nf-mobile-dock.nv-ref-dock.nvbd-business-dock{
+  position:fixed!important;
+  z-index:1100!important;
+  left:12px!important;
+  right:12px!important;
+  bottom:calc(8px + env(safe-area-inset-bottom))!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  align-items:center!important;
+  justify-items:stretch!important;
+  gap:8px!important;
+  width:auto!important;
+  height:72px!important;
+  min-height:72px!important;
+  padding:5px 10px!important;
+  box-sizing:border-box!important;
+  border:1px solid rgba(255,255,255,.88)!important;
+  border-radius:999px!important;
+  background:rgba(255,255,255,.84)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(150%)!important;
+  backdrop-filter:blur(24px) saturate(150%)!important;
+  box-shadow:0 8px 26px rgba(40,90,140,.13)!important;
+  transform:none!important;
+}
+nav.nf-mobile-dock.nv-ref-dock.nvbd-business-dock>button{
+  position:relative!important;
+  left:auto!important;
+  right:auto!important;
+  transform:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:3px!important;
+  width:100%!important;
+  min-width:0!important;
+  height:58px!important;
+  min-height:58px!important;
+  margin:0!important;
+  padding:2px 0!important;
+  border:0!important;
+  border-radius:14px!important;
+  background:transparent!important;
+  color:#8196aa!important;
+  font-size:12px!important;
+  font-weight:650!important;
+  white-space:nowrap!important;
+  box-shadow:none!important;
+}
+nav.nf-mobile-dock.nv-ref-dock.nvbd-business-dock>button svg{
+  width:19px!important;
+  height:19px!important;
+  flex:0 0 auto!important;
+}
+nav.nf-mobile-dock.nv-ref-dock.nvbd-business-dock>button span{
+  display:block!important;
+  font-size:11px!important;
+  line-height:13px!important;
+  white-space:nowrap!important;
+}
+nav.nf-mobile-dock.nv-ref-dock.nvbd-business-dock>button.active{color:#2f80ed!important}
+nav.nf-mobile-dock.nv-ref-dock.nvbd-business-dock>button.nv-ref-dock-center{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:0!important;
+  width:52px!important;
+  height:52px!important;
+  min-height:52px!important;
+  justify-self:center!important;
+  border-radius:50%!important;
+}
+nav.nf-mobile-dock.nv-ref-dock.nvbd-business-dock>button.nv-ref-dock-center .nf-dock-icon{
+  display:grid!important;
+  place-items:center!important;
+  width:46px!important;
+  height:46px!important;
+  min-width:46px!important;
+  min-height:46px!important;
+  border-radius:50%!important;
+  background:linear-gradient(135deg,#2f80ed,#58a9ef)!important;
+  color:#fff!important;
+  box-shadow:0 5px 16px rgba(47,128,237,.22)!important;
+}
+nav.nf-mobile-dock.nv-ref-dock.nvbd-business-dock>button.nv-ref-dock-center .nf-dock-icon svg{
+  width:22px!important;
+  height:22px!important;
+  color:#fff!important;
+  stroke:#fff!important;
+}
+@media(min-width:760px){
+  nav.nf-mobile-dock.nv-ref-dock.nvbd-business-dock{
+    left:50%!important;
+    right:auto!important;
+    width:min(520px,calc(100% - 32px))!important;
+    transform:translateX(-50%)!important;
+  }
+}
+@media(max-width:380px){
+  nav.nf-mobile-dock.nv-ref-dock.nvbd-business-dock{gap:4px!important;padding-inline:7px!important}
+  nav.nf-mobile-dock.nv-ref-dock.nvbd-business-dock>button span{font-size:11px!important}
+}
