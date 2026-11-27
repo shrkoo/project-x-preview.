@@ -13,6 +13,8 @@ export type AuthErrorCode =
   | "NETWORK"
   | "SERVER"
   | "INTERNAL_ERROR"
+  | "INVALID_INPUT"
+  | "TOKEN_EXPIRED"
   | "FORBIDDEN";
 
 export function authErrorKey(code: string | undefined, status = 0): string {
@@ -23,6 +25,8 @@ export function authErrorKey(code: string | undefined, status = 0): string {
     case "EMAIL_EXISTS":
     case "ACCOUNT_EXISTS": return "accountExists";
     case "NEEDS_RESET": return "authNeedsReset";
+    case "TOKEN_EXPIRED": return "resetTokenExpired";
+    case "INVALID_INPUT": return "passwordShort";
     case "UNVERIFIED":
     case "EMAIL_NOT_VERIFIED": return "loginEmailUnverified";
     case "RATE_LIMITED": return "loginTooManyAttempts";
