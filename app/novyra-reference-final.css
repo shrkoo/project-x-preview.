@@ -4377,7 +4377,7 @@ main.nv-finance button.nf-brand{width:48px!important;min-width:48px!important;mi
 
 /* Phase 1 responsive polish: compact hero, snap categories, safe dock spacing */
 .nv-personal-v1 .nv-p-home{gap:16px!important}
-.nv-personal-v1 .nv-p-section{gap:16px!important}
+.nv-personal-v1 .nv-p-section{gap:0!important}
 .nv-personal-v1 .nv-p-hero{
   min-height:0!important;
   height:auto!important;
