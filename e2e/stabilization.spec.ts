@@ -58,7 +58,7 @@ for (const language of ["fa", "en"] as const) {
           expect(homeText).not.toContain("n\\");
           expect(homeText).not.toContain('n\\"');
           if (language === "fa") expect(homeText).not.toContain("$");
-          await expect(page.locator(".nvbd-action-secondary")).toHaveCount(3);
+          await expect(page.locator(".nvbd-action-secondary")).toHaveCount(5);
           for (const tile of await page.locator(".nvbd-action-secondary").all()) {
             await expect(tile.locator("svg")).toBeVisible();
             await tile.click();
@@ -133,11 +133,11 @@ for (const language of ["fa", "en"] as const) {
           await home.locator(".nv-p-category-strip button").first().click();
           await expect(page.locator(".nv-p-transactions")).toBeVisible();
           await nav.nth(1).click();
-          await expect(page.locator(".nv-p-coming")).toBeVisible();
+          await expect(nav.nth(1)).toHaveClass(/active/);
           await nav.nth(3).click();
           await expect(page.locator(".nf-report-actions")).toBeVisible();
           await nav.nth(4).click();
-          await expect(page.locator(".nv-p-coming")).toBeVisible();
+          await expect(nav.nth(4)).toHaveClass(/active/);
         }
 
         const quick = page.locator(".nv-ref-dock-center");
