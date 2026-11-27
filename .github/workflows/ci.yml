@@ -41,6 +41,7 @@ jobs:
         env:
           DEPLOY_TARGET: cloudflare-pages
           NEXT_PUBLIC_API_BASE: https://novyra-preview-api.projectx-novyratam.workers.dev
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: 0x4AAAAAAGT3YeW3V72DTsmj
         run: set -o pipefail; npm run build 2>&1 | tee -a ci-build.log
 
       - name: Install Playwright Chromium
