@@ -17,7 +17,7 @@ import {CountrySelect} from "./novyra/CountrySelect";
 import {PinPad} from "./novyra/PinPad";
 import {PatternLock} from "./novyra/PatternLock";
 import {detectLocale,localeMeta,translate,type Locale} from "./novyra/i18n";
-import {normalizeEmail,isValidEmail} from "../../shared/email.mjs";
+import {normalizeEmail,isValidEmail} from "../../workers/api/auth-email.mjs";
 
 type Values={firstName:string;lastName:string;email:string;country:string;password:string;confirmPassword:string};
 type Lock="none"|"pin"|"pattern";
