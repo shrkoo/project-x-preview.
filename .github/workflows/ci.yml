@@ -33,6 +33,11 @@ jobs:
         shell: bash
         run: set -o pipefail; npx tsc --noEmit 2>&1 | tee -a ci-build.log
 
+      - name: Check Preview API and transfer smoke test syntax
+        run: |
+          node --check workers/api/index.js
+          node --check workers/api/tests/finance-transfer-smoke.mjs
+
       - name: Test personal finance transfers, Tehran dates and bank SMS parsing
         run: npm run test:personal-finance
 
