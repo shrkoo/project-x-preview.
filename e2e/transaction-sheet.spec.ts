@@ -119,7 +119,7 @@ for(const scenario of cases){
   await page.locator("nav.nv-ref-dock button").nth(2).click();
   await page.getByRole("button",{name:scenario.language==="en"?/Expense/:/هزینه/}).click();
   const smsSheet=page.getByRole("dialog");
-  await smsSheet.getByRole("button",{name:/تکمیل از پیامک بانکی|Complete from bank SMS/}).click();
+  await smsSheet.getByRole("button",{name:/تکمیل از پیامک بانکی|Fill from bank SMS/}).click();
   await expect(page.locator(".nv-tx-sub-sheet")).toBeVisible();
   await page.locator(".nv-tx-sub-sheet textarea").fill("پیام نامعتبر");
   await page.locator(".nv-tx-sub-sheet .nv-tx-sms-button").click();
