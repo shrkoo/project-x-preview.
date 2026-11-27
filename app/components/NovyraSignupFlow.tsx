@@ -25,7 +25,7 @@ type Mode="personal"|"business";
 type User={id:string;email:string;displayName:string;xp?:number;gamesPlayed?:number;role?:string;profile?:{accountType?:"personal"|"business";appLockType?:Lock;currency?:string}};
 declare global { interface Window { turnstile?: { render:(container:string,options:any)=>string; reset:(id?:string)=>void; }; } }
 type Props={onComplete:(user:User|null,language:any)=>void;initialNotice?:string};
-const schema=z.object({firstName:z.string().trim().min(1),lastName:z.string().trim().min(1),email:z.string().trim().email(),country:z.string().min(2),password:z.string().min(10),confirmPassword:z.string().min(1)}).refine(v=>!v.confirmPassword || !v.password || v.password===v.confirmPassword,{path:["confirmPassword"],message:"passwordMismatch"});
+const schema=z.object({firstName:z.string().trim().min(1),lastName:z.string().trim().min(1),email:z.string().trim().refine(isValidEmail,{message:"emailInvalid"}),country:z.string().min(2),password:z.string().min(10),confirmPassword:z.string().min(1)}).refine(v=>!v.confirmPassword || !v.password || v.password===v.confirmPassword,{path:["confirmPassword"],message:"passwordMismatch"});
 function base64UrlToBytes(value:string){const normalized=value.replace(/-/g,"+").replace(/_/g,"/");const binary=atob(normalized.padEnd(Math.ceil(normalized.length/4)*4,"="));return Uint8Array.from(binary,char=>char.charCodeAt(0));}
 function bytesToBase64Url(value:ArrayBuffer){const bytes=new Uint8Array(value);let binary="";for(const byte of bytes)binary+=String.fromCharCode(byte);return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");}
 const currenciesFallback=["USD","EUR","GBP","IRR","TRY","AED","SAR","CAD","AUD","CHF","JPY","CNY","NOK","SEK","DKK"];
@@ -51,7 +51,7 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
  const localizedCurrency=(code:string)=>{try{return new Intl.DisplayNames([locale],{type:"currency"}).of(code)||code}catch{return code}};
  const currencyList=useMemo(()=>Array.from(new Set([...currencies.map(c=>c.code),...currenciesFallback])).sort(),[]);
  async function checkEmailExists(){
-  const email=values.email.trim().toLowerCase();
+  const email=normalizeEmail(values.email);
   if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
   try{
     const result=await apiRequest<{exists:boolean;provider:"password"|"google"|null}>("/auth/email-check",{method:"POST",body:JSON.stringify({email,turnstileToken:captchaToken})});
@@ -97,7 +97,7 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
   }finally{setBusy(false);}
  }
  async function setupBiometric(){try{
-  const email=values.email.trim().toLowerCase();
+  const email=normalizeEmail(values.email);
   if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw new Error("biometricEmailRequired");
   if(!window.isSecureContext||!window.PublicKeyCredential||!navigator.credentials?.create)throw new Error("biometricUnavailable");
   if(typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable==="function"&&!await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())throw new Error("biometricUnavailable");
@@ -111,12 +111,12 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
   setBiometricRegistration({id:credential.id,rawId:bytesToBase64Url(credential.rawId),type:credential.type,authenticatorAttachment:credential.authenticatorAttachment,response:{clientDataJSON:bytesToBase64Url(response.clientDataJSON),attestationObject:bytesToBase64Url(response.attestationObject),transports},clientExtensionResults:credential.getClientExtensionResults()});
   setNotice("");
  }catch(e){const name=e instanceof DOMException?e.name:"";const key=name==="NotAllowedError"?"biometricCancelled":name==="NotSupportedError"||name==="SecurityError"?"biometricUnavailable":"biometricFailed";setNotice(e instanceof Error&&["biometricUnavailable","biometricCancelled","biometricEmailRequired"].includes(e.message)?t(e.message):t(key));}}
- async function finish(){if(busy)return;setNotice("");if(!currency){setNotice(locale==="fa"?"ابتدا کشور را انتخاب کن تا ارز پیش‌فرض آن مشخص شود.":"Choose a country first so its default currency can be selected.");return;}if(lock==="pin"&&(pin.length<6||pin!==pinConfirm)){setNotice(pin!==pinConfirm?t("pinMismatch"):t("pinEnter"));return;}if(lock==="pattern"&&(pattern.split("-").length<4||pattern!==patternConfirm)){setNotice(pattern!==patternConfirm?t("patternMismatch"):t("patternDraw"));return;}if(mode==="business"&&!company.trim()){setNotice(t("companyRequired"));return;}setBusy(true);const email=values.email.trim().toLowerCase();let timer=0;const controller=new AbortController();timer=window.setTimeout(()=>controller.abort(),25000);
+ async function finish(){if(busy)return;setNotice("");if(!currency){setNotice(locale==="fa"?"ابتدا کشور را انتخاب کن تا ارز پیش‌فرض آن مشخص شود.":"Choose a country first so its default currency can be selected.");return;}if(lock==="pin"&&(pin.length<6||pin!==pinConfirm)){setNotice(pin!==pinConfirm?t("pinMismatch"):t("pinEnter"));return;}if(lock==="pattern"&&(pattern.split("-").length<4||pattern!==patternConfirm)){setNotice(pattern!==patternConfirm?t("patternMismatch"):t("patternDraw"));return;}if(mode==="business"&&!company.trim()){setNotice(t("companyRequired"));return;}setBusy(true);const email=normalizeEmail(values.email);let timer=0;const controller=new AbortController();timer=window.setTimeout(()=>controller.abort(),25000);
  try{const salt=createPasswordSalt();const passwordHash=await derivePasswordHash(values.password,salt);const lockSecret=lock==="pin"?pin:lock==="pattern"?pattern:"";const appLockHash=lock==="none"?null:await deriveAppLockHash(lockSecret,email);const data=await apiRequest<{token?:string;user?:User;verificationRequired?:boolean}>("/auth/register",{method:"POST",body:JSON.stringify({turnstileToken:captchaToken,email,name:values.firstName.trim()+" "+values.lastName.trim(),firstName:values.firstName.trim(),lastName:values.lastName.trim(),country:values.country,currency,language:locale,direction:rtl?"rtl":"ltr",accountType:mode,companyName:mode==="business"?company.trim():null,appLockType:lock,appLockHash,webauthnRegistration:lock!=="none"?biometricRegistration:null,salt,passwordHash}),signal:controller.signal});if(data.verificationRequired){setVerificationPending(true);setResendSeconds(60);setStep(5);setNotice(t("verificationSent"));return;}if(!data.token||!data.user)throw new Error(t("error"));setSession(data.token);localStorage.setItem("projectx-language",locale);localStorage.setItem("projectx-country",values.country);localStorage.setItem("projectx-account-type",mode);if(mode==="business")localStorage.setItem("novyra-business-name",company.trim());localStorage.setItem("novyra-finance-currency",currency);await saveDeviceLock(data.user.id,lock,lock==="none"?undefined:lockSecret);localStorage.setItem("projectx-app-lock-user",data.user.id);localStorage.setItem("projectx-app-lock-biometric",lock!=="none"&&biometricRegistration?"1":"0");if(lock!=="none"&&biometricRegistration)localStorage.setItem("projectx-app-lock-credential",biometricRegistration.id);else localStorage.removeItem("projectx-app-lock-credential");localStorage.setItem("projectx-account",JSON.stringify({name:data.user.displayName||values.firstName+" "+values.lastName,email}));localStorage.setItem("projectx-first-run-complete","1");setComplete(true);setStep(4);
  }catch(e){const message=e instanceof Error?e.message:"";if(/برای این ایمیل حسابی وجود دارد|account already exists|email already exists|already registered/i.test(message)){setLoginMode(true);setStep(1);setNotice(t("accountExists"));}else{setNotice(e instanceof DOMException&&e.name==="AbortError"?t("timeout"):message||t("error"));}}finally{clearTimeout(timer);setBusy(false);}}
  async function biometricLogin(){
-  const email=values.email.trim().toLowerCase();
-  if(!email){setNotice(t("emailInvalid"));return;}
+  const email=normalizeEmail(values.email);
+  if(!isValidEmail(email)){setNotice(t("emailInvalid"));return;}
   setBusy(true);setNotice("");
   try{
     if(!window.isSecureContext||!window.PublicKeyCredential||!navigator.credentials?.get)throw new Error("biometricUnavailable");
@@ -134,8 +134,8 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
  }
  async function login(){
   if(busy)return;
-  const email=values.email.trim().toLowerCase();
-  if(!email||!values.password){setNotice(t("required"));return;}
+  const email=normalizeEmail(values.email);
+  if(!isValidEmail(email)||!values.password){setNotice(t("required"));return;}
   setBusy(true);setNotice("");setLoginErrorKind(null);setLoginRequestId("");
   try{
     const saltData=await apiRequest<{salt:string}>("/auth/password-salt?email="+encodeURIComponent(email),{method:"GET"});
