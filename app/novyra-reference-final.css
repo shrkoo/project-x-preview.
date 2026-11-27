@@ -4560,3 +4560,19 @@ main.nv-business-overview .nf-topbar .profile-btn span{display:none!important}
 .nv-business-overview .nvbd-calendar-row strong{font-size:11px!important;color:#31516e!important;white-space:nowrap!important}
 
 .nv-business-overview .nvbd-heading{justify-content:space-between!important}
+
+
+/* Keep all overview controls at or above the 44px touch target */
+.nv-business-overview .nvbd-head-icon{flex-basis:44px!important;width:44px!important;min-width:44px!important;height:44px!important}
+.nv-business-overview .nvbd-dots button{flex-basis:44px!important;width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important}
+.nv-business-overview .nvbd-account-link{min-height:44px!important}
+.nv-business-overview .nvbd-transactions .nvbd-section-head>button{min-height:44px!important}
+.nv-business-overview .nvbd-sms-sheet .nvbd-close{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important}
+.nv-business-overview .nvbd-pending-row>button{min-height:44px!important}
+.nv-business-overview .nvbd-chart-empty button{min-height:44px!important}
+.nv-business-overview .nvbd-sync-chip svg{animation:nvbd-sync-rotate 9s linear infinite}
+@keyframes nvbd-sync-rotate{to{transform:rotate(360deg)}}
+@media(max-width:380px){
+  main.nv-business-overview .nvbd-head-icon{flex-basis:44px!important;width:44px!important;min-width:44px!important}
+  main.nv-business-overview .nf-topbar .profile-btn{flex-basis:44px!important;width:44px!important;min-width:44px!important}
+}
