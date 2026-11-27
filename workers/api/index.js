@@ -1,4 +1,5 @@
 import { countryCodes, currencyCodes, calendarCodes, languageCodes, numberFormatCodes, numberSystemCodes } from "./data/catalog-validation.js";
+import { normalizeEmail, isValidEmail } from "../../shared/email.mjs";
 import { mergeBusinessRecordPayload } from "./business-sync.js";
 import { handlePasswordLogin } from "./auth-login.mjs";
 import { isNewPasswordHash, parsePasswordHash, verifyPassword } from "./auth-password.mjs";
@@ -662,18 +663,18 @@ export default {
    if (path === "/auth/forgot-password" && request.method === "POST") {
     const body=await readBody(request), email=cleanEmail(body?.email);
     if(!/^\\S+@\\S+\\.\\S+$/.test(email)) return fail("ایمیل معتبر وارد کن.");
-    if(!hasMailProvider(env)) return fail("سرویس ارسال ایمیل هنوز تنظیم نشده است.",503);
+    if(!hasMailProvider(env)) return json({code:"EMAIL_SEND_FAILED",message:"سرویس ارسال ایمیل در این محیط تنظیم نشده است.",requestId},503);
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     const emailKey=await digest(email);
-    if(!await hitAuthLimit(db,"forgot-password-ip:"+ip,60,3600000))return fail("برای حفظ امنیت، تعداد درخواست‌ها از این شبکه موقتاً محدود شده است. کمی بعد دوباره تلاش کن.",429);
-    if(!await hitAuthLimit(db,"forgot-password-email:"+emailKey,10,3600000))return fail("برای این ایمیل در یک ساعت گذشته درخواست‌های زیادی ثبت شده است. کمی بعد دوباره تلاش کن.",429);
-    if(!await hitAuthLimit(db,"forgot-password-cooldown:"+emailKey,1,60000))return fail("برای ارسال دوباره، لطفاً یک دقیقه صبر کن.",429);
+    if(!await hitAuthLimit(db,"forgot-password-ip:"+ip,60,3600000))return json({code:"RATE_LIMITED",message:"درخواست‌های بازیابی از این شبکه موقتاً محدود شده است.",requestId,retryAfterSeconds:3600},429);
+    if(!await hitAuthLimit(db,"forgot-password-email:"+emailKey,10,3600000))return json({code:"RATE_LIMITED",message:"برای این ایمیل درخواست‌های زیادی ثبت شده است. کمی بعد دوباره تلاش کن.",requestId,retryAfterSeconds:3600},429);
+    if(!await hitAuthLimit(db,"forgot-password-cooldown:"+emailKey,1,60000))return json({code:"RATE_LIMITED",message:"برای ارسال دوباره کمی صبر کن.",requestId,retryAfterSeconds:60},429);
     const target=await db.prepare("SELECT id,email FROM users WHERE email=?").bind(email).first();
     if(target) {
       await db.prepare("UPDATE email_tokens SET used_at=CURRENT_TIMESTAMP WHERE user_id=? AND kind='reset' AND used_at IS NULL").bind(target.id).run();
       const token=await issueEmailToken(db,target.id,"reset",60*60*1000);
       const link=(env.APP_URL || "https://novyra.pages.dev") + "/?reset=" + encodeURIComponent(token);
-      await sendMail(env,target.email,"بازیابی رمز عبور NOVYRA",renderNovyraEmail({eyebrow:"ACCOUNT SECURITY",title:"بازیابی رمز عبور",intro:"درخواست انتخاب رمز عبور جدید برای حساب NOVYRA شما ثبت شده است. برای ادامه، دکمه زیر را انتخاب کنید.",actionLabel:"تغییر رمز عبور",actionUrl:link,notice:"این لینک فقط تا یک ساعت معتبر است و پس از آن منقضی می‌شود.",footerNote:"اگر شما این درخواست را ثبت نکرده‌اید، این ایمیل را نادیده بگیرید؛ رمز عبور حساب شما تغییر نخواهد کرد."}));
+      try { await sendMail(env,target.email,"بازیابی رمز عبور NOVYRA",renderNovyraEmail({eyebrow:"ACCOUNT SECURITY",title:"بازیابی رمز عبور",intro:"درخواست انتخاب رمز عبور جدید برای حساب NOVYRA شما ثبت شده است. برای ادامه، دکمه زیر را انتخاب کنید.",actionLabel:"تغییر رمز عبور",actionUrl:link,notice:"این لینک فقط تا یک ساعت معتبر است و پس از آن منقضی می‌شود.",footerNote:"اگر شما این درخواست را ثبت نکرده‌اید، این ایمیل را نادیده بگیرید؛ رمز عبور حساب شما تغییر نخواهد کرد."})); } catch(error) { console.error("novyra-auth-error",{requestId,route:"/auth/forgot-password",code:"EMAIL_SEND_FAILED",errorName:String(error?.name||"Error"),message:String(error?.message||"Email provider failure").slice(0,160)}); return json({code:"EMAIL_SEND_FAILED",message:"ارسال ایمیل بازیابی در حال حاضر ممکن نیست. کمی بعد دوباره تلاش کن.",requestId},503); }
     }
     return json({ok:true,message:"اگر حسابی با این ایمیل وجود داشته باشد، راهنمای بازیابی ارسال می‌شود."});
    }
