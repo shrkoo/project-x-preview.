@@ -33,6 +33,7 @@ jobs:
         env:
           DEPLOY_TARGET: cloudflare-pages
           NEXT_PUBLIC_API_BASE: https://novyra-preview-api.projectx-novyratam.workers.dev
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: preview-test-site-key
         run: npm run build
       - name: TypeScript typecheck
         run: npm run typecheck
