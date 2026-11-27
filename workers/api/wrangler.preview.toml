@@ -6,8 +6,8 @@ account_id = "595c5761b6974e9f7ed15db0e5ffe3b8"
 previews = {}
 
 [vars]
-APP_URL = "https://feature-homa-auth-part1.novyra.pages.dev"
-WEBAUTHN_ORIGIN = "https://feature-homa-auth-part1.novyra.pages.dev"
+APP_URL = "https://feature-homa-auth-part1-zamd.novyra.pages.dev"
+WEBAUTHN_ORIGIN = "https://feature-homa-auth-part1-zamd.novyra.pages.dev"
 REQUIRE_EMAIL_VERIFICATION = "false"
 EMAIL_FROM = "__PREVIEW_EMAIL_FROM__"
 GOOGLE_REDIRECT_URI = "https://novyra-preview-api.projectx-novyratam.workers.dev/auth/google/callback"
@@ -20,7 +20,7 @@ migrations_dir = "migrations-preview"
 
 [[kv_namespaces]]
 binding = "STORY_MEDIA"
-id = "81ae79962a0c47778b8ca32fc9e35422"
+id = "81e14038-5b81-49f8-83a1-4c5ba1f05bd8"
 
 [[durable_objects.bindings]]
 name = "ROOM_HUB"
