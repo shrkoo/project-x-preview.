@@ -151,9 +151,17 @@ for (const language of ["fa", "en"] as const) {
           await nav.nth(0).click();
           await home.locator(".nv-p-section-head button").first().click();
           await expect(page.locator(".nv-p-transactions")).toBeVisible();
+          await expect(page.locator(".nv-p-transactions")).toHaveAttribute("data-group-by-category","false");
           await nav.nth(0).click();
-          await home.locator(".nv-p-category-strip button").first().click();
+          const categoryCard=home.locator(".nv-p-category-strip button").first();
+          const categoryKey=await categoryCard.getAttribute("data-category-key");
+          expect(categoryKey).toBeTruthy();
+          await categoryCard.click();
           await expect(page.locator(".nv-p-transactions")).toBeVisible();
+          await expect(page.locator(".nv-p-filter-row select").nth(1)).toHaveValue(categoryKey!);
+          await nav.nth(0).click();
+          await home.locator(".nv-p-section-head button").nth(1).click();
+          await expect(page.locator(".nv-p-transactions")).toHaveAttribute("data-group-by-category","true");
           await nav.nth(1).click();
           await expect(nav.nth(1)).toHaveClass(/active/);
           await nav.nth(3).click();
