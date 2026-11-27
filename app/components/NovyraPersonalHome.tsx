@@ -25,6 +25,8 @@ export default function NovyraPersonalHome(p:Props){
 .nv-finance.nv-personal-v1 .nf-main{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}
 .nv-finance.nv-personal-v1 .nf-topbar .nv-personal-bell{display:grid!important;place-items:center!important;width:38px!important;height:38px!important;border:1px solid #ffffffb8!important;border-radius:13px!important;background:#ffffffa8!important;color:#2878d0!important}
 .nv-finance.nv-personal-v1 .nv-p-home{display:flex!important;flex-direction:column!important;padding-bottom:12px!important}
+.nv-finance.nv-personal-v1 .nv-p-home{gap:16px!important}
+.nv-finance.nv-personal-v1 .nv-p-section{gap:0!important}
 .nv-finance.nv-personal-v1 .nv-p-hero{padding:14px 16px 12px!important;border-radius:22px!important}
 .nv-finance.nv-personal-v1 .nv-p-hero>small{display:block!important;margin-top:7px!important;font-size:10px!important;line-height:1.45!important;opacity:.78!important}
 .nv-finance.nv-personal-v1 .nv-p-hero-amount{font-size:clamp(25px,7vw,32px)!important;line-height:1.15!important}
