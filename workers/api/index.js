@@ -614,7 +614,7 @@ export default {
     if (!isNewPasswordHash(suppliedHash, salt)) return authFail("خروجی رمز عبور از صفحه ناقص است؛ صفحه را تازه‌سازی کن.");
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     if(!await hitAuthLimit(db,"register:"+ip,5,3600000))return authFail("Too many registration attempts. Try again later.",429);
-    if(!await verifyTurnstile(body?.turnstileToken,request,env))return authFail("Complete the security check.",403);
+    if(!await verifyTurnstile(body?.turnstileToken,request,env,requestId))return authFail("Complete the security check.",403);
     let verifiedBiometric=null;
     if(profile.app_lock_type==="biometric") {
       if(!body?.webauthnRegistration) return authFail("ثبت اثر انگشت یا تشخیص چهره کامل نشده است.",400);
