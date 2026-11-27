@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { calculateAccountBalances, dateOffsetInTehran, isValidTransfer, parseBankSms, summarizeTransactions, tehranDateKey } from "../app/lib/personal-finance.ts";
+import { calculateAccountBalances, dateOffsetInTehran, isValidTransfer, parseBankSms, summarizeTransactions, tehranDateKey } from "./personal-finance.ts";
 
 test("Tehran date crosses midnight at Tehran midnight, not UTC midnight", () => {
   assert.equal(tehranDateKey(new Date("2026-11-27T20:29:59.000Z")), "2026-11-27");
