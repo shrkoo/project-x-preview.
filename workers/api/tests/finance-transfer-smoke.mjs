@@ -27,7 +27,7 @@ if(saved.status!==200||saved.data.saved!==2) throw new Error("Transfer save fail
 const listed=await request("/finance/transactions?workspaceId="+encodeURIComponent(workspace.id));
 const found=listed.data.items?.find(item=>item.id===id);
 const savedIncome=listed.data.items?.find(item=>item.id===income.id);
-if(listed.status!==200||!found||found.kind!=="transfer"||found.fromAccount!=="Checking"||found.toAccount!=="Savings"||Number(found.amount)!==123.45||savedIncome?.account!=="Checking") throw new Error("Transfer or account did not round-trip through D1: "+JSON.stringify(listed.data));
+if(listed.status!==200||!found||found.kind!=="transfer"||found.fromAccount!=="Checking"||found.toAccount!=="Savings"||Number(found.amount)!==123.45||found.date!=="2026-11-27"||found.note!=="automated preview smoke"||savedIncome?.account!=="Checking") throw new Error("Transfer or account did not round-trip through D1: "+JSON.stringify(listed.data));
 const removed=await request("/finance/transactions/"+encodeURIComponent(id)+"?workspaceId="+encodeURIComponent(workspace.id),"DELETE");
 if(removed.status!==200) throw new Error("Transfer delete/undo failed: "+JSON.stringify(removed.data));
 const after=await request("/finance/transactions?workspaceId="+encodeURIComponent(workspace.id));
