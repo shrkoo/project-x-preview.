@@ -105,7 +105,8 @@ export async function handleForgotPassword({ body, request, db, env, requestId, 
       await sendMail(env, target.email, "بازیابی رمز عبور HomaAi", renderHomaAiResetEmail({ actionUrl: link }));
     } catch (error) {
       logError({ requestId, route: "/auth/forgot-password", code: "EMAIL_SEND_FAILED", errorName: String(error?.name || "Error"), message: String(error?.message || "Email provider failure").slice(0, 160) });
-      return json({ code: "EMAIL_SEND_FAILED", message: "ارسال ایمیل بازیابی انجام نشد. تنظیمات سرویس ایمیل را بررسی کنید و دوباره تلاش کنید.", requestId }, 502);
+      // Keep the public response identical for known and unknown accounts.
+      // The provider failure is recorded above for operators; do not expose account existence.
     }
   }
 
