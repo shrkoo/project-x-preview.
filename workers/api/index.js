@@ -1,5 +1,6 @@
 import { countryCodes, currencyCodes, calendarCodes, languageCodes, numberFormatCodes, numberSystemCodes } from "./data/catalog-validation.js";
 import { normalizeEmail, isValidEmail } from "./auth-email.mjs";
+import { handlePasswordReset } from "./auth-reset.mjs";
 import { mergeBusinessRecordPayload } from "./business-sync.js";
 import { handlePasswordLogin } from "./auth-login.mjs";
 import { isNewPasswordHash, parsePasswordHash, verifyPassword } from "./auth-password.mjs";
@@ -693,17 +694,7 @@ export default {
     return json({ok:true,message:"اگر حسابی با این ایمیل وجود داشته باشد، راهنمای بازیابی ارسال می‌شود."});
    }
    if (path === "/auth/reset-password" && request.method === "POST") {
-    const body=await readBody(request), token=String(body?.token||""), salt=String(body?.salt||""), suppliedHash=String(body?.passwordHash||"");
-    if(!/^[a-f0-9]{32}$/i.test(salt) || !isNewPasswordHash(suppliedHash, salt)) return fail("اطلاعات رمز جدید معتبر نیست.");
-    const tokenHash=await digest(token);
-    const record=await db.prepare("SELECT id,user_id FROM email_tokens WHERE token_hash=? AND kind='reset' AND expires_at>? AND used_at IS NULL").bind(tokenHash,Date.now()).first();
-    if(!record) return fail("لینک بازیابی معتبر نیست یا منقضی شده است.",410);
-    await db.batch([
-      db.prepare("UPDATE users SET password_hash=?,password_salt=? WHERE id=?").bind(suppliedHash,salt,record.user_id),
-      db.prepare("UPDATE email_tokens SET used_at=CURRENT_TIMESTAMP WHERE id=?").bind(record.id),
-      db.prepare("DELETE FROM sessions WHERE user_id=?").bind(record.user_id)
-    ]);
-    return json({ok:true,message:"رمز عبور تغییر کرد؛ دوباره وارد شو."});
+    return handlePasswordReset({body:await readBody(request),db,requestId,helpers:{json,digest,isNewPasswordHash}});
    }
    if (path === "/auth/login" && request.method === "POST") {
     return handlePasswordLogin({
