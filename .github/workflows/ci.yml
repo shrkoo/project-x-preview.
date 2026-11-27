@@ -37,7 +37,7 @@ jobs:
         run: set -o pipefail; npm run build 2>&1 | tee -a ci-build.log
 
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
 
       - name: Run responsive stabilization tests
         run: npm run test:e2e
