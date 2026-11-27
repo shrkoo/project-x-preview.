@@ -93,5 +93,16 @@
   "loginRetry": "حاول مرة أخرى",
   "loginWaitSeconds": "أعد المحاولة بعد {seconds} ثانية",
   "loginErrorCode": "رمز الخطأ: {id}",
-  "createAccount": "إنشاء حساب"
+  "createAccount": "إنشاء حساب",
+  "forgotIntro": "أدخل بريد حسابك. إذا كان هناك حساب بهذا البريد فسنرسل رابط إعادة تعيين كلمة المرور.",
+  "forgotSend": "إرسال رابط إعادة التعيين",
+  "forgotSuccessTitle": "تم استلام الطلب",
+  "forgotSuccessBody": "إذا كان هناك حساب بهذا البريد، فقد أرسلنا رابط إعادة التعيين.",
+  "forgotResendWait": "يمكن إعادة الإرسال بعد {seconds} ثانية",
+  "forgotResend": "إعادة إرسال الرابط",
+  "forgotRateLimited": "طلبات إعادة التعيين محدودة مؤقتاً. انتظر قليلاً ثم حاول مجدداً.",
+  "forgotEmailUnavailable": "خدمة بريد إعادة التعيين غير متاحة حالياً. حاول لاحقاً.",
+  "forgotServerError": "تعذر على الخادم معالجة الطلب. حاول مجدداً.",
+  "forgotRequestFailed": "فشل طلب إعادة التعيين. تحقق من البيانات وحاول مجدداً.",
+  "forgotNetworkError": "تعذر الاتصال. تحقق من الإنترنت وحاول مجدداً."
 }
