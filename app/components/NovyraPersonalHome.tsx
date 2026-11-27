@@ -66,7 +66,7 @@ export default function NovyraPersonalHome(p:Props){
 .nv-finance.nv-personal-v1 .nv-p-empty-copy>span{direction:rtl!important;text-align:right!important}
 
 .nv-finance.nv-personal-v1 .nv-p-dock>button svg{width:20px!important;height:20px!important;stroke-width:1.8!important}
-@media(max-width:380px){}
+
 /* Precise final home layout overrides. */
 .nv-finance.nv-personal-v1.nv-home-active{min-height:100svh!important;background:linear-gradient(180deg,#c6e6fa 0%,#c6e6fa 100%)!important}
 .nv-finance.nv-personal-v1 .nv-p-home{gap:16px!important}
