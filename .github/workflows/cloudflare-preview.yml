@@ -84,23 +84,36 @@ jobs:
         run: |
           set -euo pipefail
           response="$(curl --fail --silent --show-error "$PREVIEW_WORKER_URL/api/health")"
-          node -e 'const d=JSON.parse(process.argv[1]);const required=["users","sessions","auth_rate_limits","signup_verification_codes"];if(d.ok!==true||d.service!=="novyra-api"||d.database!=="connected"||required.some(k=>d.tables?.[k]!==true))process.exit(1)' "$response"
+          node -e 'const d=JSON.parse(process.argv[1]);const required=["users","sessions","auth_rate_limits","signup_verification_codes"];if(d.ok!==true||d.service!=="novyra-api"||d.database!=="connected"||required.some(k=>d.tables?.[k]!==true)||d.bindings?.D1!==true||typeof d.secrets?.TURNSTILE!=="boolean"||typeof d.secrets?.EMAIL_PROVIDER!=="boolean"||typeof d.secrets?.GOOGLE_OAUTH!=="boolean"||d.configuration?.SESSION_SECRET_REQUIRED!==false)process.exit(1);console.log("Auth readiness:",JSON.stringify({D1:d.bindings.D1,Turnstile:d.secrets.TURNSTILE,EmailProvider:d.secrets.EMAIL_PROVIDER,GoogleOAuth:d.secrets.GOOGLE_OAUTH,SessionSecretRequired:d.configuration.SESSION_SECRET_REQUIRED}))' "$response"
           options_status="$(curl --silent --output /dev/null --write-out '%{http_code}' --request OPTIONS "$PREVIEW_WORKER_URL/auth/login")"
           test "$options_status" = "204" -o "$options_status" = "200"
           echo "Preview API D1 schema health and auth CORS preflight checks passed."
 
-      - name: Smoke-test preview password login
+      - name: Smoke-test preview password login with an ephemeral test account
+        working-directory: workers/api
         env:
           PREVIEW_WORKER_URL: https://novyra-preview-api.projectx-novyratam.workers.dev
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
+          email="novyra-preview-smoke@example.invalid"
+          readarray -t credentials < <(node -e 'const c=require("node:crypto");const salt="0123456789abcdef0123456789abcdef";const hash=c.pbkdf2Sync("PreviewSmokePass123!",salt,100000,32,"sha256").toString("hex");console.log(salt);console.log("pbkdf2$100000$"+salt+"$"+hash)')
+          salt="${credentials[0]}"
+          password_hash="${credentials[1]}"
+          cleanup() {
+            npx wrangler d1 execute novyra-preview-db --remote --config wrangler.preview.toml --command "DELETE FROM users WHERE email='$email';" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          insert_sql="INSERT INTO users (id,email,display_name,password_hash,password_salt,role,verified_at) VALUES ('preview-smoke-user','$email','Preview Smoke','$password_hash','$salt','user',CURRENT_TIMESTAMP) ON CONFLICT(email) DO UPDATE SET password_hash=excluded.password_hash,password_salt=excluded.password_salt,verified_at=CURRENT_TIMESTAMP;"
+          npx wrangler d1 execute novyra-preview-db --remote --config wrangler.preview.toml --command "$insert_sql"
           status="$(curl --silent --show-error --output /tmp/login-response.json --write-out '%{http_code}' \
             --request POST "$PREVIEW_WORKER_URL/auth/login" \
             --header 'Content-Type: application/json' \
-            --data '{"email":"novyra-preview-smoke-nobody@example.invalid","passwordHash":"pbkdf2$100000$0123456789abcdef0123456789abcdef$aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}')"
-          test "$status" = "401"
-          node -e 'const d=require("/tmp/login-response.json");if(d.code!=="INVALID_CREDENTIALS"||!d.requestId||d.message!=="Email or password is incorrect.")process.exit(1)'
-          echo "Preview password-login route returned the expected generic 401 response."
+            --data "$(node -e 'process.stdout.write(JSON.stringify({email:process.argv[1],passwordHash:process.argv[2]}))' "$email" "$password_hash")")"
+          test "$status" = "200"
+          node -e 'const d=require("/tmp/login-response.json");if(!d.token||d.user?.email!=="novyra-preview-smoke@example.invalid"||!d.requestId&&d.code)process.exit(1);console.log("Preview login PASS for ephemeral test account; requestId:",d.requestId||"returned session")'
+          echo "Preview password login succeeded with a real, temporary D1 account."
 
       - name: Build static frontend for preview API
         run: npm run build
