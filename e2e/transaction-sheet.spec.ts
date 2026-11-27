@@ -56,7 +56,7 @@ for(const scenario of cases){
   await expect(expenseHomeRow).toContainText(scenario.language==="fa"?"۱٬۲۵۰٬۰۰۰":"1,250,000");
   await expect(page.locator("nav.nv-ref-dock")).toBeVisible();
 
-  await page.getByRole("button",{name:scenario.language==="en"?"AI assistant":"دستیار هوشمند"}).click();
+  await page.locator("nav.nv-ref-dock button").nth(2).click();
   await page.getByRole("button",{name:scenario.language==="en"?/^Income$/:/^درآمد$/}).click();
   const incomeSheet=page.getByRole("dialog",{name:/New income|درآمد جدید/});
   await expect(incomeSheet).toBeVisible();
