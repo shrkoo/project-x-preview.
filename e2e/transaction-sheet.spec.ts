@@ -61,7 +61,7 @@ for(const scenario of cases){
   await incomeSheet.locator(".nv-tx-field input").first().fill("E2E income");
   await incomeSheet.locator(".nv-tx-save").click();
   await expect(page.getByText("E2E income")).toBeVisible();
-  await page.getByRole("button",{name:scenario.language==="en"?/Transactions/:/تراکنش‌ها/}).click();
+  await page.locator(".nv-p-section-head button").first().click();
   await expect(page.getByText("E2E expense")).toBeVisible();
   await expect(page.getByText("E2E income")).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("dir",scenario.direction);
