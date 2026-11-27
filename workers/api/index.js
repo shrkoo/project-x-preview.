@@ -175,6 +175,13 @@ async function getBusinessAccess(db,workspaceId,userId) {
 function businessCan(access,permission) {
  return Boolean(access && BUSINESS_ROLE_PERMISSIONS[access.role]?.has(permission));
 }
+async function getFinanceAccess(db,workspaceId,userId) {
+ const row=await db.prepare("SELECT w.id,w.owner_id AS ownerId,w.type,w.name,w.currency,m.role AS memberRole,m.status AS memberStatus FROM workspaces w LEFT JOIN workspace_members m ON m.workspace_id=w.id AND m.user_id=? WHERE w.id=?").bind(userId,workspaceId).first();
+ if(!row) return null;
+ if(row.ownerId===userId) return {...row,role:"owner"};
+ if(row.type!=="business" || row.memberStatus!=="active" || !row.memberRole) return null;
+ return {...row,role:row.memberRole};
+}
 async function writeBusinessAudit(db,workspaceId,actorId,action,entityType,entityId=null,details=null) {
  await db.prepare("INSERT INTO business_audit_log (id,workspace_id,actor_user_id,action,entity_type,entity_id,details_json) VALUES (?,?,?,?,?,?,?)")
   .bind(crypto.randomUUID(),workspaceId,actorId,action,entityType,entityId,details?JSON.stringify(details).slice(0,12000):null).run();
@@ -1072,39 +1079,51 @@ export default {
     }
 if(path==="/finance/transactions" && request.method==="GET") {
      const workspaceId=String(url.searchParams.get("workspaceId")||"");
-     const access=await getBusinessAccess(db,workspaceId,user.id);
-     if(!access||!businessCan(access,"read")) return fail("فضای کاری پیدا نشد یا دسترسی ندارید.",404);
+     const access=await getFinanceAccess(db,workspaceId,user.id);
+     if(!access || (access.type==="business" && !businessCan(access,"read"))) return fail("فضای کاری پیدا نشد یا دسترسی ندارید.",404);
      const rows=await db.prepare("SELECT id,title,category,amount,kind,transaction_date AS date,note FROM finance_transactions WHERE workspace_id=? AND owner_id=? ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
-     return json({items:rows.results||[]});
+     const transfers=await db.prepare("SELECT id,'Transfer' AS category,amount,'transfer' AS kind,transaction_date AS date,note,from_account AS fromAccount,to_account AS toAccount FROM finance_transfers WHERE workspace_id=? AND owner_id=? ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
+     const items=[...(rows.results||[]),...(transfers.results||[]).map(x=>({...x,title:"انتقال از "+x.fromAccount+" به "+x.toAccount}))].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+     return json({items});
     }
     if(path==="/finance/transactions" && request.method==="PUT") {
      const body=await readBody(request)||{};
      const workspaceId=String(body.workspaceId||"");
-     const access=await getBusinessAccess(db,workspaceId,user.id);
-     if(!access||!businessCan(access,"finance:write")) return fail("نقش شما اجازه ثبت تراکنش مالی را ندارد.",403);
+     const access=await getFinanceAccess(db,workspaceId,user.id);
+     if(!access || (access.type==="business" && !businessCan(access,"finance:write"))) return fail("نقش شما اجازه ثبت تراکنش مالی را ندارد.",403);
      if(!Array.isArray(body.items)||body.items.length>500) return fail("فهرست تراکنش‌ها معتبر نیست.");
      const statements=[];
      for(const item of body.items) {
-       const id=String(item?.id||"").slice(0,80),title=String(item?.title||"").trim().slice(0,120),category=String(item?.category||"Other").trim().slice(0,80);
-       const amount=Number(item?.amount),kind=String(item?.kind||""),date=String(item?.date||""),note=String(item?.note||"").slice(0,500);
-       if(!id||!title||!Number.isFinite(amount)||amount<=0||amount>1e12||!["income","expense"].includes(kind)||!/^\d{4}-\d{2}-\d{2}$/.test(date)) return fail("یکی از تراکنش‌ها اطلاعات نامعتبر دارد.");
-       statements.push(db.prepare("INSERT INTO finance_transactions (id,workspace_id,owner_id,title,category,amount,kind,transaction_date,note) VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET title=excluded.title,category=excluded.category,amount=excluded.amount,kind=excluded.kind,transaction_date=excluded.transaction_date,note=excluded.note,updated_at=CURRENT_TIMESTAMP WHERE finance_transactions.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,title,category,amount,kind,date,note));
+       const id=String(item?.id||"").slice(0,80),amount=Number(item?.amount),kind=String(item?.kind||""),date=String(item?.date||""),note=String(item?.note||"").slice(0,500);
+       if(!id||!Number.isFinite(amount)||amount<=0||amount>1e12||!/^\d{4}-\d{2}-\d{2}$/.test(date)) return fail("یکی از تراکنش‌ها اطلاعات نامعتبر دارد.");
+       if(kind==="transfer") {
+         const fromAccount=String(item?.fromAccount||"").trim().slice(0,100),toAccount=String(item?.toAccount||"").trim().slice(0,100);
+         if(!fromAccount||!toAccount||fromAccount===toAccount) return fail("برای انتقال دو حساب متفاوت لازم است.");
+         statements.push(db.prepare("INSERT INTO finance_transfers (id,workspace_id,owner_id,from_account,to_account,amount,transaction_date,note) VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET from_account=excluded.from_account,to_account=excluded.to_account,amount=excluded.amount,transaction_date=excluded.transaction_date,note=excluded.note,updated_at=CURRENT_TIMESTAMP WHERE finance_transfers.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,fromAccount,toAccount,amount,date,note));
+       } else {
+         const title=String(item?.title||"").trim().slice(0,120),category=String(item?.category||"Other").trim().slice(0,80);
+         if(!title||!["income","expense"].includes(kind)) return fail("یکی از تراکنش‌ها اطلاعات نامعتبر دارد.");
+         statements.push(db.prepare("INSERT INTO finance_transactions (id,workspace_id,owner_id,title,category,amount,kind,transaction_date,note) VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET title=excluded.title,category=excluded.category,amount=excluded.amount,kind=excluded.kind,transaction_date=excluded.transaction_date,note=excluded.note,updated_at=CURRENT_TIMESTAMP WHERE finance_transactions.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,title,category,amount,kind,date,note));
+       }
      }
      for(let i=0;i<statements.length;i+=90) await db.batch(statements.slice(i,i+90));
-     await writeBusinessAudit(db,workspaceId,user.id,"finance.transactions_saved","transactions",null,{count:body.items.length});
+     if(access.type==="business") await writeBusinessAudit(db,workspaceId,user.id,"finance.transactions_saved","transactions",null,{count:body.items.length});
      return json({ok:true,saved:body.items.length});
     }
     const transactionDeleteMatch=path.match(/^\/finance\/transactions\/([^/]+)$/);
     if(transactionDeleteMatch && request.method==="DELETE") {
      const workspaceId=String(url.searchParams.get("workspaceId")||"");
-     const access=await getBusinessAccess(db,workspaceId,user.id);
-     if(!access||!businessCan(access,"finance:write")) return fail("نقش شما اجازه حذف تراکنش مالی را ندارد.",403);
+     const access=await getFinanceAccess(db,workspaceId,user.id);
+     if(!access || (access.type==="business" && !businessCan(access,"finance:write"))) return fail("نقش شما اجازه حذف تراکنش مالی را ندارد.",403);
      const transactionId=decodeURIComponent(transactionDeleteMatch[1]);
-     await db.prepare("DELETE FROM finance_transactions WHERE id=? AND workspace_id=? AND owner_id=?").bind(transactionId,workspaceId,access.ownerId).run();
-     await writeBusinessAudit(db,workspaceId,user.id,"finance.transaction_deleted","transaction",transactionId);
+     await db.batch([
+       db.prepare("DELETE FROM finance_transactions WHERE id=? AND workspace_id=? AND owner_id=?").bind(transactionId,workspaceId,access.ownerId),
+       db.prepare("DELETE FROM finance_transfers WHERE id=? AND workspace_id=? AND owner_id=?").bind(transactionId,workspaceId,access.ownerId)
+     ]);
+     if(access.type==="business") await writeBusinessAudit(db,workspaceId,user.id,"finance.transaction_deleted","transaction",transactionId);
      return json({ok:true});
     }
-    if(path==="/social/stories" && request.method==="GET") {
+        if(path==="/social/stories" && request.method==="GET") {
     await cleanupExpiredStories(env,db);
     const rows=await db.prepare(`
       SELECT s.id,s.user_id AS userId,s.media_url AS mediaUrl,s.type,s.created_at AS createdAt,s.expires_at AS expiresAt,
