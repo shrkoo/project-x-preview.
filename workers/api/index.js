@@ -56,61 +56,74 @@ function renderNovyraEmail({eyebrow,title,intro,actionLabel,actionUrl,notice,foo
   const safeIntro=escapeEmailHtml(intro);
   const safeAction=escapeEmailHtml(actionLabel);
   const safeNotice=escapeEmailHtml(notice);
-  const safeFooter=escapeEmailHtml(footerNote || "این پیام به‌صورت خودکار از طرف تیم NOVYRA ارسال شده است.");
-  const safeEyebrow=escapeEmailHtml(eyebrow || "NOVYRA ACCOUNT");
+  const safeFooter=escapeEmailHtml(footerNote || "این پیام به‌صورت خودکار از طرف HomaAi ارسال شده است.");
+  const safeEyebrow=escapeEmailHtml(eyebrow || "HOMAAI ACCOUNT");
   return `<!doctype html>
 <html lang="fa" dir="rtl">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${safeTitle} | NOVYRA</title></head>
-<body style="margin:0;padding:0;background:#f3f5f9;font-family:Tahoma,Arial,sans-serif;color:#172033;">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${safeTitle} — NOVYRA</div>
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f3f5f9;padding:36px 12px;">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${safeTitle} | HomaAi</title></head>
+<body style="margin:0;padding:0;background:#edf6fc;font-family:Tahoma,Arial,sans-serif;color:#17324b;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${safeTitle} — HomaAi؛ هوشمندی در هر تصمیم مالی</div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#edf6fc;padding:34px 12px;">
     <tr><td align="center">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #e7eaf0;border-radius:18px;overflow:hidden;">
-        <tr><td style="background:#111c31;padding:27px 32px;text-align:left;direction:ltr;">
-          <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr>
-            <td style="width:38px;height:38px;border:1px solid #7186a8;border-radius:11px;text-align:center;vertical-align:middle;color:#ffffff;font-size:20px;font-weight:700;">N</td>
-            <td style="padding-left:12px;color:#ffffff;font-size:19px;font-weight:700;letter-spacing:3px;">NOVYRA</td>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:590px;background:#ffffff;border:1px solid #dcebf5;border-radius:22px;overflow:hidden;box-shadow:0 18px 55px rgba(25,92,137,.12);">
+        <tr><td style="padding:30px 34px 28px;text-align:right;direction:rtl;background:#126ca8;background-image:linear-gradient(125deg,#0f4c81 0%,#167bb9 58%,#39a8dc 100%);">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr>
+            <td align="right" valign="middle">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr>
+                <td width="44" height="44" align="center" valign="middle" bgcolor="#ffffff" style="border-radius:13px;color:#126ca8;font-family:Arial,sans-serif;font-size:27px;font-weight:800;">H</td>
+                <td style="padding-right:12px;text-align:right;vertical-align:middle;">
+                  <div style="color:#ffffff;font-family:Arial,Tahoma,sans-serif;font-size:23px;font-weight:800;letter-spacing:.2px;">HomaAi</div>
+                  <div style="margin-top:4px;color:#d9f1ff;font-size:11px;line-height:1.6;">هوشمندی در هر تصمیم مالی</div>
+                </td>
+              </tr></table>
+            </td>
+            <td align="left" valign="middle" style="color:#d8efff;font-size:9px;font-weight:700;letter-spacing:1.7px;">ACCOUNT SECURITY</td>
           </tr></table>
-          <div style="margin-top:15px;color:#aebbd0;font-size:10px;letter-spacing:2px;">BUILT FOR YOUR MOMENTS</div>
+          <div style="height:1px;background:rgba(255,255,255,.22);margin-top:23px;"></div>
+          <div style="margin-top:15px;color:#e3f5ff;font-size:10px;letter-spacing:1.6px;text-align:left;direction:ltr;">SMARTER FINANCIAL DECISIONS</div>
         </td></tr>
-        <tr><td style="padding:38px 36px 30px;text-align:right;direction:rtl;">
-          <div style="color:#64748b;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:13px;">${safeEyebrow}</div>
-          <h1 style="margin:0 0 17px;color:#111c31;font-size:25px;line-height:1.6;font-weight:700;">${safeTitle}</h1>
-          <p style="margin:0 0 27px;color:#475467;font-size:15px;line-height:2.1;">${safeIntro}</p>
+        <tr><td style="padding:37px 36px 32px;text-align:right;direction:rtl;">
+          <div style="display:inline-block;padding:7px 12px;border-radius:20px;background:#e8f5fc;color:#176fa8;font-size:10px;font-weight:700;letter-spacing:.7px;">${safeEyebrow}</div>
+          <h1 style="margin:18px 0 13px;color:#123b5a;font-size:26px;line-height:1.65;font-weight:800;">${safeTitle}</h1>
+          <p style="margin:0 0 25px;color:#506a7d;font-size:14px;line-height:2.25;">${safeIntro}</p>
           <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 22px;">
-            <tr><td align="center" bgcolor="#172b4d" style="border-radius:10px;">
-              <a href="${safeUrl}" target="_blank" style="display:inline-block;padding:15px 29px;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;border-radius:10px;">${safeAction}</a>
+            <tr><td align="center" bgcolor="#167fbd" style="border-radius:12px;background-image:linear-gradient(110deg,#238fd0,#1268a5);box-shadow:0 8px 19px rgba(22,127,189,.25);">
+              <a href="${safeUrl}" target="_blank" style="display:inline-block;padding:16px 34px;color:#ffffff;text-decoration:none;font-size:14px;font-weight:800;border-radius:12px;">${safeAction}</a>
             </td></tr>
           </table>
-          <div style="background:#f5f7fb;border:1px solid #e8edf5;border-radius:10px;padding:14px 16px;color:#526078;font-size:12px;line-height:2;">${safeNotice}</div>
-          <p style="margin:23px 0 0;color:#7b8495;font-size:12px;line-height:2;">اگر دکمه بالا باز نشد، این نشانی را در مرورگر خود کپی کنید:<br><a href="${safeUrl}" style="color:#345b91;word-break:break-all;text-decoration:underline;">${safeUrl}</a></p>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 20px;background:#f0f8fd;border:1px solid #d8edf9;border-radius:13px;">
+            <tr><td style="padding:14px 16px;color:#37627d;font-size:12px;line-height:2.1;">
+              <span style="color:#147bb8;font-weight:800;">یادآوری امنیتی</span><br>${safeNotice}
+            </td></tr>
+          </table>
+          <p style="margin:20px 0 0;color:#71899b;font-size:11px;line-height:2.15;">اگر دکمه بالا باز نشد، نشانی زیر را در مرورگر خود کپی کنید:</p>
+          <p style="margin:7px 0 0;padding:11px 13px;background:#f7fafc;border:1px solid #e4edf3;border-radius:9px;direction:ltr;text-align:left;word-break:break-all;font-family:Arial,sans-serif;font-size:11px;line-height:1.8;"><a href="${safeUrl}" target="_blank" style="color:#1678b4;text-decoration:underline;">${safeUrl}</a></p>
+          <div style="margin-top:27px;color:#254d69;font-size:13px;font-weight:800;">با احترام، تیم HomaAi</div>
+          <div style="margin-top:8px;color:#7890a2;font-size:11px;line-height:2;">${safeFooter}</div>
         </td></tr>
-        <tr><td style="padding:26px 24px;background:#fafbfc;border-top:1px solid #edf0f4;text-align:center;">
-          <div style="color:#25334b;font-size:13px;font-weight:700;letter-spacing:1px;">The NOVYRA Team</div>
-          <div style="margin-top:9px;color:#8992a2;font-size:11px;line-height:1.9;">${safeFooter}</div>
-          <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:20px auto 0;">
+        <tr><td style="padding:25px 22px 27px;background:#f7fbfe;border-top:1px solid #e5f0f7;text-align:center;">
+          <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto;">
             <tr>
-              <td style="padding:0 7px;"><a href="https://www.instagram.com/homaai2026/" target="_blank" aria-label="Instagram" style="display:inline-block;width:30px;height:30px;text-decoration:none;"><img src="https://cdn.simpleicons.org/instagram/E4405F" width="30" height="30" alt="Instagram" style="display:block;width:30px;height:30px;border:0;"></a></td>
-              <td style="padding:0 7px;"><a href="https://x.com/HomaAi2026" target="_blank" aria-label="X" style="display:inline-block;width:30px;height:30px;text-decoration:none;"><img src="https://cdn.simpleicons.org/x/000000" width="30" height="30" alt="X" style="display:block;width:30px;height:30px;border:0;"></a></td>
-              <td style="padding:0 7px;"><a href="https://www.tiktok.com/@homaai8" target="_blank" aria-label="TikTok" style="display:inline-block;width:30px;height:30px;text-decoration:none;"><img src="https://cdn.simpleicons.org/tiktok/000000" width="30" height="30" alt="TikTok" style="display:block;width:30px;height:30px;border:0;"></a></td>
-              <td style="padding:0 7px;"><a href="https://www.youtube.com/@homaai2026" target="_blank" aria-label="YouTube" style="display:inline-block;width:30px;height:30px;text-decoration:none;"><img src="https://cdn.simpleicons.org/youtube/FF0033" width="30" height="30" alt="YouTube" style="display:block;width:30px;height:30px;border:0;"></a></td>
-              <td style="padding:0 7px;"><a href="https://www.linkedin.com/in/shirko-alizadeh-a95001447/" target="_blank" aria-label="LinkedIn" style="display:inline-block;width:30px;height:30px;text-decoration:none;"><img src="https://cdn.simpleicons.org/linkedin/0A66C2" width="30" height="30" alt="LinkedIn" style="display:block;width:30px;height:30px;border:0;"></a></td>
+              <td style="padding:0 8px;"><a href="https://www.instagram.com/homaai2026?lqvp=MXNsaXBjdGYwajFwZA==" target="_blank" aria-label="Instagram" style="display:inline-block;width:29px;height:29px;"><img src="https://cdn.simpleicons.org/instagram/E4405F" width="29" height="29" alt="Instagram" style="display:block;width:29px;height:29px;border:0;"></a></td>
+              <td style="padding:0 8px;"><a href="https://x.com/HomaAi2026" target="_blank" aria-label="X" style="display:inline-block;width:29px;height:29px;"><img src="https://cdn.simpleicons.org/x/111827" width="29" height="29" alt="X" style="display:block;width:29px;height:29px;border:0;"></a></td>
+              <td style="padding:0 8px;"><a href="https://www.tiktok.com/@homaai8" target="_blank" aria-label="TikTok" style="display:inline-block;width:29px;height:29px;"><img src="https://cdn.simpleicons.org/tiktok/111827" width="29" height="29" alt="TikTok" style="display:block;width:29px;height:29px;border:0;"></a></td>
+              <td style="padding:0 8px;"><a href="https://www.youtube.com/@homaai2026" target="_blank" aria-label="YouTube" style="display:inline-block;width:29px;height:29px;"><img src="https://cdn.simpleicons.org/youtube/FF0033" width="29" height="29" alt="YouTube" style="display:block;width:29px;height:29px;border:0;"></a></td>
+              <td style="padding:0 8px;"><a href="https://www.linkedin.com/in/shirko-alizadeh-a95001447?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" aria-label="LinkedIn" style="display:inline-block;width:29px;height:29px;"><img src="https://cdn.simpleicons.org/linkedin/0A66C2" width="29" height="29" alt="LinkedIn" style="display:block;width:29px;height:29px;border:0;"></a></td>
             </tr>
           </table>
-          <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:20px auto 0;">
+          <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:19px auto 0;">
             <tr>
-              <td width="36" height="36" align="center" valign="middle" bgcolor="#172b4d" style="border-radius:9px;color:#ffffff;font-family:Arial,sans-serif;font-size:23px;font-weight:700;letter-spacing:-2px;">N</td>
-              <td style="padding-left:10px;text-align:left;vertical-align:middle;">
-                <div style="color:#172b4d;font-family:Arial,sans-serif;font-size:17px;font-weight:700;letter-spacing:2px;">NOVYRA</div>
-                <div style="margin-top:2px;color:#9aa4b2;font-size:8px;letter-spacing:2px;">SMARTER DIGITAL EXPERIENCES</div>
+              <td width="35" height="35" align="center" valign="middle" bgcolor="#167fbd" style="border-radius:10px;color:#ffffff;font-family:Arial,sans-serif;font-size:22px;font-weight:800;">H</td>
+              <td style="padding-right:10px;text-align:right;vertical-align:middle;">
+                <div style="color:#164d72;font-family:Arial,Tahoma,sans-serif;font-size:17px;font-weight:800;letter-spacing:.2px;">HomaAi</div>
+                <div style="margin-top:3px;color:#66859a;font-size:10px;">هوشمندی در هر تصمیم مالی</div>
               </td>
             </tr>
           </table>
-          <div style="margin-top:17px;color:#667085;font-size:11px;line-height:2;">NOVYRA با تمرکز بر تجربه‌ای هوشمند، ساده و قابل‌اعتماد طراحی شده است.</div>
-          <div style="margin-top:10px;color:#a0a8b5;font-size:10px;letter-spacing:1px;">BUILT FOR YOUR MOMENTS</div>
+          <div style="margin-top:13px;color:#6e8799;font-size:11px;line-height:2;">HomaAi برای ساده‌تر کردن تجربه‌های مالی و کمک به تصمیم‌های آگاهانه طراحی شده است.</div>
         </td></tr>
       </table>
-      <div style="padding:18px 10px;color:#98a1af;font-size:10px;text-align:center;">لطفاً به این ایمیل پاسخ ندهید؛ این پیام به‌صورت خودکار ارسال شده است.</div>
+      <div style="padding:17px 10px;color:#8ba0af;font-size:10px;text-align:center;">لطفاً به این ایمیل پاسخ ندهید؛ این پیام به‌صورت خودکار ارسال شده است.</div>
     </td></tr>
   </table>
 </body></html>`;
@@ -288,7 +301,7 @@ export default {
       if((pending?.total||0)<3) {
         const token=await issueEmailToken(db,target.id,"password_reset",60*60*1000);
         const link=(env.APP_URL || "https://novyra.pages.dev") + "/?reset=" + encodeURIComponent(token);
-        await sendMail(env,target.email,"بازیابی رمز عبور NOVYRA",renderNovyraEmail({eyebrow:"ACCOUNT SECURITY",title:"بازیابی رمز عبور",intro:"درخواست انتخاب رمز عبور جدید برای حساب NOVYRA شما ثبت شده است. برای ادامه، دکمه زیر را انتخاب کنید.",actionLabel:"تغییر رمز عبور",actionUrl:link,notice:"این لینک فقط تا یک ساعت معتبر است و پس از آن منقضی می‌شود.",footerNote:"اگر شما این درخواست را ثبت نکرده‌اید، این ایمیل را نادیده بگیرید؛ رمز عبور حساب شما تغییر نخواهد کرد."}));
+        await sendMail(env,target.email,"بازیابی رمز عبور HomaAi",renderNovyraEmail({eyebrow:"ACCOUNT SECURITY",title:"بازیابی رمز عبور",intro:"درخواست بازیابی رمز عبور حساب HomaAi شما ثبت شده است. نگران نباشید؛ با انتخاب یک رمز تازه و امن، دوباره با خیال راحت به حساب و اطلاعات مالی خود دسترسی خواهید داشت.",actionLabel:"تغییر رمز عبور",actionUrl:link,notice:"این لینک فقط تا یک ساعت معتبر است و پس از آن منقضی می‌شود.",footerNote:"اگر شما این درخواست را ثبت نکرده‌اید، این ایمیل را نادیده بگیرید؛ رمز عبور حساب شما تغییر نخواهد کرد."}));
       }
     }
     return json({ok:true,message:"اگر حسابی با این ایمیل وجود داشته باشد، راهنمای بازیابی ارسال می‌شود."});
