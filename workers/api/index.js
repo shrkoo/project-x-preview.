@@ -366,7 +366,7 @@ export default {
   const requestId = crypto.randomUUID();
   try {
    if ((path === "/api/health" || path === "/health") && request.method === "GET") {
-    const requiredTables = ["users","sessions","auth_rate_limits","signup_verification_codes"];
+    const requiredTables = ["users","sessions","auth_rate_limits","signup_verification_codes","finance_transfers"];
     const bindings = { D1: Boolean(env.DB), DB: Boolean(env.DB), ROOM_HUB: Boolean(env.ROOM_HUB), STORY_MEDIA_KV: Boolean(env.STORY_MEDIA), R2: Boolean(env.R2), AI: Boolean(env.AI) };
     const secrets = {
       GOOGLE_CLIENT_ID: Boolean(env.GOOGLE_CLIENT_ID),
@@ -394,13 +394,14 @@ export default {
       users: ["id","email","password_hash","password_salt","verified_at","display_name","xp","games_played","role"],
       sessions: ["token_hash","user_id","expires_at"],
       auth_rate_limits: ["rate_key","window_started_at","request_count"],
-      signup_verification_codes: ["id","user_id","code_hash","expires_at","attempts","sent_at","used_at"]
+      signup_verification_codes: ["id","user_id","code_hash","expires_at","attempts","sent_at","used_at"],
+      finance_transfers: ["id","workspace_id","owner_id","from_account","to_account","amount","transaction_date","note"]
     };
     let columns = Object.fromEntries(Object.keys(expectedColumns).map(name => [name, false]));
     let databaseOk = false;
     if (env.DB) {
       try {
-        const rows = await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name IN (?,?,?,?)").bind(...requiredTables).all();
+        const rows = await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name IN (?,?,?,?,?)").bind(...requiredTables).all();
         for (const row of rows.results || []) tables[row.name] = true;
         for (const [table, expected] of Object.entries(expectedColumns)) {
           if (!tables[table]) continue;
