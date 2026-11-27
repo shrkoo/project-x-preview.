@@ -51,6 +51,8 @@ for(const scenario of cases){
   expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.viewport);
   await save.click();
   await expect(page.getByText("E2E expense")).toBeVisible();
+  const expenseHomeRow=page.locator(".nv-p-tx").filter({hasText:"E2E expense"});
+  await expect(expenseHomeRow).toContainText(scenario.language==="fa"?"۱٬۲۵۰٬۰۰۰":"1,250,000");
   await expect(page.locator("nav.nv-ref-dock")).toBeVisible();
 
   await page.getByRole("button",{name:scenario.language==="en"?"AI assistant":"دستیار هوشمند"}).click();
@@ -61,9 +63,13 @@ for(const scenario of cases){
   await incomeSheet.locator(".nv-tx-field input").first().fill("E2E income");
   await incomeSheet.locator(".nv-tx-save").click();
   await expect(page.getByText("E2E income")).toBeVisible();
+  const incomeHomeRow=page.locator(".nv-p-tx").filter({hasText:"E2E income"});
+  await expect(incomeHomeRow).toContainText(scenario.language==="fa"?"۵٬۰۰۰٬۰۰۰":"5,000,000");
   await page.locator(".nv-p-section-head button").first().click();
   await expect(page.getByText("E2E expense")).toBeVisible();
   await expect(page.getByText("E2E income")).toBeVisible();
+  await expect(page.locator(".nf-transaction").filter({hasText:"E2E expense"})).toContainText(scenario.language==="fa"?"۱٬۲۵۰٬۰۰۰":"1,250,000");
+  await expect(page.locator(".nf-transaction").filter({hasText:"E2E income"})).toContainText(scenario.language==="fa"?"۵٬۰۰۰٬۰۰۰":"5,000,000");
   await expect(page.locator("html")).toHaveAttribute("dir",scenario.direction);
  });
 }
