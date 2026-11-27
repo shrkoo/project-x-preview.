@@ -4558,3 +4558,5 @@ main.nv-business-overview .nf-topbar .profile-btn span{display:none!important}
 .nv-business-overview .nvbd-calendar-row b{font-size:12px!important;color:#244766!important}
 .nv-business-overview .nvbd-calendar-row small{font-size:10px!important;color:#7890a5!important}
 .nv-business-overview .nvbd-calendar-row strong{font-size:11px!important;color:#31516e!important;white-space:nowrap!important}
+
+.nv-business-overview .nvbd-heading{justify-content:space-between!important}
