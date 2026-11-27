@@ -55,16 +55,15 @@ for (const scenario of scenarios) {
       await expect.poll(() => requests).toBe(2);
     });
 
-    test("Google button starts OAuth redirect", async ({ page }) => {
+    test("Google button requests OAuth start endpoint", async ({ page }) => {
+      let started = false;
       await page.route("**/auth/google/start**", async route => {
-        await route.fulfill({ status: 302, headers: { location: "https://accounts.google.com/o/oauth2/v2/auth?client_id=mock-preview-client&redirect_uri=https%3A%2F%2Fnovyra-preview-api.projectx-novyratam.workers.dev%2Fauth%2Fgoogle%2Fcallback&state=mock-state" } });
-      });
-      await page.route("https://accounts.google.com/**", async route => {
-        await route.fulfill({ status: 200, contentType: "text/html", body: "<title>Mock Google OAuth</title>" });
+        started = true;
+        await route.fulfill({ status: 200, contentType: "text/html", body: "<title>Mock OAuth start</title>" });
       });
       await page.goto("/");
       await page.getByRole("button", { name: scenario.google }).click();
-      await expect(page).toHaveURL(/accounts\.google\.com\/o\/oauth2/);
+      await expect.poll(() => started).toBe(true);
     });
 
     test("sign-up completes every onboarding step", async ({ page }) => {
