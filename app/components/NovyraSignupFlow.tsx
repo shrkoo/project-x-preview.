@@ -18,6 +18,7 @@ import {PinPad} from "./novyra/PinPad";
 import {PatternLock} from "./novyra/PatternLock";
 import {detectLocale,localeMeta,translate,type Locale} from "./novyra/i18n";
 import {normalizeEmail,isValidEmail} from "../../workers/api/auth-email.mjs";
+import {authErrorKey} from "../lib/auth-errors";
 
 type Values={firstName:string;lastName:string;email:string;country:string;password:string;confirmPassword:string};
 type Lock="none"|"pin"|"pattern";
@@ -76,12 +77,8 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
   }catch(error){
     if(error instanceof ApiRequestError){
       setForgotRequestId(error.requestId||"");
-      if(error.code==="INVALID_EMAIL")setForgotError(t("emailInvalid"));
-      else if(error.code==="RATE_LIMITED"||error.status===429)setForgotError(t("forgotRateLimited"));
-      else if(error.code==="EMAIL_SEND_FAILED"||error.status===503)setForgotError(t("forgotEmailUnavailable"));
-      else if(error.status>=500)setForgotError(t("forgotServerError"));
-      else setForgotError(t("forgotRequestFailed"));
-    }else setForgotError(t("forgotNetworkError"));
+      setForgotError(t(authErrorKey(error.code,error.status)));
+    }else setForgotError(t(authErrorKey("NETWORK")));
   }finally{setBusy(false);}
  }
  async function submitDetails(){
@@ -149,15 +146,15 @@ export default function NovyraSignupFlow({onComplete,initialNotice=""}:Props){
     setValue("password","");
     if(e instanceof ApiRequestError){
       setLoginRequestId(e.requestId||"");
-      if(e.code==="NEEDS_RESET"){setLoginErrorKind("reset");setNotice(locale==="fa"?"رمز این حساب قدیمی است. برای ادامه از «فراموشی رمز عبور» استفاده کن یا یک حساب آزمایشی جدید بساز.":"This account uses an older password format. Use Forgot password or create a new preview test account.");}
-      else if(e.status===401){setLoginErrorKind("credentials");setNotice(t("loginInvalidCredentials"));}
-      else if(e.status===403){setLoginErrorKind("unverified");setNotice(t("loginEmailUnverified"));}
-      else if(e.status===429){setLoginErrorKind("rate");setResendSeconds(Math.max(1,e.retryAfterSeconds||900));setNotice(t("loginTooManyAttempts"));}
-      else if(e.status>=500){setLoginErrorKind("server");setNotice(t("loginServerProblem"));}
+      if(e.code==="NEEDS_RESET"){setLoginErrorKind("reset");setNotice(t(authErrorKey("NEEDS_RESET")));}
+      else if(e.status===401){setLoginErrorKind("credentials");setNotice(t(authErrorKey(e.code,e.status)));}
+      else if(e.status===403){setLoginErrorKind("unverified");setNotice(t(authErrorKey(e.code,e.status)));}
+      else if(e.status===429){setLoginErrorKind("rate");setResendSeconds(Math.max(1,e.retryAfterSeconds||900));setNotice(t(authErrorKey(e.code,e.status)));}
+      else if(e.status>=500){setLoginErrorKind("server");setNotice(t(authErrorKey(e.code,e.status)));}
       else {setLoginErrorKind("server");setNotice(t("loginServerProblem"));}
     }else{
       setLoginErrorKind("network");
-      setNotice(t("loginOffline"));
+      setNotice(t(authErrorKey("NETWORK")));
     }
   }finally{setBusy(false);}
  }
