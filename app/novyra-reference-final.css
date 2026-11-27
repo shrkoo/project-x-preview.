@@ -4412,3 +4412,138 @@ main.nv-finance button.nf-brand{width:48px!important;min-width:48px!important;mi
   .nv-personal-v1 .nv-p-category-strip>button{flex-basis:104px!important}
   .nv-personal-v1 .nv-p-home{gap:16px!important}
 }
+
+
+/* Homa business overview — blue mobile layout, scoped to this page only */
+main.nv-business-overview{
+  box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-height:100dvh!important;
+  overflow-x:hidden!important;background:linear-gradient(180deg,#b9e1f8 0%,#dcefff 38%,#f7fbff 100%)!important;color:#18334e!important;
+}
+main.nv-business-overview *{box-sizing:border-box!important;min-width:0}
+main.nv-business-overview .nf-shell{display:block!important;min-width:0!important;width:100%!important;max-width:100%!important;background:transparent!important;overflow:visible!important}
+main.nv-business-overview .nf-main{width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;padding:0 0 calc(116px + env(safe-area-inset-bottom))!important;background:transparent!important;overflow:visible!important}
+main.nv-business-overview .nf-topbar{
+  display:grid!important;grid-template-columns:48px minmax(0,1fr) auto!important;align-items:center!important;gap:6px!important;
+  width:100%!important;min-width:0!important;height:auto!important;min-height:64px!important;padding:calc(env(safe-area-inset-top) + 8px) 10px 8px!important;
+  border:0!important;background:transparent!important;box-shadow:none!important;
+}
+main.nv-business-overview .nf-topbar>.nf-brand{grid-column:1!important;width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;padding:0!important}
+main.nv-business-overview .nf-topbar>.nf-brand-tagline{display:none!important}
+main.nv-business-overview .nf-topbar>.nf-business-workspace-label{
+  grid-column:2!important;justify-self:center!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;
+  padding:6px 9px!important;font-size:11px!important;line-height:1.3!important;white-space:nowrap!important;
+}
+main.nv-business-overview .nf-topbar>.nf-top-right{grid-column:3!important;display:flex!important;align-items:center!important;justify-self:end!important;gap:4px!important;min-width:0!important}
+main.nv-business-overview .nvbd-head-icon{display:grid!important;place-items:center!important;flex:0 0 40px!important;width:40px!important;height:44px!important;min-width:40px!important;min-height:44px!important;padding:0!important;border:1px solid rgba(255,255,255,.9)!important;border-radius:14px!important;background:rgba(255,255,255,.78)!important;color:#2878d0!important;box-shadow:0 5px 16px rgba(50,100,150,.1)!important}
+main.nv-business-overview .nf-topbar .profile-btn{flex:0 0 44px!important;width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;padding:0!important}
+main.nv-business-overview .nf-topbar .profile-btn span{display:none!important}
+.nv-business-overview .nvbd-root.nvbd-overview{width:100%!important;max-width:900px!important;margin:0 auto!important;gap:14px!important;padding:8px 14px calc(120px + env(safe-area-inset-bottom))!important;overflow-x:hidden!important}
+.nv-business-overview .nvbd-heading{align-items:center!important;gap:8px!important;min-width:0!important}
+.nv-business-overview .nvbd-heading>div{min-width:0!important}
+.nv-business-overview .nvbd-heading h2{font-size:22px!important}
+.nv-business-overview .nvbd-sync-chip{display:flex!important;align-items:center!important;gap:5px!important;min-width:0!important;max-width:58%!important;padding:7px 8px!important;border:1px solid rgba(255,255,255,.92)!important;border-radius:999px!important;background:rgba(255,255,255,.72)!important;color:#42617f!important;font-size:10px!important;white-space:nowrap!important;overflow:hidden!important}
+.nv-business-overview .nvbd-sync-chip svg{flex:none!important;color:#2878d0!important}
+.nv-business-overview .nvbd-sync-chip span{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.nv-business-overview .nvbd-sync-chip small{flex:none!important;font-size:9px!important;color:#8294a8!important;letter-spacing:0!important}
+.nv-business-overview .nvbd-cash.nvbd-carousel{
+  position:relative!important;display:block!important;min-height:208px!important;padding:16px!important;overflow:hidden!important;
+  border-radius:24px!important;background:linear-gradient(135deg,#2f80ed,#1f6fdb)!important;color:#fff!important;
+  box-shadow:0 12px 30px rgba(47,128,237,.2)!important;touch-action:pan-y!important;
+}
+.nv-business-overview .nvbd-carousel-top{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
+.nv-business-overview .nvbd-carousel-top>small{font-size:12px!important;font-weight:750!important;color:#ffffffed!important;opacity:1!important}
+.nv-business-overview .nvbd-eye{display:grid!important;place-items:center!important;flex:0 0 44px!important;width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;border:1px solid #ffffff55!important;border-radius:14px!important;background:#ffffff22!important;color:white!important}
+.nv-business-overview .nvbd-hero-amount{display:block!important;margin-top:8px!important;font-size:clamp(24px,7vw,34px)!important;line-height:1.25!important;direction:ltr!important;text-align:start!important;overflow-wrap:anywhere!important;color:white!important}
+.nv-business-overview .nvbd-hero-unit{display:block!important;margin-top:2px!important;font-size:10px!important;color:#ffffffd9!important}
+.nv-business-overview .nvbd-account-link{display:flex!important;align-items:center!important;gap:5px!important;flex-wrap:wrap!important;min-height:42px!important;margin-top:4px!important;padding:0!important;border:0!important;background:transparent!important;color:#ffffffed!important;font-size:11px!important}
+.nv-business-overview .nvbd-account-link b{font-weight:800!important}
+.nv-business-overview .nvbd-flow-values{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin-top:8px!important}
+.nv-business-overview .nvbd-flow-values>span{display:flex!important;align-items:center!important;gap:5px!important;min-width:0!important;font-size:10px!important;color:#ffffffdf!important}
+.nv-business-overview .nvbd-flow-values b{margin-inline-start:auto!important;max-width:58%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;color:white!important;font-size:10px!important}
+.nv-business-overview .nvbd-flow-values i,.nv-business-overview .nvbd-legend i{width:8px!important;height:8px!important;flex:none!important;border-radius:50%!important}
+.nv-business-overview .nvbd-flow-values i.income{background:#27ae60!important}.nv-business-overview .nvbd-flow-values i.expense{background:#eb5757!important}
+.nv-business-overview .nvbd-flow-track{height:7px!important;margin-top:8px!important;border-radius:99px!important;background:#eb5757!important;overflow:hidden!important}
+.nv-business-overview .nvbd-flow-track>i{display:block!important;height:100%!important;border-radius:99px!important;background:#27ae60!important;transition:width .25s ease!important}
+.nv-business-overview .nvbd-slide-summary{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;margin:18px 0 14px!important}
+.nv-business-overview .nvbd-slide-summary>div{display:grid!important;gap:6px!important;min-width:0!important}
+.nv-business-overview .nvbd-slide-summary small,.nv-business-overview .nvbd-slide-foot{font-size:10px!important;color:#ffffffd9!important}
+.nv-business-overview .nvbd-slide-summary strong{font-size:clamp(13px,3.6vw,18px)!important;overflow-wrap:anywhere!important;color:#fff!important}
+.nv-business-overview .nvbd-slide-summary strong.positive{color:#a8f0c7!important}.nv-business-overview .nvbd-slide-summary strong.negative{color:#ffd0d0!important}
+.nv-business-overview .nvbd-slide-foot{display:block!important;margin-top:12px!important}
+.nv-business-overview .nvbd-dots{display:flex!important;justify-content:center!important;align-items:center!important;gap:4px!important;margin-top:7px!important}
+.nv-business-overview .nvbd-dots button{position:relative!important;display:grid!important;place-items:center!important;flex:0 0 30px!important;width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;padding:0!important;border:0!important;background:transparent!important}
+.nv-business-overview .nvbd-dots button:before{content:""!important;width:7px!important;height:7px!important;border-radius:99px!important;background:#ffffff70!important}
+.nv-business-overview .nvbd-dots button.active:before{width:19px!important;background:#fff!important}
+.nv-business-overview .nvbd-metric,.nv-business-overview .nvbd-quick,.nv-business-overview .nvbd-chart,.nv-business-overview .nvbd-reminder,.nv-business-overview .nvbd-sms-card,.nv-business-overview .nvbd-transactions,.nv-business-overview .nvbd-shortcuts{
+  min-width:0!important;padding:14px!important;border:1px solid rgba(255,255,255,.92)!important;border-radius:19px!important;
+  background:rgba(255,255,255,.76)!important;backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;
+  box-shadow:0 7px 22px rgba(65,125,180,.08)!important;color:#244766!important;
+}
+.nv-business-overview .nvbd-metric{height:92px!important;min-height:92px!important;justify-content:space-between!important}
+.nv-business-overview .nvbd-metric strong{white-space:normal!important;overflow-wrap:anywhere!important;font-size:clamp(13px,3.5vw,16px)!important}
+.nv-business-overview .nvbd-section-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;margin-bottom:9px!important}
+.nv-business-overview .nvbd-section-head h3,.nv-business-overview .nvbd-quick h3,.nv-business-overview .nvbd-chart h3{margin:0!important;font-size:13px!important;color:#244766!important}
+.nv-business-overview .nvbd-reminder-row{display:flex!important;align-items:center!important;gap:9px!important;width:100%!important;min-height:60px!important;padding:8px 0!important;border:0!important;border-bottom:1px solid #e7eff7!important;background:transparent!important;color:#244766!important;text-align:start!important}
+.nv-business-overview .nvbd-reminder-icon{display:grid!important;place-items:center!important;flex:0 0 40px!important;width:40px!important;height:40px!important;border-radius:13px!important;background:#eaf4ff!important;color:#2878d0!important}
+.nv-business-overview .nvbd-reminder-copy{display:grid!important;flex:1!important;min-width:0!important;gap:4px!important}
+.nv-business-overview .nvbd-reminder-copy b{font-size:11px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.nv-business-overview .nvbd-reminder-copy small{font-size:10px!important;color:#7890a5!important}
+.nv-business-overview .nvbd-reminder-row>strong{font-size:10px!important;white-space:nowrap!important;color:#31516e!important}
+.nv-business-overview .nvbd-sms-card{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:8px!important;align-items:center!important}
+.nv-business-overview .nvbd-sms-card>div{display:flex!important;align-items:center!important;gap:9px!important;min-width:0!important}
+.nv-business-overview .nvbd-sms-icon{display:grid!important;place-items:center!important;flex:0 0 40px!important;width:40px!important;height:40px!important;border-radius:13px!important;background:#eaf4ff!important;color:#2878d0!important}
+.nv-business-overview .nvbd-sms-card>div>span:last-child{display:grid!important;gap:4px!important;min-width:0!important}
+.nv-business-overview .nvbd-sms-card b{font-size:11px!important;color:#244766!important}
+.nv-business-overview .nvbd-sms-card small{font-size:10px!important;line-height:1.6!important;color:#7890a5!important}
+.nv-business-overview .nvbd-sms-card>button{min-height:44px!important;padding:0 12px!important;border:0!important;border-radius:12px!important;background:#2f80ed!important;color:#fff!important;font-size:11px!important;font-weight:800!important}
+.nv-business-overview .nvbd-sms-card>button.nvbd-sms-add{grid-column:1/-1!important;background:#eaf4ff!important;color:#2878d0!important;border:1px solid #cfe2f5!important}
+.nv-business-overview .nvbd-quick>div{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}
+.nv-business-overview .nvbd-quick>div button{min-width:0!important;white-space:normal!important;overflow-wrap:anywhere!important}
+.nv-business-overview .nvbd-shortcuts{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+.nv-business-overview .nvbd-shortcuts button{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:6px!important;min-width:0!important;min-height:64px!important;padding:8px 4px!important;border:1px solid #dceaf6!important;border-radius:14px!important;background:#ffffffb8!important;color:#42617f!important;font-size:10px!important;text-align:center!important}
+.nv-business-overview .nvbd-shortcuts svg{color:#2878d0!important}
+.nv-business-overview .nvbd-transactions .nvbd-section-head>button{display:flex!important;align-items:center!important;gap:3px!important;min-height:42px!important;padding:0 2px!important;border:0!important;background:transparent!important;color:#2878d0!important;font-size:10px!important}
+.nv-business-overview .nvbd-day-group{display:grid!important;gap:4px!important;margin-top:10px!important}
+.nv-business-overview .nvbd-day-group> b{padding:3px 2px!important;color:#7890a5!important;font-size:10px!important}
+.nv-business-overview .nvbd-tx-row{display:flex!important;align-items:center!important;gap:9px!important;min-width:0!important;min-height:60px!important;padding:7px 0!important;border-bottom:1px solid #e7eff7!important}
+.nv-business-overview .nvbd-tx-icon{display:grid!important;place-items:center!important;flex:0 0 38px!important;width:38px!important;height:38px!important;border-radius:13px!important;background:#fff0f0!important;color:#df6268!important}
+.nv-business-overview .nvbd-tx-icon.income{background:#e7f8ef!important;color:#209b65!important}
+.nv-business-overview .nvbd-tx-name{display:grid!important;flex:1!important;min-width:0!important;gap:4px!important}
+.nv-business-overview .nvbd-tx-name strong{font-size:11px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;color:#28445d!important}
+.nv-business-overview .nvbd-tx-name small{font-size:9px!important;color:#8296a8!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.nv-business-overview .nvbd-tx-row>strong{font-size:10px!important;direction:ltr!important;white-space:nowrap!important}
+.nv-business-overview .nvbd-tx-row>strong.positive{color:#19965c!important}.nv-business-overview .nvbd-tx-row>strong.negative{color:#d64f5a!important}
+.nv-business-overview .nvbd-sms-sheet textarea{width:100%!important;min-height:110px!important;margin:10px 0!important;padding:12px!important;border:1px solid #dceaf6!important;border-radius:14px!important;background:#fbfdff!important;color:#18324e!important;font:inherit!important;font-size:13px!important;resize:vertical!important}
+.nv-business-overview .nvbd-sms-sheet>button,.nv-business-overview .nvbd-sms-preview button{min-height:46px!important}
+.nv-business-overview .nvbd-sms-preview{display:grid!important;gap:8px!important;margin-top:12px!important;padding:12px!important;border-radius:14px!important;background:#eaf4ff!important}
+.nv-business-overview .nvbd-pending-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;align-items:center!important;gap:7px!important;padding:12px 0!important;border-bottom:1px solid #e7eff7!important}
+.nv-business-overview .nvbd-pending-row>div{display:grid!important;gap:5px!important;min-width:0!important}
+.nv-business-overview .nvbd-pending-row small{max-height:38px!important;overflow:hidden!important;font-size:10px!important;color:#7890a5!important}
+.nv-business-overview .nvbd-pending-row>button{min-height:42px!important;padding:0 10px!important;border:1px solid #dceaf6!important;border-radius:11px!important;background:#fff!important;color:#42617f!important}
+.nv-business-overview .nvbd-pending-row>button.nvbd-primary{background:#2f80ed!important;color:#fff!important}
+.nv-business-overview .nvbd-business-dock{
+  position:fixed!important;z-index:1100!important;left:12px!important;right:12px!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;
+  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;align-items:center!important;gap:2px!important;
+  width:auto!important;height:76px!important;min-height:76px!important;padding:5px 7px!important;border:1px solid #ffffffed!important;
+  border-radius:22px!important;background:#ffffffd9!important;backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;
+  box-shadow:0 9px 28px #285a8c20!important;
+}
+.nv-business-overview .nvbd-business-dock>button{position:static!important;transform:none!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;min-width:0!important;min-height:62px!important;height:64px!important;padding:2px!important;border:0!important;background:transparent!important;color:#8ba0b4!important;font-size:9px!important;font-weight:650!important;white-space:nowrap!important}
+.nv-business-overview .nvbd-business-dock>button svg{width:19px!important;height:19px!important;flex:none!important}
+.nv-business-overview .nvbd-business-dock>button span{font-size:9px!important;line-height:12px!important}
+.nv-business-overview .nvbd-business-dock>button.active{color:#2f80ed!important}
+.nv-business-overview .nvbd-business-dock>button.nv-ref-dock-center{display:flex!important;flex-direction:column!important;gap:1px!important;align-items:center!important;justify-content:center!important}
+.nv-business-overview .nvbd-business-dock .nv-ref-dock-center .nf-dock-icon{display:grid!important;place-items:center!important;width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;border-radius:50%!important;background:linear-gradient(135deg,#2f80ed,#58a9ef)!important;box-shadow:0 5px 16px #2f80ed35!important;color:#fff!important}
+.nv-business-overview .nvbd-business-dock .nv-ref-dock-center .nf-dock-icon svg{width:21px!important;height:21px!important;stroke:#fff!important;color:#fff!important}
+@media(max-width:380px){
+  main.nv-business-overview .nf-topbar{grid-template-columns:44px minmax(0,1fr) auto!important;gap:4px!important;padding-inline:8px!important}
+  main.nv-business-overview .nvbd-head-icon{flex-basis:36px!important;width:36px!important;min-width:36px!important}
+  main.nv-business-overview .nf-topbar .profile-btn{flex-basis:40px!important;width:40px!important;min-width:40px!important}
+  .nv-business-overview .nvbd-root.nvbd-overview{padding-inline:12px!important}
+  .nv-business-overview .nvbd-sync-chip{max-width:55%!important}
+}
+@media(min-width:760px){
+  .nv-business-overview .nvbd-root.nvbd-overview{padding:14px 24px calc(120px + env(safe-area-inset-bottom))!important}
+  .nv-business-overview .nvbd-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  .nv-business-overview .nvbd-business-dock{left:50%!important;right:auto!important;width:min(520px,calc(100% - 32px))!important;transform:translateX(-50%)!important}
+}
