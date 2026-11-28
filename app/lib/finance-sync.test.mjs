@@ -48,3 +48,17 @@ test("acknowledgement removes only the exact sent version", () => {
   assert.equal(remaining.length, 1);
   assert.equal(remaining[0].item?.amount, 2);
 });
+
+test("server tombstones remove stale local copies and block their queued upserts", async () => {
+  const store = storage();
+  enqueueFinanceUpserts(store, "outbox", [{ id: "deleted-on-A", amount: 25 }], "2026-11-28T10:00:00Z");
+  const { mergeFinanceTransactions, discardFinanceOutboxTombstones } = await import("./finance-sync.ts");
+  const merged = mergeFinanceTransactions(
+    [{ id: "deleted-on-A", amount: 25, updatedAt: "2026-11-28T11:00:00Z" }],
+    [{ id: "deleted-on-A", amount: 25, deletedAt: "2026-11-28T10:30:00Z" }],
+  );
+  assert.deepEqual(merged.items, []);
+  assert.deepEqual(merged.pendingUpserts, []);
+  assert.deepEqual(merged.tombstoneIds, ["deleted-on-A"]);
+  assert.deepEqual(discardFinanceOutboxTombstones(store, "outbox", merged.tombstoneIds), []);
+});
