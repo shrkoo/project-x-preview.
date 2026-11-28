@@ -4,6 +4,7 @@ test("two independent browser contexts see the same account transactions from th
   test.setTimeout(60_000);
   const server = {
     items: [] as Array<Record<string, any>>,
+    collections: { accounts: [] as Array<Record<string, any>>, categories: [] as Array<Record<string, any>>, recurring: [] as Array<Record<string, any>> },
     workspace: { id: "finance-sync-workspace", type: "personal", name: "Personal", currency: "IRT" },
   };
   const makeContext = async () => {
@@ -23,6 +24,26 @@ test("two independent browser contexts see the same account transactions from th
       const path = url.pathname;
       if (path === "/auth/me") return route.fulfill({ json: { user: { id: "finance-sync-user", email: "sync@example.test", displayName: "Sync User", profile: { accountType: "personal", appLockType: "none" } } } });
       if (path === "/workspaces") return route.fulfill({ json: { workspaces: [server.workspace] } });
+      const segments = path.split("/");
+      if (segments[1] === "finance" && ["accounts", "categories", "recurring"].includes(segments[2])) {
+        const resource = segments[2] as "accounts" | "categories" | "recurring";
+        const rows = server.collections[resource];
+        if (request.method() === "GET") return route.fulfill({ json: { items: rows.map(item => ({ ...item })) } });
+        if (request.method() === "PUT") {
+          const payload = request.postDataJSON();
+          for (const item of payload.items || []) {
+            const existing = rows.find(row => row.id === item.id);
+            if (existing?.deletedAt) continue;
+            if (existing) Object.assign(existing, item); else rows.push({ ...item });
+          }
+          return route.fulfill({ json: { ok: true, saved: (payload.items || []).length } });
+        }
+        if (request.method() === "DELETE") {
+          const existing = rows.find(row => row.id === decodeURIComponent(segments[3] || ""));
+          if (existing) existing.deletedAt = new Date().toISOString();
+          return route.fulfill({ json: { ok: true } });
+        }
+      }
       if (path === "/finance/transactions" && request.method() === "GET") return route.fulfill({ json: { items: server.items.map(item => ({ ...item })) } });
       if (path === "/finance/transactions" && request.method() === "PUT") {
         const payload = request.postDataJSON();
