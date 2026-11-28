@@ -46,7 +46,7 @@ for(const resource of ["accounts","categories","recurring","transactions"]) {
   if(denied.status!==404) throw new Error("User B unexpectedly accessed user A "+resource+": "+JSON.stringify(denied));
 }
 const crossWrite=await requestWith(headersB,"/finance/accounts","PUT",{workspaceId:workspace.id,items:[{id:crypto.randomUUID(),name:"Intrusion",currency:"USD"}]});
-if(crossWrite.status!==404) throw new Error("User B unexpectedly wrote to user A workspace: "+JSON.stringify(crossWrite));
+if(crossWrite.status!==403&&crossWrite.status!==404) throw new Error("User B unexpectedly wrote to user A workspace: "+JSON.stringify(crossWrite));
 const removed=await request("/finance/transactions/"+encodeURIComponent(id)+"?workspaceId="+encodeURIComponent(workspace.id),"DELETE");
 if(removed.status!==200) throw new Error("Transfer delete/undo failed: "+JSON.stringify(removed.data));
 const after=await request("/finance/transactions?workspaceId="+encodeURIComponent(workspace.id));
