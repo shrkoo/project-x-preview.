@@ -26,7 +26,7 @@ test("two independent browser contexts see the same account transactions from th
       const url = new URL(request.url());
       if (!url.hostname.includes("projectx-novyratam.workers.dev")) return route.continue();
       const path = url.pathname;
-      const collectionMatch = path.match(/^\\/finance\\/(accounts|categories|recurring)(?:\\/([^/]+))?$/);
+      const collectionMatch = path.match(/^\/finance\/(accounts|categories|recurring)(?:\/([^/]+))?$/);
       if (collectionMatch) {
         const resource = collectionMatch[1] as "accounts" | "categories" | "recurring";
         if (request.method() === "GET") return route.fulfill({ json: { items: server.collections[resource].map(item => ({ ...item })) } });
