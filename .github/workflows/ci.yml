@@ -102,3 +102,5 @@ jobs:
           if-no-files-found: warn
 
 # Stage 3 verification: backup, migration, tombstone-safe sync and browser coverage.
+
+# Trigger isolated PR verification against feature/homa-auth-part1; no production changes.
