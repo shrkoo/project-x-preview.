@@ -126,3 +126,6 @@
 .nv-tx-footer .nv-tx-delete{grid-column:1/-1!important;grid-row:3!important;position:static!important;justify-self:center!important;min-height:32px!important}
 
 .nv-tx-cat-actions{display:flex!important;align-items:center!important;gap:6px!important}.nv-tx-cat-actions button{display:inline-flex!important;align-items:center!important;gap:4px!important;min-height:30px!important;padding:0 9px!important;border:1px solid #d7e9f7!important;border-radius:999px!important;background:#f3f9ff!important;color:#3978aa!important;font-size:10px!important;font-weight:600!important}
+
+/* Parent validation feedback stays inside the open transaction sheet. */
+.nv-tx-parent-error{margin:0 0 8px!important;padding:8px 11px!important;border:1px solid rgba(217,75,92,.2)!important;border-radius:10px!important;background:rgba(255,239,241,.96)!important;color:#b83245!important;font-size:11px!important;line-height:1.6!important;text-align:center!important}
