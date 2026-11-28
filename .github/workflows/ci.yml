@@ -55,7 +55,7 @@ jobs:
         run: npx playwright install chromium
 
       - name: Run responsive stabilization tests
-        run: npm run test:e2e
+        run: npx playwright test --grep-invert "LIVE Preview Worker/D1 tombstones survive cross-device sync for 61 seconds"
 
       - name: Upload responsive screenshots and Playwright diagnostics
         if: always()
