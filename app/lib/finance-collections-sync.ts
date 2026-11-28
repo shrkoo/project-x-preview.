@@ -149,10 +149,10 @@ export async function syncFinanceCollections(args: {
   if (storage.getItem(migrationKey) !== "1") {
     const legacy = legacyFinanceCollections(storage, currency, accountId, accountType, preferences, recurring);
     for (const resource of resources) {
-      const items = legacy[resource].map(item => {
-        const existing = remote[resource].find(row => !row.deletedAt && (row.id === item.id || (resource === "accounts" && row.name === item.name && row.currency === item.currency) || (resource === "categories" && row.name === item.name)));
-        return existing ? { ...item, id: existing.id } : item;
-      }).filter(item => !remote[resource].some(row => !!row.deletedAt && (row.id === item.id || (resource === "accounts" && row.name === item.name && row.currency === item.currency) || (resource === "categories" && row.name === item.name))));
+      const items = legacy[resource].filter(item => !remote[resource].some(row => {
+        const sameRecord = row.id === item.id || (resource === "accounts" && row.name === item.name && row.currency === item.currency) || (resource === "categories" && row.name === item.name);
+        return sameRecord;
+      }));
       if (!items.length) continue;
       const result = await api<{ ok?: boolean; saved?: number }>("/finance/" + resource, { method: "PUT", body: JSON.stringify({ workspaceId, items }) });
       if (result?.ok !== true || result.saved !== items.length) throw new Error("Initial collection migration was not confirmed: " + resource);
