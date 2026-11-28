@@ -153,8 +153,12 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
   await first.locator(".nv-p-quick button").first().click();
   await first.getByRole("button", { name: "حذف حساب Cash" }).click();
   await first.locator(".nv-tx-close").click();
-  // The quick-add sheet retains the prior transaction form; confirm discarding it before navigating to Settings.
-  await first.getByRole("button", { name: "خروج" }).click();
+  // Closing a dirty quick-add sheet opens an in-sheet discard confirmation. Scope the action
+  // to that dialog and assert the sheet is gone before navigating to Settings.
+  const discardDialog = first.locator(".nv-tx-confirm");
+  await expect(discardDialog).toBeVisible();
+  await discardDialog.getByRole("button", { name: "خروج", exact: true }).click();
+  await expect(first.locator(".nv-tx-backdrop")).toHaveCount(0);
 
   await first.locator("nav.nv-ref-dock button[aria-label='تنظیمات']").click();
   await first.getByRole("button", { name: /دسته‌بندی‌ها/ }).click();
