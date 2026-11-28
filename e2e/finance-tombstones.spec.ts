@@ -99,10 +99,10 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
   await expect.poll(() => server.transactions.some(item => item.id === "tx-delete-1")).toBe(true);
 
   const backup = await first.evaluate(() => {
-    const key = Object.keys(localStorage).find(name => name.startsWith("nv-backup-pre-sync-v1:"));
+    const key = Object.keys(localStorage).find(name => name.startsWith("nv-backup-pre-sync-v2:"));
     return key ? JSON.parse(localStorage.getItem(key) || "null") : null;
   });
-  expect(backup?.format).toBe("novyra-pre-sync-backup-v1");
+  expect(backup?.format).toBe("novyra-pre-sync-backup-v2");
   expect(backup?.data?.transactions?.[0]?.id).toBe("tx-delete-1");
   expect(backup?.data?.goals?.custom?.[0]?.id).toBe("goal-1");
   expect(backup?.data?.budgets?.preferences?.monthlyBudget).toBe("9000000");
