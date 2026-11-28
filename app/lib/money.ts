@@ -62,3 +62,9 @@ export function formatMoneyInput(amount:number,locale:string):string {
   if(!Number.isFinite(amount))return "";
   return new Intl.NumberFormat(locale,{maximumFractionDigits:currencyDigits("USD"),useGrouping:true}).format(amount);
 }
+
+/** Persian-digit amount input with the Persian thousands separator. */
+export function formatMoneyInputFa(amount: number, maximumFractionDigits = 0): string {
+  if (!Number.isFinite(amount)) return "";
+  return new Intl.NumberFormat("fa-IR", { numberingSystem: "arabext", useGrouping: true, maximumFractionDigits }).format(amount).replace(/,/g, "٬");
+}
