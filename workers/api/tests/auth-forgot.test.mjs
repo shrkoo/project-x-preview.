@@ -33,7 +33,7 @@ function harness({ user = null, mailAvailable = true, rateAllowed = true, sendFa
     hasMailProvider: () => mailAvailable,
     hitAuthLimit: async (_db, key) => { calls.push({ kind: "limit", key }); return rateAllowed; },
     digest: async value => "hash:" + value,
-    issueEmailToken: async (_db, userId) => { calls.push({ kind: "token", userId }); return "mock-reset-token"; },
+    issueEmailToken: async (_db, userId, kind, ttlMs) => { calls.push({ kind: "token", userId, tokenKind: kind, ttlMs }); return "mock-reset-token"; },
     sendMail: async (_env, to, subject, html) => { calls.push({ kind: "mail", to, subject, html }); if (sendFails) throw new Error("mock provider failure"); },
     renderNovyraEmail: value => JSON.stringify(value),
     logError: value => errors.push(value)
@@ -54,6 +54,7 @@ test("valid email is normalized and reset email is sent with a mocked provider",
   const result = await invoke({ user: { id: "user-1", email: validEmail } }, "\u200F  " + validEmail.toUpperCase() + " \u2066");
   assert.equal(result.response.status, 200);
   assert.equal(result.calls.find(x => x.kind === "mail")?.to, validEmail);
+  assert.deepEqual(result.calls.find(x => x.kind === "token"), { kind: "token", userId: "user-1", tokenKind: "reset", ttlMs: 30 * 60 * 1000 });
   assert.equal(result.calls.filter(x => x.kind === "limit").length, 3);
 });
 
