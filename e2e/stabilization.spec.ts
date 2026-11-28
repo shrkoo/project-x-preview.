@@ -41,7 +41,7 @@ async function prepare(page: Page, language: "fa" | "en", accountType: "personal
 for (const language of ["fa", "en"] as const) {
   for (const viewport of [{ width: 360, height: 640 }, { width: 390, height: 844 }]) {
     for (const accountType of ["personal", "business"] as const) {
-      test(`${accountType} workspace / ${language} / ${viewport.width}x${viewport.height}`, async ({ page }) => {
+      test(`${accountType} workspace / ${language} / ${viewport.width}x${viewport.height}`, async ({ page }, testInfo) => {
         await page.setViewportSize(viewport);
         const errors: string[] = [];
         page.on("pageerror", error => errors.push(error.message));
@@ -88,6 +88,9 @@ for (const language of ["fa", "en"] as const) {
         if (accountType === "business") {
           await nav.nth(1).click();
           await expect(page.locator(".nvbd-sales-tabs")).toBeVisible();
+          if (language === "fa" && viewport.width === 390) {
+            await page.screenshot({ path: testInfo.outputPath("business-sales-390x844.png"), fullPage: false });
+          }
           const invoicesText = await page.locator(".nvbd-root").innerText();
           expect(invoicesText).not.toContain("\\n");
           expect(invoicesText).not.toContain("n\\");
