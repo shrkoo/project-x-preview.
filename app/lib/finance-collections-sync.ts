@@ -78,12 +78,25 @@ export function legacyFinanceCollections(storage: StorageLike, currency: string,
   for (let i = 0; i < storage.length; i++) { const key = storage.key(i); if (key?.startsWith(accountPrefix)) accountKeys.push(key); }
   accountKeys.sort((a, b) => a === accountPrefix + currency ? -1 : b === accountPrefix + currency ? 1 : a.localeCompare(b));
   const rawAccounts = accountKeys.flatMap(key => parseArray(storage.getItem(key)).map(value => ({ value, currency: String(value?.currency || key.slice(accountPrefix.length) || currency) })));
+  const accountIdsByCurrency = new Map<string, Record<string, string>>();
   const accounts = rawAccounts.map(({ value, currency: accountCurrency }) => {
     const name = typeof value === "string" ? value.trim() : String(value?.name || value?.title || "").trim();
     if (!name) return null;
-    const id = typeof value?.id === "string" && value.id ? value.id : stableId("legacy-account", accountCurrency + ":" + name);
+    let idMap = accountIdsByCurrency.get(accountCurrency);
+    if (!idMap) {
+      try {
+        const parsed = JSON.parse(storage.getItem("nv-personal-account-ids:" + accountCurrency) || "{}");
+        idMap = parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+      } catch { idMap = {}; }
+      accountIdsByCurrency.set(accountCurrency, idMap);
+    }
+    const id = typeof value?.id === "string" && value.id ? value.id : idMap[name] || stableId("legacy-account", accountCurrency + ":" + name);
+    idMap[name] = id;
     return { id, name, currency: accountCurrency };
   }).filter(Boolean) as FinanceCollectionItem[];
+  for (const [accountCurrency, idMap] of accountIdsByCurrency) {
+    storage.setItem("nv-personal-account-ids:" + accountCurrency, JSON.stringify(idMap));
+  }
   const categories = (Array.isArray(preferences?.categories) ? preferences.categories : [])
     .filter((name: unknown) => typeof name === "string" && name.trim() && !builtInCategories.has(name.trim()))
     .map((name: string) => ({ id: stableId("legacy-category", name), name: name.trim(), kind: "both" as const }));
@@ -146,8 +159,8 @@ export async function syncFinanceCollections(args: {
   let remote = await readRemote();
   const blocked = new Set(resources.flatMap(resource => remote[resource].filter(item => !!item.deletedAt).map(item => resource + ":" + item.id)));
   storage.setItem(outboxKey, JSON.stringify(readOutbox(storage, outboxKey).filter(entry => !blocked.has(entry.resource + ":" + entry.item.id))));
+  const legacy = legacyFinanceCollections(storage, currency, accountId, accountType, preferences, recurring);
   if (storage.getItem(migrationKey) !== "1") {
-    const legacy = legacyFinanceCollections(storage, currency, accountId, accountType, preferences, recurring);
     for (const resource of resources) {
       const items = legacy[resource].filter(item => !remote[resource].some(row => {
         const sameRecord = row.id === item.id || (resource === "accounts" && row.name === item.name && row.currency === item.currency) || (resource === "categories" && row.name === item.name);
@@ -173,6 +186,7 @@ export async function syncFinanceCollections(args: {
     },
   };
 }
-export function financeCollectionStableId(resource: FinanceCollectionResource, name: string) {
-  return stableId(resource === "accounts" ? "legacy-account" : "legacy-category", name);
+export function financeCollectionStableId(resource: FinanceCollectionResource, name: string, currency?: string) {
+  const value = resource === "accounts" && currency ? currency + ":" + name : name;
+  return stableId(resource === "accounts" ? "legacy-account" : "legacy-category", value);
 }
