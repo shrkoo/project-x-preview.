@@ -15,11 +15,18 @@ export function formatMoney(amount:number,currency:string,locale:string,options:
   if(!Number.isFinite(value))return "—";
   const code=codeOf(currency), digits=currencyDigits(code);
   if(code==="IRT"||code==="TOMAN") {
-    const n=new Intl.NumberFormat(locale,{maximumFractionDigits:0,useGrouping:true}).format(value);
-    return locale.startsWith("fa")?n+" تومان":n+" Toman";
+    const faLocale=/^(fa|ckb)(-|$)/i.test(locale);
+    const n=new Intl.NumberFormat(faLocale?"fa-IR":locale,{maximumFractionDigits:0,useGrouping:true}).format(Math.abs(value));
+    const sign=value<0?(faLocale?"−":"-"):"";
+    const result=faLocale?sign+n+" تومان":sign+n+" Toman";
+    return faLocale?"\u2066"+result+"\u2069":result;
   }
-  if(code==="IRR"&&locale.startsWith("fa"))return new Intl.NumberFormat(locale,{maximumFractionDigits:0,useGrouping:true}).format(value)+" ریال";
-  return new Intl.NumberFormat(locale,{style:"currency",currency:code,minimumFractionDigits:digits,maximumFractionDigits:digits}).format(value);
+  if(code==="IRR"&&/^(fa|ckb)(-|$)/i.test(locale)) {
+    const n=new Intl.NumberFormat("fa-IR",{maximumFractionDigits:0,useGrouping:true}).format(Math.abs(value));
+    return "\u2066"+(value<0?"−":"")+n+" ریال\u2069";
+  }
+  const formatted=new Intl.NumberFormat(locale,{style:"currency",currency:code,minimumFractionDigits:digits,maximumFractionDigits:digits}).format(value);
+  return /^(fa|ar|ckb)(-|$)/i.test(locale)?"\u2066"+formatted+"\u2069":formatted;
 }
 /** Parse user-entered major units; no currency conversion or scaling is performed. */
 export function parseMoney(input:string,currency:string):number {
