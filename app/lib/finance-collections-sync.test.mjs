@@ -141,13 +141,15 @@ test("collection delete outbox is acknowledged only after server confirmation", 
 
 test("v2 migration reuses an account ID from the earlier preview migration", async () => {
   const store = storage({ "nv-personal-accounts:IRT": JSON.stringify(["Cash"]) });
-  const { api, db } = mockApi();
+  const { api, db, calls } = mockApi();
   const previousId = financeCollectionStableId("accounts", "Cash");
-  db.accounts.push({ id: previousId, name: "Cash", currency: "IRT" });
+  db.accounts.push({ id: previousId, name: "Cash", currency: "IRT", serverOnly: "keep" });
   await syncFinanceCollections({
     storage: store, accountId: "user", workspaceId: "workspace", currency: "IRT", accountType: "personal",
     preferences: {}, recurring: [], api,
   });
   assert.equal(db.accounts.length, 1);
   assert.equal(db.accounts[0].id, previousId);
+  assert.equal(db.accounts[0].serverOnly, "keep");
+  assert.equal(calls.filter(call => call.method === "PUT").length, 0);
 });
