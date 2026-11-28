@@ -73,6 +73,41 @@ export default function NovyraPersonalHome(p:Props){
 .nv-finance.nv-personal-v1 .nv-p-hero>small,.nv-finance.nv-personal-v1 .nv-p-hero-top>span,.nv-finance.nv-personal-v1 .nv-p-flow span,.nv-finance.nv-personal-v1 .nv-p-flow b,.nv-finance.nv-personal-v1 .nv-p-hero>span,.nv-finance.nv-personal-v1 .nv-p-account-link{color:#fff!important;font-weight:600!important;text-shadow:0 1px 2px rgba(0,40,80,.18)!important}
 .nv-finance.nv-personal-v1 .nv-p-category-strip>button{height:80px!important;min-height:80px!important;max-height:80px!important;flex:0 0 82px!important;min-width:82px!important}
 .nv-finance.nv-personal-v1 .nv-p-category-strip>button b,.nv-finance.nv-personal-v1 .nv-p-category-strip>button small{font-weight:600!important}
+
+@media (min-width:768px){
+  body:has(.nv-finance.nv-personal-v1.nv-home-active){
+    background:linear-gradient(135deg,#c6e6fa 0%,#d9effc 48%,#b9def6 100%)!important;
+  }
+  .nv-finance.nv-personal-v1.nv-home-active{
+    width:min(100%,480px)!important;
+    max-width:480px!important;
+    min-height:100vh!important;
+    margin-inline:auto!important;
+    background:linear-gradient(180deg,#c6e6fa 0%,#c6e6fa 100%)!important;
+    box-shadow:0 0 36px rgba(42,112,170,.08)!important;
+  }
+  .nv-finance.nv-personal-v1.nv-home-active .nf-main{
+    width:100%!important;
+    max-width:480px!important;
+    margin-inline:auto!important;
+  }
+  .nv-finance.nv-personal-v1.nv-home-active .nv-p-dock{
+    position:fixed!important;
+    left:50%!important;
+    right:auto!important;
+    width:min(480px,calc(100vw - 28px))!important;
+    max-width:480px!important;
+    transform:translateX(-50%)!important;
+    background:rgba(255,255,255,.78)!important;
+    border:1px solid rgba(255,255,255,.9)!important;
+    box-shadow:0 8px 26px rgba(40,90,140,.14)!important;
+    backdrop-filter:blur(22px) saturate(145%)!important;
+    -webkit-backdrop-filter:blur(22px) saturate(145%)!important;
+  }
+  .nv-finance.nv-personal-v1.nv-home-active .nv-p-eye{
+    flex:0 0 36px!important;
+  }
+}
 `}
 </style>
  </div>;
