@@ -16,8 +16,10 @@ for(const scenario of cases){
    localStorage.setItem("novyra-text-direction",direction);
    localStorage.setItem("novyra-finance-currency","IRT");
    localStorage.setItem("novyra-preferences-v1",JSON.stringify({country:"IR",language,direction,currency:"IRT",calendar:language==="fa"?"persian":"gregory",dateFormat:"YYYY/MM/DD",numberSystem:language==="fa"?"arabext":"latn",digits:language==="fa"?"arabext":"latn",firstDay:"saturday"}));
-   localStorage.removeItem("nv-tx-draft:IRT");
-   localStorage.setItem("nv-personal-accounts:IRT",JSON.stringify([]));
+   for(const currency of ["IRR","IRT","USD"]){
+    localStorage.removeItem("nv-tx-draft:"+currency);
+    localStorage.setItem("nv-personal-accounts:"+currency,JSON.stringify([]));
+   }
   },{language:scenario.language,direction:scenario.direction});
   let remoteItems:Array<any>=[];
   await page.route("**/*",async route=>{

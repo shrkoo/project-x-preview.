@@ -12,7 +12,7 @@ test("two independent browser contexts see the same account transactions from th
       localStorage.setItem("projectx-language", "fa");
       localStorage.setItem("novyra-text-direction", "rtl");
       localStorage.setItem("novyra-finance-currency", "IRT");
-      localStorage.setItem("nv-personal-accounts:IRT", JSON.stringify([]));
+      for (const currency of ["IRR", "IRT", "USD"]) localStorage.setItem("nv-personal-accounts:" + currency, JSON.stringify(["Checking", "Savings"]));
       localStorage.setItem("novyra-preferences-v1", JSON.stringify({ country: "IR", language: "fa", direction: "rtl", currency: "IRT", calendar: "persian", dateFormat: "YYYY/MM/DD", numberSystem: "arabext", digits: "arabext", firstDay: "saturday" }));
     });
     await context.route("**/*", async route => {
@@ -68,14 +68,7 @@ test("two independent browser contexts see the same account transactions from th
   sheet = first.locator(".nv-tx-sheet");
   await sheet.locator(".nv-tx-seg").nth(2).click();
   await sheet.locator("#nv-tx-amount").fill("250000");
-  const noAccounts = sheet.locator(".nv-tx-no-transfer-accounts");
-  await expect(noAccounts).toBeVisible();
-  for (const name of ["Checking", "Savings"]) {
-    await noAccounts.locator("button").click();
-    const addAccount = sheet.locator(".nv-tx-add-account");
-    await addAccount.locator("input").fill(name);
-    await addAccount.locator("button").click();
-  }
+  await expect(sheet.locator(".nv-tx-no-transfer-accounts")).toHaveCount(0);
   await expect(sheet.locator(".nv-tx-transfer select")).toHaveCount(2);
   await sheet.locator(".nv-tx-transfer select").nth(0).selectOption("Checking");
   await sheet.locator(".nv-tx-transfer select").nth(1).selectOption("Savings");
