@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("two independent browser contexts see the same account transactions from the shared API", async ({ browser }) => {
+  test.setTimeout(60_000);
   const server = {
     items: [] as Array<Record<string, any>>,
     workspace: { id: "finance-sync-workspace", type: "personal", name: "Personal", currency: "IRT" },

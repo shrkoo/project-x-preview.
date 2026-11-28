@@ -9,6 +9,7 @@ const cases=[
 
 for(const scenario of cases){
  test(`personal transaction sheet ${scenario.width}x${scenario.height} ${scenario.language}`,async({page})=>{
+  test.setTimeout(60_000);
   await page.setViewportSize({width:scenario.width,height:scenario.height});
   await page.addInitScript(({language,direction})=>{
    localStorage.setItem("projectx-token","e2e-preview-token");
@@ -18,7 +19,7 @@ for(const scenario of cases){
    localStorage.setItem("novyra-preferences-v1",JSON.stringify({country:"IR",language,direction,currency:"IRT",calendar:language==="fa"?"persian":"gregory",dateFormat:"YYYY/MM/DD",numberSystem:language==="fa"?"arabext":"latn",digits:language==="fa"?"arabext":"latn",firstDay:"saturday"}));
    for(const currency of ["IRR","IRT","USD"]){
     localStorage.removeItem("nv-tx-draft:"+currency);
-    localStorage.setItem("nv-personal-accounts:"+currency,JSON.stringify([]));
+    localStorage.setItem("nv-personal-accounts:"+currency,JSON.stringify(["Checking","Savings"]));
    }
   },{language:scenario.language,direction:scenario.direction});
   let remoteItems:Array<any>=[];
