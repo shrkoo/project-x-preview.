@@ -71,11 +71,19 @@ export function downloadLocalFinanceBackup() {
   URL.revokeObjectURL(url);
 }
 export function legacyFinanceCollections(storage: StorageLike, currency: string, accountId: string, accountType: string, preferences: any, recurring: any[]): Record<FinanceCollectionResource, FinanceCollectionItem[]> {
-  const rawAccounts = parseArray(storage.getItem("nv-personal-accounts:" + currency));
-  const accounts = rawAccounts.map(value => {
+  const accountPrefix = "nv-personal-accounts:";
+  const accountKeys: string[] = [];
+  for (let i = 0; i < storage.length; i++) { const key = storage.key(i); if (key?.startsWith(accountPrefix)) accountKeys.push(key); }
+  accountKeys.sort((a, b) => a === accountPrefix + currency ? -1 : b === accountPrefix + currency ? 1 : a.localeCompare(b));
+  const seenAccountNames = new Set<string>();
+  const rawAccounts = accountKeys.flatMap(key => parseArray(storage.getItem(key)).map(value => ({ value, currency: String(value?.currency || key.slice(accountPrefix.length) || currency) })));
+  const accounts = rawAccounts.map(({ value, currency: accountCurrency }) => {
     const name = typeof value === "string" ? value.trim() : String(value?.name || value?.title || "").trim();
     if (!name) return null;
-    return { id: typeof value?.id === "string" ? value.id : stableId("legacy-account", name), name, currency };
+    const duplicateName = seenAccountNames.has(name);
+    seenAccountNames.add(name);
+    const id = typeof value?.id === "string" && value.id ? value.id : stableId("legacy-account", duplicateName ? accountCurrency + ":" + name : name);
+    return { id, name, currency: accountCurrency };
   }).filter(Boolean) as FinanceCollectionItem[];
   const categories = (Array.isArray(preferences?.categories) ? preferences.categories : [])
     .filter((name: unknown) => typeof name === "string" && name.trim() && !builtInCategories.has(name.trim()))
