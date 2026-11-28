@@ -24,17 +24,17 @@ test("LIVE Preview Worker/D1 tombstones survive cross-device sync for 61 seconds
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(({ seed, token, userId, runId, ids }) => {
       localStorage.setItem("projectx-token", token);
-      localStorage.setItem("projectx-language", "en");
-      localStorage.setItem("novyra-text-direction", "ltr");
-      localStorage.setItem("novyra-finance-currency", "USD");
+      localStorage.setItem("projectx-language", "fa");
+      localStorage.setItem("novyra-text-direction", "rtl");
+      localStorage.setItem("novyra-finance-currency", "IRT");
       if (seed) {
         localStorage.setItem("novyra-finance-transactions-v1:" + userId + ":personal", JSON.stringify([
           { id: ids.transaction, title: "Live deletion proof " + runId, amount: 17.25, kind: "expense", category: ids.category, date: "2026-11-28", account: ids.account, updatedAt: new Date().toISOString() },
         ]));
-        localStorage.setItem("nv-personal-accounts:USD", JSON.stringify([ids.account]));
+        localStorage.setItem("nv-personal-accounts:IRT", JSON.stringify([ids.account]));
         localStorage.setItem("novyra-preferences-v1", JSON.stringify({
-          country: "US", language: "en", direction: "ltr", currency: "USD", calendar: "gregory",
-          dateFormat: "YYYY-MM-DD", digits: "latn", firstDay: "sunday", categories: ["General", ids.category],
+          country: "IR", language: "fa", direction: "rtl", currency: "IRT", calendar: "persian",
+          dateFormat: "YYYY/MM/DD", digits: "arabext", firstDay: "saturday", categories: ["General", ids.category],
         }));
       }
     }, { seed, token, userId, runId, ids });
@@ -58,27 +58,27 @@ test("LIVE Preview Worker/D1 tombstones survive cross-device sync for 61 seconds
   await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes(ids.category), { ids }), { timeout: 45_000 }).toBe(true);
 
   // Delete the seeded transaction on device A through the real UI.
-  await first.getByRole("button", { name: /View all|See all/i }).click();
+  await first.getByRole("button", { name: /مشاهده همه/ }).click();
   const txRow = first.locator(".nf-transaction").filter({ hasText: "Live deletion proof " + runId });
   await expect(txRow).toBeVisible();
-  await txRow.getByRole("button", { name: /Edit transaction/i }).click();
+  await txRow.getByRole("button", { name: /ویرایش تراکنش/ }).click();
   await first.locator(".nv-tx-delete").click();
-  await first.locator(".nv-tx-confirm").getByRole("button", { name: /Delete/i }).click();
+  await first.locator(".nv-tx-confirm").getByRole("button", { name: /حذف/ }).click();
 
   // Delete the migrated account through the real transaction sheet.
-  await first.locator("nav.nv-ref-dock button[aria-label='Home']").click();
+  await first.locator("nav.nv-ref-dock button[aria-label='خانه']").click();
   await first.locator(".nv-p-quick button").first().click();
-  await first.getByRole("button", { name: "Delete account " + ids.account }).click();
+  await first.getByRole("button", { name: "حذف حساب " + ids.account }).click();
   await first.locator(".nv-tx-close").click();
   const discardDialog = first.locator(".nv-tx-confirm");
-  if (await discardDialog.count()) await discardDialog.getByRole("button", { name: "Exit", exact: true }).click();
+  if (await discardDialog.count()) await discardDialog.getByRole("button", { name: "خروج", exact: true }).click();
   await expect(first.locator(".nv-tx-backdrop")).toHaveCount(0);
 
   // Delete the custom category through Settings.
-  await first.locator("nav.nv-ref-dock button[aria-label='Settings']").click();
-  await first.getByRole("button", { name: /Categories/i }).click();
+  await first.locator("nav.nv-ref-dock button[aria-label='تنظیمات']").click();
+  await first.getByRole("button", { name: /دسته‌بندی‌ها/ }).click();
   await first.locator(".nvsh-chips span").filter({ hasText: ids.category }).getByRole("button").click();
-  await first.getByRole("button", { name: /^Save$/ }).click();
+  await first.getByRole("button", { name: /^ذخیره$/ }).click();
   await first.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
 
   // The real Worker must return server tombstones for all three resource types.
