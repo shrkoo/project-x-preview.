@@ -1,7 +1,7 @@
 import { PERSONAL_CATEGORIES } from "../data/personal-categories";
 
 export type FinanceCollectionResource = "accounts" | "categories" | "recurring";
-export type FinanceCollectionItem = { id: string; name?: string; currency?: string; kind?: "income" | "expense" | "both"; updatedAt?: string; deletedAt?: string; [key: string]: unknown };
+export type FinanceCollectionItem = { id: string; name?: string; currency?: string; kind?: "income" | "expense" | "both" | "transfer"; updatedAt?: string; deletedAt?: string; [key: string]: unknown };
 export type FinanceCollectionApi = <T>(path: string, options?: { method?: string; body?: string }) => Promise<T>;
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "length" | "key">;
 const resources: FinanceCollectionResource[] = ["accounts", "categories", "recurring"];
