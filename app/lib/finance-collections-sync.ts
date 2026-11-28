@@ -75,14 +75,11 @@ export function legacyFinanceCollections(storage: StorageLike, currency: string,
   const accountKeys: string[] = [];
   for (let i = 0; i < storage.length; i++) { const key = storage.key(i); if (key?.startsWith(accountPrefix)) accountKeys.push(key); }
   accountKeys.sort((a, b) => a === accountPrefix + currency ? -1 : b === accountPrefix + currency ? 1 : a.localeCompare(b));
-  const seenAccountNames = new Set<string>();
   const rawAccounts = accountKeys.flatMap(key => parseArray(storage.getItem(key)).map(value => ({ value, currency: String(value?.currency || key.slice(accountPrefix.length) || currency) })));
   const accounts = rawAccounts.map(({ value, currency: accountCurrency }) => {
     const name = typeof value === "string" ? value.trim() : String(value?.name || value?.title || "").trim();
     if (!name) return null;
-    const duplicateName = seenAccountNames.has(name);
-    seenAccountNames.add(name);
-    const id = typeof value?.id === "string" && value.id ? value.id : stableId("legacy-account", duplicateName ? accountCurrency + ":" + name : name);
+    const id = typeof value?.id === "string" && value.id ? value.id : stableId("legacy-account", accountCurrency + ":" + name);
     return { id, name, currency: accountCurrency };
   }).filter(Boolean) as FinanceCollectionItem[];
   const categories = (Array.isArray(preferences?.categories) ? preferences.categories : [])
@@ -150,7 +147,10 @@ export async function syncFinanceCollections(args: {
   if (storage.getItem(migrationKey) !== "1") {
     const legacy = legacyFinanceCollections(storage, currency, accountId, accountType, preferences, recurring);
     for (const resource of resources) {
-      const items = legacy[resource].filter(item => !remote[resource].some(row => row.id === item.id && !!row.deletedAt));
+      const items = legacy[resource].map(item => {
+        const existing = remote[resource].find(row => !row.deletedAt && (row.id === item.id || (resource === "accounts" && row.name === item.name && row.currency === item.currency) || (resource === "categories" && row.name === item.name)));
+        return existing ? { ...item, id: existing.id } : item;
+      }).filter(item => !remote[resource].some(row => !!row.deletedAt && (row.id === item.id || (resource === "accounts" && row.name === item.name && row.currency === item.currency) || (resource === "categories" && row.name === item.name))));
       if (!items.length) continue;
       const result = await api<{ ok?: boolean; saved?: number }>("/finance/" + resource, { method: "PUT", body: JSON.stringify({ workspaceId, items }) });
       if (result?.ok !== true || result.saved !== items.length) throw new Error("Initial collection migration was not confirmed: " + resource);
