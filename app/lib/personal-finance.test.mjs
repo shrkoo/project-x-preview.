@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { calculateAccountBalances, dateOffsetInTehran, isValidTransfer, parseBankSms, summarizeTransactions, tehranDateKey } from "./personal-finance.ts";
+import { calculateAccountBalances, dateOffsetInTehran, isValidTransfer, parseBankSms, summarizeTransactions, tehranDateKey, validatePersonalTransaction, resolvePersonalTransactionTitle } from "./personal-finance.ts";
+import { parseMoney, formatMoneyInputFa } from "./money.ts";
 
 test("Tehran date crosses midnight at Tehran midnight, not UTC midnight", () => {
   assert.equal(tehranDateKey(new Date("2026-11-27T20:29:59.000Z")), "2026-11-27");
@@ -39,3 +40,34 @@ const smsCases = [
 ];
 for (const [message, expected] of smsCases) test(`bank SMS parses ${message}`, () => assert.deepEqual(parseBankSms(message), expected));
 test("unrecognized bank message returns null", () => assert.equal(parseBankSms("موجودی حساب شما ۱۰۰۰۰۰ ریال"), null));
+
+
+test("grouped Latin and Persian amounts parse in the selected Toman currency", () => {
+  assert.equal(parseMoney("100,000", "IRT"), 100000);
+  assert.equal(parseMoney("۱۰۰٬۰۰۰", "IRT"), 100000);
+  assert.equal(parseMoney("۱۰۰٬۰۰۰", "IRR"), 100000);
+});
+
+test("amount input uses Persian digits and the Persian thousands separator", () => {
+  assert.equal(formatMoneyInputFa(100000), "۱۰۰٬۰۰۰");
+});
+
+test("shared validation accepts a positive amount and rejects zero", () => {
+  assert.equal(validatePersonalTransaction(100), null);
+  assert.equal(validatePersonalTransaction(0), "مبلغ باید بیشتر از صفر باشد");
+});
+
+test("a missing title falls back to category, then transaction kind", () => {
+  assert.equal(resolvePersonalTransactionTitle("", "خوراک", "expense"), "خوراک");
+  assert.equal(resolvePersonalTransactionTitle("  ", "", "income"), "درآمد");
+  assert.equal(resolvePersonalTransactionTitle("فروشگاه", "خرید", "expense"), "فروشگاه");
+});
+
+test("personal transaction draft permits zero accounts or a selected account", () => {
+  const withoutAccount = { amount: parseMoney("۱۰۰٬۰۰۰", "IRT"), account: undefined };
+  const withAccount = { amount: parseMoney("100,000", "IRT"), account: "نقدی" };
+  assert.equal(validatePersonalTransaction(withoutAccount.amount), null);
+  assert.equal(withoutAccount.account, undefined);
+  assert.equal(validatePersonalTransaction(withAccount.amount), null);
+  assert.equal(withAccount.account, "نقدی");
+});
