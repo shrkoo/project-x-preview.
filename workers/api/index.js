@@ -366,7 +366,7 @@ export default {
   const requestId = crypto.randomUUID();
   try {
    if ((path === "/api/health" || path === "/health") && request.method === "GET") {
-    const requiredTables = ["users","sessions","auth_rate_limits","signup_verification_codes","finance_transfers","finance_transactions"];
+    const requiredTables = ["users","sessions","auth_rate_limits","signup_verification_codes","finance_transfers","finance_transactions","accounts","custom_categories","recurring"];
     const bindings = { D1: Boolean(env.DB), DB: Boolean(env.DB), ROOM_HUB: Boolean(env.ROOM_HUB), STORY_MEDIA_KV: Boolean(env.STORY_MEDIA), R2: Boolean(env.R2), AI: Boolean(env.AI) };
     const secrets = {
       GOOGLE_CLIENT_ID: Boolean(env.GOOGLE_CLIENT_ID),
@@ -395,14 +395,17 @@ export default {
       sessions: ["token_hash","user_id","expires_at"],
       auth_rate_limits: ["rate_key","window_started_at","request_count"],
       signup_verification_codes: ["id","user_id","code_hash","expires_at","attempts","sent_at","used_at"],
-      finance_transfers: ["id","workspace_id","owner_id","from_account","to_account","amount","transaction_date","note"],
-      finance_transactions: ["id","workspace_id","owner_id","title","category","amount","kind","transaction_date","note","account"]
+      finance_transfers: ["id","workspace_id","owner_id","from_account","to_account","amount","transaction_date","note","updated_at","deleted_at"],
+      finance_transactions: ["id","workspace_id","owner_id","title","category","amount","kind","transaction_date","note","account","updated_at","deleted_at"],
+      accounts: ["id","workspace_id","owner_id","name","currency","updated_at","deleted_at"],
+      custom_categories: ["id","workspace_id","owner_id","name","kind","updated_at","deleted_at"],
+      recurring: ["id","workspace_id","owner_id","data_json","updated_at","deleted_at"]
     };
     let columns = Object.fromEntries(Object.keys(expectedColumns).map(name => [name, false]));
     let databaseOk = false;
     if (env.DB) {
       try {
-        const rows = await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name IN (?,?,?,?,?,?)").bind(...requiredTables).all();
+        const rows = await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name IN (?,?,?,?,?,?,?,?,?)").bind(...requiredTables).all();
         for (const row of rows.results || []) tables[row.name] = true;
         for (const [table, expected] of Object.entries(expectedColumns)) {
           if (!tables[table]) continue;
@@ -1079,12 +1082,72 @@ export default {
       const rows=await db.prepare("SELECT id,email,role,expires_at AS expiresAt,created_at AS createdAt FROM business_invitations WHERE workspace_id=? AND accepted_at IS NULL AND revoked_at IS NULL ORDER BY created_at DESC LIMIT 100").bind(workspaceId).all();
       return json({invitations:rows.results||[]});
     }
-if(path==="/finance/transactions" && request.method==="GET") {
+const financeCollectionMatch=path.match(/^\/finance\/(accounts|categories|recurring)$/);
+    if(financeCollectionMatch) {
+     const resource=financeCollectionMatch[1],table=resource==="accounts"?"accounts":resource==="categories"?"custom_categories":"recurring";
+     if(request.method==="GET") {
+      const workspaceId=String(url.searchParams.get("workspaceId")||"");
+      const access=await getFinanceAccess(db,workspaceId,user.id);
+      if(!access || (access.type==="business" && !businessCan(access,"read"))) return fail("فضای کاری پیدا نشد یا دسترسی ندارید.",404);
+      const includeDeleted=url.searchParams.get("includeDeleted")==="1";
+      const where="workspace_id=? AND owner_id=?"+(includeDeleted?"":" AND deleted_at IS NULL");
+      let rows;
+      if(resource==="accounts") rows=await db.prepare("SELECT id,name,currency,updated_at AS updatedAt,deleted_at AS deletedAt FROM accounts WHERE "+where+" ORDER BY updated_at DESC").bind(workspaceId,access.ownerId).all();
+      else if(resource==="categories") rows=await db.prepare("SELECT id,name,kind,updated_at AS updatedAt,deleted_at AS deletedAt FROM custom_categories WHERE "+where+" ORDER BY updated_at DESC").bind(workspaceId,access.ownerId).all();
+      else rows=await db.prepare("SELECT id,data_json AS dataJson,updated_at AS updatedAt,deleted_at AS deletedAt FROM recurring WHERE "+where+" ORDER BY updated_at DESC").bind(workspaceId,access.ownerId).all();
+      const items=(rows.results||[]).map(row=>{
+       if(resource!=="recurring") return row;
+       let data={};try{data=JSON.parse(row.dataJson||"{}")||{}}catch{}
+       return {...data,id:row.id,updatedAt:row.updatedAt,deletedAt:row.deletedAt};
+      });
+      return json({items});
+     }
+     if(request.method==="PUT") {
+      const body=await readBody(request)||{},workspaceId=String(body.workspaceId||"");
+      const access=await getFinanceAccess(db,workspaceId,user.id);
+      if(!access || (access.type==="business" && !businessCan(access,"finance:write"))) return fail("نقش شما اجازه ثبت اطلاعات مالی را ندارد.",403);
+      if(!Array.isArray(body.items)||body.items.length>500) return fail("فهرست اطلاعات مالی معتبر نیست.");
+      const statements=[];
+      for(const item of body.items) {
+       const id=String(item?.id||"").trim().slice(0,80);
+       if(!id) return fail("شناسه رکورد معتبر نیست.");
+       if(resource==="accounts") {
+        const name=String(item?.name||"").trim().slice(0,100),currency=String(item?.currency||access.currency||"USD").toUpperCase();
+        if(!name||!currencyCodes.has(currency)) return fail("نام حساب یا واحد پول معتبر نیست.");
+        statements.push(db.prepare("INSERT INTO accounts (id,workspace_id,owner_id,name,currency) VALUES (?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET name=excluded.name,currency=excluded.currency,updated_at=CURRENT_TIMESTAMP,deleted_at=NULL WHERE accounts.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,name,currency));
+       } else if(resource==="categories") {
+        const name=String(item?.name||"").trim().slice(0,100),kind=String(item?.kind||"both");
+        if(!name||!["income","expense","both"].includes(kind)) return fail("دسته‌بندی معتبر نیست.");
+        statements.push(db.prepare("INSERT INTO custom_categories (id,workspace_id,owner_id,name,kind) VALUES (?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET name=excluded.name,kind=excluded.kind,updated_at=CURRENT_TIMESTAMP,deleted_at=NULL WHERE custom_categories.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,name,kind));
+       } else {
+        const data={...item,id};delete data.updatedAt;delete data.deletedAt;
+        const dataJson=JSON.stringify(data);
+        if(dataJson.length>20000) return fail("اطلاعات تکرارشونده بیش از حد بزرگ است.");
+        statements.push(db.prepare("INSERT INTO recurring (id,workspace_id,owner_id,data_json) VALUES (?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET data_json=excluded.data_json,updated_at=CURRENT_TIMESTAMP,deleted_at=NULL WHERE recurring.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,dataJson));
+       }
+      }
+      for(let i=0;i<statements.length;i+=90) await db.batch(statements.slice(i,i+90));
+      return json({ok:true,saved:body.items.length});
+     }
+    }
+    const financeCollectionDeleteMatch=path.match(/^\/finance\/(accounts|categories|recurring)\/([^/]+)$/);
+    if(financeCollectionDeleteMatch && request.method==="DELETE") {
+     const resource=financeCollectionDeleteMatch[1],table=resource==="accounts"?"accounts":resource==="categories"?"custom_categories":"recurring";
+     const workspaceId=String(url.searchParams.get("workspaceId")||"");
+     const access=await getFinanceAccess(db,workspaceId,user.id);
+     if(!access || (access.type==="business" && !businessCan(access,"finance:write"))) return fail("نقش شما اجازه حذف اطلاعات مالی را ندارد.",403);
+     const id=decodeURIComponent(financeCollectionDeleteMatch[2]);
+     await db.prepare("UPDATE "+table+" SET deleted_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP WHERE id=? AND workspace_id=? AND owner_id=?").bind(id,workspaceId,access.ownerId).run();
+     return json({ok:true});
+    }
+    if(path==="/finance/transactions" && request.method==="GET") {
      const workspaceId=String(url.searchParams.get("workspaceId")||"");
      const access=await getFinanceAccess(db,workspaceId,user.id);
      if(!access || (access.type==="business" && !businessCan(access,"read"))) return fail("فضای کاری پیدا نشد یا دسترسی ندارید.",404);
-     const rows=await db.prepare("SELECT id,title,category,amount,kind,transaction_date AS date,note,account,updated_at AS updatedAt FROM finance_transactions WHERE workspace_id=? AND owner_id=? ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
-     const transfers=await db.prepare("SELECT id,'Transfer' AS category,amount,'transfer' AS kind,transaction_date AS date,note,from_account AS fromAccount,to_account AS toAccount,updated_at AS updatedAt FROM finance_transfers WHERE workspace_id=? AND owner_id=? ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
+     const includeDeleted=url.searchParams.get("includeDeleted")==="1";
+     const activeFilter=includeDeleted?"":" AND deleted_at IS NULL";
+     const rows=await db.prepare("SELECT id,title,category,amount,kind,transaction_date AS date,note,account,updated_at AS updatedAt,deleted_at AS deletedAt FROM finance_transactions WHERE workspace_id=? AND owner_id=?"+activeFilter+" ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
+     const transfers=await db.prepare("SELECT id,'Transfer' AS category,amount,'transfer' AS kind,transaction_date AS date,note,from_account AS fromAccount,to_account AS toAccount,updated_at AS updatedAt,deleted_at AS deletedAt FROM finance_transfers WHERE workspace_id=? AND owner_id=?"+activeFilter+" ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
      const items=[...(rows.results||[]),...(transfers.results||[]).map(x=>({...x,title:"انتقال از "+x.fromAccount+" به "+x.toAccount}))].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
      return json({items});
     }
@@ -1101,11 +1164,11 @@ if(path==="/finance/transactions" && request.method==="GET") {
        if(kind==="transfer") {
          const fromAccount=String(item?.fromAccount||"").trim().slice(0,100),toAccount=String(item?.toAccount||"").trim().slice(0,100);
          if(!fromAccount||!toAccount||fromAccount===toAccount) return fail("برای انتقال دو حساب متفاوت لازم است.");
-         statements.push(db.prepare("INSERT INTO finance_transfers (id,workspace_id,owner_id,from_account,to_account,amount,transaction_date,note) VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET from_account=excluded.from_account,to_account=excluded.to_account,amount=excluded.amount,transaction_date=excluded.transaction_date,note=excluded.note,updated_at=CURRENT_TIMESTAMP WHERE finance_transfers.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,fromAccount,toAccount,amount,date,note));
+         statements.push(db.prepare("INSERT INTO finance_transfers (id,workspace_id,owner_id,from_account,to_account,amount,transaction_date,note) VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET from_account=excluded.from_account,to_account=excluded.to_account,amount=excluded.amount,transaction_date=excluded.transaction_date,note=excluded.note,updated_at=CURRENT_TIMESTAMP,deleted_at=NULL WHERE finance_transfers.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,fromAccount,toAccount,amount,date,note));
        } else {
          const title=String(item?.title||"").trim().slice(0,120),category=String(item?.category||"Other").trim().slice(0,80);
          if(!title||!["income","expense"].includes(kind)) return fail("یکی از تراکنش‌ها اطلاعات نامعتبر دارد.");
-         statements.push(db.prepare("INSERT INTO finance_transactions (id,workspace_id,owner_id,title,category,amount,kind,transaction_date,note,account) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET title=excluded.title,category=excluded.category,amount=excluded.amount,kind=excluded.kind,transaction_date=excluded.transaction_date,note=excluded.note,account=excluded.account,updated_at=CURRENT_TIMESTAMP WHERE finance_transactions.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,title,category,amount,kind,date,note,String(item?.account||"").trim().slice(0,100)));
+         statements.push(db.prepare("INSERT INTO finance_transactions (id,workspace_id,owner_id,title,category,amount,kind,transaction_date,note,account) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET title=excluded.title,category=excluded.category,amount=excluded.amount,kind=excluded.kind,transaction_date=excluded.transaction_date,note=excluded.note,account=excluded.account,updated_at=CURRENT_TIMESTAMP,deleted_at=NULL WHERE finance_transactions.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,title,category,amount,kind,date,note,String(item?.account||"").trim().slice(0,100)));
        }
      }
      for(let i=0;i<statements.length;i+=90) await db.batch(statements.slice(i,i+90));
@@ -1119,8 +1182,8 @@ if(path==="/finance/transactions" && request.method==="GET") {
      if(!access || (access.type==="business" && !businessCan(access,"finance:write"))) return fail("نقش شما اجازه حذف تراکنش مالی را ندارد.",403);
      const transactionId=decodeURIComponent(transactionDeleteMatch[1]);
      await db.batch([
-       db.prepare("DELETE FROM finance_transactions WHERE id=? AND workspace_id=? AND owner_id=?").bind(transactionId,workspaceId,access.ownerId),
-       db.prepare("DELETE FROM finance_transfers WHERE id=? AND workspace_id=? AND owner_id=?").bind(transactionId,workspaceId,access.ownerId)
+       db.prepare("UPDATE finance_transactions SET deleted_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP WHERE id=? AND workspace_id=? AND owner_id=?").bind(transactionId,workspaceId,access.ownerId),
+       db.prepare("UPDATE finance_transfers SET deleted_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP WHERE id=? AND workspace_id=? AND owner_id=?").bind(transactionId,workspaceId,access.ownerId)
      ]);
      if(access.type==="business") await writeBusinessAudit(db,workspaceId,user.id,"finance.transaction_deleted","transaction",transactionId);
      return json({ok:true});
