@@ -43,7 +43,8 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
       if (path === "/auth/me") return route.fulfill({ json: { user: { id: "tombstone-user", email: "tombstone@example.test", displayName: "Tombstone User", profile: { accountType: "personal", appLockType: "none" } } } });
       if (path === "/workspaces" && request.method() === "GET") return route.fulfill({ json: { workspaces: [workspace] } });
       if (path === "/workspaces" && request.method() === "POST") return route.fulfill({ json: { workspace } });
-      const collectionMatch = path.match(/^\/finance\/(accounts|categories|recurring)(?:\/([^/]+))?$/);
+      const segments = path.split("/");
+      const collectionMatch = segments[1] === "finance" && ["accounts", "categories", "recurring"].includes(segments[2]) ? [path, segments[2], segments[3]] : null;
       if (collectionMatch) {
         const resource = collectionMatch[1] as "accounts" | "categories" | "recurring";
         const rows = server[resource];
