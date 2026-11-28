@@ -19,7 +19,7 @@ for(const scenario of cases){
    localStorage.setItem("novyra-preferences-v1",JSON.stringify({country:"IR",language,direction,currency:"IRT",calendar:language==="fa"?"persian":"gregory",dateFormat:"YYYY/MM/DD",numberSystem:language==="fa"?"arabext":"latn",digits:language==="fa"?"arabext":"latn",firstDay:"saturday"}));
    for(const currency of ["IRR","IRT","USD"]){
     localStorage.removeItem("nv-tx-draft:"+currency);
-    localStorage.setItem("nv-personal-accounts:"+currency,JSON.stringify([]));
+    localStorage.setItem("nv-personal-accounts:"+currency,JSON.stringify(["Checking","Savings"]));
    }
   },{language:scenario.language,direction:scenario.direction});
   let remoteItems:Array<any>=[];
@@ -105,19 +105,10 @@ for(const scenario of cases){
   const transferSheet=page.getByRole("dialog");
   await expect(transferSheet).toBeVisible();
   await transferSheet.getByRole("button",{name:scenario.language==="en"?/Transfer/:/انتقال وجه/}).click();
-  const noAccounts=transferSheet.locator(".nv-tx-no-transfer-accounts");
-  await expect(noAccounts).toContainText("برای انتقال، دو حساب لازم است");
-  await expect(noAccounts.locator("button")).toHaveCount(1);
-  await expect(transferSheet.locator(".nv-tx-section-title button")).toHaveCount(0);
-  const existingAccountCount=await page.evaluate(()=>JSON.parse(localStorage.getItem("nv-personal-accounts:IRT")||"[]").length);
-  const accountsToAdd=["Checking","Savings"].slice(0,Math.max(0,2-existingAccountCount));
-  for(const accountName of accountsToAdd){
-    await noAccounts.locator("button").click();
-    await transferSheet.locator(".nv-tx-add-account input").fill(accountName);
-    await transferSheet.locator(".nv-tx-add-account button").click();
-  }
-  await expect(noAccounts).toHaveCount(0);
-  await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem("nv-personal-accounts:IRT")||"[]").length)).toBe(2);
+  await expect(transferSheet.locator(".nv-tx-no-transfer-accounts")).toHaveCount(0);
+  await expect(transferSheet.locator(".nv-tx-transfer select")).toHaveCount(2);
+  await expect(transferSheet.locator(".nv-tx-transfer select").nth(0).locator("option")).toContainText("Checking");
+  await expect(transferSheet.locator(".nv-tx-transfer select").nth(1).locator("option")).toContainText("Savings");
   await transferSheet.locator("#nv-tx-amount").fill("250000");
   await transferSheet.locator('input[placeholder="توضیح (اختیاری)"]').fill("انتقال پس‌انداز");
   await transferSheet.locator(".nv-tx-transfer select").nth(0).selectOption("Checking");
