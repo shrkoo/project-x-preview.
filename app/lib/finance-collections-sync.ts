@@ -67,8 +67,10 @@ export function downloadLocalFinanceBackup() {
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = "novyra-local-backup.json";
+  document.body.appendChild(anchor);
   anchor.click();
-  URL.revokeObjectURL(url);
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export function legacyFinanceCollections(storage: StorageLike, currency: string, accountId: string, accountType: string, preferences: any, recurring: any[]): Record<FinanceCollectionResource, FinanceCollectionItem[]> {
   const accountPrefix = "nv-personal-accounts:";
