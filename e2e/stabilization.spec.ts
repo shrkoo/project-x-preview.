@@ -202,3 +202,33 @@ for (const language of ["fa", "en"] as const) {
     }
   }
 }
+
+
+for (const viewport of [{ width: 1280, height: 800 }, { width: 1440, height: 900 }]) {
+  test(`personal desktop home is centered and captured at ${viewport.width}x${viewport.height}`, async ({ page }, testInfo) => {
+    await page.setViewportSize(viewport);
+    await prepare(page, "fa", "personal");
+    await page.goto("/");
+    await expect(page.locator(".nv-finance.nv-personal-v1.nv-home-active")).toBeVisible({ timeout: 30_000 });
+    const measurements = await page.evaluate(() => {
+      const app = document.querySelector<HTMLElement>(".nv-finance.nv-personal-v1.nv-home-active")!;
+      const dock = document.querySelector<HTMLElement>(".nv-finance.nv-personal-v1.nv-home-active .nv-p-dock")!;
+      const appRect = app.getBoundingClientRect();
+      const dockRect = dock.getBoundingClientRect();
+      return {
+        appWidth: appRect.width,
+        appLeft: appRect.left,
+        dockWidth: dockRect.width,
+        dockCenter: dockRect.left + dockRect.width / 2,
+        viewportCenter: window.innerWidth / 2,
+        background: getComputedStyle(document.body).backgroundImage
+      };
+    });
+    expect(measurements.appWidth).toBeLessThanOrEqual(480);
+    expect(Math.abs(measurements.appLeft + measurements.appWidth / 2 - viewport.width / 2)).toBeLessThanOrEqual(1);
+    expect(measurements.dockWidth).toBeLessThanOrEqual(480);
+    expect(Math.abs(measurements.dockCenter - measurements.viewportCenter)).toBeLessThanOrEqual(1);
+    expect(measurements.background).toContain("gradient");
+    await page.screenshot({ path: testInfo.outputPath(`personal-home-${viewport.width}x${viewport.height}.png`), fullPage: true });
+  });
+}
