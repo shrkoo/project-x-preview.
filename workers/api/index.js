@@ -1114,16 +1114,16 @@ const financeCollectionMatch=path.match(/^\/finance\/(accounts|categories|recurr
        if(resource==="accounts") {
         const name=String(item?.name||"").trim().slice(0,100),currency=String(item?.currency||access.currency||"USD").toUpperCase();
         if(!name||!currencyCodes.has(currency)) return fail("نام حساب یا واحد پول معتبر نیست.");
-        statements.push(db.prepare("INSERT INTO accounts (id,workspace_id,owner_id,name,currency) VALUES (?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET name=excluded.name,currency=excluded.currency,updated_at=CURRENT_TIMESTAMP,deleted_at=NULL WHERE accounts.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,name,currency));
+        statements.push(db.prepare("INSERT INTO accounts (id,workspace_id,owner_id,name,currency) VALUES (?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET name=excluded.name,currency=excluded.currency,updated_at=CURRENT_TIMESTAMP WHERE accounts.owner_id=excluded.owner_id AND accounts.deleted_at IS NULL").bind(id,workspaceId,access.ownerId,name,currency));
        } else if(resource==="categories") {
         const name=String(item?.name||"").trim().slice(0,100),kind=String(item?.kind||"both");
         if(!name||!["income","expense","both"].includes(kind)) return fail("دسته‌بندی معتبر نیست.");
-        statements.push(db.prepare("INSERT INTO custom_categories (id,workspace_id,owner_id,name,kind) VALUES (?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET name=excluded.name,kind=excluded.kind,updated_at=CURRENT_TIMESTAMP,deleted_at=NULL WHERE custom_categories.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,name,kind));
+        statements.push(db.prepare("INSERT INTO custom_categories (id,workspace_id,owner_id,name,kind) VALUES (?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET name=excluded.name,kind=excluded.kind,updated_at=CURRENT_TIMESTAMP WHERE custom_categories.owner_id=excluded.owner_id AND custom_categories.deleted_at IS NULL").bind(id,workspaceId,access.ownerId,name,kind));
        } else {
         const data={...item,id};delete data.updatedAt;delete data.deletedAt;
         const dataJson=JSON.stringify(data);
         if(dataJson.length>20000) return fail("اطلاعات تکرارشونده بیش از حد بزرگ است.");
-        statements.push(db.prepare("INSERT INTO recurring (id,workspace_id,owner_id,data_json) VALUES (?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET data_json=excluded.data_json,updated_at=CURRENT_TIMESTAMP,deleted_at=NULL WHERE recurring.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,dataJson));
+        statements.push(db.prepare("INSERT INTO recurring (id,workspace_id,owner_id,data_json) VALUES (?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET data_json=excluded.data_json,updated_at=CURRENT_TIMESTAMP WHERE recurring.owner_id=excluded.owner_id AND recurring.deleted_at IS NULL").bind(id,workspaceId,access.ownerId,dataJson));
        }
       }
       for(let i=0;i<statements.length;i+=90) await db.batch(statements.slice(i,i+90));
@@ -1164,11 +1164,11 @@ const financeCollectionMatch=path.match(/^\/finance\/(accounts|categories|recurr
        if(kind==="transfer") {
          const fromAccount=String(item?.fromAccount||"").trim().slice(0,100),toAccount=String(item?.toAccount||"").trim().slice(0,100);
          if(!fromAccount||!toAccount||fromAccount===toAccount) return fail("برای انتقال دو حساب متفاوت لازم است.");
-         statements.push(db.prepare("INSERT INTO finance_transfers (id,workspace_id,owner_id,from_account,to_account,amount,transaction_date,note) VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET from_account=excluded.from_account,to_account=excluded.to_account,amount=excluded.amount,transaction_date=excluded.transaction_date,note=excluded.note,updated_at=CURRENT_TIMESTAMP,deleted_at=NULL WHERE finance_transfers.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,fromAccount,toAccount,amount,date,note));
+         statements.push(db.prepare("INSERT INTO finance_transfers (id,workspace_id,owner_id,from_account,to_account,amount,transaction_date,note) VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET from_account=excluded.from_account,to_account=excluded.to_account,amount=excluded.amount,transaction_date=excluded.transaction_date,note=excluded.note,updated_at=CURRENT_TIMESTAMP WHERE finance_transfers.owner_id=excluded.owner_id AND finance_transfers.deleted_at IS NULL").bind(id,workspaceId,access.ownerId,fromAccount,toAccount,amount,date,note));
        } else {
          const title=String(item?.title||"").trim().slice(0,120),category=String(item?.category||"Other").trim().slice(0,80);
          if(!title||!["income","expense"].includes(kind)) return fail("یکی از تراکنش‌ها اطلاعات نامعتبر دارد.");
-         statements.push(db.prepare("INSERT INTO finance_transactions (id,workspace_id,owner_id,title,category,amount,kind,transaction_date,note,account) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET title=excluded.title,category=excluded.category,amount=excluded.amount,kind=excluded.kind,transaction_date=excluded.transaction_date,note=excluded.note,account=excluded.account,updated_at=CURRENT_TIMESTAMP,deleted_at=NULL WHERE finance_transactions.owner_id=excluded.owner_id").bind(id,workspaceId,access.ownerId,title,category,amount,kind,date,note,String(item?.account||"").trim().slice(0,100)));
+         statements.push(db.prepare("INSERT INTO finance_transactions (id,workspace_id,owner_id,title,category,amount,kind,transaction_date,note,account) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(workspace_id,id) DO UPDATE SET title=excluded.title,category=excluded.category,amount=excluded.amount,kind=excluded.kind,transaction_date=excluded.transaction_date,note=excluded.note,account=excluded.account,updated_at=CURRENT_TIMESTAMP WHERE finance_transactions.owner_id=excluded.owner_id AND finance_transactions.deleted_at IS NULL").bind(id,workspaceId,access.ownerId,title,category,amount,kind,date,note,String(item?.account||"").trim().slice(0,100)));
        }
      }
      for(let i=0;i<statements.length;i+=90) await db.batch(statements.slice(i,i+90));
