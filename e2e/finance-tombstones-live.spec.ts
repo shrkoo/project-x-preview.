@@ -43,10 +43,33 @@ test("LIVE Preview Worker/D1 tombstones survive cross-device sync for 61 seconds
 
   const firstContext = await contextFor(true);
   const first = await firstContext.newPage();
+  const diagnostic: string[] = [];
+  first.on("request", request => {
+    if (request.url().startsWith(apiBase)) diagnostic.push("REQ " + request.method() + " " + request.url() + " body=" + (request.postData() || ""));
+  });
+  first.on("response", async response => {
+    if (response.url().startsWith(apiBase)) {
+      let body = "";
+      try { body = (await response.text()).slice(0, 2500); } catch {}
+      diagnostic.push("RES " + response.status() + " " + response.url() + " body=" + body);
+    }
+  });
+  first.on("console", message => { if (message.type() === "error") diagnostic.push("CONSOLE " + message.text()); });
+  first.on("pageerror", error => diagnostic.push("PAGEERROR " + error.stack));
+  first.on("requestfailed", request => diagnostic.push("REQFAILED " + request.url() + " " + request.failure()?.errorText));
   await first.goto("/");
+  const localSnapshot = await first.evaluate(() => Object.fromEntries(Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i)!).filter(k => /projectx-token|novyra-finance-transactions|nv-personal-accounts|novyra-preferences/.test(k)).map(k => [k, localStorage.getItem(k)])));
+  console.log("LIVE E2E localStorage after injection/reload:", JSON.stringify(localSnapshot));
+  const authProbe = await first.evaluate(async apiBase => { const r=await fetch(apiBase+"/auth/me",{headers:{Authorization:"Bearer "+localStorage.getItem("projectx-token")}});return {status:r.status,body:(await r.text()).slice(0,2500)}; }, apiBase);
+  console.log("LIVE E2E auth probe:", JSON.stringify(authProbe));
   await expect(first.locator(".nv-p-home")).toBeVisible({ timeout: 45_000 });
 
-  await expect.poll(async () => (await api("/finance/transactions?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.some(x => x.id === ids.transaction), { timeout: 45_000 }).toBe(true);
+  try {
+    await expect.poll(async () => (await api("/finance/transactions?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.some(x => x.id === ids.transaction), { timeout: 45_000 }).toBe(true);
+  } catch (error) {
+    console.log("LIVE E2E network/auth diagnostics:", diagnostic.join("\\n"));
+    throw error;
+  }
   await expect.poll(async () => (await api("/finance/accounts?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.some(x => x.name === ids.account), { timeout: 45_000 }).toBe(true);
   await expect.poll(async () => (await api("/finance/categories?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.some(x => x.name === ids.category), { timeout: 45_000 }).toBe(true);
 
