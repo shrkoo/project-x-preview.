@@ -67,3 +67,15 @@ export function validatePersonalTransaction(amount: number): string | null {
 export function resolvePersonalTransactionTitle(title: string, category: string, kind: "income" | "expense"): string {
   return title.trim() || category.trim() || (kind === "income" ? "درآمد" : "هزینه");
 }
+
+/** Format an ISO transaction date as a Jalali date in Tehran's time zone. */
+export function formatTehranPersianDate(value: Date | string | number): string {
+  const date = value instanceof Date ? value : new Date(typeof value === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(value) ? value + "T12:00:00+03:30" : value);
+  if (Number.isNaN(date.getTime())) throw new RangeError("Invalid date");
+  const parts = new Intl.DateTimeFormat("fa-IR-u-ca-persian-nu-arabext", {
+    timeZone: "Asia/Tehran", calendar: "persian", numberingSystem: "arabext",
+    year: "numeric", month: "2-digit", day: "2-digit"
+  }).formatToParts(date);
+  const get = (type: string) => parts.find(part => part.type === type)?.value || "";
+  return get("year") + "/" + get("month").padStart(2, "۰") + "/" + get("day").padStart(2, "۰");
+}

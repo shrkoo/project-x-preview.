@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { calculateAccountBalances, dateOffsetInTehran, isValidTransfer, parseBankSms, summarizeTransactions, tehranDateKey, validatePersonalTransaction, resolvePersonalTransactionTitle } from "./personal-finance.ts";
+import { calculateAccountBalances, dateOffsetInTehran, isValidTransfer, parseBankSms, summarizeTransactions, tehranDateKey, validatePersonalTransaction, resolvePersonalTransactionTitle, formatTehranPersianDate } from "./personal-finance.ts";
 import { parseMoney, formatMoneyInputFa } from "./money.ts";
 
 test("Tehran date crosses midnight at Tehran midnight, not UTC midnight", () => {
@@ -70,4 +70,9 @@ test("personal transaction draft permits zero accounts or a selected account", (
   assert.equal(withoutAccount.account, undefined);
   assert.equal(validatePersonalTransaction(withAccount.amount), null);
   assert.equal(withAccount.account, "نقدی");
+});
+
+test("transaction dates render as Jalali calendar dates in Tehran", () => {
+  assert.equal(formatTehranPersianDate("2026-11-27"), "۱۴۰۵/۰۹/۰۶");
+  assert.equal(formatTehranPersianDate("2026-11-27T20:30:00.000Z"), "۱۴۰۵/۰۹/۰۷");
 });

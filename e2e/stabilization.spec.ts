@@ -39,7 +39,7 @@ async function prepare(page: Page, language: "fa" | "en", accountType: "personal
 }
 
 for (const language of ["fa", "en"] as const) {
-  for (const viewport of [{ width: 360, height: 640 }, { width: 390, height: 844 }]) {
+  for (const viewport of [{ width: 360, height: 640 }, { width: 390, height: 844 }, { width: 420, height: 844 }]) {
     for (const accountType of ["personal", "business"] as const) {
       test(`${accountType} workspace / ${language} / ${viewport.width}x${viewport.height}`, async ({ page }, testInfo) => {
         await page.setViewportSize(viewport);
@@ -110,6 +110,7 @@ for (const language of ["fa", "en"] as const) {
           const home = page.locator(".nv-p-home");
           await nav.nth(0).click();
           await expect(home).toBeVisible();
+          await page.screenshot({ path: testInfo.outputPath(`personal-home-${viewport.width}x${viewport.height}-${language}.png`), fullPage: true });
           const spacing = await home.evaluate(element => {
             const sections = Array.from(element.querySelectorAll(".nv-p-section"));
             const heading = sections[1]?.querySelector(".nv-p-section-head");
