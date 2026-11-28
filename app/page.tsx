@@ -50,7 +50,6 @@ export default function Home() {
     document.documentElement.dir = direction || (languageByCode.get(nextLanguage)?.rtl ? "rtl" : "ltr");
 
     const currentUrl = new URL(window.location.href);
-    const currentUrl = new URL(window.location.href);
     // A password-reset link must take priority over any existing saved session.
     // Otherwise the app restores the old session and never mounts the reset form.
     const passwordResetToken = currentUrl.searchParams.get("reset");
