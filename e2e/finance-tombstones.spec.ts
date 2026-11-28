@@ -148,6 +148,8 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
   await first.locator(".nv-tx-delete").click();
   await first.locator(".nv-tx-confirm").getByRole("button", { name: "حذف" }).click();
 
+  // Closing the transaction editor returns to the full list; navigate back to Home before using dashboard quick actions.
+  await first.locator("nav.nv-ref-dock button[aria-label='خانه']").click();
   await first.locator(".nv-p-quick button").first().click();
   await first.getByRole("button", { name: "حذف حساب Cash" }).click();
   await first.locator(".nv-tx-close").click();
