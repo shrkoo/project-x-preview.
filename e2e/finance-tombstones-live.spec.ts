@@ -75,9 +75,29 @@ test("LIVE Preview Worker/D1 tombstones survive cross-device sync for 61 seconds
 
   const secondContext = await contextFor(false);
   const second = await secondContext.newPage();
+  const secondDiagnostic: string[] = [];
+  second.on("request", request => {
+    if (request.url().startsWith(apiBase)) secondDiagnostic.push("REQ " + request.method() + " " + request.url() + " body=" + (request.postData() || ""));
+  });
+  second.on("response", async response => {
+    if (response.url().startsWith(apiBase)) {
+      let body = "";
+      try { body = (await response.text()).slice(0, 2500); } catch {}
+      secondDiagnostic.push("RES " + response.status() + " " + response.url() + " body=" + body);
+    }
+  });
+  second.on("console", message => { if (message.type() === "error") secondDiagnostic.push("CONSOLE " + message.text()); });
+  second.on("pageerror", error => secondDiagnostic.push("PAGEERROR " + error.stack));
+  second.on("requestfailed", request => secondDiagnostic.push("REQFAILED " + request.url() + " " + request.failure()?.errorText));
   await second.goto("/");
   await expect(second.locator(".nv-p-home")).toBeVisible({ timeout: 45_000 });
-  await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("nv-personal-accounts:USD") || "[]").includes(ids.account), { ids }), { timeout: 45_000 }).toBe(true);
+  try {
+    await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("nv-personal-accounts:" + (JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").currency || "USD")) || "[]").includes(ids.account), { ids }), { timeout: 45_000 }).toBe(true);
+  } catch (error) {
+    const state = await second.evaluate(() => ({ preferences: localStorage.getItem("novyra-preferences-v1"), accountKeys: Object.keys(localStorage).filter(k => k.startsWith("nv-personal-accounts:")).map(k => [k, localStorage.getItem(k)]) }));
+    console.log("LIVE E2E device B initial sync diagnostics:", JSON.stringify({ state, requests: secondDiagnostic }));
+    throw error;
+  }
   await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes(ids.category), { ids }), { timeout: 45_000 }).toBe(true);
 
   // Delete the seeded transaction on device A through the real UI.
@@ -111,14 +131,14 @@ test("LIVE Preview Worker/D1 tombstones survive cross-device sync for 61 seconds
 
   // Device B must remove the local copies and must not recreate them across two refresh cycles.
   await second.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
-  await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("nv-personal-accounts:USD") || "[]").includes(ids.account), { ids })).toBe(false);
+  await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("nv-personal-accounts:" + (JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").currency || "USD")) || "[]").includes(ids.account), { ids })).toBe(false);
   await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes(ids.category), { ids })).toBe(false);
   await second.waitForTimeout(61_000);
   await second.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
   await expect.poll(async () => (await api("/finance/transactions?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.id === ids.transaction)?.deletedAt).toBeTruthy();
   await expect.poll(async () => (await api("/finance/accounts?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.name === ids.account)?.deletedAt).toBeTruthy();
   await expect.poll(async () => (await api("/finance/categories?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.name === ids.category)?.deletedAt).toBeTruthy();
-  await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("nv-personal-accounts:USD") || "[]").includes(ids.account), { ids })).toBe(false);
+  await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("nv-personal-accounts:" + (JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").currency || "USD")) || "[]").includes(ids.account), { ids })).toBe(false);
   await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes(ids.category), { ids })).toBe(false);
 
   await firstContext.close();
