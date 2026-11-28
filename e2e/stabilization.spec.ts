@@ -225,9 +225,16 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 1440, height: 900
         dockWidth: dockRect.width,
         dockCenter: dockRect.left + dockRect.width / 2,
         viewportCenter: window.innerWidth / 2,
-        background: getComputedStyle(document.body).backgroundImage
+        background: getComputedStyle(document.body).backgroundImage,
+        dockPosition: getComputedStyle(dock).position,
+        dockLeft: getComputedStyle(dock).left,
+        dockRight: getComputedStyle(dock).right,
+        dockTransform: getComputedStyle(dock).transform,
+        dockMarginLeft: getComputedStyle(dock).marginLeft,
+        dockMarginRight: getComputedStyle(dock).marginRight
       };
     });
+    console.log("DESKTOP_DOCK_LAYOUT", JSON.stringify(measurements));
     await page.screenshot({ path: testInfo.outputPath(`personal-home-${viewport.width}x${viewport.height}.png`), fullPage: true });
     expect(measurements.appWidth).toBeLessThanOrEqual(480);
     expect(Math.abs(measurements.appLeft + measurements.appWidth / 2 - viewport.width / 2)).toBeLessThanOrEqual(1);
