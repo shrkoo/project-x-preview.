@@ -4580,12 +4580,14 @@ main.nv-business-overview .nf-topbar .profile-btn span{display:none!important}
 
 /* Keep the compact mobile profile target at the same accessible size as other dock actions. */
 @media (max-width: 400px) {
-  main.nv-finance #profileBtn,
-  main.nv-finance .nf-topbar .profile-btn {
-    width: 44px !important;
-    min-width: 44px !important;
-    height: 44px !important;
-    min-height: 44px !important;
-    flex: 0 0 44px !important;
+  html body main.nv-finance button#profileBtn.nf-avatar.profile-btn {
+    display: inline-flex !important;
+    flex: 0 0 48px !important;
+    width: 48px !important;
+    min-width: 48px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    max-width: 48px !important;
+    padding: 0 !important;
   }
 }
