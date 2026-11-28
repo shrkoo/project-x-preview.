@@ -58,3 +58,8 @@ export function parseBankSms(message: string): { amount: number; kind: "income" 
   const amount = amountMatch ? Number(amountMatch[1].replace(/[\s,٬،.]/g, "")) : candidates[0];
   return Number.isSafeInteger(amount) && amount > 0 ? { amount, kind } : null;
 }
+
+/** Shared transaction validation used by both the sheet and its parent save handler. */
+export function validatePersonalTransaction(amount: number): string | null {
+  return Number.isFinite(amount) && amount > 0 ? null : "مبلغ باید بیشتر از صفر باشد";
+}
