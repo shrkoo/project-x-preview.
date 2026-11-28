@@ -3847,9 +3847,11 @@ main.nv-business-workspace .profile-btn span{display:none!important}main.nv-busi
   }
   main.nv-finance #profileBtn {
     display: inline-flex !important;
-    flex: 0 0 38px !important;
-    width: 38px !important;
-    min-width: 38px !important;
+    flex: 0 0 44px !important;
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
     padding: 0 !important;
     justify-content: center !important;
     gap: 0 !important;

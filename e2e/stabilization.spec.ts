@@ -262,3 +262,21 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 1440, height: 900
     expect(measurements.background).toContain("gradient");
   });
 }
+
+for (const viewport of [{ width: 768, height: 900 }, { width: 390, height: 844 }]) {
+  test(`personal dock aligns to app column at ${viewport.width}px`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await prepare(page, "fa", "personal");
+    await page.goto("/");
+    await expect(page.locator(".nv-finance.nv-personal-v1.nv-home-active")).toBeVisible({ timeout: 30_000 });
+    const result = await page.evaluate(() => {
+      const app = document.querySelector<HTMLElement>(".nv-finance.nv-personal-v1.nv-home-active")!;
+      const dock = app.querySelector<HTMLElement>(".nv-p-dock")!;
+      const a = app.getBoundingClientRect(), d = dock.getBoundingClientRect();
+      return { appCenter: a.left + a.width / 2, dockCenter: d.left + d.width / 2, dockWidth: d.width, position: getComputedStyle(dock).position };
+    });
+    expect(result.position).toBe("fixed");
+    expect(result.dockWidth).toBeLessThanOrEqual(480);
+    expect(Math.abs(result.dockCenter - result.appCenter)).toBeLessThanOrEqual(1);
+  });
+}
