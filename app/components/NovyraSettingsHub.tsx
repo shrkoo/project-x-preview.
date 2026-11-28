@@ -4,6 +4,7 @@ import {useEffect,useRef,useState,type ReactNode} from "react";
 import {Activity,ArrowLeft,ArrowRight,Bell,BriefcaseBusiness,Building2,ChartNoAxesCombined,ChevronRight,Copy,Download,FileDown,Fingerprint,Globe,HelpCircle,LockKeyhole,LogOut,Palette,Plus,Search,ShieldCheck,SlidersHorizontal,Trash2,User,Wallet,X,Check,Clock3,Users,Receipt,Boxes,FileSpreadsheet,Landmark,LifeBuoy,Database,EyeOff,CalendarDays,Upload,Share2,Settings} from "lucide-react";
 import {verifyDeviceLock} from "../lib/device-lock";
 import {apiRequest,clearSession} from "../lib/api";
+import {downloadLocalFinanceBackup} from "../lib/finance-collections-sync";
 import {PatternLock} from "./novyra/PatternLock";
 import {countries} from "../data/countries";
 import {currencies} from "../data/currencies";
