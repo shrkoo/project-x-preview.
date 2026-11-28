@@ -121,6 +121,7 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
   await first.locator(".nv-tx-add-account input").fill("Travel");
   await first.locator(".nv-tx-add-account button").click();
   await first.locator(".nv-tx-close").click();
+  await first.getByRole("button", { name: "خروج" }).click();
   await first.locator("nav.nv-ref-dock button[aria-label='تنظیمات']").click();
   await first.getByRole("button", { name: /دسته‌بندی‌ها/ }).click();
   await first.locator(".nvsh-add input").fill("Side hustle");
