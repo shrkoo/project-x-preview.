@@ -53,11 +53,18 @@ const after=await request("/finance/transactions?workspaceId="+encodeURIComponen
 if(after.data.items?.some(item=>item.id===id)) throw new Error("Soft-deleted transfer is still in the active list");
 const transactionTombstones=await request("/finance/transactions?workspaceId="+encodeURIComponent(workspace.id)+"&includeDeleted=1");
 if(!transactionTombstones.data.items?.some(item=>item.id===id&&item.deletedAt)) throw new Error("Transfer soft-delete tombstone was not returned.");
+const attemptedRevive=await request("/finance/transactions","PUT",{workspaceId:workspace.id,items:[transfer]});
+const afterRevive=await request("/finance/transactions?workspaceId="+encodeURIComponent(workspace.id)+"&includeDeleted=1");
+if(attemptedRevive.status!==200||!afterRevive.data.items?.some(item=>item.id===id&&item.deletedAt)) throw new Error("A stale transaction upsert revived a server tombstone.");
 for(const [resource,recordId] of [["accounts",accountId],["categories",categoryId],["recurring",recurringId]]) {
   const removed=await request("/finance/"+resource+"/"+encodeURIComponent(recordId)+"?workspaceId="+encodeURIComponent(workspace.id),"DELETE");
   if(removed.status!==200) throw new Error("Soft delete failed for "+resource+": "+JSON.stringify(removed));
   const active=await request("/finance/"+resource+"?workspaceId="+encodeURIComponent(workspace.id));
   const all=await request("/finance/"+resource+"?workspaceId="+encodeURIComponent(workspace.id)+"&includeDeleted=1");
   if(active.data.items?.some(item=>item.id===recordId)||!all.data.items?.some(item=>item.id===recordId&&item.deletedAt)) throw new Error("Soft-delete tombstone mismatch for "+resource);
+  const staleItem=resource==="accounts"?{id:recordId,name:"Smoke Cash",currency:"USD"}:resource==="categories"?{id:recordId,name:"Smoke Custom",kind:"both"}:{id:recordId,title:"Smoke recurring",amount:10,kind:"expense",category:"Other",frequency:"monthly"};
+  const attempted=await request("/finance/"+resource,"PUT",{workspaceId:workspace.id,items:[staleItem]});
+  const stillDeleted=await request("/finance/"+resource+"?workspaceId="+encodeURIComponent(workspace.id)+"&includeDeleted=1");
+  if(attempted.status!==200||!stillDeleted.data.items?.some(item=>item.id===recordId&&item.deletedAt)) throw new Error("A stale "+resource+" upsert revived a server tombstone.");
 }
 console.log("PASS: finance collections are owner-isolated, upsertable, and soft-deletable; transactions and transfers expose tombstones.");
