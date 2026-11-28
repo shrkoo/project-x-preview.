@@ -80,6 +80,7 @@ test("pre-sync backup captures transactions, accounts, categories, recurring, bu
 test("one-time migration preserves IDs, is idempotent, and marks complete only after confirmation", async () => {
   const store = storage({
     "nv-personal-accounts:IRT": JSON.stringify(["Cash", { id: "account-fixed", name: "Savings" }]),
+    "nv-personal-accounts:USD": JSON.stringify(["Travel"]),
     "novyra-preferences-v1": JSON.stringify({ categories: ["عمومی", "Freelance"] }),
     "novyra-recurring:user:personal": JSON.stringify([{ id: "repeat-fixed", title: "Rent", frequency: "monthly" }]),
   });
@@ -87,14 +88,15 @@ test("one-time migration preserves IDs, is idempotent, and marks complete only a
   const args = { storage: store, accountId: "user", workspaceId: "workspace", currency: "IRT", accountType: "personal", preferences: JSON.parse(store.getItem("novyra-preferences-v1")), recurring: JSON.parse(store.getItem("novyra-recurring:user:personal")), api };
   await syncFinanceCollections(args);
   assert.equal(store.getItem(financeCollectionMigrationKey("user", "workspace")), "1");
-  assert.equal(db.accounts.length, 2);
+  assert.equal(db.accounts.length, 3);
   assert.equal(db.accounts.find(item => item.id === "account-fixed").name, "Savings");
+  assert.equal(db.accounts.find(item => item.name === "Travel").currency, "USD");
   assert.equal(db.categories.some(item => item.id === financeCollectionStableId("categories", "Freelance")), true);
   assert.equal(db.recurring.some(item => item.id === "repeat-fixed"), true);
   const putsBefore = calls.filter(call => call.method === "PUT").length;
   await syncFinanceCollections(args);
   assert.equal(calls.filter(call => call.method === "PUT").length, putsBefore);
-  assert.equal(db.accounts.length, 2);
+  assert.equal(db.accounts.length, 3);
 });
 
 test("migration marker is not written when server confirmation fails", async () => {
