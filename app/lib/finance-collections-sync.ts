@@ -6,7 +6,7 @@ export type FinanceCollectionApi = <T>(path: string, options?: { method?: string
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "length" | "key">;
 
 const resources: FinanceCollectionResource[] = ["accounts", "categories", "recurring"];
-const builtInCategories = new Set(PERSONAL_CATEGORIES.map(item => item.label));
+const builtInCategories = new Set<string>([...PERSONAL_CATEGORIES.map(item => item.label), "پس‌انداز", "فروش"]);
 
 export function financeCollectionMigrationKey(accountId: string, workspaceId: string) {
   return "nv-finance-collections-migrated-v1:" + accountId + ":" + workspaceId;
@@ -18,12 +18,12 @@ export function financePreSyncBackupKey(accountId: string, workspaceId: string) 
   return "nv-backup-pre-sync-v1:" + accountId + ":" + workspaceId;
 }
 function stableId(prefix: string, value: string) {
-  let hash = 0xcbf29ce484222325n;
+  let hash = 2166136261;
   for (const byte of new TextEncoder().encode(value.normalize("NFKC").trim().toLocaleLowerCase())) {
-    hash ^= BigInt(byte);
-    hash = BigInt.asUintN(64, hash * 0x100000001b3n);
+    hash ^= byte;
+    hash = Math.imul(hash, 16777619) >>> 0;
   }
-  return prefix + "-" + hash.toString(16);
+  return prefix + "-" + hash.toString(16).padStart(8, "0");
 }
 function parseArray(value: string | null): any[] {
   try { const parsed = value ? JSON.parse(value) : []; return Array.isArray(parsed) ? parsed : []; } catch { return []; }
