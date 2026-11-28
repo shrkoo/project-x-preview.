@@ -44,6 +44,7 @@ test("LIVE Preview Worker/D1 tombstones survive cross-device sync for 61 seconds
   const firstContext = await contextFor(true);
   const first = await firstContext.newPage();
   const diagnostic: string[] = [];
+  first.on("dialog", async dialog => { diagnostic.push("DIALOG " + dialog.type() + " " + dialog.message()); await dialog.accept(); diagnostic.push("DIALOG_ACCEPTED"); });
   first.on("request", request => {
     if (request.url().startsWith(apiBase)) diagnostic.push("REQ " + request.method() + " " + request.url() + " body=" + (request.postData() || ""));
   });
@@ -95,7 +96,8 @@ test("LIVE Preview Worker/D1 tombstones survive cross-device sync for 61 seconds
     await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("nv-personal-accounts:" + (JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").currency || "USD")) || "[]").includes(ids.account), { ids }), { timeout: 45_000 }).toBe(true);
   } catch (error) {
     const state = await second.evaluate(() => ({ preferences: localStorage.getItem("novyra-preferences-v1"), accountKeys: Object.keys(localStorage).filter(k => k.startsWith("nv-personal-accounts:")).map(k => [k, localStorage.getItem(k)]) }));
-    console.log("LIVE E2E device B initial sync diagnostics:", JSON.stringify({ state, requests: secondDiagnostic }));
+    const remoteCategories = await api("/finance/categories?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1");
+    console.log("LIVE E2E device B initial sync diagnostics:", JSON.stringify({ state, remoteCategories, requests: secondDiagnostic }));
     throw error;
   }
   await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes(ids.category), { ids }), { timeout: 45_000 }).toBe(true);
@@ -126,7 +128,13 @@ test("LIVE Preview Worker/D1 tombstones survive cross-device sync for 61 seconds
 
   // The real Worker must return server tombstones for all three resource types.
   await expect.poll(async () => (await api("/finance/transactions?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.id === ids.transaction)?.deletedAt, { timeout: 45_000 }).toBeTruthy();
-  await expect.poll(async () => (await api("/finance/accounts?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.name === ids.account)?.deletedAt, { timeout: 45_000 }).toBeTruthy();
+  try {
+    await expect.poll(async () => (await api("/finance/accounts?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.name === ids.account)?.deletedAt, { timeout: 45_000 }).toBeTruthy();
+  } catch (error) {
+    const accountState = await first.evaluate(({ ids, userId, workspaceId }) => ({ currency: localStorage.getItem("novyra-finance-currency"), accounts: localStorage.getItem("nv-personal-accounts:" + (localStorage.getItem("novyra-finance-currency") || "USD")), idMap: localStorage.getItem("nv-personal-account-ids:" + (localStorage.getItem("novyra-finance-currency") || "USD")), outbox: Object.keys(localStorage).filter(key => key.includes("finance-collections-outbox")).map(key => [key, localStorage.getItem(key)]) }), { ids, userId, workspaceId });
+    console.log("LIVE E2E account deletion diagnostics:", JSON.stringify({ accountState, requests: diagnostic }));
+    throw error;
+  }
   await expect.poll(async () => (await api("/finance/categories?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.name === ids.category)?.deletedAt, { timeout: 45_000 }).toBeTruthy();
 
   // Device B must remove the local copies and must not recreate them across two refresh cycles.
