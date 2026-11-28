@@ -99,6 +99,30 @@ test("one-time migration preserves IDs, is idempotent, and marks complete only a
   assert.equal(db.accounts.length, 3);
 });
 
+test("legacy account migration persists the exact ID used by later account deletion", async () => {
+  const store = storage({ "nv-personal-accounts:IRT": JSON.stringify(["Cash", "Savings"]) });
+  const { api, db } = mockApi();
+  const args = {
+    storage: store, accountId: "user", workspaceId: "workspace", currency: "IRT", accountType: "personal",
+    preferences: {}, recurring: [], api,
+  };
+  await syncFinanceCollections(args);
+  const idMap = JSON.parse(store.getItem("nv-personal-account-ids:IRT") || "{}");
+  const migratedCash = db.accounts.find(item => item.name === "Cash");
+  assert.ok(migratedCash);
+  assert.equal(idMap.Cash, migratedCash.id);
+  assert.equal(migratedCash.id, financeCollectionStableId("accounts", "Cash", "IRT"));
+
+  const key = financeCollectionOutboxKey("user", "workspace");
+  queueFinanceCollectionDelete(store, key, "accounts", {
+    id: idMap.Cash, name: "Cash", currency: "IRT",
+  });
+  const result = await syncFinanceCollections(args);
+  assert.ok(db.accounts.find(item => item.id === migratedCash.id)?.deletedAt);
+  assert.equal(result.accounts.some(item => item.name === "Cash"), false);
+  assert.deepEqual(JSON.parse(store.getItem(key) || "[]"), []);
+});
+
 test("migration marker is not written when server confirmation fails", async () => {
   const store = storage({ "nv-personal-accounts:IRT": JSON.stringify(["Cash"]) });
   const api = async (path, options = {}) => {
@@ -116,7 +140,7 @@ test("migration marker is not written when server confirmation fails", async () 
 test("collection tombstones block matching local IDs and delete outbox entries", async () => {
   const store = storage({ "nv-personal-accounts:IRT": JSON.stringify(["Cash"]) });
   const { api, db } = mockApi();
-  const id = financeCollectionStableId("accounts", "Cash");
+  const id = financeCollectionStableId("accounts", "Cash", "IRT");
   db.accounts.push({ id, name: "Cash", currency: "IRT", deletedAt: "2026-11-28T12:00:00.000Z" });
   const result = await syncFinanceCollections({
     storage: store, accountId: "user", workspaceId: "workspace", currency: "IRT", accountType: "personal",
