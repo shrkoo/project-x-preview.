@@ -1,0 +1,103 @@
+import { test, expect } from "@playwright/test";
+
+test("LIVE Preview Worker/D1 tombstones survive cross-device sync for 61 seconds", async ({ browser }) => {
+  test.setTimeout(180_000);
+  const apiBase = process.env.PREVIEW_API_URL;
+  const token = process.env.LIVE_TEST_TOKEN;
+  const userId = process.env.LIVE_TEST_USER_ID;
+  const workspaceId = process.env.LIVE_TEST_WORKSPACE_ID;
+  const runId = process.env.LIVE_TEST_RUN_ID;
+  if (!apiBase || !token || !userId || !workspaceId || !runId) throw new Error("Live Preview test environment is incomplete.");
+
+  const ids = {
+    transaction: "live-tx-" + runId,
+    category: "LiveCategory-" + runId,
+    account: "LiveCash-" + runId,
+  };
+  const authHeaders = { Authorization: "Bearer " + token };
+  const api = async (path: string) => {
+    const response = await fetch(apiBase + path, { headers: authHeaders });
+    if (!response.ok) throw new Error("Preview Worker GET " + path + " failed: " + response.status + " " + await response.text());
+    return response.json() as Promise<{ items: Array<Record<string, any>> }>;
+  };
+  const contextFor = async (seed: boolean) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await context.addInitScript(({ seed, token, userId, runId, ids }) => {
+      localStorage.setItem("projectx-token", token);
+      localStorage.setItem("projectx-language", "en");
+      localStorage.setItem("novyra-text-direction", "ltr");
+      localStorage.setItem("novyra-finance-currency", "USD");
+      if (seed) {
+        localStorage.setItem("novyra-finance-transactions-v1:" + userId + ":personal", JSON.stringify([
+          { id: ids.transaction, title: "Live deletion proof " + runId, amount: 17.25, kind: "expense", category: ids.category, date: "2026-11-28", account: ids.account, updatedAt: new Date().toISOString() },
+        ]));
+        localStorage.setItem("nv-personal-accounts:USD", JSON.stringify([ids.account]));
+        localStorage.setItem("novyra-preferences-v1", JSON.stringify({
+          country: "US", language: "en", direction: "ltr", currency: "USD", calendar: "gregory",
+          dateFormat: "YYYY-MM-DD", digits: "latn", firstDay: "sunday", categories: ["General", ids.category],
+        }));
+      }
+    }, { seed, token, userId, runId, ids });
+    return context;
+  };
+
+  const firstContext = await contextFor(true);
+  const first = await firstContext.newPage();
+  await first.goto("/");
+  await expect(first.locator(".nv-p-home")).toBeVisible({ timeout: 45_000 });
+
+  await expect.poll(async () => (await api("/finance/transactions?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.some(x => x.id === ids.transaction), { timeout: 45_000 }).toBe(true);
+  await expect.poll(async () => (await api("/finance/accounts?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.some(x => x.name === ids.account), { timeout: 45_000 }).toBe(true);
+  await expect.poll(async () => (await api("/finance/categories?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.some(x => x.name === ids.category), { timeout: 45_000 }).toBe(true);
+
+  const secondContext = await contextFor(false);
+  const second = await secondContext.newPage();
+  await second.goto("/");
+  await expect(second.locator(".nv-p-home")).toBeVisible({ timeout: 45_000 });
+  await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("nv-personal-accounts:USD") || "[]").includes(ids.account), { ids }), { timeout: 45_000 }).toBe(true);
+  await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes(ids.category), { ids }), { timeout: 45_000 }).toBe(true);
+
+  // Delete the seeded transaction on device A through the real UI.
+  await first.getByRole("button", { name: /View all|See all/i }).click();
+  const txRow = first.locator(".nf-transaction").filter({ hasText: "Live deletion proof " + runId });
+  await expect(txRow).toBeVisible();
+  await txRow.getByRole("button", { name: /Edit transaction/i }).click();
+  await first.locator(".nv-tx-delete").click();
+  await first.locator(".nv-tx-confirm").getByRole("button", { name: /Delete/i }).click();
+
+  // Delete the migrated account through the real transaction sheet.
+  await first.locator("nav.nv-ref-dock button[aria-label='Home']").click();
+  await first.locator(".nv-p-quick button").first().click();
+  await first.getByRole("button", { name: "Delete account " + ids.account }).click();
+  await first.locator(".nv-tx-close").click();
+  const discardDialog = first.locator(".nv-tx-confirm");
+  if (await discardDialog.count()) await discardDialog.getByRole("button", { name: "Exit", exact: true }).click();
+  await expect(first.locator(".nv-tx-backdrop")).toHaveCount(0);
+
+  // Delete the custom category through Settings.
+  await first.locator("nav.nv-ref-dock button[aria-label='Settings']").click();
+  await first.getByRole("button", { name: /Categories/i }).click();
+  await first.locator(".nvsh-chips span").filter({ hasText: ids.category }).getByRole("button").click();
+  await first.getByRole("button", { name: /^Save$/ }).click();
+  await first.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+
+  // The real Worker must return server tombstones for all three resource types.
+  await expect.poll(async () => (await api("/finance/transactions?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.id === ids.transaction)?.deletedAt, { timeout: 45_000 }).toBeTruthy();
+  await expect.poll(async () => (await api("/finance/accounts?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.name === ids.account)?.deletedAt, { timeout: 45_000 }).toBeTruthy();
+  await expect.poll(async () => (await api("/finance/categories?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.name === ids.category)?.deletedAt, { timeout: 45_000 }).toBeTruthy();
+
+  // Device B must remove the local copies and must not recreate them across two refresh cycles.
+  await second.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("nv-personal-accounts:USD") || "[]").includes(ids.account), { ids })).toBe(false);
+  await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes(ids.category), { ids })).toBe(false);
+  await second.waitForTimeout(61_000);
+  await second.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await expect.poll(async () => (await api("/finance/transactions?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.id === ids.transaction)?.deletedAt).toBeTruthy();
+  await expect.poll(async () => (await api("/finance/accounts?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.name === ids.account)?.deletedAt).toBeTruthy();
+  await expect.poll(async () => (await api("/finance/categories?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1")).items.find(x => x.name === ids.category)?.deletedAt).toBeTruthy();
+  await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("nv-personal-accounts:USD") || "[]").includes(ids.account), { ids })).toBe(false);
+  await expect.poll(() => second.evaluate(({ ids }) => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes(ids.category), { ids })).toBe(false);
+
+  await firstContext.close();
+  await secondContext.close();
+});
