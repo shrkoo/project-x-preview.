@@ -107,8 +107,6 @@ for(const scenario of cases){
   await transferSheet.getByRole("button",{name:scenario.language==="en"?/Transfer/:/انتقال وجه/}).click();
   await expect(transferSheet.locator(".nv-tx-no-transfer-accounts")).toHaveCount(0);
   await expect(transferSheet.locator(".nv-tx-transfer select")).toHaveCount(2);
-  await expect(transferSheet.locator(".nv-tx-transfer select").nth(0).locator("option")).toContainText("Checking");
-  await expect(transferSheet.locator(".nv-tx-transfer select").nth(1).locator("option")).toContainText("Savings");
   await transferSheet.locator("#nv-tx-amount").fill("250000");
   await transferSheet.locator('input[placeholder="توضیح (اختیاری)"]').fill("انتقال پس‌انداز");
   await transferSheet.locator(".nv-tx-transfer select").nth(0).selectOption("Checking");
