@@ -126,6 +126,11 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
   await first.locator(".nvsh-add input").fill("Side hustle");
   await first.locator(".nvsh-add button").click();
   await first.getByRole("button", { name: /^ذخیره$/ }).click();
+  await first.locator(".nvsh-back").click();
+  await first.getByRole("button", { name: /داده و پشتیبان/ }).click();
+  const [backupDownload] = await Promise.all([first.waitForEvent("download"), first.getByRole("button", { name: /دریافت پشتیبان JSON/ }).click()]);
+  expect(backupDownload.suggestedFilename()).toBe("novyra-local-backup.json");
+  await first.locator('nav.nv-ref-dock button[aria-label="خانه"]').click();
   await first.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
   await expect.poll(() => server.accounts.some(item => item.name === "Travel"), { timeout: 35_000 }).toBe(true);
   await expect.poll(() => server.categories.some(item => item.name === "Side hustle"), { timeout: 35_000 }).toBe(true);
