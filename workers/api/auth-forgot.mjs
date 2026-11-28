@@ -99,7 +99,7 @@ export async function handleForgotPassword({ body, request, db, env, requestId, 
   const target = await db.prepare("SELECT id,email FROM users WHERE email=?").bind(email).first();
   if (target) {
     await db.prepare("UPDATE email_tokens SET used_at=CURRENT_TIMESTAMP WHERE user_id=? AND kind='reset' AND used_at IS NULL").bind(target.id).run();
-    const token = await issueEmailToken(db, target.id, "reset", 60 * 60 * 1000);
+    const token = await issueEmailToken(db, target.id, "reset", 30 * 60 * 1000);
     const link = (env.APP_URL || "https://novyra.pages.dev") + "/?reset=" + encodeURIComponent(token);
     try {
       await sendMail(env, target.email, "بازیابی رمز عبور HomaAi", renderHomaAiResetEmail({ actionUrl: link }));
