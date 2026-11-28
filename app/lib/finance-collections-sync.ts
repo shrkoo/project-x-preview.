@@ -82,14 +82,13 @@ export function legacyFinanceCollections(storage: StorageLike, currency: string,
   const accounts = rawAccounts.map(({ value, currency: accountCurrency }) => {
     const name = typeof value === "string" ? value.trim() : String(value?.name || value?.title || "").trim();
     if (!name) return null;
-    let idMap = accountIdsByCurrency.get(accountCurrency);
-    if (!idMap) {
+    const idMap = accountIdsByCurrency.get(accountCurrency) ?? (() => {
       try {
         const parsed = JSON.parse(storage.getItem("nv-personal-account-ids:" + accountCurrency) || "{}");
-        idMap = parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
-      } catch { idMap = {}; }
-      accountIdsByCurrency.set(accountCurrency, idMap);
-    }
+        return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed as Record<string, string> : {};
+      } catch { return {}; }
+    })();
+    accountIdsByCurrency.set(accountCurrency, idMap);
     const id = typeof value?.id === "string" && value.id ? value.id : idMap[name] || stableId("legacy-account", accountCurrency + ":" + name);
     idMap[name] = id;
     return { id, name, currency: accountCurrency };
