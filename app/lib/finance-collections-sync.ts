@@ -8,13 +8,13 @@ const builtInCategories = new Set<string>(["عمومی", "خوراک", "حمل�
 const sensitiveKey = /(?:auth|token|session|password|secret|otp|credential|app-lock|webauthn)/i;
 
 export function financeCollectionMigrationKey(accountId: string, workspaceId: string) {
-  return "nv-finance-collections-migrated-v1:" + accountId + ":" + workspaceId;
+  return "nv-finance-collections-migrated-v2:" + accountId + ":" + workspaceId;
 }
 export function financeCollectionOutboxKey(accountId: string, workspaceId: string) {
   return "nv-finance-collections-outbox-v1:" + accountId + ":" + workspaceId;
 }
 export function financePreSyncBackupKey(accountId: string, workspaceId: string) {
-  return "nv-backup-pre-sync-v1:" + accountId + ":" + workspaceId;
+  return "nv-backup-pre-sync-v2:" + accountId + ":" + workspaceId;
 }
 function stableId(prefix: string, value: string) {
   let hash = 2166136261;
@@ -43,7 +43,7 @@ export function ensurePreSyncFinanceBackup(storage: StorageLike, accountId: stri
   const entries = snapshotEntries(storage);
   const readObject = (name: string) => { try { return JSON.parse(entries[name] || "{}"); } catch { return {}; } };
   const backup = {
-    format: "novyra-pre-sync-backup-v1",
+    format: "novyra-pre-sync-backup-v2",
     createdAt: new Date().toISOString(),
     accountId,
     workspaceId,
@@ -62,7 +62,7 @@ export function ensurePreSyncFinanceBackup(storage: StorageLike, accountId: stri
 }
 export function downloadLocalFinanceBackup() {
   const entries = snapshotEntries(localStorage);
-  const blob = new Blob([JSON.stringify({ format: "novyra-local-backup-v1", createdAt: new Date().toISOString(), entries }, null, 2)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify({ format: "novyra-local-backup-v2", createdAt: new Date().toISOString(), entries }, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
