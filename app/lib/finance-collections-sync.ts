@@ -6,7 +6,7 @@ export type FinanceCollectionApi = <T>(path: string, options?: { method?: string
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "length" | "key">;
 const resources: FinanceCollectionResource[] = ["accounts", "categories", "recurring"];
 const builtInCategories = new Set<string>([...PERSONAL_CATEGORIES.map(item => item.label), "پس‌انداز", "فروش"]);
-const sensitiveKey = /^(projectx-token|projectx-session|projectx-app-lock-credential|projectx-app-lock-user|projectx-app-lock-configured)/i;
+const sensitiveKey = /(?:auth|token|session|password|secret|otp|credential|app-lock|webauthn)/i;
 
 export function financeCollectionMigrationKey(accountId: string, workspaceId: string) {
   return "nv-finance-collections-migrated-v1:" + accountId + ":" + workspaceId;
