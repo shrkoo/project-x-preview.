@@ -138,3 +138,16 @@ test("collection delete outbox is acknowledged only after server confirmation", 
   assert.ok(db.accounts[0].deletedAt);
   assert.deepEqual(JSON.parse(store.getItem(key) || "[]"), []);
 });
+
+test("v2 migration reuses an account ID from the earlier preview migration", async () => {
+  const store = storage({ "nv-personal-accounts:IRT": JSON.stringify(["Cash"]) });
+  const { api, db } = mockApi();
+  const previousId = financeCollectionStableId("accounts", "Cash");
+  db.accounts.push({ id: previousId, name: "Cash", currency: "IRT" });
+  await syncFinanceCollections({
+    storage: store, accountId: "user", workspaceId: "workspace", currency: "IRT", accountType: "personal",
+    preferences: {}, recurring: [], api,
+  });
+  assert.equal(db.accounts.length, 1);
+  assert.equal(db.accounts[0].id, previousId);
+});
