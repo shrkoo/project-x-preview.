@@ -106,7 +106,9 @@ for(const scenario of cases){
   await expect(noAccounts).toContainText("برای انتقال، دو حساب لازم است");
   await expect(noAccounts.locator("button")).toHaveCount(1);
   await expect(transferSheet.locator(".nv-tx-section-title button")).toHaveCount(0);
-  for(const accountName of ["Checking","Savings"]){
+  const existingAccountCount=await page.evaluate(()=>JSON.parse(localStorage.getItem("nv-personal-accounts:IRT")||"[]").length);
+  const accountsToAdd=["Checking","Savings"].slice(0,Math.max(0,2-existingAccountCount));
+  for(const accountName of accountsToAdd){
     await noAccounts.locator("button").click();
     await transferSheet.locator(".nv-tx-add-account input").fill(accountName);
     await transferSheet.locator(".nv-tx-add-account button").click();
