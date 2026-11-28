@@ -134,6 +134,44 @@ jobs:
           NEXT_PUBLIC_API_BASE: https://novyra-preview-api.projectx-novyratam.workers.dev
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: 0x4AAAAAAGT3YeW3V72DTsmj
 
+      - name: Run live finance tombstone E2E against Preview Worker and D1
+        working-directory: workers/api
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PREVIEW_API_URL: https://novyra-preview-api.projectx-novyratam.workers.dev
+          PREVIEW_D1_DATABASE_ID: 51e14038-5b81-49f8-83a1-4c5ba1f05bd8
+          PRODUCTION_D1_DATABASE_ID: 04aef3ef-8143-4fc2-af7b-7f40c06534e1
+        run: |
+          set -euo pipefail
+          node -e "const fs=require('fs');const p=fs.readFileSync('wrangler.preview.toml','utf8');const prod=fs.readFileSync('wrangler.jsonc','utf8');const a=(p.match(/database_id\\s*=\\s*\\\"([^\\\"]+)\\\"/)||[])[1];const b=(prod.match(/\\\"database_id\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"/)||[])[1];if(a!==process.env.PREVIEW_D1_DATABASE_ID||a===b||b!==process.env.PRODUCTION_D1_DATABASE_ID)throw new Error('Live E2E blocked: Preview/Production D1 isolation mismatch');console.log('D1 isolation verified:',a,'!=',b)"
+          run_id="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          user_id="live-tombstone-user-${run_id}"
+          workspace_id="live-tombstone-workspace-${run_id}"
+          email="live-tombstone-${run_id}@example.invalid"
+          token="$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("hex"))')"
+          token_hash="$(node -e 'process.stdout.write(require("node:crypto").createHash("sha256").update(process.argv[1]).digest("hex"))' "$token")"
+          cleanup() {
+            npx wrangler d1 execute novyra-preview-db --remote --config wrangler.preview.toml --command "DELETE FROM users WHERE id='$user_id';" >/dev/null 2>&1 || true
+            echo "Cleaned Preview-only E2E user and cascaded test records: $user_id"
+          }
+          trap cleanup EXIT
+          npx wrangler d1 execute novyra-preview-db --remote --config wrangler.preview.toml --command "INSERT INTO users (id,email,display_name,password_hash,password_salt,role,verified_at) VALUES ('$user_id','$email','Live Tombstone E2E','test-only-hash','00000000000000000000000000000000','user',CURRENT_TIMESTAMP); INSERT INTO workspaces (id,owner_id,type,name,currency) VALUES ('$workspace_id','$user_id','personal','Live Tombstone E2E','USD'); INSERT INTO sessions (token_hash,user_id,expires_at) VALUES ('$token_hash','$user_id',CAST(strftime('%s','now') AS INTEGER)*1000+3600000);"
+          export LIVE_TEST_TOKEN="$token"
+          export LIVE_TEST_USER_ID="$user_id"
+          export LIVE_TEST_WORKSPACE_ID="$workspace_id"
+          export LIVE_TEST_RUN_ID="$run_id"
+          cd ../..
+          npx playwright install chromium
+          set +e
+          npx playwright test e2e/finance-tombstones-live.spec.ts --workers=1
+          test_status=$?
+          set -e
+          sql="SELECT (SELECT COUNT(*) FROM finance_transactions WHERE id='live-tx-$run_id' AND workspace_id='$workspace_id' AND deleted_at IS NOT NULL) AS transaction_tombstone, (SELECT COUNT(*) FROM accounts WHERE workspace_id='$workspace_id' AND name='LiveCash-$run_id' AND deleted_at IS NOT NULL) AS account_tombstone, (SELECT COUNT(*) FROM custom_categories WHERE workspace_id='$workspace_id' AND name='LiveCategory-$run_id' AND deleted_at IS NOT NULL) AS category_tombstone;"
+          curl --fail --silent --show-error --request POST "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/d1/database/$PREVIEW_D1_DATABASE_ID/query" --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" --header "Content-Type: application/json" --data "$(node -e 'process.stdout.write(JSON.stringify({sql:process.argv[1]}))' "$sql")" > /tmp/live-d1-result.json
+          node -e 'const d=require("/tmp/live-d1-result.json");if(!d.success||d.result?.[0]?.results?.[0]?.transaction_tombstone!==1||d.result?.[0]?.results?.[0]?.account_tombstone!==1||d.result?.[0]?.results?.[0]?.category_tombstone!==1){console.error(JSON.stringify(d));process.exit(1)}console.log("Direct Preview D1 tombstone verification:",JSON.stringify(d.result[0].results[0]))'
+          exit "$test_status"
+
       - name: Deploy Pages preview only
         run: npx wrangler pages deploy out --project-name novyra --branch feature-homa-auth-part1
         env:
