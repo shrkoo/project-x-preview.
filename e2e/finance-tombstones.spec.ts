@@ -124,6 +124,7 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
   await first.getByRole("button", { name: /دسته‌بندی‌ها/ }).click();
   await first.locator(".nvsh-add input").fill("Side hustle");
   await first.locator(".nvsh-add button").click();
+  await first.getByRole("button", { name: "ذخیره تغییرات" }).click();
   await first.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
   await expect.poll(() => server.accounts.some(item => item.name === "Travel"), { timeout: 35_000 }).toBe(true);
   await expect.poll(() => server.categories.some(item => item.name === "Side hustle"), { timeout: 35_000 }).toBe(true);
@@ -142,6 +143,7 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
   await first.locator("nav.nv-ref-dock button[aria-label='تنظیمات']").click();
   await first.getByRole("button", { name: /دسته‌بندی‌ها/ }).click();
   await first.locator(".nvsh-chips span").filter({ hasText: "Freelance" }).getByRole("button").click();
+  await first.getByRole("button", { name: "ذخیره تغییرات" }).click();
   await first.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
   await expect.poll(() => server.transactions.find(item => item.id === "tx-delete-1")?.deletedAt).toBeTruthy();
   await expect.poll(() => server.accounts.find(item => item.name === "Cash")?.deletedAt).toBeTruthy();
