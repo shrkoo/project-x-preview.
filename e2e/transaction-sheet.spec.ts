@@ -3,6 +3,7 @@ import {test,expect} from "@playwright/test";
 const cases=[
  {width:360,height:640,language:"fa",direction:"rtl"},
  {width:390,height:844,language:"fa",direction:"rtl"},
+ {width:420,height:844,language:"fa",direction:"rtl"},
  {width:360,height:640,language:"en",direction:"ltr"},
  {width:390,height:844,language:"en",direction:"ltr"},
 ] as const;

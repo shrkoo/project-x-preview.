@@ -129,3 +129,9 @@
 
 /* Parent validation feedback stays inside the open transaction sheet. */
 .nv-tx-parent-error{margin:0 0 8px!important;padding:8px 11px!important;border:1px solid rgba(217,75,92,.2)!important;border-radius:10px!important;background:rgba(255,239,241,.96)!important;color:#b83245!important;font-size:11px!important;line-height:1.6!important;text-align:center!important}
+
+/* Finance form refinements: readable amount and predictable transfer layout. */
+.nv-tx-amount-line input{letter-spacing:0!important;direction:ltr!important;unicode-bidi:isolate!important;font-variant-numeric:tabular-nums!important}
+.nv-tx-transfer{margin-top:12px!important;gap:12px!important}
+.nv-tx-no-transfer-accounts{margin-bottom:12px!important}
+.nv-tx-save-another:disabled{opacity:.45!important;cursor:not-allowed!important}

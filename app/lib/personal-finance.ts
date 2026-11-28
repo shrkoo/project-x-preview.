@@ -79,3 +79,12 @@ export function formatTehranPersianDate(value: Date | string | number): string {
   const get = (type: string) => parts.find(part => part.type === type)?.value || "";
   return get("year") + "/" + get("month").padStart(2, "۰") + "/" + get("day").padStart(2, "۰");
 }
+
+/** Returns the first actionable reason a transfer cannot be saved. */
+export function transferValidationMessage(amount: number, accounts: string[], from: string, to: string): string | null {
+  if (!Number.isFinite(amount) || amount <= 0) return "مبلغ را وارد کنید";
+  if (accounts.length < 2) return "برای انتقال ابتدا دو حساب بسازید";
+  if (!from || !to) return "حساب مبدأ و مقصد را انتخاب کنید";
+  if (from === to) return "حساب مبدأ و مقصد باید متفاوت باشند";
+  return null;
+}
