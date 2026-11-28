@@ -219,23 +219,42 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 1440, height: 900
       const dock = document.querySelector<HTMLElement>(".nv-finance.nv-personal-v1.nv-home-active .nv-p-dock")!;
       const appRect = app.getBoundingClientRect();
       const dockRect = dock.getBoundingClientRect();
+      const properties = ["position","left","right","inset","width","maxWidth","transform","filter","backdropFilter","contain","willChange"];
+      const ancestors = [];
+      let node: HTMLElement | null = dock;
+      while (node) {
+        const style = getComputedStyle(node);
+        const rect = node.getBoundingClientRect();
+        ancestors.push({
+          tag: node.tagName, id: node.id, className: String(node.className || ""),
+          box: {x: rect.x, y: rect.y, width: rect.width, height: rect.height, top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left},
+          computed: Object.fromEntries(properties.map(key => [key, (style as any)[key] || style.getPropertyValue(key.replace(/[A-Z]/g, m => "-" + m.toLowerCase()))]))
+        });
+        node = node.parentElement;
+      }
+      const matchedRules: string[] = [];
+      const walkRules = (rules: CSSRuleList, prefix = "") => {
+        for (const rule of Array.from(rules)) {
+          if (rule instanceof CSSStyleRule) {
+            try { if (dock.matches(rule.selectorText)) matchedRules.push(prefix + rule.cssText); } catch {}
+          } else if (rule instanceof CSSMediaRule && matchMedia(rule.conditionText).matches) {
+            walkRules(rule.cssRules, prefix + "@media " + rule.conditionText + " ");
+          }
+        }
+      };
+      for (const sheet of Array.from(document.styleSheets)) {
+        try { if (sheet.cssRules) walkRules(sheet.cssRules); } catch {}
+      }
       return {
-        appWidth: appRect.width,
-        appLeft: appRect.left,
-        dockWidth: dockRect.width,
-        dockCenter: dockRect.left + dockRect.width / 2,
-        viewportCenter: window.innerWidth / 2,
-        background: getComputedStyle(document.body).backgroundImage,
-        dockPosition: getComputedStyle(dock).position,
-        dockLeft: getComputedStyle(dock).left,
-        dockRight: getComputedStyle(dock).right,
-        dockTransform: getComputedStyle(dock).transform,
-        dockMarginLeft: getComputedStyle(dock).marginLeft,
-        dockMarginRight: getComputedStyle(dock).marginRight
+        appBox: {x:appRect.x,y:appRect.y,width:appRect.width,height:appRect.height,left:appRect.left,right:appRect.right},
+        dockBox: {x:dockRect.x,y:dockRect.y,width:dockRect.width,height:dockRect.height,left:dockRect.left,right:dockRect.right},
+        appWidth: appRect.width, appLeft: appRect.left, dockWidth: dockRect.width,
+        dockCenter: dockRect.left + dockRect.width / 2, viewportCenter: window.innerWidth / 2,
+        background: getComputedStyle(document.body).backgroundImage, ancestors, matchedRules
       };
     });
     console.log("DESKTOP_DOCK_LAYOUT", JSON.stringify(measurements));
-    await page.screenshot({ path: testInfo.outputPath(`personal-home-${viewport.width}x${viewport.height}.png`), fullPage: true });
+    await page.screenshot({ path: testInfo.outputPath(`personal-home-${viewport.width}x${viewport.height}.png`), fullPage: false });
     expect(measurements.appWidth).toBeLessThanOrEqual(480);
     expect(Math.abs(measurements.appLeft + measurements.appWidth / 2 - viewport.width / 2)).toBeLessThanOrEqual(1);
     expect(measurements.dockWidth).toBeLessThanOrEqual(480);
