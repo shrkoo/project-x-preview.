@@ -63,3 +63,7 @@ export function parseBankSms(message: string): { amount: number; kind: "income" 
 export function validatePersonalTransaction(amount: number): string | null {
   return Number.isFinite(amount) && amount > 0 ? null : "مبلغ باید بیشتر از صفر باشد";
 }
+
+export function resolvePersonalTransactionTitle(title: string, category: string, kind: "income" | "expense"): string {
+  return title.trim() || category.trim() || (kind === "income" ? "درآمد" : "هزینه");
+}
