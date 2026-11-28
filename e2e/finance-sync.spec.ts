@@ -5,6 +5,7 @@ test("two independent browser contexts see the same account transactions from th
   const server = {
     items: [] as Array<Record<string, any>>,
     workspace: { id: "finance-sync-workspace", type: "personal", name: "Personal", currency: "IRT" },
+    collections: { accounts: [] as Array<Record<string, any>>, categories: [] as Array<Record<string, any>>, recurring: [] as Array<Record<string, any>> },
   };
   const makeContext = async () => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
@@ -14,13 +15,37 @@ test("two independent browser contexts see the same account transactions from th
       localStorage.setItem("novyra-text-direction", "rtl");
       localStorage.setItem("novyra-finance-currency", "IRT");
       for (const currency of ["IRR", "IRT", "USD"]) localStorage.setItem("nv-personal-accounts:" + currency, JSON.stringify(["Checking", "Savings"]));
-      localStorage.setItem("novyra-preferences-v1", JSON.stringify({ country: "IR", language: "fa", direction: "rtl", currency: "IRT", calendar: "persian", dateFormat: "YYYY/MM/DD", numberSystem: "arabext", digits: "arabext", firstDay: "saturday" }));
+      localStorage.setItem("novyra-preferences-v1", JSON.stringify({ country: "IR", language: "fa", direction: "rtl", currency: "IRT", calendar: "persian", dateFormat: "YYYY/MM/DD", numberSystem: "arabext", digits: "arabext", firstDay: "saturday", monthlyBudget: "9000000", categoryBudgets: { "خوراک": "2000000" }, categories: ["عمومی", "خوراک", "حمل‌ونقل", "خانه", "سلامت", "آموزش", "حقوق", "سرمایه‌گذاری", "پس‌انداز", "فروش", "قبض", "سایر", "فریلنس"] }));
+      localStorage.setItem("novyra-recurring:finance-sync-user:personal", JSON.stringify([{ id: "repeat-seed-1", title: "Rent", amount: 1000000, kind: "expense", category: "خانه", frequency: "monthly", createdAt: "2026-11-01", lastGenerated: "2026-11-01" }]));
+      localStorage.setItem("novyra-custom-goals", JSON.stringify([{ id: "goal-1", title: "Emergency", target: 5000000 }]));
+      localStorage.setItem("novyra-saving-target", "5000000");
+      localStorage.setItem("novyra-travel-target", "12000000");
     });
     await context.route("**/*", async route => {
       const request = route.request();
       const url = new URL(request.url());
       if (!url.hostname.includes("projectx-novyratam.workers.dev")) return route.continue();
       const path = url.pathname;
+      const collectionMatch = path.match(/^\\/finance\\/(accounts|categories|recurring)(?:\\/([^/]+))?$/);
+      if (collectionMatch) {
+        const resource = collectionMatch[1] as "accounts" | "categories" | "recurring";
+        if (request.method() === "GET") return route.fulfill({ json: { items: server.collections[resource].map(item => ({ ...item })) } });
+        if (request.method() === "PUT") {
+          const payload = request.postDataJSON();
+          for (const item of payload.items || []) {
+            const index = server.collections[resource].findIndex(row => row.id === item.id);
+            if (index >= 0) server.collections[resource][index] = { ...item, deletedAt: undefined };
+            else server.collections[resource].push({ ...item });
+          }
+          return route.fulfill({ json: { ok: true, saved: (payload.items || []).length } });
+        }
+        if (request.method() === "DELETE") {
+          const id = decodeURIComponent(collectionMatch[2] || "");
+          const row = server.collections[resource].find(item => item.id === id);
+          if (row) row.deletedAt = new Date().toISOString();
+          return route.fulfill({ json: { ok: true } });
+        }
+      }
       if (path === "/auth/me") return route.fulfill({ json: { user: { id: "finance-sync-user", email: "sync@example.test", displayName: "Sync User", profile: { accountType: "personal", appLockType: "none" } } } });
       if (path === "/workspaces") return route.fulfill({ json: { workspaces: [server.workspace] } });
       if (path === "/finance/transactions" && request.method() === "GET") return route.fulfill({ json: { items: server.items.map(item => ({ ...item })) } });
@@ -47,6 +72,20 @@ test("two independent browser contexts see the same account transactions from th
   const first = await firstContext.newPage();
   await first.goto("/");
   await expect(first.locator(".nv-p-home")).toBeVisible({ timeout: 30_000 });
+  await expect.poll(() => server.collections.accounts.length).toBe(2);
+  await expect.poll(() => server.collections.categories.some(item => item.name === "فریلنس")).toBe(true);
+  await expect.poll(() => server.collections.recurring.some(item => item.id === "repeat-seed-1")).toBe(true);
+  const migrationKey = "nv-finance-collections-migrated-v1:finance-sync-user:finance-sync-workspace";
+  const backupKey = "nv-backup-pre-sync-v1:finance-sync-user:finance-sync-workspace";
+  await expect.poll(() => first.evaluate(key => localStorage.getItem(key), migrationKey)).toBe("1");
+  const backup = await first.evaluate(key => JSON.parse(localStorage.getItem(key) || "null"), backupKey);
+  expect(backup?.format).toBe("novyra-pre-sync-backup-v1");
+  expect(backup?.data?.transactions).toBeDefined();
+  expect(backup?.data?.preferences?.monthlyBudget).toBe("9000000");
+  expect(backup?.data?.goals?.[0]?.id).toBe("goal-1");
+  expect(backup?.data?.savingTarget).toBe("5000000");
+  expect(backup?.data?.travelTarget).toBe("12000000");
+
 
   await first.locator(".nv-p-quick button").first().click();
   let sheet = first.locator(".nv-tx-sheet");
@@ -80,6 +119,10 @@ test("two independent browser contexts see the same account transactions from th
   const second = await secondContext.newPage();
   await second.goto("/");
   await expect(second.locator(".nv-p-home")).toBeVisible({ timeout: 30_000 });
+  await expect.poll(() => second.evaluate(key => JSON.parse(localStorage.getItem(key) || "[]"), "nv-personal-accounts:IRT")).toEqual(["Checking", "Savings"]);
+  await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("novyra-recurring:finance-sync-user:personal") || "[]").some((item:any) => item.id === "repeat-seed-1"))).toBe(true);
+  await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes("فریلنس"))).toBe(true);
+
   await expect(second.getByText("Sync expense")).toBeVisible();
   await expect(second.getByText("Sync income")).toBeVisible();
   await expect(second.getByText(/انتقال از Checking به Savings/)).toBeVisible();
