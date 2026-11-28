@@ -14,15 +14,16 @@ function timestamp(value?: string): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-export function mergeFinanceTransactions<T extends FinanceTransactionRecord>(
+export function mergeFinanceTransactions<T extends FinanceTransactionRecord & { deletedAt?: string | null }>(
   localItems: T[],
   remoteItems: T[],
-): { items: T[]; pendingUpserts: T[] } {
+): { items: T[]; pendingUpserts: T[]; tombstoneIds: string[] } {
+  const tombstones = new Set(remoteItems.filter(item => item?.id && !!item.deletedAt).map(item => item.id));
   const merged = new Map<string, T>();
-  for (const remote of remoteItems) if (remote?.id) merged.set(remote.id, remote);
+  for (const remote of remoteItems) if (remote?.id && !remote.deletedAt) merged.set(remote.id, remote);
   const pendingUpserts: T[] = [];
   for (const local of localItems) {
-    if (!local?.id) continue;
+    if (!local?.id || tombstones.has(local.id) || local.deletedAt) continue;
     const remote = merged.get(local.id);
     if (!remote) {
       merged.set(local.id, local);
@@ -32,7 +33,18 @@ export function mergeFinanceTransactions<T extends FinanceTransactionRecord>(
       pendingUpserts.push(local);
     }
   }
-  return { items: [...merged.values()], pendingUpserts };
+  return { items: [...merged.values()], pendingUpserts, tombstoneIds: [...tombstones] };
+}
+
+export function discardFinanceOutboxTombstones<T extends FinanceTransactionRecord>(
+  storage: StorageLike,
+  key: string,
+  tombstoneIds: string[],
+): FinanceOutboxEntry<T>[] {
+  const blocked = new Set(tombstoneIds);
+  const remaining = readFinanceOutbox<T>(storage, key).filter(entry => !blocked.has(entry.transactionId));
+  writeOutbox(storage, key, remaining);
+  return remaining;
 }
 
 export function financeOutboxStorageKey(accountId: string, accountType: string, workspaceId: string): string {
