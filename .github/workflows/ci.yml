@@ -100,3 +100,5 @@ jobs:
           name: ci-build-log
           path: ci-build.log
           if-no-files-found: warn
+
+# Stage 3 verification: backup, migration, tombstone-safe sync and browser coverage.
