@@ -1,11 +1,10 @@
-import { PERSONAL_CATEGORIES } from "../data/personal-categories";
 
 export type FinanceCollectionResource = "accounts" | "categories" | "recurring";
 export type FinanceCollectionItem = { id: string; name?: string; currency?: string; kind?: "income" | "expense" | "both" | "transfer"; updatedAt?: string; deletedAt?: string; [key: string]: unknown };
 export type FinanceCollectionApi = <T>(path: string, options?: { method?: string; body?: string }) => Promise<T>;
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "length" | "key">;
 const resources: FinanceCollectionResource[] = ["accounts", "categories", "recurring"];
-const builtInCategories = new Set<string>([...PERSONAL_CATEGORIES.map(item => item.label), "پس‌انداز", "فروش"]);
+const builtInCategories = new Set<string>(["عمومی", "خوراک", "حمل‌ونقل", "خانه", "سلامت", "آموزش", "حقوق", "سرمایه‌گذاری", "پس‌انداز", "فروش", "قبض", "سایر"]);
 const sensitiveKey = /(?:auth|token|session|password|secret|otp|credential|app-lock|webauthn)/i;
 
 export function financeCollectionMigrationKey(accountId: string, workspaceId: string) {
