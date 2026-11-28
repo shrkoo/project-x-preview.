@@ -129,10 +129,21 @@ export async function syncFinanceCollections(args: {
   const migrationKey = financeCollectionMigrationKey(accountId, workspaceId);
   const outboxKey = financeCollectionOutboxKey(accountId, workspaceId);
   ensurePreSyncFinanceBackup(storage, accountId, workspaceId);
+  const readRemote = async () => {
+    const remote = {} as Record<FinanceCollectionResource, FinanceCollectionItem[]>;
+    for (const resource of resources) {
+      const result = await api<{ items: FinanceCollectionItem[] }>("/finance/" + resource + "?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1");
+      remote[resource] = Array.isArray(result.items) ? result.items : [];
+    }
+    return remote;
+  };
+  let remote = await readRemote();
+  const blocked = new Set(resources.flatMap(resource => remote[resource].filter(item => !!item.deletedAt).map(item => resource + ":" + item.id)));
+  storage.setItem(outboxKey, JSON.stringify(readOutbox(storage, outboxKey).filter(entry => !blocked.has(entry.resource + ":" + entry.item.id))));
   if (storage.getItem(migrationKey) !== "1") {
     const legacy = legacyFinanceCollections(storage, currency, accountId, accountType, preferences, recurring);
     for (const resource of resources) {
-      const items = legacy[resource];
+      const items = legacy[resource].filter(item => !remote[resource].some(row => row.id === item.id && !!row.deletedAt));
       if (!items.length) continue;
       const result = await api<{ ok?: boolean; saved?: number }>("/finance/" + resource, { method: "PUT", body: JSON.stringify({ workspaceId, items }) });
       if (result?.ok !== true || result.saved !== items.length) throw new Error("Initial collection migration was not confirmed: " + resource);
@@ -140,11 +151,7 @@ export async function syncFinanceCollections(args: {
     storage.setItem(migrationKey, "1");
   }
   await flushOutbox(storage, outboxKey, workspaceId, api);
-  const remote = {} as Record<FinanceCollectionResource, FinanceCollectionItem[]>;
-  for (const resource of resources) {
-    const result = await api<{ items: FinanceCollectionItem[] }>("/finance/" + resource + "?workspaceId=" + encodeURIComponent(workspaceId) + "&includeDeleted=1");
-    remote[resource] = Array.isArray(result.items) ? result.items : [];
-  }
+  remote = await readRemote();
   const active = (resource: FinanceCollectionResource) => remote[resource].filter(item => !item.deletedAt);
   return {
     accounts: active("accounts"),
