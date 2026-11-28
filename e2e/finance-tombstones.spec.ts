@@ -129,6 +129,9 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
   await first.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
   await expect.poll(() => server.accounts.some(item => item.name === "Travel"), { timeout: 35_000 }).toBe(true);
   await expect.poll(() => server.categories.some(item => item.name === "Side hustle"), { timeout: 35_000 }).toBe(true);
+  await second.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("nv-personal-accounts:IRT") || "[]").some((item: any) => item.name === "Travel"))).toBe(true);
+  await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes("Side hustle"))).toBe(true);
 
   // Delete the transaction, account and custom category on context A.
   await first.locator("nav.nv-ref-dock button[aria-label='خانه']").click();
