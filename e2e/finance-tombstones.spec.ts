@@ -112,7 +112,7 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
   second.on("dialog", dialog => dialog.accept());
   await second.goto("/");
   await expect(second.locator(".nv-p-home")).toBeVisible({ timeout: 30_000 });
-  await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("nv-personal-accounts:IRT") || "[]").some((item: any) => item.name === "Cash"))).toBe(true);
+  await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("nv-personal-accounts:IRT") || "[]").includes("Cash"))).toBe(true);
   await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("novyra-recurring:tombstone-user:personal") || "[]").some((item: any) => item.id === "repeat-seed-1"))).toBe(true);
 
   // Add a new account and custom category after the one-time migration.
@@ -135,7 +135,7 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
   await expect.poll(() => server.accounts.some(item => item.name === "Travel"), { timeout: 35_000 }).toBe(true);
   await expect.poll(() => server.categories.some(item => item.name === "Side hustle"), { timeout: 35_000 }).toBe(true);
   await second.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
-  await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("nv-personal-accounts:IRT") || "[]").some((item: any) => item.name === "Travel"))).toBe(true);
+  await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("nv-personal-accounts:IRT") || "[]").includes("Travel"))).toBe(true);
   await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes("Side hustle"))).toBe(true);
 
   // Delete the transaction, account and custom category on context A.
@@ -159,7 +159,7 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
   await expect.poll(() => server.categories.find(item => item.name === "Freelance")?.deletedAt).toBeTruthy();
 
   await second.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
-  await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("nv-personal-accounts:IRT") || "[]").some((item: any) => item.name === "Cash"))).toBe(false);
+  await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("nv-personal-accounts:IRT") || "[]").includes("Cash"))).toBe(false);
   await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes("Freelance"))).toBe(false);
   await expect(second.locator(".nf-transaction").filter({ hasText: "Old local transaction" })).toHaveCount(0);
 
@@ -167,7 +167,7 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
   await second.waitForTimeout(61_000);
   await second.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
   await expect(second.locator(".nf-transaction").filter({ hasText: "Old local transaction" })).toHaveCount(0);
-  await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("nv-personal-accounts:IRT") || "[]").some((item: any) => item.name === "Cash"))).toBe(false);
+  await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("nv-personal-accounts:IRT") || "[]").includes("Cash"))).toBe(false);
   await expect.poll(() => second.evaluate(() => JSON.parse(localStorage.getItem("novyra-preferences-v1") || "{}").categories?.includes("Freelance"))).toBe(false);
 
   await firstContext.close();
