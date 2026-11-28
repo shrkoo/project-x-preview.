@@ -1083,8 +1083,8 @@ if(path==="/finance/transactions" && request.method==="GET") {
      const workspaceId=String(url.searchParams.get("workspaceId")||"");
      const access=await getFinanceAccess(db,workspaceId,user.id);
      if(!access || (access.type==="business" && !businessCan(access,"read"))) return fail("فضای کاری پیدا نشد یا دسترسی ندارید.",404);
-     const rows=await db.prepare("SELECT id,title,category,amount,kind,transaction_date AS date,note,account FROM finance_transactions WHERE workspace_id=? AND owner_id=? ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
-     const transfers=await db.prepare("SELECT id,'Transfer' AS category,amount,'transfer' AS kind,transaction_date AS date,note,from_account AS fromAccount,to_account AS toAccount FROM finance_transfers WHERE workspace_id=? AND owner_id=? ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
+     const rows=await db.prepare("SELECT id,title,category,amount,kind,transaction_date AS date,note,account,updated_at AS updatedAt FROM finance_transactions WHERE workspace_id=? AND owner_id=? ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
+     const transfers=await db.prepare("SELECT id,'Transfer' AS category,amount,'transfer' AS kind,transaction_date AS date,note,from_account AS fromAccount,to_account AS toAccount,updated_at AS updatedAt FROM finance_transfers WHERE workspace_id=? AND owner_id=? ORDER BY transaction_date DESC,updated_at DESC").bind(workspaceId,access.ownerId).all();
      const items=[...(rows.results||[]),...(transfers.results||[]).map(x=>({...x,title:"انتقال از "+x.fromAccount+" به "+x.toAccount}))].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
      return json({items});
     }

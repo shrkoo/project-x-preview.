@@ -40,6 +40,8 @@ jobs:
 
       - name: Test personal finance transfers, Tehran dates and bank SMS parsing
         run: npm run test:personal-finance
+      - name: Test finance merge and outbox
+        run: npm run test:finance-sync
 
       - name: Build static preview for browser tests
         shell: bash

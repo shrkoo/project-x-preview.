@@ -46,7 +46,7 @@ jobs:
       - name: Run money formatting guard
         run: npm run test:money-usage
       - name: Run responsive Playwright tests
-        run: npx playwright test e2e/auth-flows.spec.ts e2e/responsive-locales.spec.ts e2e/transaction-sheet.spec.ts
+        run: npx playwright test e2e/auth-flows.spec.ts e2e/responsive-locales.spec.ts e2e/transaction-sheet.spec.ts e2e/finance-sync.spec.ts
       - name: Upload screenshots and reports
         if: always()
         uses: actions/upload-artifact@v4
