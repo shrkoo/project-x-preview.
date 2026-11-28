@@ -141,6 +141,8 @@ test("pre-sync migration, cross-context tombstones and 60-second no-resurrection
 
   // Delete the transaction, account and custom category on context A.
   await first.locator("nav.nv-ref-dock button[aria-label='خانه']").click();
+  // The home dashboard renders compact .nv-p-tx cards; open the full transaction list before using the edit control.
+  await first.getByRole("button", { name: /مشاهده همه/ }).click();
   const txRow = first.locator(".nf-transaction").filter({ hasText: "Old local transaction" });
   await txRow.getByRole("button", { name: "ویرایش تراکنش" }).click();
   await first.locator(".nv-tx-delete").click();
