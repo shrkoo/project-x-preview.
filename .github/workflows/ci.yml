@@ -57,6 +57,17 @@ jobs:
       - name: Run responsive stabilization tests
         run: npm run test:e2e
 
+      - name: Upload responsive screenshots and Playwright diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stabilization-screenshots
+          path: |
+            test-results/**/personal-home-*.png
+            test-results/**/error-context.md
+            test-results/**/trace.zip
+          if-no-files-found: warn
+
       - name: Check language autonyms
         shell: bash
         run: set -o pipefail; npm run test:language-autonyms 2>&1 | tee -a ci-build.log

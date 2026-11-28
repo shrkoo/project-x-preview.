@@ -3800,3 +3800,17 @@ html.novyra-app-obscured body>*{filter:none!important;pointer-events:auto!import
 @media(max-width:390px){.nvbd-root{gap:14px}.nvbd-cash{padding:17px!important}.nvbd-metric{padding:11px!important}.nvbd-metric strong{font-size:14px!important}.nvbd-quick{padding:13px!important}}
 
 main.nv-business-workspace .profile-btn span{display:none!important}main.nv-business-workspace .profile-btn{width:48px!important;min-width:48px!important;justify-content:center!important}
+
+
+/* Desktop personal finance dock: constrain the fixed navigation to the app column. */
+@media (min-width: 768px) {
+  body:has(main.nv-finance.nv-personal-v1.nv-home-active) nav.nf-mobile-dock.nv-p-dock {
+    position: fixed !important;
+    left: 50% !important;
+    right: auto !important;
+    width: min(480px, calc(100vw - 28px)) !important;
+    max-width: 480px !important;
+    margin: 0 !important;
+    transform: translateX(-50%) !important;
+  }
+}

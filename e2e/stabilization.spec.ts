@@ -58,7 +58,7 @@ for (const language of ["fa", "en"] as const) {
           expect(homeText).not.toContain("n\\");
           expect(homeText).not.toContain('n\\"');
           if (language === "fa") expect(homeText).not.toContain("$");
-          await expect(page.locator(".nvbd-action-secondary")).toHaveCount(5);
+          await expect(page.locator(".nvbd-action-secondary")).toHaveCount(3);
           for (const tile of await page.locator(".nvbd-action-secondary").all()) {
             await expect(tile.locator("svg")).toBeVisible();
             await tile.click();
@@ -165,6 +165,10 @@ for (const language of ["fa", "en"] as const) {
           await nav.nth(1).click();
           await expect(nav.nth(1)).toHaveClass(/active/);
           await nav.nth(3).click();
+          await expect(nav.nth(3)).toHaveClass(/active/);
+          await expect(page.locator("main.nv-goals-screen")).toBeVisible();
+          await nav.nth(0).click();
+          await home.locator(".nv-p-insight").click();
           await expect(page.locator(".nf-report-actions")).toBeVisible();
           await nav.nth(4).click();
           await expect(nav.nth(4)).toHaveClass(/active/);
@@ -224,11 +228,11 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 1440, height: 900
         background: getComputedStyle(document.body).backgroundImage
       };
     });
+    await page.screenshot({ path: testInfo.outputPath(`personal-home-${viewport.width}x${viewport.height}.png`), fullPage: true });
     expect(measurements.appWidth).toBeLessThanOrEqual(480);
     expect(Math.abs(measurements.appLeft + measurements.appWidth / 2 - viewport.width / 2)).toBeLessThanOrEqual(1);
     expect(measurements.dockWidth).toBeLessThanOrEqual(480);
     expect(Math.abs(measurements.dockCenter - measurements.viewportCenter)).toBeLessThanOrEqual(1);
     expect(measurements.background).toContain("gradient");
-    await page.screenshot({ path: testInfo.outputPath(`personal-home-${viewport.width}x${viewport.height}.png`), fullPage: true });
   });
 }
